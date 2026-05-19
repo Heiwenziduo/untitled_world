@@ -1,0 +1,28 @@
+package com.github.nahnullscience.cypher_nexus.init
+
+import com.github.nahnullscience.cypher_nexus.CypherNexus
+import net.minecraft.core.registries.Registries
+import net.minecraft.world.item.CreativeModeTab
+import net.neoforged.neoforge.registries.DeferredRegister
+import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
+
+object ModTabs {
+    val DEFERRED_REGISTER: DeferredRegister<CreativeModeTab> =
+        DeferredRegister.create(Registries.CREATIVE_MODE_TAB, CypherNexus.MOD_ID)
+
+    fun register() {
+        DEFERRED_REGISTER.register(MOD_BUS)
+    }
+
+    val BASE_MODE_TAB = DEFERRED_REGISTER.register(CypherNexus.MOD_ID, { ->
+        CreativeModeTab.builder()
+            .title(CypherNexus.modTranslation("item_group"))
+            .icon { -> ModItems.BASIC_WAND.defaultInstance }
+            .displayItems { parameters, output ->
+                // add items while BuildCreativeModeTabContentsEvent is feasible too
+                output.accept { ModItems.BASIC_WAND }
+            }
+            .build()
+    })
+
+}
