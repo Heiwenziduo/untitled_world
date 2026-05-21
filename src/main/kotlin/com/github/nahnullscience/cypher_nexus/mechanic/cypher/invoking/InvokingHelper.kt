@@ -1,0 +1,141 @@
+package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
+
+import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataFrequent
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
+import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
+import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.Level
+
+/** cypher chain compiler */
+class InvokingHelper (
+    val level: Level,
+    val invoker: LivingEntity?,
+    val stack: ItemStack?,
+
+    val wandStats: WandDataInvariable,
+    val aoc: ArrayOfCyphers,
+    val data: HelperDataBundle,
+    /** direction doesn't have to be normalized */
+    val invokePosDire: PosDirePair,
+) {
+    val rootBlock = ProjectileStateBlock()
+    val states = HelperStateBundle()
+
+    init {
+        // define the order of bits go from right to left, which is inverse compare to the order of the cypherArray
+        // number 5L (0b...0101) represents the first and the third cyphers
+        if (data.deck == 0L) {
+            data.deck = aoc.bits()
+            data.discard = 0
+        }
+    }
+
+    fun start() {
+        // TODO triggers
+        while (data.draw >= 1) {
+            val canContinue = step()
+            if (!canContinue) break
+        }
+        rootBlock.release(level, invoker, invokePosDire)
+        hand2discard()
+
+        if (states.wrapped) {
+            // force a reload
+            data.index = 0
+            data.deck = 0
+            data.discard = aoc.bits()
+        }
+    }
+
+    fun step(): Boolean {
+        val cy = drawNext()
+        if (cy != null) {
+            cy.invokeInHand(this, rootBlock, data, states)
+            data.draw --
+            return true
+        }
+        return false
+    }
+
+    /** non-empty-cypher, null if deck is empty */
+    fun drawNext(): AbstractCypher? {
+        // find the index of the first '1' (last '0', in fact) starting from the right.
+        val drawIndex = data.deck.countTrailingZeroBits()
+        if (drawIndex >= aoc.size) return null
+        return draw(drawIndex)
+    }
+
+    /** non-empty */
+    private fun draw(index: Int): AbstractCypher? {
+        val cy = aoc[index]
+        println("draw [$cy], the ${index + 1}th cypher")
+        if (cy.isEmpty()) {
+            // this should not happen
+            CypherNexus.LOGGER.fatal("draw empty: $index in $aoc")
+            return null
+        }
+        if (data.manaCurrent < cy.manaDrain) {
+            println("mana not enough, [$cy] discards directly")
+            deck2discard(index)
+            return drawNext()
+        }
+        deck2hand(index)
+        data.manaCurrent -= cy.manaDrain
+        return cy
+    }
+
+    // ============== bit operations ===================================================
+    fun deck2hand(index: Int): AbstractCypher? {
+        val cy = aoc[index]
+        data.deck = data.deck and (1L shl index).inv()
+        data.hand = data.hand or (1L shl index)
+        return cy
+    }
+    fun hand2discard() {
+        data.discard = data.discard or data.hand
+        data.hand = 0
+    }
+    fun deck2discard(index: Int) {
+        data.deck = data.deck and (1L shl index).inv()
+        data.discard = data.discard or (1L shl index)
+    }
+    /** aka. wrap */
+    fun discard2deck() {
+        data.deck = data.deck or data.discard
+        data.discard = 0
+    }
+    // =================================================================================
+
+
+    data class HelperDataBundle (
+        var draw: Int,
+        var index: Int,
+        var delay: Int,
+        var recharge: Int,
+        var manaCurrent: Float,
+
+        var hand: Long = 0,
+        /** R -> L */
+        var deck: Long = 0,
+        var discard: Long = 0,
+    ) {
+        fun frequentData() = WandDataFrequent(manaCurrent, index, delay, recharge, deck, discard)
+        companion object {
+            fun of(draw: Int, frequent: WandDataFrequent): HelperDataBundle {
+                return HelperDataBundle(draw, frequent.index, frequent.delay, frequent.recharge, frequent.manaCurrent, 0, frequent.deck, frequent.discard)
+            }
+            fun of(invariable: WandDataInvariable, frequent: WandDataFrequent): HelperDataBundle {
+                return HelperDataBundle(invariable.chunkI.draw, frequent.index, invariable.chunkI.castDelay, frequent.recharge + invariable.chunkI.rechargeTime, frequent.manaCurrent, 0, frequent.deck, frequent.discard)
+            }
+        }
+    }
+
+    data class HelperStateBundle (
+        var wrapped: Boolean = false,
+        var alreadyRefreshed: Boolean = false,
+    )
+}

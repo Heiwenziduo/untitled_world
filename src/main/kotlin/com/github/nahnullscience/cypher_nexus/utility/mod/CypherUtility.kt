@@ -11,7 +11,7 @@ object CypherUtility {
         val a = opMap.getOrDefault(CypherAttributeOperation.ADD, CypherAttributeOperation.ADD.defaultValue)
         val m1 = opMap.getOrDefault(CypherAttributeOperation.MULTIPLY_BASE, CypherAttributeOperation.MULTIPLY_BASE.defaultValue)
         val m2 = opMap.getOrDefault(CypherAttributeOperation.MULTIPLY_TOTAL, CypherAttributeOperation.MULTIPLY_TOTAL.defaultValue)
-        val s = opMap[CypherAttributeOperation.SET]
+        val s = opMap[CypherAttributeOperation.SET_ALL]
         return s ?: ((base + a) * (m1 + 1) * m2)
     }
 

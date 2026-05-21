@@ -8,16 +8,16 @@ import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.FieryCyphe
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.PierceEntityCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.ArrowCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.EnderRecallCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher._TestModifier
+import com.github.nahnullscience.cypher_nexus.content.cypher._TestModifier
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.EnderTeleportationCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.SnowballCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.LlamaSpitCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.SpawnEggCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.static_projectile.ExplosionCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.CypherNotFoundException
+import com.github.nahnullscience.cypher_nexus.mechanic.exception.CypherNotFoundException
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher._TestProjectile
+import com.github.nahnullscience.cypher_nexus.content.cypher._TestProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import net.minecraft.core.Holder
@@ -121,8 +121,8 @@ object ModCyphers {
             5f,
             "bouncy"
         ).attribute(CypherAttributes.BOUNCE, CypherAttributeOperation.ADD, 5.0))
-    val NO_MORE_BOUNCE = registerCypher(SimpleModifier(0f, "no_more_bounce").attribute(CypherAttributes.BOUNCE, CypherAttributeOperation.SET, 0.0))
-    val NO_MORE_DAMAGE = registerCypher(SimpleModifier(0f, "no_more_damage").attribute(CypherAttributes.DAMAGE, CypherAttributeOperation.SET, 0.0))
+    val NO_MORE_BOUNCE = registerCypher(SimpleModifier(0f, "no_more_bounce").attribute(CypherAttributes.BOUNCE, CypherAttributeOperation.SET_ALL, 0.0))
+    val NO_MORE_DAMAGE = registerCypher(SimpleModifier(0f, "no_more_damage").attribute(CypherAttributes.DAMAGE, CypherAttributeOperation.SET_ALL, 0.0))
     val EXTEND_TIME = registerCypher(
         SimpleModifier(35f, "extend_time")
         .attribute(CypherAttributes.RECHARGE_TIME, CypherAttributeOperation.ADD, 4.0)
@@ -137,7 +137,7 @@ object ModCyphers {
     val DAEDALUS = registerCypher(DaedalusCypher)
     val NULLIFIER = registerCypher(
         SimpleModifier(44f, "nullifier")
-        .attribute(CypherAttributes.EXISTING, CypherAttributeOperation.SET, 1.0)
+        .attribute(CypherAttributes.EXISTING, CypherAttributeOperation.SET_ALL, 1.0)
         .attribute(CypherAttributes.CAST_DELAY, CypherAttributeOperation.ADD, -7.0)
         .attribute(CypherAttributes.RECHARGE_TIME, CypherAttributeOperation.ADD, -5.0))
 
@@ -159,4 +159,5 @@ object ModCyphers {
     // passive
 
     // other
+
 }

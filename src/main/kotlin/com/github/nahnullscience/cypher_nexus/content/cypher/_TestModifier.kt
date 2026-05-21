@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.mechanic.cypher
+package com.github.nahnullscience.cypher_nexus.content.cypher
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.entity.CypherProjectile
@@ -9,6 +9,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.Fi
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.HitEntityHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickBehaviorHook
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategoryRegistry
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 

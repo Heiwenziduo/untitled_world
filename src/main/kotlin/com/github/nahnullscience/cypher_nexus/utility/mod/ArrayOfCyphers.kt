@@ -1,75 +1,119 @@
 package com.github.nahnullscience.cypher_nexus.utility.mod
 
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategoryRegistry
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 
+private val AbstractCypher.isInvokable: Boolean
+    get() = isNotEmpty() && category != CypherCategoryRegistry.PASSIVE
+private val AbstractCypher.isPassive: Boolean
+    get() = isNotEmpty() && category == CypherCategoryRegistry.PASSIVE
+
 /** fixed length, cypher changeable, EmptyCypher autofill */
-class ArrayOfCyphers(val capacity: Int = 1) : Iterable<AbstractCypher> {
-    init {
-        // let's make sure capa > 0
-    }
-    constructor(list: List<AbstractCypher>) : this(list.size) {
-        list.withIndex().forEach { (i, cypher) -> _cyphers[i] = cypher }
-    }
-
-    val size = capacity
-
-    // An Array is naturally fixed-length and very fast!
-    // We fill it entirely with EmptyCypher upon creation.
+class ArrayOfCyphers(private val capacity: Int = 1) : Iterable<AbstractCypher> {
+    /** not empty and not "passive" */
+    private var _bitInvokable: Long = 0
+    private var _bitPassive: Long = 0
     private val _cyphers: Array<AbstractCypher> = Array(capacity) { EmptyCypher }
 
-    // Overriding the bracket operator allows you to do: myInventory[0]
-    operator fun get(index: Int): AbstractCypher {
-        return _cyphers[index]
+    companion object {
+        /** O(n) */
+        fun of(list: List<AbstractCypher?>) : ArrayOfCyphers = ArrayOfCyphers(list)
+
+        const val MAX_LENGTH = 64 // max length capped at a Long-bits count, guess this is quite enough
+    }
+    init {
+        // let's make sure capa > 0
+        require(capacity > 0 && capacity <= MAX_LENGTH)
+    }
+    /** O(n) */
+    constructor(list: List<AbstractCypher?>) : this(list.size) {
+        list.withIndex().forEach { (i, cypher) ->
+            if (cypher == null) return@forEach
+            _cyphers[i] = cypher
+
+            if (cypher.isInvokable) {
+                _bitInvokable = _bitInvokable or (1L shl i)
+            } else if (cypher.isPassive) {
+                _bitPassive = _bitPassive or (1L shl i)
+            }
+        }
     }
 
-    // Overriding allows you to do: myInventory[0] = FireballCypher()
-    operator fun set(index: Int, cypher: AbstractCypher?) {
-        // If someone tries to set a slot to null, we safely enforce the EmptyCypher rule!
-        _cyphers[index] = cypher ?: EmptyCypher
+    val size : Int
+        get() = capacity
+
+    // this allows index-get: myInventory[0]
+    operator fun get(index: Int): AbstractCypher = _cyphers[index]
+    // this allows for-loop
+    override fun iterator(): Iterator<AbstractCypher> = _cyphers.iterator()
+    // this allows index-set: myInventory[0] = FireballCypher()
+    operator fun set(index: Int, cypher0: AbstractCypher?) {
+        val cypher = cypher0 ?: EmptyCypher
+        _cyphers[index] = cypher
+
+        if (cypher.isInvokable) _bitInvokable = _bitInvokable or (1L shl index)
+        if (cypher.isPassive) _bitPassive = _bitPassive or (1L shl index)
+        if (cypher.isEmpty()) {
+            _bitInvokable = _bitInvokable and (1L shl index).inv()
+            _bitPassive = _bitPassive and (1L shl index).inv()
+        }
     }
     fun remove(index: Int) = set(index, null)
+    /** O(n) */
+    fun toList(): List<AbstractCypher> = _cyphers.toList()
+    fun copy(): ArrayOfCyphers = ArrayOfCyphers(_cyphers.toList())
 
     /** find the first Empty then replace that with given cypher
      * @return the replaced index, -1 if no empty */
     fun add(cypher: AbstractCypher) : Int {
-        // TODO
+        // O(1) due to _bit-s
+        val first = (_bitInvokable or _bitPassive).inv().countTrailingZeroBits()
+        if (first < capacity) {
+            set(first, cypher)
+            return first
+        }
         return -1
     }
 
     fun switch(i0: Int, i1: Int) {
-        if (i0 >= size || i1 >= size) return
+        if (i0 >= capacity || i1 >= capacity) return
         val t = this[i0]
-        this[i0] = this[i1]
+        this[i0] = this[i1] // this calls #set internally
         this[i1] = t
     }
 
-    // Allows you to use this class in a for-loop: for (cypher in myInventory)
-    override fun iterator(): Iterator<AbstractCypher> {
-        return _cyphers.iterator()
-    }
-
     fun clearAll() {
+        _bitInvokable = 0
+        _bitPassive = 0
         for (i in _cyphers.indices) {
             _cyphers[i] = EmptyCypher
         }
     }
 
-    fun getActiveCyphers(): List<AbstractCypher> {
-        return _cyphers.filter { it !is EmptyCypher }
+    /** gets a bit representation of cyphers, non-invokable set to 0 */
+    fun bits(): Long {
+        // O(1) due to _bit-s
+        return _bitInvokable
     }
 
-    fun toList(): List<AbstractCypher> = _cyphers.toList()
-
-    companion object {
-        fun of(list: List<AbstractCypher?>) : ArrayOfCyphers {
-            val arr = ArrayOfCyphers(list.size)
-            list.withIndex().forEach { (i, cypher) -> arr[i] = cypher }
-            return arr
+    fun getFirstInvokable(): AbstractCypher? {
+        val i = _bitInvokable.countTrailingZeroBits()
+        if (i < capacity) {
+            return _cyphers[i]
         }
+        return null
     }
+    fun getLastInvokable(): AbstractCypher? {
+        val i = 63 - _bitInvokable.countLeadingZeroBits()
+        if (i < capacity && i >= 0) {
+            return _cyphers[i]
+        }
+        return null
+    }
+
 
     override fun toString(): String {
-        return super.toString()
+        return _cyphers.toString()
     }
 }

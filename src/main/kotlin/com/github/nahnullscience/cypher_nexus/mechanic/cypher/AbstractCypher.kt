@@ -6,17 +6,16 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHookRegistr
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateBlock
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.ChatFormatting
 import net.minecraft.core.Holder
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.entity.Entity
-import net.minecraft.world.item.ItemStack
-import net.minecraft.world.level.Level
 
 /**
  *
@@ -67,12 +66,12 @@ sealed class AbstractCypher: IRegisterable {
         else CypherNexus.LOGGER.fatal("try add attribute ${holder.registeredName} while map is locked!")
         return this
     }
-    /**
-     * add Attributes to the helper
-     * */
-    fun addAttribute(helper: CypherInvokerHelper) {
-        helper.addAttribute(_attributeMap)
-    }
+//    /**
+//     * add Attributes to the helper
+//     * */
+//    fun addAttribute(helper: CypherInvokerHelper) {
+//        helper.addAttribute(_attributeMap)
+//    }
 
 
     protected open fun initializeData() {
@@ -93,8 +92,47 @@ sealed class AbstractCypher: IRegisterable {
 
 
     /** custom logic up to subclasses */
-    // TODO maybe change this to "hook"
-    open fun onInvokeServer(level: Level, caster: Entity?, stack: ItemStack?, helper: CypherInvokerHelper, wandLength: Float) {}
+//    open fun onInvokeServer(level: Level, caster: Entity?, stack: ItemStack?, helper: CypherInvokerHelper, wandLength: Float) {}
+
+    fun isEmpty() = this is EmptyCypher
+    fun isNotEmpty() = !isEmpty()
+
+    /** call super# unless you know what you are doing */
+    open fun invokeInHand(
+        helper: InvokingHelper,
+        block: ProjectileStateBlock,
+        data: InvokingHelper.HelperDataBundle,
+        states: InvokingHelper.HelperStateBundle
+    ) {
+        println("[$this] is invoked")
+        modifyState(helper, block)
+        var forwardState = block
+        if (this is AbstractProjectileCypher) {
+            forwardState = attachToBlock(helper, block)
+        }
+
+        for (i in 0..<draw) {
+            var cy = helper.drawNext()
+            if (cy == null) {
+                println("[$this] want a wrap")
+                helper.discard2deck() // warp
+                cy = helper.drawNext()
+            }
+//            data.manaCurrent -= cy?.manaDrain ?: 0f
+            cy?.invokeInHand(helper, forwardState, data, states)
+        }
+    }
+    open fun modifyState(helper: InvokingHelper, state: ProjectileStateBlock) {
+        _attributeMap.forEach { holder, cyMap ->
+            val stateMap = state.computedOperationMap.getOrPut(holder.value()) { HashMap() }
+            cyMap.forEach { operator, value ->
+                // TODO prune
+                if (operator != CypherAttributeOperation.BASE && operator != CypherAttributeOperation.SET_SELF) {
+                    stateMap.compute(operator) { op, v -> operator.cumulate(v?: operator.defaultValue, value) }
+                }
+            }
+        }
+    }
 
     // ============================================================================================================
 

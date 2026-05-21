@@ -1,7 +1,9 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.content.entity.CypherProjectile
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategoryRegistry
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateBlock
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.ItemStack
@@ -22,23 +24,15 @@ object EmptyCypher: AbstractProjectileCypher() {
 
     override fun createProjectile(
         level: Level,
-        helper: CypherInvokerHelper,
         invoker: LivingEntity?,
-        stack: ItemStack?,
         startPos: Vec3,
         direction: Vec3?,
-        invokeList: List<AbstractCypher>
-    ) {
+        shootState: ProjectileStateBlock,
+        payload: ProjectileStateBlock?
+    ): CypherProjectile {
         // do nothing
+        // FIXME should always skip this
+        return super.createProjectile(level, invoker, startPos, direction, shootState, payload)
     }
 
-    override fun onInvokeServer(
-        level: Level,
-        caster: Entity?,
-        stack: ItemStack?,
-        helper: CypherInvokerHelper,
-        wandLength: Float
-    ) {
-        // do nothing
-    }
 }

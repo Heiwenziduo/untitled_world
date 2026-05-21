@@ -43,7 +43,13 @@ enum class CypherAttributeOperation {
      * Force an attribute to become an invariable value,
      * will ignore other operations.
      * */
-    SET {
+    SET_ALL {
+        override fun cumulate(last: Double, new: Double): Double = new
+        override fun toString() = "="
+    },
+
+
+    SET_SELF { // TODO
         override fun cumulate(last: Double, new: Double): Double = new
         override fun toString() = "="
     },

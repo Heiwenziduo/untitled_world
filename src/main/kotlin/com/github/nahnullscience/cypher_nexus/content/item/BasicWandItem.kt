@@ -7,6 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPay
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
+import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResultHolder
 import net.minecraft.world.entity.Entity
@@ -32,17 +33,6 @@ open class BasicWandItem(
         .component(ModDataComponents.WAND_FREQUENT, WandDataFrequent.Companion.DEFAULT)
 ), IWandLike {
     override val isEditableWand = true
-
-    // test
-//    val testData: List<AbstractCypher> = listOf( // there should be a method to reach registry items here
-//        ModCyphers.HOMING.value(),
-//        ModCyphers.HOMING.value(),
-//        ModCyphers.SNOWBALL.value()
-//    )
-
-    init {
-
-    }
 
     override fun use(level: Level, player: Player, usedHand: InteractionHand): InteractionResultHolder<ItemStack> {
         val stack = player.getItemInHand(usedHand)
@@ -85,7 +75,8 @@ open class BasicWandItem(
             flag = true
         }
 
-        if (flag) stack.set(ModDataComponents.WAND_FREQUENT, WandDataFrequent(manaCurrent, index, delay, recharge,))
+        if (flag) stack.set(ModDataComponents.WAND_FREQUENT,
+            WandDataFrequent(manaCurrent, index, delay, recharge, frequent.deck, frequent.discard))
     }
 
     override fun getUseAnimation(stack: ItemStack): UseAnim {
@@ -93,19 +84,10 @@ open class BasicWandItem(
     }
 
     override fun getWandData(stack: ItemStack?, caster: LivingEntity?): IWandLike.WandDataBundle? {
-//        var stack0: ItemStack
-//        if (egg == null && living != null) stack0 = living.getItemInHand(InteractionHand.MAIN_HAND)
-        if (stack != null) {
+        if (stack != null && !stack.isEmpty) {
             val invariable = stack.get(ModDataComponents.WAND_INVARIABLE)
             val highPayload = stack.get(ModDataComponents.WAND_HIGH_PAYLOAD)
             val frequent = stack.get(ModDataComponents.WAND_FREQUENT)
-
-            // test
-//            val testData: List<AbstractCypher> = listOf(
-//                    ModCyphers.T_T_T_Modifier.value(),
-//                    ModCyphers.SNOWBALL.value()
-//                )
-//            val t = WandDataHighPayload(testData)
 
             if (invariable != null && highPayload != null && frequent != null)
                 return IWandLike.WandDataBundle(invariable, highPayload, frequent)
@@ -144,7 +126,7 @@ open class BasicWandItem(
             println("editWand: $stack")
             // TODO maybe we should use BasicWandItem instead?
             if (stack.item is IWandLike) {
-                stack.set(ModDataComponents.WAND_HIGH_PAYLOAD, WandDataHighPayload(list))
+                stack.set(ModDataComponents.WAND_HIGH_PAYLOAD, WandDataHighPayload(ArrayOfCyphers(list)))
             }
         }
 

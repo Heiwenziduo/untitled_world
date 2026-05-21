@@ -363,7 +363,7 @@ class CypherIndexScreen(
             currentInvariableData = currentStack?.get(ModDataComponents.WAND_INVARIABLE)
             val highPayload = currentStack?.get(ModDataComponents.WAND_HIGH_PAYLOAD)
             if (highPayload != null) {
-                currentEditCyphers = ArrayOfCyphers(highPayload.cypherList)
+                currentEditCyphers = highPayload.cypherList.copy()
             }
         }
         println("pickwand: $currentEditCyphers") // TODO

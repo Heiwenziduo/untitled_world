@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherInvokerHelper
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataFrequent
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
@@ -58,8 +58,8 @@ interface IWandLike {
         CypherNexus.LOGGER.debug("read from data component: {}\n\n\n", wandData)
 
 
-        val bundle = CypherInvokerHelper.HelperDataBundle(invariable.chunkI.draw, frequent)
-        val helper = CypherInvokerHelper(
+        val bundle = InvokingHelper.HelperDataBundle.of(invariable, frequent)
+        val helper = InvokingHelper(
             level, invoker, stack, invariable, cypherList, bundle,
             getInvokePosDire(level, invoker, invariable.chunkF.wandLength),
         )

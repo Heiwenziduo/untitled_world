@@ -2,8 +2,8 @@ package com.github.nahnullscience.cypher_nexus.client.cypher.visualizer
 
 import com.github.nahnullscience.cypher_nexus.client.cypher.ICypherVisualizer
 import com.github.nahnullscience.cypher_nexus.content.entity.CypherProjectile
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher._TestModifier
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher._TestProjectile
+import com.github.nahnullscience.cypher_nexus.content.cypher._TestModifier
+import com.github.nahnullscience.cypher_nexus.content.cypher._TestProjectile
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderType

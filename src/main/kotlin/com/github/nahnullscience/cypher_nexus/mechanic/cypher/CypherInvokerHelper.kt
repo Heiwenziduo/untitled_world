@@ -21,6 +21,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 /** a modifier carrier created when user manually cast, or a trigger-cypher is fired */
+@Deprecated("InvokerHelper")
 class CypherInvokerHelper(
     val level: Level,
     val invoker: LivingEntity?,
@@ -163,14 +164,14 @@ class CypherInvokerHelper(
         for ((i, c) in projCyList.withIndex()) {
             val pair = invokeHookContainer.cumulateHooks(CypherBehaviorHookRegistry.INVOKE_REDIRECT_POS, invokePosDire)
             { h, l, pair -> h.redirectPosDireServer(level as ServerLevel, invoker, l, pair, i) }
-            invokeProjectile(c, invokeList, pair)
+//            invokeProjectile(c, invokeList, pair)
         }
     }
 
     /***/
     private fun preInvoke(cypher: AbstractCypher) {
-        cypher.addAttribute(this) // computedMap will include both Consumer-attr(BASE) and modifier-attr
-        cypher.onInvokeServer(level, invoker, stack, this, wandStats.chunkF.wandLength)
+//        cypher.addAttribute(this) // computedMap will include both Consumer-attr(BASE) and modifier-attr
+//        cypher.onInvokeServer(level, invoker, stack, this, wandStats.chunkF.wandLength)
         invokeHookContainer.add(cypher)
 
         when(cypher) {
@@ -182,19 +183,19 @@ class CypherInvokerHelper(
         }
     }
     private fun invokeProjectile(cypher: AbstractProjectileCypher, invokes: List<AbstractCypher>, posDirePair: PosDirePair) {
-        cypher.createProjectile(level, this, invoker, stack, posDirePair, invokes)
+//        cypher.createProjectile(level, this, invoker, stack, posDirePair, invokes)
     }
 
-    fun duplicate(source1: InvokeSource, helperData1: HelperDataBundle? = null) : CypherInvokerHelper = CypherInvokerHelper(
-        level = level,
-        invoker = invoker,
-        stack = stack,
-        wandStats = wandStats,
-        cypherList = cypherList,
-        helperData = helperData1?: helperData,
-        invokePosDire = invokePosDire,
-        source = source1
-    )
+//    fun duplicate(source1: InvokeSource, helperData1: HelperDataBundle? = null) : CypherInvokerHelper = CypherInvokerHelper(
+//        level = level,
+//        invoker = invoker,
+//        stack = stack,
+//        wandStats = wandStats,
+//        cypherList = cypherList,
+//        helperData = helperData1?: helperData,
+//        invokePosDire = invokePosDire,
+//        source = source1
+//    )
 
 
 
@@ -206,7 +207,7 @@ class CypherInvokerHelper(
         var manaCurrent: Float,
     ) {
         constructor(draw: Int, data: WandDataFrequent) : this(draw, data.index, data.delay, data.recharge, data.manaCurrent)
-        fun frequentData() = WandDataFrequent(manaCurrent, index, delay, recharge,)
+        fun frequentData() = WandDataFrequent(manaCurrent, index, delay, recharge, 0, 0)
 
         fun withDraw(draw: Int) = HelperDataBundle(draw, index, delay, recharge, manaCurrent)
     }

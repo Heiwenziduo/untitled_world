@@ -12,15 +12,15 @@ abstract class ProjectileCypher(
 
     override val category = CypherCategoryRegistry.PROJECTILE
 
-    final override fun createProjectile(
-        level: Level,
-        helper: CypherInvokerHelper,
-        invoker: LivingEntity?,
-        stack: ItemStack?,
-        startPos: Vec3,
-        direction: Vec3?,
-        invokeList: List<AbstractCypher>
-    ) {
-        super.createProjectile(level, helper, invoker, stack, startPos, direction, invokeList)
-    }
+//    final override fun createProjectile(
+//        level: Level,
+//        helper: CypherInvokerHelper,
+//        invoker: LivingEntity?,
+//        stack: ItemStack?,
+//        startPos: Vec3,
+//        direction: Vec3?,
+//        invokeList: List<AbstractCypher>
+//    ) {
+//        super.createProjectile(level, helper, invoker, stack, startPos, direction, invokeList)
+//    }
 }

@@ -1,8 +1,9 @@
-package com.github.nahnullscience.cypher_nexus.mechanic.cypher
+package com.github.nahnullscience.cypher_nexus.content.cypher
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategoryRegistry
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
 
 object _TestProjectile: ProjectileCypher(
     manaDrain = 5f

@@ -10,7 +10,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 
 data class ServerboundEditWandCyphers(
     val uuid: String,
-    val cyphers : List<AbstractCypher>
+    val cyphers : List<AbstractCypher> // TODO use AOC instead
 ) : CustomPacketPayload {
     override fun type() = TYPE
 
