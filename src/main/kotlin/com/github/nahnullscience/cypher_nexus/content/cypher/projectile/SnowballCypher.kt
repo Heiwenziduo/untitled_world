@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.projectile
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.entity.CypherProjectile
+import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
 import net.minecraft.core.particles.ParticleTypes
@@ -18,7 +18,7 @@ object SnowballCypher : ProjectileCypher(
         addAttribute(CypherAttributes.GRAVITY_FACTOR, 0.03)
     }
 
-    override fun visualEffectOnHit(level: Level, projectile: CypherProjectile) {
+    override fun visualEffectOnHit(level: Level, projectile: AbstractCypherProjectile) {
         val pos = projectile.position()
         // check: ItemParticleOption(ParticleTypes.ITEM, itemstack), and ParticleTypes.ITEM_SNOWBALL
         for (i in 0..7) {

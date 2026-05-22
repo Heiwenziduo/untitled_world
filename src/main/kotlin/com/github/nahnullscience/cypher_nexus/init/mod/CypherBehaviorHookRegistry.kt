@@ -2,11 +2,14 @@ package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.InvokeRedirectPosHook
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BeforeDiscardHook
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.FirstTickHook
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.HitEntityHook
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickBehaviorHook
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule.HookType
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule.HookType.INVOKING
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule.HookType.PROJECTILE
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.HookInvokeRedirectPosServer
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.HookBeforeDiscardBoth
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.HookFirstTickBoth
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.HookHitEntityServer
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.HookTickBehaviorBoth
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceKey
 import net.neoforged.neoforge.registries.DeferredRegister
@@ -27,15 +30,15 @@ object CypherBehaviorHookRegistry {
         DEFERRED_REGISTER.register(MOD_BUS)
     }
 
-    fun <T : Any> registerHook(path: String, hook: KClass<T>, target: HookModule.HookType): Supplier<out HookModule<T>> {
-        // I find checking DeferredHolder<R, T>'s type is annoying...
-        return DEFERRED_REGISTER.register(path) { resource -> HookModule(resource, hook, type = target) }
+    fun <T : Any> registerHook(path: String, hook: KClass<T>, target: HookType, sync: Boolean): Supplier<out HookModule<T>> {
+        // checking DeferredHolder<R, T>'s type is annoying...
+        return DEFERRED_REGISTER.register(path) { resource -> HookModule(resource, hook, sync = sync, type = target) }
     }
 
-    val INVOKE_REDIRECT_POS = registerHook("invoke_redirect_pos", InvokeRedirectPosHook::class, HookModule.HookType.INVOKING)
+    val INVOKE_REDIRECT_POS_SERVER = registerHook("invoke_redirect_pos", HookInvokeRedirectPosServer::class, INVOKING, false)
 
-    val BEFORE_DISCARD = registerHook("before_discard", BeforeDiscardHook::class, HookModule.HookType.PROJECTILE)
-    val FIRST_TICK = registerHook("first_tick", FirstTickHook::class, HookModule.HookType.PROJECTILE)
-    val HIT_ENTITY = registerHook("hit_entity", HitEntityHook::class, HookModule.HookType.PROJECTILE)
-    val TICK_BEHAVIOR = registerHook("tick_behavior", TickBehaviorHook::class, HookModule.HookType.PROJECTILE)
+    val HIT_ENTITY_SERVER = registerHook("hit_entity", HookHitEntityServer::class, PROJECTILE, false)
+    val BEFORE_DISCARD_BOTH = registerHook("before_discard", HookBeforeDiscardBoth::class, PROJECTILE, true)
+    val FIRST_TICK_BOTH = registerHook("first_tick", HookFirstTickBoth::class, PROJECTILE, true)
+    val TICK_BEHAVIOR_BOTH = registerHook("tick_behavior", HookTickBehaviorBoth::class, PROJECTILE, true)
 }

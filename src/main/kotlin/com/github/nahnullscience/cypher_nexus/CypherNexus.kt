@@ -111,6 +111,6 @@ object CypherNexus {
 
     @SubscribeEvent
     private fun onServerStarting(event: ServerStartingEvent) {
-        LOGGER.info("HELLO from server starting")
+        // LOGGER.info("HELLO from server starting")
     }
 }

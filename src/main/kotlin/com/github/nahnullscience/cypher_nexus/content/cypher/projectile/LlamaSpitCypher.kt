@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.projectile
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.entity.CypherProjectile
+import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
@@ -22,7 +22,7 @@ object LlamaSpitCypher : ProjectileCypher(
         addAttribute(CypherAttributes.CRIT_CHANCE, CypherAttributeOperation.ADD,0.05)
     }
 
-    override fun visualEffectOnHit(level: Level, projectile: CypherProjectile) {
+    override fun visualEffectOnHit(level: Level, projectile: AbstractCypherProjectile) {
         val pos = projectile.position()
 
     }

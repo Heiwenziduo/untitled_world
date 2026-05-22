@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.init
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.entity.CypherProjectile
+import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
@@ -17,9 +17,9 @@ object ModEntities {
         DEFERRED_REGISTER.register(MOD_BUS)
     }
 
-    val CYPHER_PROJECTILE: Supplier<EntityType<CypherProjectile>> =
+    val CYPHER_PROJECTILE: Supplier<EntityType<AbstractCypherProjectile>> =
         DEFERRED_REGISTER.register("cypher_projectile") { resource ->
-            EntityType.Builder.of({ t, l -> CypherProjectile(t, l) }, MobCategory.MISC)
+            EntityType.Builder.of({ t, l -> AbstractCypherProjectile(t, l) }, MobCategory.MISC)
                 .sized(0.125f, 0.125f)
                 // Prevents the entity from being saved to disk.
                 .noSave()

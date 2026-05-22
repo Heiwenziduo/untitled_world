@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.client.cypher.visualizer
 
 import com.github.nahnullscience.cypher_nexus.client.cypher.ICypherVisualizer
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.ArrowCypher
-import com.github.nahnullscience.cypher_nexus.content.entity.CypherProjectile
+import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import com.mojang.math.Axis
@@ -20,7 +20,7 @@ object ArrowVi : ICypherVisualizer {
 
     /** {net.minecraft.client.renderer.entity.ArrowRenderer} */
     override fun render(
-        projectile: CypherProjectile,
+        projectile: AbstractCypherProjectile,
         entityYaw: Float,
         partialTick: Float,
         poseStack: PoseStack,

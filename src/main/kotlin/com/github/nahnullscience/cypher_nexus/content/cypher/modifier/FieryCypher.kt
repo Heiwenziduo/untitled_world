@@ -1,30 +1,25 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.entity.CypherProjectile
+import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.HitEntityHook
-import net.minecraft.world.entity.Entity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.HookHitEntityServer
 import net.minecraft.world.level.Level
-import kotlin.math.min
+import net.minecraft.world.phys.HitResult
 
 object FieryCypher : ModifierCypher(
     manaDrain = 5f
-), HitEntityHook {
+), HookHitEntityServer {
     override val resource = CypherNexus.modResource("fiery")
     init {
         addFlag(CypherFlags.WITH_FIRE)
     }
-    override fun onHitEntityServer(
-        level: Level,
-        projectile: CypherProjectile,
-        strength: Int,
-        target: Entity
-    ) {
+    override fun onHitServer(level: Level, projectile: AbstractCypherProjectile, strength: Int, result: HitResult) {
 //        if (target is LivingEntity) {
 //            target.hurt()
 //        }
-        target.remainingFireTicks = min(target.remainingFireTicks + 100, 300)
+        // TODO
+        // target.remainingFireTicks = min(target.remainingFireTicks + 100, 300)
     }
 }

@@ -1,23 +1,23 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.projectile
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.entity.CypherProjectile
+import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BeforeDiscardHook
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.HookBeforeDiscardBoth
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.level.Level
 
 object EnderTeleportationCypher : ProjectileCypher(
     manaDrain = 20f
-), BeforeDiscardHook {
+), HookBeforeDiscardBoth {
     override val resource = CypherNexus.modResource("ender_teleportation")
     override fun beforeDiscardBoth(
         level: Level,
-        projectile: CypherProjectile,
+        projectile: AbstractCypherProjectile,
         strength: Int,
-        reason: CypherProjectile.DiscardReason
+        reason: AbstractCypherProjectile.DiscardReason
     ) {
         val pos = projectile.position()
         if (!level.isClientSide) {

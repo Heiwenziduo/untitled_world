@@ -32,4 +32,7 @@ object ModDataSerializer {
     val CYPHER_LIST_DATA: DeferredHolder<EntityDataSerializer<*>, EntityDataSerializer<List<AbstractCypher>>> =
         DEFERRED_REGISTER.register("cypher_list_data", )
         { t -> EntityDataSerializer.forValueType(CNCodecs.CYPHER_LIST_STREAM) }
+
+    // TODO
+    val HOOK_CONTAINER = null
 }

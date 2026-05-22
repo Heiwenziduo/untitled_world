@@ -1,20 +1,20 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.static_projectile
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.entity.CypherProjectile
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BeforeDiscardHook
+import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.HookBeforeDiscardBoth
 import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
 
 object ExplosionCypher : AbstractStaticSummoner(
-    manaDrain = 20f
-), BeforeDiscardHook {
+    manaDrain = 80f
+), HookBeforeDiscardBoth {
     override val resource = CypherNexus.modResource("explosion")
     override fun beforeDiscardBoth(
         level: Level,
-        projectile: CypherProjectile,
+        projectile: AbstractCypherProjectile,
         strength: Int,
-        reason: CypherProjectile.DiscardReason
+        reason: AbstractCypherProjectile.DiscardReason
     ) {
         if (!level.isClientSide) {
             val pos = projectile.position()

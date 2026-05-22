@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.client.cypher.visualizer
 
 import com.github.nahnullscience.cypher_nexus.client.cypher.ICypherVisualizer
-import com.github.nahnullscience.cypher_nexus.content.entity.CypherProjectile
+import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.content.cypher._TestModifier
 import com.github.nahnullscience.cypher_nexus.content.cypher._TestProjectile
 import com.mojang.blaze3d.vertex.PoseStack
@@ -19,7 +19,7 @@ object TestVis {
     object Modifier : ICypherVisualizer {
         override fun cypher() = _TestModifier
         override fun render(
-            projectile: CypherProjectile,
+            projectile: AbstractCypherProjectile,
             entityYaw: Float,
             partialTick: Float,
             poseStack: PoseStack,
@@ -48,7 +48,7 @@ object TestVis {
         override fun cypher() = _TestProjectile
         val blockState: Block = Blocks.STONE
         override fun render(
-            projectile: CypherProjectile,
+            projectile: AbstractCypherProjectile,
             entityYaw: Float,
             partialTick: Float,
             poseStack: PoseStack,

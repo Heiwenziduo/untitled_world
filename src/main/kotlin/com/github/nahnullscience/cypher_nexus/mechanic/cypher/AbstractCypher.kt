@@ -40,11 +40,7 @@ sealed class AbstractCypher: IRegisterable {
         hookModules.filter { it.hook.isInstance(this) }
     }
 
-    private var _initLock = false // this seems unnecessary
-
     abstract val category: Holder<CypherCategory>
-    abstract override val resource: ResourceLocation
-
     init {
         initializeData()
     }
@@ -59,36 +55,21 @@ sealed class AbstractCypher: IRegisterable {
      * add Attributes with specific operator
      * */
     protected fun addAttribute(holder: Holder<CypherAttribute>, operator: CypherAttributeOperation, value: Double?): AbstractCypher {
-        if (!_initLock) {
-            val map = _attributeMap.getOrPut(holder) { HashMap() }
-            if (value != null) map.compute(operator) { k,v -> operator.cumulate(v?: operator.defaultValue, value) }
-        }
-        else CypherNexus.LOGGER.fatal("try add attribute ${holder.registeredName} while map is locked!")
+        val map = _attributeMap.getOrPut(holder) { HashMap() }
+        if (value != null) map.compute(operator) { k,v -> operator.cumulate(v?: operator.defaultValue, value) }
         return this
     }
-//    /**
-//     * add Attributes to the helper
-//     * */
-//    fun addAttribute(helper: CypherInvokerHelper) {
-//        helper.addAttribute(_attributeMap)
-//    }
-
+    protected fun addFlag(flags: CypherFlags): AbstractCypher {
+        _flag = _flag or flags.value
+        return this
+    }
 
     protected open fun initializeData() {
         // TODO: read from json
     }
 
-    /**
-     * register a hook to modifier projectile-AI at specific moments
-     * */
-//    protected fun registerHooks(hooks: Supplier<out HookModule<*>>) {
-//        if (!_initLock) _hookList.add(hooks)
-//    }
 
-    protected fun addFlag(flags: CypherFlags): AbstractCypher {
-        _flag = _flag or flags.value
-        return this
-    }
+
 
 
     /** custom logic up to subclasses */
@@ -103,12 +84,13 @@ sealed class AbstractCypher: IRegisterable {
         block: ProjectileStateBlock,
         data: InvokingHelper.HelperDataBundle,
         states: InvokingHelper.HelperStateBundle
+        // TODO invoke source
     ) {
         println("[$this] is invoked")
         modifyState(helper, block)
         var forwardState = block
         if (this is AbstractProjectileCypher) {
-            forwardState = attachToBlock(helper, block)
+            forwardState = addToState(helper, block)
         }
 
         for (i in 0..<draw) {
@@ -118,7 +100,6 @@ sealed class AbstractCypher: IRegisterable {
                 helper.discard2deck() // warp
                 cy = helper.drawNext()
             }
-//            data.manaCurrent -= cy?.manaDrain ?: 0f
             cy?.invokeInHand(helper, forwardState, data, states)
         }
     }
@@ -131,6 +112,11 @@ sealed class AbstractCypher: IRegisterable {
                     stateMap.compute(operator) { op, v -> operator.cumulate(v?: operator.defaultValue, value) }
                 }
             }
+        }
+        if (this is AbstractNonProjectileCypher) {
+            // hooks on NonProjectile affect the Block, hooks on Projectile only affect itself
+            state.attachHooks(this)
+            state.enableFlags(flag)
         }
     }
 

@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.client.cypher.visualizer.modifier
 
 import com.github.nahnullscience.cypher_nexus.client.cypher.ICypherVisualizer
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.FieryCypher
-import com.github.nahnullscience.cypher_nexus.content.entity.CypherProjectile
+import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.block.BlockRenderDispatcher
@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.entity.ItemRenderer
 object FieryVi : ICypherVisualizer {
     override fun cypher() = FieryCypher
     override fun render(
-        projectile: CypherProjectile,
+        projectile: AbstractCypherProjectile,
         entityYaw: Float,
         partialTick: Float,
         poseStack: PoseStack,

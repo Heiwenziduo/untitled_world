@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.client.cypher.visualizer
 
 import com.github.nahnullscience.cypher_nexus.client.cypher.ICypherVisualizer
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.EnderTeleportationCypher
-import com.github.nahnullscience.cypher_nexus.content.entity.CypherProjectile
+import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
@@ -18,7 +18,7 @@ object EnderTeleportationVi : ICypherVisualizer.IBasicItemVisualizer {
     override val stack = ItemStack(Items.ENDER_PEARL)
 
     override fun render(
-        projectile: CypherProjectile,
+        projectile: AbstractCypherProjectile,
         entityYaw: Float,
         partialTick: Float,
         poseStack: PoseStack,

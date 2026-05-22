@@ -1,6 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.client.cypher
 
-import com.github.nahnullscience.cypher_nexus.content.entity.CypherProjectile
+import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
@@ -17,7 +17,7 @@ import net.neoforged.api.distmarker.OnlyIn
 interface ICypherVisualizer {
     fun cypher(): AbstractCypher
     fun render(
-        projectile: CypherProjectile,
+        projectile: AbstractCypherProjectile,
         entityYaw: Float,
         partialTick: Float,
         poseStack: PoseStack,
@@ -31,7 +31,7 @@ interface ICypherVisualizer {
     interface IBasicItemVisualizer: ICypherVisualizer {
         val stack: ItemStack
         override fun render(
-            projectile: CypherProjectile,
+            projectile: AbstractCypherProjectile,
             entityYaw: Float,
             partialTick: Float,
             poseStack: PoseStack,

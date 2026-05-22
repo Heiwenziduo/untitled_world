@@ -1,35 +1,35 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.projectile
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.entity.CypherProjectile
+import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BeforeDiscardHook
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.FirstTickHook
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.HookBeforeDiscardBoth
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.HookFirstTickBoth
 import net.minecraft.world.level.Level
 
 object EnderRecallCypher : ProjectileCypher(
     manaDrain = 25f
-), BeforeDiscardHook, FirstTickHook {
+), HookBeforeDiscardBoth, HookFirstTickBoth {
     override val resource = CypherNexus.modResource("ender_recall")
     override fun beforeDiscardBoth(
         level: Level,
-        projectile: CypherProjectile,
+        projectile: AbstractCypherProjectile,
         strength: Int,
-        reason: CypherProjectile.DiscardReason
+        reason: AbstractCypherProjectile.DiscardReason
     ) {
         EnderTeleportationCypher.beforeDiscardBoth(level, projectile, strength, reason)
     }
 
     override fun firstTickBoth(
         level: Level,
-        projectile: CypherProjectile,
+        projectile: AbstractCypherProjectile,
         strength: Int
     ) {
         if (!level.isClientSide) {
             val pos = projectile.position()
-            val teleportation = CypherProjectile.Companion.from(level, EnderTeleportationCypher, projectile.owner, )
+            val teleportation = AbstractCypherProjectile.Companion.from(level, EnderTeleportationCypher, projectile.owner, )
             teleportation.setPos(pos)
             teleportation.existing = 100 // recall after 5seconds, at most
             teleportation.gravity = 0.01f

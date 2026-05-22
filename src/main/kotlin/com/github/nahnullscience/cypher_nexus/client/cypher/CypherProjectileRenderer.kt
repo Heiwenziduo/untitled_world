@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.client.cypher
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.entity.CypherProjectile
+import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.block.BlockRenderDispatcher
@@ -15,12 +15,12 @@ import net.neoforged.api.distmarker.OnlyIn
 @OnlyIn(Dist.CLIENT)
 class CypherProjectileRenderer(
     context: EntityRendererProvider.Context
-) : EntityRenderer<CypherProjectile>(context) {
+) : EntityRenderer<AbstractCypherProjectile>(context) {
     private val itemRenderer: ItemRenderer = context.itemRenderer
     private val blockRenderer: BlockRenderDispatcher = context.blockRenderDispatcher
 
     override fun render(
-        projectile: CypherProjectile,
+        projectile: AbstractCypherProjectile,
         entityYaw: Float,
         partialTick: Float,
         poseStack: PoseStack,
@@ -30,12 +30,12 @@ class CypherProjectileRenderer(
         // super.render(projectile, entityYaw, partialTick, poseStack, bufferSource, packedLight)
 
         poseStack.pushPose()
-        // use which egg depends on the visualizer implementation
-        for (modifier in projectile.invokeList) {
-            CypherVisualizerRegistry.get(modifier)?.render(
-                projectile, entityYaw, partialTick, poseStack, bufferSource, packedLight, itemRenderer, blockRenderer, entityRenderDispatcher
-            )
-        }
+        // use which egg depends on the visualizer implementation // ??
+//        for (modifier in projectile.invokeList) {
+//            CypherVisualizerRegistry.get(modifier)?.render(
+//                projectile, entityYaw, partialTick, poseStack, bufferSource, packedLight, itemRenderer, blockRenderer, entityRenderDispatcher
+//            )
+//        }
         CypherVisualizerRegistry.get(projectile.cypher)?.render(
             projectile, entityYaw, partialTick, poseStack, bufferSource, packedLight, itemRenderer, blockRenderer, entityRenderDispatcher
         )
@@ -44,7 +44,7 @@ class CypherProjectileRenderer(
     }
 
 
-    override fun getTextureLocation(entity: CypherProjectile): ResourceLocation {
+    override fun getTextureLocation(entity: AbstractCypherProjectile): ResourceLocation {
         return CypherNexus.modResource("textures/entity/some_texture.png")
     }
 }

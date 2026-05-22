@@ -7,7 +7,7 @@ import kotlin.reflect.KClass
 class HookModule <HOOK : Any> (
     override val resource: ResourceLocation,
     val hook: KClass<HOOK>,
-    val sync: Boolean = true,
+    val sync: Boolean,
     val type: HookType
 ): IRegisterable {
 
@@ -16,7 +16,7 @@ class HookModule <HOOK : Any> (
     }
 
     enum class HookType {
-        INVOKING,
+        INVOKING, // FIXME necessary? since invoking process always on server
         PROJECTILE
     }
 }

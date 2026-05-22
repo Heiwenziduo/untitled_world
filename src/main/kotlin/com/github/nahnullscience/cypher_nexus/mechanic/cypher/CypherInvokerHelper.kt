@@ -47,7 +47,7 @@ class CypherInvokerHelper(
     private val projCyList = mutableListOf<AbstractProjectileCypher>()
 
     override var enabledFlags: Int = 0
-    val invokeHookContainer = HookContainer(HookModule.HookType.INVOKING)
+    val invokeHookContainer = HookContainer()
     private var _recurDepth = 0
     val recurDepth
         get() = _recurDepth
@@ -162,8 +162,8 @@ class CypherInvokerHelper(
         // if (projCyList.isEmpty()) return
         invokeList = invokeListTmp.toList()
         for ((i, c) in projCyList.withIndex()) {
-            val pair = invokeHookContainer.cumulateHooks(CypherBehaviorHookRegistry.INVOKE_REDIRECT_POS, invokePosDire)
-            { h, l, pair -> h.redirectPosDireServer(level as ServerLevel, invoker, l, pair, i) }
+//            val pair = invokeHookContainer.cumulateHooks(CypherBehaviorHookRegistry.INVOKE_REDIRECT_POS, invokePosDire)
+//            { h, l, pair -> h.redirectPosDireServer(level as ServerLevel, invoker, l, pair, i) }
 //            invokeProjectile(c, invokeList, pair)
         }
     }

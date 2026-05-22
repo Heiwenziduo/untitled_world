@@ -1,12 +1,12 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.entity.CypherProjectile
+import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategoryRegistry
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateBlock
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 
@@ -24,15 +24,17 @@ object EmptyCypher: AbstractProjectileCypher() {
 
     override fun createProjectile(
         level: Level,
-        invoker: LivingEntity?,
+        invoker: Entity?,
         startPos: Vec3,
         direction: Vec3?,
         shootState: ProjectileStateBlock,
-        payload: ProjectileStateBlock?
-    ): CypherProjectile {
+        payload: ProjectileStateBlock?,
+        parentHooks: HookContainer?
+    ): AbstractCypherProjectile {
         // do nothing
         // FIXME should always skip this
-        return super.createProjectile(level, invoker, startPos, direction, shootState, payload)
+        CypherNexus.LOGGER.debug("Empty#createProjectile is called.")
+        return super.createProjectile(level, invoker, startPos, direction, shootState, payload, null)
     }
 
 }
