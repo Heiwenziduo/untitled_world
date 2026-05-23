@@ -1,25 +1,15 @@
 package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.SimpleModifier
-import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.HomingCypher
-import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.DaedalusCypher
-import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.FieryCypher
-import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.PierceEntityCypher
-import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.ArrowCypher
-import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.EnderRecallCypher
-import com.github.nahnullscience.cypher_nexus.content.cypher._TestModifier
-import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.EnderTeleportationCypher
-import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.SnowballCypher
-import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.LlamaSpitCypher
-import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.SpawnEggCypher
+import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.*
+import com.github.nahnullscience.cypher_nexus.content.cypher.other.AddTrigger
+import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.static_projectile.ExplosionCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.exception.CypherNotFoundException
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
-import com.github.nahnullscience.cypher_nexus.content.cypher._TestProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
+import com.github.nahnullscience.cypher_nexus.mechanic.exception.CypherNotFoundException
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceKey
@@ -54,9 +44,6 @@ object ModCyphers {
         return c
     }
 
-    // test things
-    val T_T_T_Projectile = registerCypher(_TestProjectile)
-    val T_T_T_Modifier = registerCypher(_TestModifier)
 
     // technical
     val EMPTY_CYPHER = registerCypher(EmptyCypher)
@@ -159,5 +146,5 @@ object ModCyphers {
     // passive
 
     // other
-
+    val ADD_TRIGGER = registerCypher(AddTrigger)
 }

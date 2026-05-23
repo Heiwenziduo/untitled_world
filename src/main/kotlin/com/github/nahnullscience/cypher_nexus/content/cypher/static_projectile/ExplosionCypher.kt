@@ -2,13 +2,13 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.static_projectile
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.HookBeforeDiscardBoth
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothBeforeDiscardHook
 import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
 
 object ExplosionCypher : AbstractStaticSummoner(
     manaDrain = 80f
-), HookBeforeDiscardBoth {
+), BothBeforeDiscardHook {
     override val resource = CypherNexus.modResource("explosion")
     override fun beforeDiscardBoth(
         level: Level,

@@ -4,9 +4,9 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategoryRegistry
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateBlock
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 
@@ -27,14 +27,14 @@ object EmptyCypher: AbstractProjectileCypher() {
         invoker: Entity?,
         startPos: Vec3,
         direction: Vec3?,
-        shootState: ProjectileStateBlock,
-        payload: ProjectileStateBlock?,
+        shootState: ProjectileStateChunk,
+        node: ProjectileNode,
         parentHooks: HookContainer?
     ): AbstractCypherProjectile {
         // do nothing
         // FIXME should always skip this
         CypherNexus.LOGGER.debug("Empty#createProjectile is called.")
-        return super.createProjectile(level, invoker, startPos, direction, shootState, payload, null)
+        return super.createProjectile(level, invoker, startPos, direction, shootState, node, null)
     }
 
 }

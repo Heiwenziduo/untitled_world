@@ -6,17 +6,19 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAt
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateBlock
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import net.minecraft.core.Holder
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
+import kotlin.reflect.KClass
 
 abstract class AbstractProjectileCypher: AbstractCypher() {
-//    abstract val projectile: KClass<CypherProjectile>
-    open fun addToState(helper: InvokingHelper, state: ProjectileStateBlock): ProjectileStateBlock {
+    // TODO
+    //open val projectile: KClass<AbstractCypherProjectile> = AbstractCypherProjectile::class
+    open fun addToStateChunk(helper: InvokingHelper, chunk: ProjectileStateChunk): ProjectileStateChunk {
         val node = ProjectileNode(this, null)
-        return state.addProjectile(node) // forward state
+        return chunk.addProjectile(node) // forward state
     }
 
     open fun createProjectile(
@@ -24,11 +26,11 @@ abstract class AbstractProjectileCypher: AbstractCypher() {
         invoker: Entity?,
         startPos: Vec3,
         direction: Vec3?,
-        shootState: ProjectileStateBlock,
-        payload: ProjectileStateBlock?,
+        shootState: ProjectileStateChunk,
+        node: ProjectileNode,
         parentHooks: HookContainer?
     ): AbstractCypherProjectile {
-        val projectile = AbstractCypherProjectile(level, invoker, this, direction, shootState, payload, parentHooks)
+        val projectile = AbstractCypherProjectile(level, invoker, this, direction, shootState, node, parentHooks)
         projectile.setPos(startPos)
         return projectile
     }
@@ -39,6 +41,8 @@ abstract class AbstractProjectileCypher: AbstractCypher() {
         attributeMap[holder]?.get(CypherAttributeOperation.BASE)?: holder.value().defaultValue
     fun getAttrBaseOrDefault(attr: CypherAttribute) = getAttrBaseOrDefault(attr.attrRegistryHolder())
 
+    override fun triggerCanAttach() = true
+    override fun triggerCanPayload() = true
 
     // due to cost, should prioritise these to hook on expire
     /** called when projectile hits something

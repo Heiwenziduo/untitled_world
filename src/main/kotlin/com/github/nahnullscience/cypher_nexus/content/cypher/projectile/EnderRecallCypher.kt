@@ -5,13 +5,13 @@ import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProje
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.HookBeforeDiscardBoth
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.HookFirstTickBoth
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothBeforeDiscardHook
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothFirstTickHook
 import net.minecraft.world.level.Level
 
 object EnderRecallCypher : ProjectileCypher(
     manaDrain = 25f
-), HookBeforeDiscardBoth, HookFirstTickBoth {
+), BothBeforeDiscardHook, BothFirstTickHook {
     override val resource = CypherNexus.modResource("ender_recall")
     override fun beforeDiscardBoth(
         level: Level,

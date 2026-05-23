@@ -2,14 +2,14 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
-import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHookRegistry
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateBlock
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.ChatFormatting
 import net.minecraft.core.Holder
@@ -23,6 +23,7 @@ import net.minecraft.resources.ResourceLocation
 sealed class AbstractCypher: IRegisterable {
     open val manaDrain: Float = 0f
     open val draw: Int = 0
+    open val isRecursive: Boolean = false
     /** whether the cypher shows in the index(left side) */
     open val hide: Boolean = false
     /** override colors from category */
@@ -36,7 +37,7 @@ sealed class AbstractCypher: IRegisterable {
         get() = _attributeMap
     /** auto detect hooks */
     val implementHooks: List<HookModule<*>> by lazy { // lazy init and cache result, cool
-        val hookModules = CypherBehaviorHookRegistry.REGISTRY
+        val hookModules = CypherBehaviorHooks.REGISTRY
         hookModules.filter { it.hook.isInstance(this) }
     }
 
@@ -77,35 +78,40 @@ sealed class AbstractCypher: IRegisterable {
 
     fun isEmpty() = this is EmptyCypher
     fun isNotEmpty() = !isEmpty()
+    /** use for AddTrigger series */
+    open fun triggerCanAttach() = false
+    /** use for AddTrigger series */
+    open fun triggerCanPayload() = false
 
     /** call super# unless you know what you are doing */
     open fun invokeInHand(
         helper: InvokingHelper,
-        block: ProjectileStateBlock,
+        chunk: ProjectileStateChunk,
         data: InvokingHelper.HelperDataBundle,
-        states: InvokingHelper.HelperStateBundle
-        // TODO invoke source
+        state: InvokingHelper.HelperStateBundle,
+        options: CypherInvokingOptions = CypherInvokingOptions()
     ) {
-        println("[$this] is invoked")
-        modifyState(helper, block)
-        var forwardState = block
+        CypherNexus.LOGGER.debug("[{}] is invoked", this)
+        modifyStateChunk(helper, chunk)
+        var forwardState = chunk
         if (this is AbstractProjectileCypher) {
-            forwardState = addToState(helper, block)
+            forwardState = addToStateChunk(helper, chunk)
         }
 
+        if (options.drawEnabled)
         for (i in 0..<draw) {
             var cy = helper.drawNext()
             if (cy == null) {
-                println("[$this] want a wrap")
+                CypherNexus.LOGGER.debug("[{}] want a wrap", this)
                 helper.discard2deck() // warp
                 cy = helper.drawNext()
             }
-            cy?.invokeInHand(helper, forwardState, data, states)
+            cy?.invokeInHand(helper, forwardState, data, state)
         }
     }
-    open fun modifyState(helper: InvokingHelper, state: ProjectileStateBlock) {
+    open fun modifyStateChunk(helper: InvokingHelper, chunk: ProjectileStateChunk) {
         _attributeMap.forEach { holder, cyMap ->
-            val stateMap = state.computedOperationMap.getOrPut(holder.value()) { HashMap() }
+            val stateMap = chunk.computedOperationMap.getOrPut(holder.value()) { HashMap() }
             cyMap.forEach { operator, value ->
                 // TODO prune
                 if (operator != CypherAttributeOperation.BASE && operator != CypherAttributeOperation.SET_SELF) {
@@ -114,9 +120,10 @@ sealed class AbstractCypher: IRegisterable {
             }
         }
         if (this is AbstractNonProjectileCypher) {
+            CypherNexus.LOGGER.debug("[{}] modifies the state", this)
             // hooks on NonProjectile affect the Block, hooks on Projectile only affect itself
-            state.attachHooks(this)
-            state.enableFlags(flag)
+            chunk.attachHooks(this)
+            chunk.enableFlags(flag)
         }
     }
 
@@ -195,5 +202,12 @@ sealed class AbstractCypher: IRegisterable {
         override fun toString(): String {
             return this.name.lowercase()
         }
+    }
+
+    data class CypherInvokingOptions(
+        val drawEnabled: Boolean = true,
+        val recursiveDepth: Int = 0,
+    ) {
+
     }
 }

@@ -5,7 +5,7 @@ import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProje
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.HookInvokeRedirectPosServer
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeRedirectPosHook
 import com.github.nahnullscience.cypher_nexus.utility.RayCastUtility
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.server.level.ServerLevel
@@ -15,7 +15,7 @@ import net.minecraft.world.phys.Vec3
 
 object DaedalusCypher : ModifierCypher(
     manaDrain = 50f
-), HookInvokeRedirectPosServer {
+), ServerInvokeRedirectPosHook {
     const val MARGIN = 0.3f
     override val resource = CypherNexus.modResource("daedalus")
     init {

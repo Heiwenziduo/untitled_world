@@ -33,10 +33,8 @@ enum class CypherFlags(override val value: Int): IFlaggable.IFlagEnum {
     WITH_FIRE(16),
     /** stick on touching surface */
     STICKY(32), // TODO
-    /** force projectile's lifetime no more than 1 tick,
-     * the difference from SET=1 is this only affect the projectile itself
-     * (given the flag is set on the Projectile instead of a Modifier) */
-    LIMITED_EXISTING(64),
+    /** make projectile always use its base existing, not affect by modifiers */
+    CONSTANT_EXISTING(64),
 
 
     ;

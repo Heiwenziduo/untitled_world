@@ -4,15 +4,16 @@ import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.resources.ResourceLocation
 import kotlin.reflect.KClass
 
-class HookModule <HOOK : Any> (
+class HookModule <out HOOK : Any> (
     override val resource: ResourceLocation,
-    val hook: KClass<HOOK>,
+    val hook: KClass<out HOOK>,
     val sync: Boolean,
-    val type: HookType
+    val type: HookType,
+    val unique: Boolean = false,
 ): IRegisterable {
 
     override fun toString(): String {
-        return "module_${hook.simpleName}"
+        return "${hook.simpleName}"
     }
 
     enum class HookType {

@@ -22,7 +22,7 @@ class InvokingHelper (
     /** direction doesn't have to be normalized */
     val invokePosDire: PosDirePair,
 ) {
-    val rootBlock = ProjectileStateBlock()
+    val rootBlock = ProjectileStateChunk()
     val states = HelperStateBundle()
 
     init {
@@ -72,14 +72,14 @@ class InvokingHelper (
     /** non-empty */
     private fun draw(index: Int): AbstractCypher? {
         val cy = aoc[index]
-        println("draw [$cy], the ${index + 1}th cypher")
+        CypherNexus.LOGGER.debug("draw [{}], the {}th cypher", cy, index + 1)
         if (cy.isEmpty()) {
             // this should not happen
-            CypherNexus.LOGGER.fatal("draw empty: $index in $aoc")
+            CypherNexus.LOGGER.error("draw [empty]: $index in $aoc, this should not happen")
             return null
         }
         if (data.manaCurrent < cy.manaDrain) {
-            println("mana not enough, [$cy] discards directly")
+            CypherNexus.LOGGER.debug("mana not enough, [{}] discards directly", cy)
             deck2discard(index)
             return drawNext()
         }

@@ -54,6 +54,7 @@ object CypherAttributes {
     val DAMAGE = registerAttribute("damage", 0.0, sync = false)
     /** 1.00 <-> 100% */
     val CRIT_CHANCE = registerAttribute("crit_chance", 0.0, 0.0, sync = false)
+    val KNOCKBACK = registerAttribute("knockback", 0.0, 0.0, 114.514 ,sync = false, hide = true)
     /** block per tick, but will show block/sec */
     val SPEED = registerAttribute("speed", 0.0, 0.0, 8.0)
     /** tick */

@@ -4,6 +4,7 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategoryRegistry
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 
+// TODO maybe let Cypher-s decide
 private val AbstractCypher.isInvokable: Boolean
     get() = isNotEmpty() && category != CypherCategoryRegistry.PASSIVE
 private val AbstractCypher.isPassive: Boolean
@@ -97,17 +98,25 @@ class ArrayOfCyphers(private val capacity: Int = 1) : Iterable<AbstractCypher> {
         return _bitInvokable
     }
 
-    fun getFirstInvokable(): AbstractCypher? {
+    fun firstInvokable(): AbstractCypher? {
         val i = _bitInvokable.countTrailingZeroBits()
         if (i < capacity) {
             return _cyphers[i]
         }
         return null
     }
-    fun getLastInvokable(): AbstractCypher? {
+    fun lastInvokable(): AbstractCypher? {
         val i = 63 - _bitInvokable.countLeadingZeroBits()
         if (i < capacity && i >= 0) {
             return _cyphers[i]
+        }
+        return null
+    }
+    fun nextInvokable(index: Int): AbstractCypher? {
+        val l = (_bitInvokable shr index).countTrailingZeroBits()
+        val t = index + l
+        if (t < capacity) {
+            return _cyphers[t]
         }
         return null
     }

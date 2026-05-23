@@ -2,18 +2,15 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
-import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHookRegistry
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlaggable
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataFrequent
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
 import com.github.nahnullscience.cypher_nexus.utility.mod.CypherUtility
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.core.Holder
-import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level

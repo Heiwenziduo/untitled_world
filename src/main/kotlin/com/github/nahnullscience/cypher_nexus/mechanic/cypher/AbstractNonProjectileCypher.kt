@@ -12,5 +12,9 @@ abstract class AbstractNonProjectileCypher: AbstractCypher() {
         return addAttribute(holder, CypherAttributeOperation.ADD, add)
     }
 
+    final override fun triggerCanAttach() = false
+    final override fun triggerCanPayload() = false
+
     // Do not add BASE value on NonProjectileCypher, which will not count
+
 }

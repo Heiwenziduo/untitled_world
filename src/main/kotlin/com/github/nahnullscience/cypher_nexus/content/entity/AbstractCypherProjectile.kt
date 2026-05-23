@@ -4,14 +4,16 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataSerializer
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
-import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHookRegistry
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateBlock
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.RayCastUtility
 import com.github.nahnullscience.cypher_nexus.utility.VectorUtility
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlaggable
@@ -82,8 +84,9 @@ open class AbstractCypherProjectile(entityType: EntityType<out Projectile>, leve
     val clipMargin = 0.2f
 
     private var hooks: HookContainer? = null
-    private var _payload: ProjectileStateBlock? = null
-    val payload: ProjectileStateBlock?
+    private var _payload: ProjectileStateChunk? = null
+    private var _trigger = TriggerType.NONE
+    val payload: ProjectileStateChunk?
         get() = _payload
 
     private constructor(level: Level, cypher0: AbstractProjectileCypher, invoker: Entity?, direction: Vec3? = null) :
@@ -97,12 +100,13 @@ open class AbstractCypherProjectile(entityType: EntityType<out Projectile>, leve
 
     constructor(
         level: Level, invoker: Entity?, cypher0: AbstractProjectileCypher, direction: Vec3? = null,
-        shootState: ProjectileStateBlock, payload: ProjectileStateBlock?, parentHooks: HookContainer?) :
+        shootState: ProjectileStateChunk, node: ProjectileNode, parentHooks: HookContainer?) :
         this(ModEntities.CYPHER_PROJECTILE.get(), level) {
         owner = invoker
         _cypher = cypher0
         enabledFlags = shootState.enabledFlags or _cypher.flag
-        _payload = payload
+        _payload = node.payload
+        _trigger = node.trigger
         setHooks(parentHooks)
         // TODO
 //        _invokeList = invokeList0
@@ -114,9 +118,11 @@ open class AbstractCypherProjectile(entityType: EntityType<out Projectile>, leve
         CypherFlags.Companion.printFlag(enabledFlags)
         printModifiedAttrMap()
     }
-    protected fun initAttributes(shootState: ProjectileStateBlock) {
+    protected fun initAttributes(shootState: ProjectileStateChunk) {
         shootState.computedOperationMap.forEach { (attr, opMap) ->
             if (!attr.isProjectileAttribute) return@forEach
+            if (haveFlag(CypherFlags.CONSTANT_EXISTING) && CypherAttributes.EXISTING.`is`(attr.resource)) return@forEach
+
             _attributeMap.compute(attr) { a, v ->
                 val def = _cypher.getAttrBaseOrDefault(attr)
                 val final = CypherUtility.attributeCalculator(opMap, def)
@@ -193,7 +199,7 @@ open class AbstractCypherProjectile(entityType: EntityType<out Projectile>, leve
     override fun tick() {
         // called on both server side and client side
         if (firstTick) { // start from tickCount == 1
-            hooks?.playHooks(CypherBehaviorHookRegistry.FIRST_TICK_BOTH)
+            hooks?.playHooks(CypherBehaviorHooks.FIRST_TICK_BOTH)
             { h, i -> h.firstTickBoth(level(), this, i) }
 
             if (level().isClientSide) {
@@ -207,11 +213,13 @@ open class AbstractCypherProjectile(entityType: EntityType<out Projectile>, leve
         super.tick() // TODO: prune default tick
 
         // hookContainer.get(TICK_BEHAVIOR).forEach { h, i -> h.tickBehaviorBoth(level(), this, i) }
-        hooks?.playHooks(CypherBehaviorHookRegistry.TICK_BEHAVIOR_BOTH)
+        hooks?.playHooks(CypherBehaviorHooks.TICK_BEHAVIOR_BOTH)
         { h, i -> h.tickBehaviorBoth(level(), this, i) }
         projectileTick()
         modifierTick()
-        if (existing == tickCount || haveFlag(CypherFlags.LIMITED_EXISTING)) {
+
+        if (tickCount == 20) trigger(TriggerType.TIMER)
+        if (existing == tickCount) {
             // here's a trick, if player make existing-time less or equal to 0, projectile will last till the game quit
             discardCy(DiscardReason.EXPIRE)
         }
@@ -334,7 +342,9 @@ open class AbstractCypherProjectile(entityType: EntityType<out Projectile>, leve
     override fun onHit(result: HitResult) {
         super.onHit(result) // distribute hitResult
         if (level().isClientSide) return
-        hooks?.playHooks(CypherBehaviorHookRegistry.HIT_ENTITY_SERVER)
+        trigger(TriggerType.COLLISION)
+
+        hooks?.playHooks(CypherBehaviorHooks.HIT_ENTITY_SERVER)
         { h, i -> h.onHitServer(level(), this, i, result) }
 
         val canPierce =
@@ -361,6 +371,7 @@ open class AbstractCypherProjectile(entityType: EntityType<out Projectile>, leve
     /** ProjectileStateBlock#release */
     fun releasePayload(posDire: PosDirePair) = _payload?.release(level(), owner, posDire)
     fun releasePayload() = releasePayload(PosDirePair(position(), deltaMovement.reverse()))
+    fun trigger(type: TriggerType) = if (type == _trigger) releasePayload() else Unit
 
     // ==================================================================================================================
     // ==================================================================================================================
@@ -429,8 +440,9 @@ open class AbstractCypherProjectile(entityType: EntityType<out Projectile>, leve
             else -> {
                 if (level().isClientSide && reason == DiscardReason.EXPIRE) {
                     _cypher.visualEffectOnExpire(level(), this)
+                    trigger(TriggerType.EXPIRE)
                 }
-                hooks?.playHooks(CypherBehaviorHookRegistry.BEFORE_DISCARD_BOTH)
+                hooks?.playHooks(CypherBehaviorHooks.BEFORE_DISCARD_BOTH)
                 { h, i -> h.beforeDiscardBoth(level(), this, i, reason) }
             }
         }
