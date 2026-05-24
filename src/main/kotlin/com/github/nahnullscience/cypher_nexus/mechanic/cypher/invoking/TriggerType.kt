@@ -6,5 +6,5 @@ enum class TriggerType {
     COLLISION,
     TIMER,
     EXPIRE,
-    RED_STONE,
+    RED_STONE, // TODO
 }

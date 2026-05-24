@@ -2,13 +2,14 @@ package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.*
-import com.github.nahnullscience.cypher_nexus.content.cypher.other.AddTrigger
+import com.github.nahnullscience.cypher_nexus.content.cypher.other.AbstractAddTrigger
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.static_projectile.ExplosionCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.mechanic.exception.CypherNotFoundException
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
@@ -146,5 +147,20 @@ object ModCyphers {
     // passive
 
     // other
-    val ADD_TRIGGER = registerCypher(AddTrigger)
+    val ADD_TRIGGER = registerCypher(object : AbstractAddTrigger(10f) {
+        override val triggerType = TriggerType.COLLISION
+        override val resource = CypherNexus.modResource("add_trigger")
+    })
+    val ADD_TRIGGER_TIMER = registerCypher(object : AbstractAddTrigger(20f) {
+        override val triggerType = TriggerType.TIMER
+        override val resource = CypherNexus.modResource("add_trigger_timer")
+    })
+    val ADD_TRIGGER_EXPIRY = registerCypher(object : AbstractAddTrigger(20f) {
+        override val triggerType = TriggerType.EXPIRE
+        override val resource = CypherNexus.modResource("add_trigger_expiry")
+    })
+//    val ADD_TRIGGER_RED_STONE = registerCypher(object : AbstractAddTrigger(20f) {
+//        override val triggerType = TriggerType.RED_STONE
+//        override val resource = CypherNexus.modResource("add_trigger_red_stone")
+//    })
 }
