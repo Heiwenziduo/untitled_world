@@ -1,13 +1,10 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
 
-import com.github.nahnullscience.cypher_nexus.init.mod.ModCyphers
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.network.CNCodecs
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.network.RegistryFriendlyByteBuf
-import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 
 /**

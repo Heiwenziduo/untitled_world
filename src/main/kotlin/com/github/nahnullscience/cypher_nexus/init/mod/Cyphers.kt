@@ -22,7 +22,7 @@ import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 /**
  *
  * */
-object ModCyphers {
+object Cyphers {
     val RESOURCE_KEY: ResourceKey<Registry<AbstractCypher>> =
         ResourceKey.createRegistryKey(CypherNexus.modResource("cypher"))
     val REGISTRY: Registry<AbstractCypher> = RegistryBuilder(RESOURCE_KEY).sync(true).defaultKey(EmptyCypher.resource).create()

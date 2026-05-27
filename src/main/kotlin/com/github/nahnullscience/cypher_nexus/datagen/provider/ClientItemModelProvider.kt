@@ -15,6 +15,6 @@ class ClientItemModelProvider(output: PackOutput, existingFileHelper: ExistingFi
         //     .texture("layer0", "item/basic_wand")
         // do the same things as the expression above
 //        basicItem(ModItems.BASIC_WAND) // "item/generated"
-        handheldItem(ModItems.BASIC_WAND) // "item/handheld"
+        handheldItem(ModItems.TIERED_WAND) // "item/handheld"
     }
 }

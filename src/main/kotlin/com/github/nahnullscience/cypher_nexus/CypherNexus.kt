@@ -2,14 +2,15 @@ package com.github.nahnullscience.cypher_nexus
 
 import com.github.nahnullscience.cypher_nexus.init.ModBlocks
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
-import com.github.nahnullscience.cypher_nexus.init.ModDataSerializer
+import com.github.nahnullscience.cypher_nexus.init.ModDataLootFunctions
+import com.github.nahnullscience.cypher_nexus.init.ModDataSerializers
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.init.ModItems
 import com.github.nahnullscience.cypher_nexus.init.ModTabs
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategoryRegistry
-import com.github.nahnullscience.cypher_nexus.init.mod.ModCyphers
+import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -50,13 +51,14 @@ object CypherNexus {
         LOGGER.log(Level.INFO, "Hello world!")
         ModBlocks.register()
         ModItems.register()
-        ModDataComponents.register()
         ModEntities.register()
-        ModDataSerializer.register()
+        ModDataComponents.register()
+        ModDataSerializers.register()
+        ModDataLootFunctions.register()
 
         ModTabs.register()
 
-        ModCyphers.register()
+        Cyphers.register()
         CypherAttributes.register()
         CypherCategoryRegistry.register()
         CypherBehaviorHooks.register()
@@ -103,7 +105,7 @@ object CypherNexus {
 
     @SubscribeEvent
     fun registerRegistries(event: NewRegistryEvent) {
-        event.register(ModCyphers.REGISTRY)
+        event.register(Cyphers.REGISTRY)
         event.register(CypherAttributes.REGISTRY)
         event.register(CypherCategoryRegistry.REGISTRY)
         event.register(CypherBehaviorHooks.REGISTRY)

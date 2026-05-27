@@ -1,10 +1,10 @@
 package com.github.nahnullscience.cypher_nexus.network
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.item.BasicWandItem
+import com.github.nahnullscience.cypher_nexus.content.item.AbstractItemWand
+import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.network.server.ServerboundEditWandCyphers
-import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.network.handling.IPayloadContext
@@ -38,8 +38,8 @@ object ServerPayloadHandler {
             }
 
             if (!stack.isEmpty) {
-                BasicWandItem.Companion.editWand(stack, data.cyphers)
-                BasicWandItem.Companion.resetIndex(stack)
+                AbstractItemWand.Companion.editWand(stack, data.cyphers)
+                AbstractItemWand.Companion.resetIndex(stack)
             }
 
         }.exceptionally {

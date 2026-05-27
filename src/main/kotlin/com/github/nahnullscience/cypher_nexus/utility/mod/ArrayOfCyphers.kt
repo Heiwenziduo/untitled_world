@@ -63,6 +63,8 @@ class ArrayOfCyphers(private val capacity: Int = 1) : Iterable<AbstractCypher> {
     fun remove(index: Int) = set(index, null)
     /** O(n) */
     fun toList(): List<AbstractCypher> = _cyphers.toList()
+    /** Empty -> null */
+    fun toNullableList(): List<AbstractCypher?> = _cyphers.map { if (it.isEmpty()) null else it }
     fun copy(): ArrayOfCyphers = ArrayOfCyphers(_cyphers.toList())
 
     /** find the first Empty then replace that with given cypher

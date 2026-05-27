@@ -1,6 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.utility.mod
 
-import com.github.nahnullscience.cypher_nexus.init.mod.ModCyphers
+import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import net.minecraft.server.level.ServerPlayer
@@ -9,7 +9,7 @@ import net.minecraft.server.level.ServerPlayer
 class CypherData private constructor (){
     companion object {
         private val _enabledList: List<AbstractCypher> by lazy {
-            val list = ModCyphers.REGISTRY.toList().filter { true } // TODO server-config?
+            val list = Cyphers.REGISTRY.toList().filter { true } // TODO server-config?
             println("cypher _enabledList init: $list")
             list
         }

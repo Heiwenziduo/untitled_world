@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.client.cypher
 
 import com.github.nahnullscience.cypher_nexus.client.cypher.visualizer.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.EnderRecallCypher
-import com.github.nahnullscience.cypher_nexus.init.mod.ModCyphers
+import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import net.minecraft.resources.ResourceLocation
 import net.neoforged.api.distmarker.Dist
@@ -21,7 +21,7 @@ object CypherVisualizerRegistry {
     }
 
     fun get(cypherId: ResourceLocation): ICypherVisualizer? {
-        val cy = ModCyphers.REGISTRY.get(cypherId)
+        val cy = Cyphers.REGISTRY.get(cypherId)
         return _visualizers[cy]
     }
     fun get(cypher: AbstractCypher): ICypherVisualizer? {

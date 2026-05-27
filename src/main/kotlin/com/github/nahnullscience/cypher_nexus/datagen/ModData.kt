@@ -1,6 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.datagen
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.datagen.loot_table.ServerLootTableProvider
 import com.github.nahnullscience.cypher_nexus.datagen.provider.ClientBlockStateProvider
 import com.github.nahnullscience.cypher_nexus.datagen.provider.ClientItemModelProvider
 import com.github.nahnullscience.cypher_nexus.datagen.provider.ServerAdvancementProvider
@@ -40,5 +41,6 @@ object ModData {
         generator.addProvider(client, ClientBlockStateProvider(output, existingFileHelper))
         // and data on the server
         generator.addProvider(server, ServerAdvancementProvider(output, lookupProvider, existingFileHelper))
+        generator.addProvider(server, ServerLootTableProvider(output, lookupProvider))
     }
 }

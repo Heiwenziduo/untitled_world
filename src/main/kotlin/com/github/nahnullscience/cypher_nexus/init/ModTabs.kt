@@ -17,10 +17,10 @@ object ModTabs {
     val BASE_MODE_TAB = DEFERRED_REGISTER.register(CypherNexus.MOD_ID, { ->
         CreativeModeTab.builder()
             .title(CypherNexus.modTranslation("item_group"))
-            .icon { -> ModItems.BASIC_WAND.defaultInstance }
+            .icon { -> ModItems.TIERED_WAND.defaultInstance }
             .displayItems { parameters, output ->
                 // add items while BuildCreativeModeTabContentsEvent is feasible too
-                output.accept { ModItems.BASIC_WAND }
+                output.accept { ModItems.TIERED_WAND }
             }
             .build()
     })

@@ -1,13 +1,13 @@
 package com.github.nahnullscience.cypher_nexus.content.item
 
+import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataFrequent
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
-import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
-import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
+import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResultHolder
 import net.minecraft.world.entity.Entity
@@ -16,24 +16,17 @@ import net.minecraft.world.entity.player.Inventory.SLOT_OFFHAND
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.UseAnim
 import net.minecraft.world.level.Level
 import kotlin.math.min
 
-/**
- *
- * */
-open class BasicWandItem(
-
-) : Item(
+abstract class AbstractItemWand : Item(
     Properties()
         .stacksTo(1)
         .component(ModDataComponents.WAND_INVARIABLE, WandDataInvariable.Companion.DEFAULT)
         .component(ModDataComponents.WAND_HIGH_PAYLOAD, WandDataHighPayload.Companion.DEFAULT)
         .component(ModDataComponents.WAND_FREQUENT, WandDataFrequent.Companion.DEFAULT)
-), IWandLike {
-    override val isEditableWand = true
-
+), IWandLike  {
+    abstract override val isEditableWand: Boolean
     override fun use(level: Level, player: Player, usedHand: InteractionHand): InteractionResultHolder<ItemStack> {
         val stack = player.getItemInHand(usedHand)
 
@@ -52,12 +45,10 @@ open class BasicWandItem(
         if (entity is Player && (slotId in 0..8 || slotId == SLOT_OFFHAND)) { // nine hotbar slots (indices 0-8).
             wandTick(stack, entity)
         }
-
-
     }
-    /** update the "frequent" data */
+
     protected fun wandTick(stack: ItemStack, player: Player) {
-        val (invariable, highPayload, frequent) = getWandData(stack, player)?: return // kotliiiiin?
+        val (invariable, highPayload, frequent) = getWandData(stack, player)?: return
         var flag = false
         val (maxMana, manaRegen) = invariable.chunkF
         var (manaCurrent, index, delay, recharge, ) = frequent
@@ -75,13 +66,11 @@ open class BasicWandItem(
             flag = true
         }
 
+        // FIXME use timestamp instead of checking every tick, which may lead to massive network pressure
         if (flag) stack.set(ModDataComponents.WAND_FREQUENT,
             WandDataFrequent(manaCurrent, index, delay, recharge, frequent.deck, frequent.discard))
     }
 
-    override fun getUseAnimation(stack: ItemStack): UseAnim {
-        return UseAnim.BOW
-    }
 
     override fun getWandData(stack: ItemStack?, caster: LivingEntity?): IWandLike.WandDataBundle? {
         if (stack != null && !stack.isEmpty) {
@@ -118,10 +107,8 @@ open class BasicWandItem(
     }
 
 
-
     companion object {
         // TODO check data authentic
-
         fun editWand(stack: ItemStack, list: List<AbstractCypher>) {
             println("editWand: $stack")
             // TODO maybe we should use BasicWandItem instead?
@@ -129,7 +116,6 @@ open class BasicWandItem(
                 stack.set(ModDataComponents.WAND_HIGH_PAYLOAD, WandDataHighPayload(ArrayOfCyphers(list)))
             }
         }
-
         fun resetIndex(stack: ItemStack) {
             println("resetIndex: $stack")
             if (stack.item is IWandLike) {
@@ -141,3 +127,4 @@ open class BasicWandItem(
         }
     }
 }
+

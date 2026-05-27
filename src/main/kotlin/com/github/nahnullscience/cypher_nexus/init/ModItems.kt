@@ -1,7 +1,10 @@
 package com.github.nahnullscience.cypher_nexus.init
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.item.BasicWandItem
+import com.github.nahnullscience.cypher_nexus.content.item.AbstractItemWand
+import com.github.nahnullscience.cypher_nexus.content.item.MythicalStick
+import com.github.nahnullscience.cypher_nexus.content.item.TieredWandItem
+import net.minecraft.world.item.BlockItem
 import net.neoforged.neoforge.registries.DeferredRegister
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 import thedarkcolour.kotlinforforge.neoforge.forge.getValue
@@ -13,10 +16,11 @@ object ModItems {
         DEFERRED_REGISTER.register(MOD_BUS)
     }
 
-    val BASIC_WAND: BasicWandItem by DEFERRED_REGISTER.register("basic_wand") { registryName -> BasicWandItem() }
+    val MYTHICAL_STICK: AbstractItemWand by DEFERRED_REGISTER.register("mythical_stick") { registryName -> MythicalStick }
+    val TIERED_WAND: AbstractItemWand by DEFERRED_REGISTER.register("basic_wand") { registryName -> TieredWandItem() }
 
     // When it comes to mass, guess I can make a factory function to auto register block-item.
-    val CYPHER_INDEX_BLOCK_ITEM by DEFERRED_REGISTER.registerSimpleBlockItem("cypher_index") { ->
+    val CYPHER_INDEX_BLOCK_ITEM: BlockItem by DEFERRED_REGISTER.registerSimpleBlockItem("cypher_index") { ->
         ModBlocks.CYPHER_INDEX_BLOCK
     }
 }

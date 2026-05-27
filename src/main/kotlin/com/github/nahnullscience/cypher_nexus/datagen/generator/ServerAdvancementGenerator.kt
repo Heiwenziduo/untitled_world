@@ -82,7 +82,7 @@ class ServerAdvancementGenerator : AdvancementProvider.AdvancementGenerator {
         val first_wand = Advancement.Builder.recipeAdvancement()
             .parent(root)
             .display(
-                ModItems.BASIC_WAND,
+                ModItems.TIERED_WAND,
                 langKey("first_wand.title"),
                 langKey("first_wand.description"),
                 null,

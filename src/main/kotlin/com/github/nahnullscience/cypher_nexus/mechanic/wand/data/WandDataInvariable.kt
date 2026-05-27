@@ -1,6 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
 
-import com.github.nahnullscience.cypher_nexus.init.mod.ModCyphers
+import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -33,7 +33,7 @@ data class WandDataInvariable(val chunkF: WandDataChunkF, val chunkI: WandDataCh
             Codec.INT.fieldOf("rechargeTime").forGetter(WandDataChunkI::rechargeTime),
         ).apply(it, ::WandDataChunkI) }
         val CHUNK2_CODEX: Codec<WandDataChunkL> = RecordCodecBuilder.create { it.group(
-            ModCyphers.REGISTRY
+            Cyphers.REGISTRY
                 .byNameCodec().listOf()
                 .fieldOf("alwaysCast")
                 .forGetter(WandDataChunkL::alwaysCast)
@@ -62,7 +62,7 @@ data class WandDataInvariable(val chunkF: WandDataChunkF, val chunkI: WandDataCh
             ByteBufCodecs.INT, WandDataChunkI::rechargeTime,
             ::WandDataChunkI)
         val CHUNK2_STREAM: StreamCodec<RegistryFriendlyByteBuf, WandDataChunkL> =
-            ByteBufCodecs.registry(ModCyphers.RESOURCE_KEY).apply(ByteBufCodecs.list())
+            ByteBufCodecs.registry(Cyphers.RESOURCE_KEY).apply(ByteBufCodecs.list())
                 .map(::WandDataChunkL, WandDataChunkL::alwaysCast)
         val CHUNK3_STREAM: StreamCodec<ByteBuf, WandDataChunkU> = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8, WandDataChunkU::uuid,

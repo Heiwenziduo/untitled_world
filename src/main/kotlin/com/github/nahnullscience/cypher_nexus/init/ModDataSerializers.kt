@@ -15,7 +15,7 @@ import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
  * meaning that if you want to add new EntityDataSerializers,
  * they must be added by registration.
  * */
-object ModDataSerializer {
+object ModDataSerializers {
 
     val DEFERRED_REGISTER: DeferredRegister<EntityDataSerializer<*>> =
         DeferredRegister.create(NeoForgeRegistries.Keys.ENTITY_DATA_SERIALIZERS, CypherNexus.MOD_ID)

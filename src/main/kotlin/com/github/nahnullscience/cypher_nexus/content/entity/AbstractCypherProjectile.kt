@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.content.entity
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.init.ModDataSerializer
+import com.github.nahnullscience.cypher_nexus.init.ModDataSerializers
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
@@ -164,10 +164,10 @@ open class AbstractCypherProjectile(entityType: EntityType<out Projectile>, leve
 
         val CYPHER: EntityDataAccessor<AbstractCypher> = SynchedEntityData.defineId(
             AbstractCypherProjectile::class.java,
-            ModDataSerializer.CYPHER_DATA.get())
+            ModDataSerializers.CYPHER_DATA.get())
         val CYPHER_LIST: EntityDataAccessor<List<AbstractCypher>> = SynchedEntityData.defineId(
             AbstractCypherProjectile::class.java,
-            ModDataSerializer.CYPHER_LIST_DATA.get())
+            ModDataSerializers.CYPHER_LIST_DATA.get())
         val FLAG: EntityDataAccessor<Int> = SynchedEntityData.defineId(
             AbstractCypherProjectile::class.java,
             EntityDataSerializers.INT)
