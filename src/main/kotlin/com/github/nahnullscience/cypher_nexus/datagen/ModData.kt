@@ -1,10 +1,11 @@
 package com.github.nahnullscience.cypher_nexus.datagen
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.datagen.loot_table.ServerLootTableProvider
-import com.github.nahnullscience.cypher_nexus.datagen.provider.ClientBlockStateProvider
-import com.github.nahnullscience.cypher_nexus.datagen.provider.ClientItemModelProvider
-import com.github.nahnullscience.cypher_nexus.datagen.provider.ServerAdvancementProvider
+import com.github.nahnullscience.cypher_nexus.datagen.client.CNBlockStateProvider
+import com.github.nahnullscience.cypher_nexus.datagen.client.CNItemModelProvider
+import com.github.nahnullscience.cypher_nexus.datagen.loot_table.CNGlobalLootModifierProvider
+import com.github.nahnullscience.cypher_nexus.datagen.loot_table.CNLootTableProvider
+import com.github.nahnullscience.cypher_nexus.datagen.server.CNAdvancementProvider
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.data.event.GatherDataEvent
@@ -37,10 +38,11 @@ object ModData {
         val client = event.includeClient()
 
         // assets on the client
-        generator.addProvider(client, ClientItemModelProvider(output, existingFileHelper))
-        generator.addProvider(client, ClientBlockStateProvider(output, existingFileHelper))
+        generator.addProvider(client, CNItemModelProvider(output, existingFileHelper))
+        generator.addProvider(client, CNBlockStateProvider(output, existingFileHelper))
         // and data on the server
-        generator.addProvider(server, ServerAdvancementProvider(output, lookupProvider, existingFileHelper))
-        generator.addProvider(server, ServerLootTableProvider(output, lookupProvider))
+        generator.addProvider(server, CNAdvancementProvider(output, lookupProvider, existingFileHelper))
+        generator.addProvider(server, CNGlobalLootModifierProvider(output, lookupProvider))
+        generator.addProvider(server, CNLootTableProvider(output, lookupProvider))
     }
 }

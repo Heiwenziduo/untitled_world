@@ -20,7 +20,39 @@ data class WandDataInvariable(val chunkF: WandDataChunkF, val chunkI: WandDataCh
     data class WandDataChunkL(val alwaysCast: List<AbstractCypher>)
     data class WandDataChunkU(val uuid: String)
 
+    class Builder() {
+        var manaMax: Float = 99f
+        var manaRegen: Float = 0.9f
+        var wandLength: Float = 0.9f
+
+        var capacity: Int = 2
+        var draw: Int = 1
+        var castDelay: Int = 10
+        var rechargeTime: Int = 15
+
+        val alwaysCast = mutableListOf<AbstractCypher>()
+
+        fun manaMax(v: Float) : Builder = run { manaMax += v; this }
+        fun manaRegen(v: Float) : Builder = run { manaRegen += v; this }
+        fun wandLength(v: Float) : Builder = run { wandLength = v; this }
+        fun capacity(v: Int) : Builder = run { capacity = v; this }
+        fun draw(v: Int) : Builder = run { draw = v; this }
+        fun castDelay(v: Int) : Builder = run { castDelay -= v; this }
+        fun rechargeTime(v: Int) : Builder = run { rechargeTime -= v; this }
+
+        fun build() : WandDataInvariable {
+            return WandDataInvariable(
+                WandDataChunkF(manaMax, manaRegen, wandLength),
+                WandDataChunkI(capacity, draw, castDelay, rechargeTime),
+                WandDataChunkL(alwaysCast),
+                WandDataChunkU(UUID.randomUUID().toString())
+            )
+        }
+    }
+
     companion object {
+        fun builder() = Builder()
+
         val CHUNK0_CODEX: Codec<WandDataChunkF> = RecordCodecBuilder.create { it.group(
             Codec.FLOAT.fieldOf("manaMax").forGetter(WandDataChunkF::manaMax),
             Codec.FLOAT.fieldOf("manaRegen").forGetter(WandDataChunkF::manaRegen),
@@ -97,5 +129,7 @@ data class WandDataInvariable(val chunkF: WandDataChunkF, val chunkI: WandDataCh
 //            WandDataChunkL(listOf()),
 //            WandDataChunkU(UUID.randomUUID().toString())
 //        )
+
+
     }
 }

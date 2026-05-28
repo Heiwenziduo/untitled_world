@@ -6,7 +6,6 @@ import com.github.nahnullscience.cypher_nexus.init.ModItems.TIERED_WAND
 import net.minecraft.core.HolderLookup
 import net.minecraft.data.loot.LootTableSubProvider
 import net.minecraft.resources.ResourceKey
-import net.minecraft.world.item.Items
 import net.minecraft.world.level.storage.loot.BuiltInLootTables
 import net.minecraft.world.level.storage.loot.LootPool
 import net.minecraft.world.level.storage.loot.LootTable
@@ -19,20 +18,23 @@ import java.util.function.BiConsumer
 
 data class CNChestLoot(val registries: HolderLookup.Provider): LootTableSubProvider {
     override fun generate(output: BiConsumer<ResourceKey<LootTable>, LootTable.Builder>) {
+        // note: this will overwrite vanilla loot table
+
         for (key in BuiltInLootTables.all()) {
             if (key.location().path.startsWith("chests")) {
-                output.accept(
-                    key,
-                    LootTable.lootTable()
-                        .withPool(
-                            LootPool.lootPool()
-                            .setRolls(ConstantValue.exactly(1.0f))
-                            .add(LootItem.lootTableItem(Items.HEART_OF_THE_SEA)) // test
-                            // TODO check first open
-                        )
-                )
+//                output.accept(
+//                    key,
+//                    LootTable.lootTable()
+//                        .withPool(
+//                            LootPool.lootPool()
+//                            .setRolls(ConstantValue.exactly(1.0f))
+//                            .add(LootItem.lootTableItem(Items.HEART_OF_THE_SEA)) // test
+//                        )
+//                )
             }
         }
+        return
+
         output.accept(
             BuiltInLootTables.ABANDONED_MINESHAFT,
             LootTable.lootTable()

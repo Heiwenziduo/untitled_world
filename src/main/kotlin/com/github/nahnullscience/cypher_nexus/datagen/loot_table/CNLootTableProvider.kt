@@ -6,7 +6,7 @@ import net.minecraft.data.loot.LootTableProvider
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
 import java.util.concurrent.CompletableFuture
 
-class ServerLootTableProvider(
+class CNLootTableProvider(
     output: PackOutput,
     registries: CompletableFuture<HolderLookup.Provider>
 ) : LootTableProvider(

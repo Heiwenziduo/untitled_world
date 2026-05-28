@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.datagen.provider
+package com.github.nahnullscience.cypher_nexus.datagen.client
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModBlocks
@@ -10,8 +10,13 @@ import net.neoforged.neoforge.client.model.generators.ModelFile
 import net.neoforged.neoforge.common.data.ExistingFileHelper
 
 
-class ClientBlockStateProvider(output: PackOutput, exFileHelper: ExistingFileHelper) :
-    BlockStateProvider(output, CypherNexus.MOD_ID, exFileHelper
+class CNBlockStateProvider(
+    output: PackOutput,
+    exFileHelper: ExistingFileHelper
+) : BlockStateProvider(
+    output,
+    CypherNexus.MOD_ID,
+    exFileHelper
 ) {
     override fun registerStatesAndModels() {
         val exampleModel: ModelFile = models().withExistingParent(
