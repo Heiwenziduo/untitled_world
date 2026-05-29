@@ -2,17 +2,19 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
+import java.util.Optional
 import java.util.function.Supplier
 import kotlin.collections.iterator
+import kotlin.jvm.optionals.getOrNull
 
 // TODO consider sync hook-map to client
 class HookContainer (
     /** the "prototype", use to isolate projectile specific hooks (child) from StateBlock hooks (parent),
      * while iteration, search this(child) first, then parents
      *  */
-    val parent: HookContainer? = null
+    val parent: Optional<HookContainer> = Optional.empty()
 ) {
-    constructor(map: HashMap<HookModule<*>, LinkedHashMap<AbstractCypher, Int>>, parent: HookContainer? = null) : this(parent) {
+    constructor(map: HashMap<HookModule<*>, LinkedHashMap<AbstractCypher, Int>>, parent: Optional<HookContainer> = Optional.empty()) : this(parent) {
         _map = map
     }
 
@@ -24,7 +26,7 @@ class HookContainer (
     private var _map = HashMap<HookModule<*>, LinkedHashMap<AbstractCypher, Int>>()
 
     fun add(cypher: AbstractCypher) {
-        for (module in cypher.implementHooks) {
+        for (module in cypher.implementedHooks) {
             add(module, cypher)
         }
     }
@@ -42,7 +44,7 @@ class HookContainer (
     fun <T : Any> get(module: HookModule<T>): Map<T, Int> {
         val rawChild = _map[module]
         val childMap: Map<T, Int> = if (rawChild != null) rawChild as Map<T, Int> else emptyMap()
-        val parentMap = parent?.get(module)
+        val parentMap = parent.getOrNull()?.get(module)
         // because we strictly checked `isInstance` inside the add() method,
         // we mathematically guarantee that every AbstractCypher inside this specific
         // innerMap implements the interface 'T'. Therefore, we can cast the whole map safely

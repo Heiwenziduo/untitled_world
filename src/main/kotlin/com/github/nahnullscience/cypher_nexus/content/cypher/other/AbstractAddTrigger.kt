@@ -1,6 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.other
 
-import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategoryRegistry
+import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
@@ -13,7 +14,7 @@ abstract class AbstractAddTrigger(
     override val manaDrain: Float
 ) : AbstractNonProjectileCypher() {
     override val draw: Int = 0
-    override val category = CypherCategoryRegistry.OTHER
+    override val category = CypherCategories.OTHER
     abstract val triggerType: TriggerType
 
     override fun invokeInHand(
@@ -23,6 +24,7 @@ abstract class AbstractAddTrigger(
         state: InvokingHelper.HelperStateBundle,
         options: CypherInvokingOptions
     ) {
+        CypherNexus.LOGGER.debug("[{}] is invoked", this)
         var attachIndex = data.deck.countTrailingZeroBits()
         var cy: AbstractProjectileCypher = EmptyCypher
         while (attachIndex < helper.aoc.size) {

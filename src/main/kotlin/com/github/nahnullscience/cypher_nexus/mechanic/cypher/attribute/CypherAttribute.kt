@@ -52,4 +52,14 @@ open class CypherAttribute(
         INVOKING,
         PROJECTILE
     }
+
+//    class Builder(val resource: ResourceLocation) {
+//        val defaultValue: Double = 0.0
+//        val min: Double = -Double.MAX_VALUE
+//        val max: Double = Double.MAX_VALUE
+//        val sync: Boolean = true
+//        val applyOn: AttributeApply = AttributeApply.INVOKING
+//        val hide: Boolean = false
+//        fun build() = CypherAttribute
+//    }
 }

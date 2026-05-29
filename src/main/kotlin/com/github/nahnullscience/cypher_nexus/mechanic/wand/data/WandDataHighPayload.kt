@@ -1,6 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
 
-import com.github.nahnullscience.cypher_nexus.network.CNCodecs
+import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder

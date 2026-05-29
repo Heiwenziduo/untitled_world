@@ -32,6 +32,7 @@ import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.*
+import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
 
 // TODO abs
@@ -151,7 +152,7 @@ open class AbstractCypherProjectile(entityType: EntityType<out Projectile>, leve
     }
 
     private fun setHooks(parent: HookContainer?) {
-        hooks = HookContainer(parent)
+        hooks = HookContainer(Optional.ofNullable(parent))
         hooks?.add(_cypher)
     }
 
@@ -400,9 +401,7 @@ open class AbstractCypherProjectile(entityType: EntityType<out Projectile>, leve
 
     // ==================================================================================================================
     // ==================================================================================================================
-    fun getAttribute(attr: CypherAttribute): Double? {
-        return _attributeMap.get(attr)
-    }
+    fun getAttribute(attr: CypherAttribute): Double? = _attributeMap.get(attr)
     fun getAttribute(holer: Holder<CypherAttribute>): Double? = getAttribute(holer.value())
     fun getAttrOrProjDefault(attr: CypherAttribute): Double = _attributeMap[attr] ?: _cypher.getAttrBaseOrDefault(attr)
     /** computedOperationMap > projectileCypher-base > attr#default */
@@ -411,20 +410,11 @@ open class AbstractCypherProjectile(entityType: EntityType<out Projectile>, leve
 
     // ==================================================================================================================
     // ==================================================================================================================
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-    }
+    override fun readAdditionalSaveData(compound: CompoundTag) {}
+    override fun addAdditionalSaveData(compound: CompoundTag) {}
+    override fun getPickResult(): ItemStack? = null // null by default, this is the creative mod middle button pick result
+    override fun isPickable(): Boolean = false // false by default, entirely disable the picking activity
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
-    }
-
-    override fun getPickResult(): ItemStack? {
-        // null by default, this is the creative mod middle button pick result
-        return null
-    }
-    override fun isPickable(): Boolean {
-        // false by default, entirely disable the picking activity
-        return false
-    }
     // a public method, to get a HitResult by checking if there is any block or entity in the direction of #getViewVector
     // ray cast
 //    override fun pick(hitDistance: Double, partialTicks: Float, hitFluids: Boolean): HitResult {
@@ -433,14 +423,14 @@ open class AbstractCypherProjectile(entityType: EntityType<out Projectile>, leve
 
 
     protected fun discardCy(reason: DiscardReason) {
+        trigger(TriggerType.DEATH)
         when(reason){
             DiscardReason.ERASE -> {
 
             }
             else -> {
-                if (level().isClientSide && reason == DiscardReason.EXPIRE) {
-                    _cypher.visualEffectOnExpire(level(), this)
-                    trigger(TriggerType.EXPIRE)
+                if (reason == DiscardReason.EXPIRE) {
+                    if (level().isClientSide) _cypher.visualEffectOnExpire(level(), this)
                 }
                 hooks?.playHooks(CypherBehaviorHooks.BEFORE_DISCARD_BOTH)
                 { h, i -> h.beforeDiscardBoth(level(), this, i, reason) }

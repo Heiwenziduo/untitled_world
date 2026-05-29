@@ -3,6 +3,8 @@ package com.github.nahnullscience.cypher_nexus.init.mod
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.AbstractAddTrigger
+import com.github.nahnullscience.cypher_nexus.content.cypher.other.AbstractRequirement
+import com.github.nahnullscience.cypher_nexus.content.cypher.other.RequirementHP
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.static_projectile.ExplosionCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
@@ -10,7 +12,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
-import com.github.nahnullscience.cypher_nexus.mechanic.exception.CypherNotFoundException
+import com.github.nahnullscience.cypher_nexus.utility.exception.CypherNotFoundException
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceKey
@@ -71,8 +73,8 @@ object Cyphers {
         .attribute(CypherAttributes.RECOIL, CypherAttributeOperation.ADD, 1.0))
     val BRISK = registerCypher(SimpleModifier(5f, "brisk").attribute(CypherAttributes.SPEED, CypherAttributeOperation.MULTIPLY_TOTAL, 2.0))
     val FIERY = registerCypher(FieryCypher)
-    val ANTIGRAVITY = registerCypher(SimpleModifier(1f, "antigravity").attribute(CypherAttributes.GRAVITY_FACTOR, CypherAttributeOperation.MULTIPLY_TOTAL, -1.0))
-
+    val REVERSE_GRAVITY = registerCypher(SimpleModifier(1f, "reverse_gravity").attribute(CypherAttributes.GRAVITY_FACTOR, CypherAttributeOperation.MULTIPLY_TOTAL, -1.0))
+    val ANTIGRAVITY = registerCypher(SimpleModifier(1f, "antigravity").attribute(CypherAttributes.GRAVITY_FACTOR, CypherAttributeOperation.MULTIPLY_BASE, -0.66))
 
 
 
@@ -105,10 +107,8 @@ object Cyphers {
         .attribute(CypherAttributes.FRICTION_FACTOR, CypherAttributeOperation.MULTIPLY_BASE, 1.0))
     val PEACEFUL = registerCypher(SimpleModifier(5f, "peaceful").flag(CypherFlags.NO_DAMAGE))
     val BOUNCY = registerCypher(
-        SimpleModifier(
-            5f,
-            "bouncy"
-        ).attribute(CypherAttributes.BOUNCE, CypherAttributeOperation.ADD, 5.0))
+        SimpleModifier(5f, "bouncy")
+            .attribute(CypherAttributes.BOUNCE, CypherAttributeOperation.ADD, 5.0))
     val NO_MORE_BOUNCE = registerCypher(SimpleModifier(0f, "no_more_bounce").attribute(CypherAttributes.BOUNCE, CypherAttributeOperation.SET_ALL, 0.0))
     val NO_MORE_DAMAGE = registerCypher(SimpleModifier(0f, "no_more_damage").attribute(CypherAttributes.DAMAGE, CypherAttributeOperation.SET_ALL, 0.0))
     val EXTEND_TIME = registerCypher(
@@ -155,12 +155,15 @@ object Cyphers {
         override val triggerType = TriggerType.TIMER
         override val resource = CypherNexus.modResource("add_trigger_timer")
     })
-    val ADD_TRIGGER_EXPIRY = registerCypher(object : AbstractAddTrigger(20f) {
-        override val triggerType = TriggerType.EXPIRE
-        override val resource = CypherNexus.modResource("add_trigger_expiry")
+    val ADD_TRIGGER_DEATH = registerCypher(object : AbstractAddTrigger(20f) {
+        override val triggerType = TriggerType.DEATH
+        override val resource = CypherNexus.modResource("add_trigger_death")
     })
 //    val ADD_TRIGGER_RED_STONE = registerCypher(object : AbstractAddTrigger(20f) {
 //        override val triggerType = TriggerType.RED_STONE
 //        override val resource = CypherNexus.modResource("add_trigger_red_stone")
 //    })
+    val REQUIREMENT_HP = registerCypher(RequirementHP)
+    val REQUIREMENT_OTHERWISE = registerCypher(AbstractRequirement.RequirementOtherwise)
+    val REQUIREMENT_ENDPOINT = registerCypher(AbstractRequirement.RequirementEndpoint)
 }

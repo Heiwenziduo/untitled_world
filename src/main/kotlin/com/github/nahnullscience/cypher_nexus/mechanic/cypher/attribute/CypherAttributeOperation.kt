@@ -15,6 +15,12 @@ enum class CypherAttributeOperation {
         }
         override fun toString() = ""
     },
+    /**  */
+    SET_SELF { // TODO
+        override fun cumulate(last: Double, new: Double): Double = new
+        override fun toString() = "="
+    },
+
     /** 1.0 -> add 1.0 */
     ADD {
         override fun cumulate(last: Double, new: Double): Double = last + new
@@ -49,10 +55,7 @@ enum class CypherAttributeOperation {
     },
 
 
-    SET_SELF { // TODO
-        override fun cumulate(last: Double, new: Double): Double = new
-        override fun toString() = "="
-    },
+
 
     ;
 //    abstract fun <T> apply(v1: T, v2: T) : T

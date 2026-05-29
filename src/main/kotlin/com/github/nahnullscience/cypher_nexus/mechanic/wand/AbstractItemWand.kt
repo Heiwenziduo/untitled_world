@@ -1,8 +1,7 @@
-package com.github.nahnullscience.cypher_nexus.content.item
+package com.github.nahnullscience.cypher_nexus.mechanic.wand
 
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataFrequent
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
@@ -12,19 +11,17 @@ import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResultHolder
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.player.Inventory.SLOT_OFFHAND
+import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import kotlin.math.min
 
-abstract class AbstractItemWand : Item(
-    Properties()
-        .stacksTo(1)
-        .component(ModDataComponents.WAND_INVARIABLE, WandDataInvariable.Companion.DEFAULT)
-        .component(ModDataComponents.WAND_HIGH_PAYLOAD, WandDataHighPayload.Companion.DEFAULT)
-        .component(ModDataComponents.WAND_FREQUENT, WandDataFrequent.Companion.DEFAULT)
+abstract class AbstractItemWand(
+    properties: Properties = Properties()
+) : Item(
+    properties.stacksTo(1)
 ), IWandLike  {
     abstract override val isEditableWand: Boolean
     override fun use(level: Level, player: Player, usedHand: InteractionHand): InteractionResultHolder<ItemStack> {
@@ -42,7 +39,7 @@ abstract class AbstractItemWand : Item(
         // MAINHAND, OFFHAND, FEET, LEGS, CHEST, HEAD, and BODY (where BODY is used for horse and dog armor).
         // entity is Mob && entity.getItemBySlot()
 
-        if (entity is Player && (slotId in 0..8 || slotId == SLOT_OFFHAND)) { // nine hotbar slots (indices 0-8).
+        if (entity is Player && (slotId in 0..8 || slotId == Inventory.SLOT_OFFHAND)) { // nine hotbar slots (indices 0-8).
             wandTick(stack, entity)
         }
     }
@@ -67,8 +64,10 @@ abstract class AbstractItemWand : Item(
         }
 
         // FIXME use timestamp instead of checking every tick, which may lead to massive network pressure
-        if (flag) stack.set(ModDataComponents.WAND_FREQUENT,
-            WandDataFrequent(manaCurrent, index, delay, recharge, frequent.deck, frequent.discard))
+        if (flag) stack.set(
+            ModDataComponents.WAND_FREQUENT,
+            WandDataFrequent(manaCurrent, index, delay, recharge, frequent.deck, frequent.discard)
+        )
     }
 
 
@@ -111,7 +110,7 @@ abstract class AbstractItemWand : Item(
         // TODO check data authentic
         fun editWand(stack: ItemStack, list: List<AbstractCypher>) {
             println("editWand: $stack")
-            // TODO maybe we should use BasicWandItem instead?
+            // TODO maybe we should use AbstractItemWand instead?
             if (stack.item is IWandLike) {
                 stack.set(ModDataComponents.WAND_HIGH_PAYLOAD, WandDataHighPayload(ArrayOfCyphers(list)))
             }
@@ -127,4 +126,3 @@ abstract class AbstractItemWand : Item(
         }
     }
 }
-

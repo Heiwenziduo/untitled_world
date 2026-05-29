@@ -1,5 +1,24 @@
 package com.github.nahnullscience.cypher_nexus.content.item
 
-object MythicalStick: AbstractItemWand() {
+import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.AbstractItemWand
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataFrequent
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
+
+object MythicalStick: AbstractItemWand(
+    Properties()
+        .component(
+            ModDataComponents.WAND_INVARIABLE,
+            WandDataInvariable(
+                chunkF = WandDataInvariable.WandDataChunkF(3000f, 30f, 1.6f),
+                chunkI = WandDataInvariable.WandDataChunkI(20, 1, 6, 10),
+                chunkL = WandDataInvariable.WandDataChunkL(listOf()),
+                chunkU = WandDataInvariable.WandDataChunkU("i")
+            )
+        )
+        .component(ModDataComponents.WAND_HIGH_PAYLOAD, WandDataHighPayload.Companion.DEFAULT)
+        .component(ModDataComponents.WAND_FREQUENT, WandDataFrequent.Companion.DEFAULT)
+) {
     override val isEditableWand = true
 }

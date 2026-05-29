@@ -8,8 +8,8 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataFrequent
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
-import com.github.nahnullscience.cypher_nexus.network.CNCodecs.AOC_CODEC
-import com.github.nahnullscience.cypher_nexus.network.CNCodecs.CYPHER_LIST
+import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.AOC_CODEC
+import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.CYPHER_LIST
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlaggable
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.mojang.serialization.Codec

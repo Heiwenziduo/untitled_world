@@ -22,7 +22,7 @@ class InvokingHelper (
     /** direction doesn't have to be normalized */
     val invokePosDire: PosDirePair,
 ) {
-    val rootBlock = ProjectileStateChunk()
+    val rootChunk = ProjectileStateChunk()
     val states = HelperStateBundle()
 
     init {
@@ -35,12 +35,11 @@ class InvokingHelper (
     }
 
     fun start() {
-        // TODO triggers
         while (data.draw >= 1) {
             val canContinue = step()
             if (!canContinue) break
         }
-        rootBlock.release(level, invoker, invokePosDire)
+        rootChunk.release(level, invoker, invokePosDire)
         hand2discard()
 
         if (states.wrapped) {
@@ -54,7 +53,7 @@ class InvokingHelper (
     fun step(): Boolean {
         val cy = drawNext()
         if (cy != null) {
-            cy.invokeInHand(this, rootBlock, data, states)
+            cy.invokeInHand(this, rootChunk, data, states)
             data.draw --
             return true
         }
@@ -89,6 +88,7 @@ class InvokingHelper (
     }
 
     // ============== bit operations ===================================================
+
     fun deck2hand(index: Int): AbstractCypher? {
         val cy = aoc[index]
         data.deck = data.deck and (1L shl index).inv()
@@ -102,6 +102,15 @@ class InvokingHelper (
     fun deck2discard(index: Int) {
         data.deck = data.deck and (1L shl index).inv()
         data.discard = data.discard or (1L shl index)
+    }
+    /** start <= ... < end */
+    fun deck2discard(from: Int, until: Int) {
+        val filter = ((1L shl from) - 1).inv()
+        val filter1 = ((1L shl until) - 1) and filter
+
+        val toDiscard = data.deck and filter1
+        data.deck = data.deck and toDiscard.inv()
+        data.discard = data.discard or toDiscard
     }
     /** aka. wrap */
     fun discard2deck() {

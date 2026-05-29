@@ -9,7 +9,7 @@ import com.github.nahnullscience.cypher_nexus.init.ModItems
 import com.github.nahnullscience.cypher_nexus.init.ModTabs
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
-import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategoryRegistry
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -60,7 +60,7 @@ object CypherNexus {
 
         Cyphers.register()
         CypherAttributes.register()
-        CypherCategoryRegistry.register()
+        CypherCategories.register()
         CypherBehaviorHooks.register()
 
 //        // Kotlin style events register
@@ -107,7 +107,7 @@ object CypherNexus {
     fun registerRegistries(event: NewRegistryEvent) {
         event.register(Cyphers.REGISTRY)
         event.register(CypherAttributes.REGISTRY)
-        event.register(CypherCategoryRegistry.REGISTRY)
+        event.register(CypherCategories.REGISTRY)
         event.register(CypherBehaviorHooks.REGISTRY)
     }
 

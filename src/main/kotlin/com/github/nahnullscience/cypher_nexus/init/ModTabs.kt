@@ -20,6 +20,7 @@ object ModTabs {
             .icon { -> ModItems.TIERED_WAND.defaultInstance }
             .displayItems { parameters, output ->
                 // add items while BuildCreativeModeTabContentsEvent is feasible too
+                output.accept { ModItems.MYTHICAL_STICK }
                 output.accept { ModItems.TIERED_WAND }
             }
             .build()

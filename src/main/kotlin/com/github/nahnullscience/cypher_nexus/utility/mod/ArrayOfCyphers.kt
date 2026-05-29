@@ -1,20 +1,19 @@
 package com.github.nahnullscience.cypher_nexus.utility.mod
 
-import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategoryRegistry
+import com.github.nahnullscience.cypher_nexus.content.cypher.other.AbstractRequirement
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 
-// TODO maybe let Cypher-s decide
-private val AbstractCypher.isInvokable: Boolean
-    get() = isNotEmpty() && category != CypherCategoryRegistry.PASSIVE
-private val AbstractCypher.isPassive: Boolean
-    get() = isNotEmpty() && category == CypherCategoryRegistry.PASSIVE
+
+private fun AbstractCypher.isPassive(): Boolean = isNotEmpty() && category == CypherCategories.PASSIVE
 
 /** fixed length, cypher changeable, EmptyCypher autofill */
 class ArrayOfCyphers(private val capacity: Int = 1) : Iterable<AbstractCypher> {
     /** not empty and not "passive" */
     private var _bitInvokable: Long = 0
     private var _bitPassive: Long = 0
+//    private var _bitRequirement: Long = 0
     private val _cyphers: Array<AbstractCypher> = Array(capacity) { EmptyCypher }
 
     companion object {
@@ -33,11 +32,13 @@ class ArrayOfCyphers(private val capacity: Int = 1) : Iterable<AbstractCypher> {
             if (cypher == null) return@forEach
             _cyphers[i] = cypher
 
-            if (cypher.isInvokable) {
+            if (cypher.isInvokable()) {
                 _bitInvokable = _bitInvokable or (1L shl i)
-            } else if (cypher.isPassive) {
+            } else if (cypher.isPassive()) {
                 _bitPassive = _bitPassive or (1L shl i)
             }
+//            if (cypher is AbstractRequirement.RequirementOtherwise || cypher is AbstractRequirement.RequirementEndpoint)
+//                _bitRequirement = _bitRequirement or (1L shl i)
         }
     }
 
@@ -53,8 +54,8 @@ class ArrayOfCyphers(private val capacity: Int = 1) : Iterable<AbstractCypher> {
         val cypher = cypher0 ?: EmptyCypher
         _cyphers[index] = cypher
 
-        if (cypher.isInvokable) _bitInvokable = _bitInvokable or (1L shl index)
-        if (cypher.isPassive) _bitPassive = _bitPassive or (1L shl index)
+        if (cypher.isInvokable()) _bitInvokable = _bitInvokable or (1L shl index)
+        if (cypher.isPassive()) _bitPassive = _bitPassive or (1L shl index)
         if (cypher.isEmpty()) {
             _bitInvokable = _bitInvokable and (1L shl index).inv()
             _bitPassive = _bitPassive and (1L shl index).inv()

@@ -5,6 +5,6 @@ enum class TriggerType {
     NONE,
     COLLISION,
     TIMER,
-    EXPIRE,
+    DEATH,
     RED_STONE, // TODO
 }

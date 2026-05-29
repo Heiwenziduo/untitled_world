@@ -24,7 +24,7 @@ object CypherAttributes {
         DEFERRED_REGISTER.register(MOD_BUS)
     }
 
-    // TODO, maybe a chain is more well-received
+    // maybe use a chain...
     fun registerAttribute(path: String, default: Double, min: Double = -Double.MAX_VALUE, max: Double = Double.MAX_VALUE,
                           target: CypherAttribute.AttributeApply = CypherAttribute.AttributeApply.PROJECTILE, sync: Boolean = true, hide: Boolean = false)
     : Holder<CypherAttribute> =
@@ -42,8 +42,10 @@ object CypherAttributes {
 //    val MANA_DRAIN = registerAttribute("mana_drain")
 //    val DRAW = registerAttribute("draw")
     /** unit is "tick", cast to int at last */
+    // TODO check data-driven
     val CAST_DELAY = registerAttribute("cast_delay", 0.0, target = CypherAttribute.AttributeApply.INVOKING)
     /** unit is "tick", cast to int at last */
+    // TODO check data-driven
     val RECHARGE_TIME = registerAttribute("recharge_time", 0.0, target = CypherAttribute.AttributeApply.INVOKING)
     /** degree */
     val SPREAD = registerAttribute("spread", 0.0, 0.0, 720.0, target = CypherAttribute.AttributeApply.INVOKING)

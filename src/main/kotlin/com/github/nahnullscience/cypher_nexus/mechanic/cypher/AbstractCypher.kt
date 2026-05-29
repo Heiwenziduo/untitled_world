@@ -22,8 +22,10 @@ import net.minecraft.resources.ResourceLocation
  * */
 sealed class AbstractCypher: IRegisterable {
     open val manaDrain: Float = 0f
+    open val delay = 0
+    open val recharge = 0
     open val draw: Int = 0
-    open val isRecursive: Boolean = false
+
     /** whether the cypher shows in the index(left side) */
     open val hide: Boolean = false
     /** override colors from category */
@@ -36,10 +38,20 @@ sealed class AbstractCypher: IRegisterable {
     val attributeMap
         get() = _attributeMap
     /** auto detect hooks */
-    val implementHooks: List<HookModule<*>> by lazy { // lazy init and cache result, cool
+    val implementedHooks: List<HookModule<*>> by lazy { // lazy init and cache result, cool
         val hookModules = CypherBehaviorHooks.REGISTRY
         hookModules.filter { it.hook.isInstance(this) }
     }
+
+    open val isRecursive: Boolean = false
+    fun isEmpty() = this is EmptyCypher
+    fun isNotEmpty() = !isEmpty()
+    /** use for AddTrigger series */
+    open fun triggerCanAttach() = false
+    /** use for AddTrigger series */
+    open fun triggerCanPayload() = false
+    open fun isInvokable() = true
+
 
     abstract val category: Holder<CypherCategory>
     init {
@@ -49,20 +61,18 @@ sealed class AbstractCypher: IRegisterable {
     /**
      * add Attributes with its BASE value
      * */
-    protected open fun addAttribute(holder: Holder<CypherAttribute>, base: Double): AbstractCypher {
+    protected open fun addAttribute(holder: Holder<CypherAttribute>, base: Double) {
         return addAttribute(holder, CypherAttributeOperation.BASE, base)
     }
     /**
      * add Attributes with specific operator
      * */
-    protected fun addAttribute(holder: Holder<CypherAttribute>, operator: CypherAttributeOperation, value: Double?): AbstractCypher {
+    protected fun addAttribute(holder: Holder<CypherAttribute>, operator: CypherAttributeOperation, value: Double?) {
         val map = _attributeMap.getOrPut(holder) { HashMap() }
         if (value != null) map.compute(operator) { k,v -> operator.cumulate(v?: operator.defaultValue, value) }
-        return this
     }
-    protected fun addFlag(flags: CypherFlags): AbstractCypher {
+    protected fun addFlag(flags: CypherFlags) {
         _flag = _flag or flags.value
-        return this
     }
 
     protected open fun initializeData() {
@@ -70,19 +80,7 @@ sealed class AbstractCypher: IRegisterable {
     }
 
 
-
-
-
-    /** custom logic up to subclasses */
-//    open fun onInvokeServer(level: Level, caster: Entity?, stack: ItemStack?, helper: CypherInvokerHelper, wandLength: Float) {}
-
-    fun isEmpty() = this is EmptyCypher
-    fun isNotEmpty() = !isEmpty()
-    /** use for AddTrigger series */
-    open fun triggerCanAttach() = false
-    /** use for AddTrigger series */
-    open fun triggerCanPayload() = false
-
+    // ============================================================================================================
     /** call super# unless you know what you are doing */
     open fun invokeInHand(
         helper: InvokingHelper,
@@ -98,22 +96,36 @@ sealed class AbstractCypher: IRegisterable {
             forwardState = addToStateChunk(helper, chunk)
         }
 
-        if (options.drawEnabled)
-        for (i in 0..<draw) {
+        if (options.drawEnabled) handleDraws(helper, forwardState, data, state, options)
+    }
+    private fun handleDraws(
+        helper: InvokingHelper,
+        chunk: ProjectileStateChunk,
+        data: InvokingHelper.HelperDataBundle,
+        state: InvokingHelper.HelperStateBundle,
+        options: CypherInvokingOptions = CypherInvokingOptions()
+    ) {
+        for (i in 0 until draw) {
             var cy = helper.drawNext()
             if (cy == null) {
                 CypherNexus.LOGGER.debug("[{}] want a wrap", this)
                 helper.discard2deck() // warp
                 cy = helper.drawNext()
             }
-            cy?.invokeInHand(helper, forwardState, data, state)
+            cy?.invokeInHand(helper, chunk, data, state)
         }
     }
+
     open fun modifyStateChunk(helper: InvokingHelper, chunk: ProjectileStateChunk) {
         _attributeMap.forEach { holder, cyMap ->
+            // prune 1, sub-chunk do not affect delay, spread, whatsoever. note recharge is an exception
+            if (chunk != helper.rootChunk && holder.value().applyOn == CypherAttribute.AttributeApply.INVOKING) return@forEach
+
             val stateMap = chunk.computedOperationMap.getOrPut(holder.value()) { HashMap() }
+            // prune 2, if set, skip
+            if (stateMap[CypherAttributeOperation.SET_ALL] != null && cyMap[CypherAttributeOperation.SET_ALL] == null) return@forEach
+
             cyMap.forEach { operator, value ->
-                // TODO prune
                 if (operator != CypherAttributeOperation.BASE && operator != CypherAttributeOperation.SET_SELF) {
                     stateMap.compute(operator) { op, v -> operator.cumulate(v?: operator.defaultValue, value) }
                 }

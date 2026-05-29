@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.init
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
-import com.github.nahnullscience.cypher_nexus.network.CNCodecs
+import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs
 import net.minecraft.network.syncher.EntityDataSerializer
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister

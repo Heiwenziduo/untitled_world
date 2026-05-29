@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.network.server
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
-import com.github.nahnullscience.cypher_nexus.network.CNCodecs
+import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec

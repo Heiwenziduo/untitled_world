@@ -13,7 +13,7 @@ import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 /**
  * use to create pools, to display, or to roll for some sake
  * */
-object CypherCategoryRegistry {
+object CypherCategories {
     val RESOURCE_KEY: ResourceKey<Registry<CypherCategory>> =
         ResourceKey.createRegistryKey(CypherNexus.modResource("cypher/category"))
     val REGISTRY: Registry<CypherCategory> = RegistryBuilder(RESOURCE_KEY).sync(true).create()
@@ -35,12 +35,14 @@ object CypherCategoryRegistry {
     val MODIFIER_RESOURCE = CypherNexus.modResource("modifier")
     val PASSIVE_RESOURCE = CypherNexus.modResource("passive")
 //    val WAND_MODULE = CypherNexus.modResource("wand_module")
+    val UTILITY_RESOURCE = CypherNexus.modResource("utility")
     val OTHER_RESOURCE = CypherNexus.modResource("other")
 
 
     val PROJECTILE = registerCategory(CypherCategory(PROJECTILE_RESOURCE, 0xFFBA1650.toInt()))
     val STATIC_PROJECTILE = registerCategory(CypherCategory(STATIC_PROJECTILE_RESOURCE, 0xFF228B22.toInt()))
-    val MODIFIER = registerCategory(CypherCategory(MODIFIER_RESOURCE, 0xFF72BFE5.toInt()))
+    val MODIFIER = registerCategory(CypherCategory(MODIFIER_RESOURCE, 0xFF5F8CD6.toInt()))
     val PASSIVE = registerCategory(CypherCategory(PASSIVE_RESOURCE, 0xFF056C5C.toInt()))
-    val OTHER = registerCategory(CypherCategory(OTHER_RESOURCE, 0xFF828C91.toInt()))
+    val UTILITY = registerCategory(CypherCategory(UTILITY_RESOURCE, 0xFF8D25E1.toInt()))
+    val OTHER = registerCategory(CypherCategory(OTHER_RESOURCE, 0xFFF2EC8D.toInt()))
 }

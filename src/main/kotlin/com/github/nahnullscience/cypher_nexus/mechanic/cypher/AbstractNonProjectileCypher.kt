@@ -8,7 +8,7 @@ abstract class AbstractNonProjectileCypher: AbstractCypher() {
     /**
      * add Attributes as its ADD value
      * */
-    final override fun addAttribute(holder: Holder<CypherAttribute>, add: Double): AbstractCypher {
+    final override fun addAttribute(holder: Holder<CypherAttribute>, add: Double) {
         return addAttribute(holder, CypherAttributeOperation.ADD, add)
     }
 

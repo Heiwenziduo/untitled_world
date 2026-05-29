@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.init
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.item.AbstractItemWand
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.AbstractItemWand
 import com.github.nahnullscience.cypher_nexus.content.item.MythicalStick
 import com.github.nahnullscience.cypher_nexus.content.item.TieredWandItem
 import net.minecraft.world.item.BlockItem

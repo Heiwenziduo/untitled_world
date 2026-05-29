@@ -13,8 +13,6 @@ object LlamaSpitCypher : ProjectileCypher(
     override val resource = CypherNexus.modResource("llama_spit")
 
     init {
-        addAttribute(CypherAttributes.RECHARGE_TIME, 2.0)
-
         addAttribute(CypherAttributes.DAMAGE, 1.0)
         addAttribute(CypherAttributes.SPEED, 1.0)
         addAttribute(CypherAttributes.EXISTING, 300.0)

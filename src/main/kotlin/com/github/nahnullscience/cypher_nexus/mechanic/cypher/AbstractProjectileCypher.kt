@@ -7,6 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
+import com.google.common.base.Optional
 import net.minecraft.core.Holder
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
@@ -35,7 +36,7 @@ abstract class AbstractProjectileCypher: AbstractCypher() {
         return projectile
     }
 
-    final override fun addAttribute(holder: Holder<CypherAttribute>, base: Double): AbstractCypher = super.addAttribute(holder, base)
+    final override fun addAttribute(holder: Holder<CypherAttribute>, base: Double) = super.addAttribute(holder, base)
 
     fun getAttrBaseOrDefault(holder: Holder<CypherAttribute>) =
         attributeMap[holder]?.get(CypherAttributeOperation.BASE)?: holder.value().defaultValue

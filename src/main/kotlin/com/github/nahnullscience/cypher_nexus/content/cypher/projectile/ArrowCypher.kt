@@ -17,9 +17,6 @@ object ArrowCypher : ProjectileCypher(
     val stack = ItemStack(Items.ARROW)
 
     init {
-        addAttribute(CypherAttributes.CAST_DELAY, 1.0)
-        addAttribute(CypherAttributes.RECHARGE_TIME, 1.0)
-
         addAttribute(CypherAttributes.DAMAGE, 3.0)
         addAttribute(CypherAttributes.SPEED, 1.0)
         addAttribute(CypherAttributes.EXISTING, 300.0)
