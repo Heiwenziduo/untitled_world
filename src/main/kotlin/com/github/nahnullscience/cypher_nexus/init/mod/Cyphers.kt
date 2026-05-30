@@ -96,8 +96,7 @@ object Cyphers {
 
     val MANA_SURGE = registerCypher(
         SimpleModifier(-50f, "mana_surge")
-        .attribute(CypherAttributes.CAST_DELAY, CypherAttributeOperation.ADD, 4.0)
-        .attribute(CypherAttributes.RECHARGE_TIME, CypherAttributeOperation.ADD, 4.0))
+        .attribute(CypherAttributes.CAST_DELAY, CypherAttributeOperation.ADD, 4.0))
     val HEAVILY_STRONG = registerCypher(
         SimpleModifier(20f, "heavily_strong")
         .attribute(CypherAttributes.DAMAGE, CypherAttributeOperation.ADD, 4.0)

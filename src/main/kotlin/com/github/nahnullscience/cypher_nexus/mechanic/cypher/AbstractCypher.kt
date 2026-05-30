@@ -98,7 +98,7 @@ sealed class AbstractCypher: IRegisterable {
 
         if (options.drawEnabled) handleDraws(helper, forwardState, data, state, options)
     }
-    private fun handleDraws(
+    protected fun handleDraws(
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
         data: InvokingHelper.HelperDataBundle,

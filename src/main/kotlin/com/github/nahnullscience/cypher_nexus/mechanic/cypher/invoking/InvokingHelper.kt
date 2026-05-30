@@ -99,9 +99,16 @@ class InvokingHelper (
         data.discard = data.discard or data.hand
         data.hand = 0
     }
+    /** discard an exact index, do nothing if target index does not exist in deck */
     fun deck2discard(index: Int) {
+        if (data.deck and (1L shl index) == 0L) return // target index is unavailable
         data.deck = data.deck and (1L shl index).inv()
         data.discard = data.discard or (1L shl index)
+    }
+    /** discard next non-empty */
+    fun deckNext2discard(start: Int = 0) {
+        val next = (data.deck shr start).countTrailingZeroBits() + start
+        deck2discard(next)
     }
     /** start <= ... < end */
     fun deck2discard(from: Int, until: Int) {

@@ -42,19 +42,23 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
                     endpoint = i
                     break
                 }
+                if (cy is RequirementIf) break
             }
 
             if (ok) {
-                // FIXME next NONEMPTY
                 if (otherwise > 0) {
                     if (endpoint > 0) helper.deck2discard(otherwise, endpoint + 1)
-                    else helper.deck2discard(otherwise, otherwise + 2) // discard otherwise itself and the next ONE if any
+                    else {
+                        helper.deck2discard(otherwise)
+                        helper.deckNext2discard(otherwise) // discard otherwise itself and the next ONE if any
+                    }
                     // this is different from Noita, which will discard directly till the end if no "close-parenthesis" after "else".
                 }
             } else {
                 if (otherwise > 0) {
-                    helper.deck2discard(currentIndex, otherwise + 1) // if there is an "else", discard everything between them
-                    // in this specific case, endpoint search is unnecessary...
+                    helper.deck2discard(currentIndex, otherwise + 1)
+                    // if there is an "else", discard everything between them
+                    // in this specific case, endpoint search is unnecessary... well
                 } else if (endpoint > 0) {
                     helper.deck2discard(currentIndex, endpoint + 1)
                 } else {
@@ -62,8 +66,8 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
                 }
             }
 
-            // then draw
-            super.invokeInHand(helper, chunk, data, state, options)
+            if (options.drawEnabled) handleDraws(helper, chunk, data, state, options)
+            CypherNexus.LOGGER.debug("[{}] is invoked", this)
             CypherNexus.LOGGER.debug("[{}] requirement is {} met", this, if (ok) "" else "not")
         }
     }
