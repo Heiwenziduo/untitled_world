@@ -104,8 +104,11 @@ class InvokingHelper (
         if (data.deck and (1L shl index) == 0L) return // target index is unavailable
         data.deck = data.deck and (1L shl index).inv()
         data.discard = data.discard or (1L shl index)
+
+        val cy = aoc[index]
+        CypherNexus.LOGGER.debug("[{}] discard from deck", cy)
     }
-    /** discard next non-empty */
+    /** discard next invokable */
     fun deckNext2discard(start: Int = 0) {
         val next = (data.deck shr start).countTrailingZeroBits() + start
         deck2discard(next)
@@ -114,15 +117,27 @@ class InvokingHelper (
     fun deck2discard(from: Int, until: Int) {
         val filter = ((1L shl from) - 1).inv()
         val filter1 = ((1L shl until) - 1) and filter
-
         val toDiscard = data.deck and filter1
+
+//        CypherNexus.LOGGER.debug("deck before bunch-discard: {}", data.deck.toString(2).padStart(20, '0'))
+
         data.deck = data.deck and toDiscard.inv()
         data.discard = data.discard or toDiscard
+
+//        CypherNexus.LOGGER.debug("deck after bunch-discard: {}", data.deck.toString(2).padStart(20, '0'))
+
+        for (i in toDiscard.countTrailingZeroBits() until 64 - toDiscard.countLeadingZeroBits()) {
+            val cy = aoc[i]
+            if (cy.isInvokable()) CypherNexus.LOGGER.debug("[{}] bunch-discard from deck", cy)
+        }
     }
-    /** aka. wrap */
-    fun discard2deck() {
+    /** aka. wrap, return true if there is something to wrap */
+    fun discard2deck(): Boolean {
+        CypherNexus.LOGGER.debug("discard {} wrap back into deck", data.discard.toString(2))
+        val old = data.discard
         data.deck = data.deck or data.discard
         data.discard = 0
+        return old > 0
     }
     // =================================================================================
 
@@ -135,7 +150,7 @@ class InvokingHelper (
         var manaCurrent: Float,
 
         var hand: Long = 0,
-        /** R -> L */
+        /** R -> L, invokable only */
         var deck: Long = 0,
         var discard: Long = 0,
     ) {

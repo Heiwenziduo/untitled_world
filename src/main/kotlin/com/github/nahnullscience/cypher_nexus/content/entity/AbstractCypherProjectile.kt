@@ -219,7 +219,7 @@ open class AbstractCypherProjectile(entityType: EntityType<out Projectile>, leve
         projectileTick()
         modifierTick()
 
-        if (tickCount == 20) trigger(TriggerType.TIMER)
+        if (tickCount == 20) trigger(TriggerType.TIMER_20)
         if (existing == tickCount) {
             // here's a trick, if player make existing-time less or equal to 0, projectile will last till the game quit
             discardCy(DiscardReason.EXPIRE)

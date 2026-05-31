@@ -15,7 +15,7 @@ import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 object CypherAttributes {
     val RESOURCE_KEY: ResourceKey<Registry<CypherAttribute>> =
         ResourceKey.createRegistryKey(CypherNexus.modResource("cypher/attribute"))
-    val REGISTRY: Registry<CypherAttribute> = RegistryBuilder(RESOURCE_KEY).create()
+    val REGISTRY: Registry<CypherAttribute> = RegistryBuilder(RESOURCE_KEY).sync(true).create()
 
     val DEFERRED_REGISTER: DeferredRegister<CypherAttribute> =
         DeferredRegister.create(REGISTRY, CypherNexus.MOD_ID)

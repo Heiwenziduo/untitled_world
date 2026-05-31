@@ -1,7 +1,11 @@
 package com.github.nahnullscience.cypher_nexus.utility.mod
 
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation.Companion.CODEC_OPERATION
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -11,6 +15,7 @@ import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 
 object CNCodecs {
+
     val CYPHER: Codec<AbstractCypher> = Cyphers.REGISTRY.byNameCodec()
     val CYPHER_STREAM: StreamCodec<RegistryFriendlyByteBuf, AbstractCypher> = ByteBufCodecs.registry(Cyphers.RESOURCE_KEY)
 
@@ -27,19 +32,24 @@ object CNCodecs {
         { aoc -> aoc.toList() }
     )
 
-    val HOOK_CONTAINER: Codec<HookContainer> = Codec.recursive(HookContainer::class.simpleName) {
-        recursedCodec -> RecordCodecBuilder.create()
-        {
-            it.group(
-                recursedCodec.optionalFieldOf("parent").forGetter(HookContainer::parent)
-            ).apply(it, ::HookContainer)
-        }
-    }
-    val HOOK_CONTAINER_STREAM: StreamCodec<ByteBuf, HookContainer> = StreamCodec.recursive {
-        recursedStreamCodec -> StreamCodec.composite(
-            recursedStreamCodec.apply(ByteBufCodecs::optional),
-            HookContainer::parent,
-            ::HookContainer
-        )
-    }
+    val CYPHER_ATTRIBUTE: Codec<CypherAttribute> = CypherAttributes.REGISTRY.byNameCodec()
+    /** represents a map that key is string-fied attribute-operator, and value is a double */
+    val CYPHER_OPERATION_MAP: Codec<Map<CypherAttributeOperation, Double>> =
+        Codec.unboundedMap(CODEC_OPERATION, Codec.DOUBLE)
+
+//    val HOOK_CONTAINER: Codec<HookContainer> = Codec.recursive(HookContainer::class.simpleName) {
+//        recursedCodec -> RecordCodecBuilder.create()
+//        {
+//            it.group(
+//                recursedCodec.optionalFieldOf("parent").forGetter(HookContainer::parent)
+//            ).apply(it, ::HookContainer)
+//        }
+//    }
+//    val HOOK_CONTAINER_STREAM: StreamCodec<ByteBuf, HookContainer> = StreamCodec.recursive {
+//        recursedStreamCodec -> StreamCodec.composite(
+//            recursedStreamCodec.apply(ByteBufCodecs::optional),
+//            HookContainer::parent,
+//            ::HookContainer
+//        )
+//    }
 }

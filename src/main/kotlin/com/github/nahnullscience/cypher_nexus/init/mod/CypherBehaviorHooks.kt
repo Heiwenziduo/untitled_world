@@ -36,6 +36,12 @@ object CypherBehaviorHooks {
         return DEFERRED_REGISTER.register(module.resource.path) { resource -> module }
     }
 
+    /*
+     * ensure that none of the hook implementations modify the state-chunk itself,
+     * which may cause every projectile of the same state-chunk be modified together and de-sync.
+     * hooks should only modify the projectile that preforms the hook
+     * */
+
     val INVOKE_REDIRECT_POS_SERVER = registerHook(ServerInvokeRedirectPosHook.MODULE)
 
     val HIT_ENTITY_SERVER = registerHook(ServerHitEntityHook.MODULE)

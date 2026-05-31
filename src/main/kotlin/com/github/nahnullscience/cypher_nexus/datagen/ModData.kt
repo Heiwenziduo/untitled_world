@@ -6,6 +6,7 @@ import com.github.nahnullscience.cypher_nexus.datagen.client.CNItemModelProvider
 import com.github.nahnullscience.cypher_nexus.datagen.loot_table.CNGlobalLootModifierProvider
 import com.github.nahnullscience.cypher_nexus.datagen.loot_table.CNLootTableProvider
 import com.github.nahnullscience.cypher_nexus.datagen.server.CNAdvancementProvider
+import com.github.nahnullscience.cypher_nexus.datagen.server.CNDataMapProvider
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.data.event.GatherDataEvent
@@ -44,5 +45,6 @@ object ModData {
         generator.addProvider(server, CNAdvancementProvider(output, lookupProvider, existingFileHelper))
         generator.addProvider(server, CNGlobalLootModifierProvider(output, lookupProvider))
         generator.addProvider(server, CNLootTableProvider(output, lookupProvider))
+        generator.addProvider(server, CNDataMapProvider(output, lookupProvider))
     }
 }

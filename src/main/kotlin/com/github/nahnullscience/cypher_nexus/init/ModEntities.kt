@@ -29,7 +29,7 @@ object ModEntities {
                 .clientTrackingRange(10)
                 // How often update packets are sent for this entity, in once every x ticks. This is set to higher values
                 // for entities that have predictable movement patterns, for example, projectiles. Defaults to 3.
-                .updateInterval(3)
+                .updateInterval(10)
                 .build(resource.path)
         }
 }

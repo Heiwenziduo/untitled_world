@@ -1,8 +1,10 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.CYPHER_DATA_ATTACH
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
+import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
@@ -10,20 +12,22 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingH
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
+import com.github.nahnullscience.cypher_nexus.utility.exception.CypherNotFoundException
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.ChatFormatting
 import net.minecraft.core.Holder
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.ResourceLocation
+import kotlin.jvm.optionals.getOrElse
 
 /**
  *
  * */
 sealed class AbstractCypher: IRegisterable {
     open val manaDrain: Float = 0f
-    open val delay = 0
-    open val recharge = 0
+    open val delay: Int = 0
+    open val recharge: Int = 0
     open val draw: Int = 0
 
     /** whether the cypher shows in the index(left side) */
@@ -54,9 +58,6 @@ sealed class AbstractCypher: IRegisterable {
 
 
     abstract val category: Holder<CypherCategory>
-    init {
-        initializeData()
-    }
 
     /**
      * add Attributes with its BASE value
@@ -75,10 +76,17 @@ sealed class AbstractCypher: IRegisterable {
         _flag = _flag or flags.value
     }
 
-    protected open fun initializeData() {
-        // TODO: read from json
-    }
 
+    // = attr & data attach ==============================================================================================
+
+    fun holder(): Holder.Reference<AbstractCypher> = Cyphers.REGISTRY.getHolder(resource).getOrElse()
+    { throw CypherNotFoundException("$resource not exist") }
+
+    private fun attributesData() = holder().getData(CYPHER_DATA_ATTACH)
+
+    open fun defaultAttributes(): CypherDataAttach.Builder = CypherDataAttach.builder()
+
+    fun attributes() = attributesData() ?: run { CypherNexus.LOGGER.warn("cypher $this missing attributes data, this may cause lag"); defaultAttributes().build() }
 
     // ============================================================================================================
     /** call super# unless you know what you are doing */
@@ -109,7 +117,8 @@ sealed class AbstractCypher: IRegisterable {
             var cy = helper.drawNext()
             if (cy == null) {
                 CypherNexus.LOGGER.debug("[{}] want a wrap", this)
-                helper.discard2deck() // warp
+                val wrap = helper.discard2deck() // wrap
+                if (!wrap) break // nothing to wrap, break
                 cy = helper.drawNext()
             }
             cy?.invokeInHand(helper, chunk, data, state)
@@ -138,6 +147,10 @@ sealed class AbstractCypher: IRegisterable {
             chunk.enableFlags(flag)
         }
     }
+
+//    open fun discardFromDeck(helper: InvokingHelper,) {
+//
+//    }
 
     // ============================================================================================================
 

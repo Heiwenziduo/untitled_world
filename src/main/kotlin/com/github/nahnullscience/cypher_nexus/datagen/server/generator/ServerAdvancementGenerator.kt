@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.datagen.generator
+package com.github.nahnullscience.cypher_nexus.datagen.server.generator
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModBlocks

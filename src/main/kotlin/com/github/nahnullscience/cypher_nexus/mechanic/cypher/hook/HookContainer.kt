@@ -7,7 +7,6 @@ import java.util.function.Supplier
 import kotlin.collections.iterator
 import kotlin.jvm.optionals.getOrNull
 
-// TODO consider sync hook-map to client
 class HookContainer (
     /** the "prototype", use to isolate projectile specific hooks (child) from StateBlock hooks (parent),
      * while iteration, search this(child) first, then parents

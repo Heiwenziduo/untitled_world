@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.init
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.item.CreativeModeTab
+import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 
@@ -14,7 +15,8 @@ object ModTabs {
         DEFERRED_REGISTER.register(MOD_BUS)
     }
 
-    val BASE_MODE_TAB = DEFERRED_REGISTER.register(CypherNexus.MOD_ID, { ->
+    val BASE_MODE_TAB: DeferredHolder<CreativeModeTab, CreativeModeTab> =
+        DEFERRED_REGISTER.register(CypherNexus.MOD_ID, { ->
         CreativeModeTab.builder()
             .title(CypherNexus.modTranslation("item_group"))
             .icon { -> ModItems.TIERED_WAND.defaultInstance }

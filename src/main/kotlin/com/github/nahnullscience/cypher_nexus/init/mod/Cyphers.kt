@@ -74,7 +74,7 @@ object Cyphers {
     val BRISK = registerCypher(SimpleModifier(5f, "brisk").attribute(CypherAttributes.SPEED, CypherAttributeOperation.MULTIPLY_TOTAL, 2.0))
     val FIERY = registerCypher(FieryCypher)
     val REVERSE_GRAVITY = registerCypher(SimpleModifier(1f, "reverse_gravity").attribute(CypherAttributes.GRAVITY_FACTOR, CypherAttributeOperation.MULTIPLY_TOTAL, -1.0))
-    val ANTIGRAVITY = registerCypher(SimpleModifier(1f, "antigravity").attribute(CypherAttributes.GRAVITY_FACTOR, CypherAttributeOperation.MULTIPLY_BASE, -0.66))
+    val ANTIGRAVITY = registerCypher(SimpleModifier(5f, "antigravity").attribute(CypherAttributes.GRAVITY_FACTOR, CypherAttributeOperation.MULTIPLY_BASE, -0.66))
 
 
 
@@ -151,7 +151,7 @@ object Cyphers {
         override val resource = CypherNexus.modResource("add_trigger")
     })
     val ADD_TRIGGER_TIMER = registerCypher(object : AbstractAddTrigger(20f) {
-        override val triggerType = TriggerType.TIMER
+        override val triggerType = TriggerType.TIMER_20
         override val resource = CypherNexus.modResource("add_trigger_timer")
     })
     val ADD_TRIGGER_DEATH = registerCypher(object : AbstractAddTrigger(20f) {

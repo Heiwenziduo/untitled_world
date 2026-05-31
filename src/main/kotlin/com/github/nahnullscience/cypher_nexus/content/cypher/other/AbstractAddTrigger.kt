@@ -16,6 +16,7 @@ abstract class AbstractAddTrigger(
     override val draw: Int = 0
     override val category = CypherCategories.OTHER
     abstract val triggerType: TriggerType
+    override fun modifyStateChunk(helper: InvokingHelper, chunk: ProjectileStateChunk) = Unit
 
     override fun invokeInHand(
         helper: InvokingHelper,
@@ -25,14 +26,17 @@ abstract class AbstractAddTrigger(
         options: CypherInvokingOptions
     ) {
         CypherNexus.LOGGER.debug("[{}] is invoked", this)
-        var attachIndex = data.deck.countTrailingZeroBits()
+        val startIndex = data.deck.countTrailingZeroBits()
+        var attachIndex = startIndex
         var cy: AbstractProjectileCypher = EmptyCypher
         while (attachIndex < helper.aoc.size) {
             // step 1, find target projectile cypher
             val cy0 = helper.aoc[attachIndex]
-            cy0.modifyStateChunk(helper, chunk)
-            helper.deck2discard(attachIndex)
             attachIndex++
+            if (!cy0.isInvokable()) continue
+
+            cy0.modifyStateChunk(helper, chunk)
+
             if (cy0 is AbstractProjectileCypher && cy0.triggerCanAttach()) {
                 cy = cy0
                 break
@@ -40,6 +44,11 @@ abstract class AbstractAddTrigger(
         }
 
         if (cy.isNotEmpty()) {
+            // discard if attach is found
+            CypherNexus.LOGGER.debug("[{}] find trigger attachable [{}]", this, cy)
+            helper.deck2discard(startIndex, attachIndex)
+            // TODO check cy#related-projectile to fit Noita mechanic (like blood magic)
+
             // step 2, find payload
             var index1 = attachIndex
             var find = false
@@ -52,6 +61,7 @@ abstract class AbstractAddTrigger(
                 }
             }
             if (find) {
+                CypherNexus.LOGGER.debug("invoke [{}] with payload", cy)
                 val subChunk = ProjectileStateChunk(Int.MAX_VALUE)
                 chunk.addProjectile(ProjectileNode(cy, subChunk, triggerType))
                 val payload = helper.drawNext()

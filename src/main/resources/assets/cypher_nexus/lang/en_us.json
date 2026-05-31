@@ -35,6 +35,8 @@
   "cypher.cypher_nexus.modifier.fiery.description": "Fiery",
   "cypher.cypher_nexus.modifier.antigravity": "Antigravity",
   "cypher.cypher_nexus.modifier.antigravity.description": "Antigravity",
+  "cypher.cypher_nexus.modifier.reverse_gravity": "Reverse Gravity",
+  "cypher.cypher_nexus.modifier.reverse_gravity.description": "Reverse Gravity",
   "cypher.cypher_nexus.modifier.mana_surge": "Mana Surge",
   "cypher.cypher_nexus.modifier.mana_surge.description": "Mana Surge",
   "cypher.cypher_nexus.modifier.heavily_strong": "Heavy & Strong",

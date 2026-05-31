@@ -11,10 +11,11 @@ import net.minecraft.core.Holder
 class SimpleModifier(
     manaDrain: Float,
     path: String,
+    override val draw: Int = 1,
+    override val color: Int = 0,
+
     override val delay: Int = 0,
     override val recharge: Int = 0,
-    override val draw: Int = 1,
-    override val color: Int = 0
 ) : ModifierCypher(manaDrain) {
     override val resource = CypherNexus.modResource(path)
     fun attribute(attribute: Holder<CypherAttribute>, operator: CypherAttributeOperation, value: Double) = run {

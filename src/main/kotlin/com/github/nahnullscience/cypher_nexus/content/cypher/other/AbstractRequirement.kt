@@ -31,6 +31,7 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
             state: InvokingHelper.HelperStateBundle,
             options: CypherInvokingOptions
         ) {
+            CypherNexus.LOGGER.debug("[{}] is invoked", this)
             val currentIndex = data.deck.countTrailingZeroBits()
             val ok = requirement(helper, chunk, data, state, options)
             var otherwise = -1
@@ -45,6 +46,7 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
                 if (cy is RequirementIf) break
             }
 
+            CypherNexus.LOGGER.debug("[{}] requirement is {} met", this, if (ok) "" else "not")
             if (ok) {
                 if (otherwise > 0) {
                     if (endpoint > 0) helper.deck2discard(otherwise, endpoint + 1)
@@ -67,8 +69,6 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
             }
 
             if (options.drawEnabled) handleDraws(helper, chunk, data, state, options)
-            CypherNexus.LOGGER.debug("[{}] is invoked", this)
-            CypherNexus.LOGGER.debug("[{}] requirement is {} met", this, if (ok) "" else "not")
         }
     }
 

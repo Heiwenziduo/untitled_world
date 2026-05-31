@@ -1,6 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.datagen.server
 
-import com.github.nahnullscience.cypher_nexus.datagen.generator.ServerAdvancementGenerator
+import com.github.nahnullscience.cypher_nexus.datagen.server.generator.ServerAdvancementGenerator
 import net.minecraft.core.HolderLookup
 import net.minecraft.data.PackOutput
 import net.neoforged.neoforge.common.data.AdvancementProvider

@@ -19,9 +19,9 @@ object EmptyCypher: AbstractProjectileCypher() {
     override val category = CypherCategories.OTHER
     override val resource = CypherNexus.modResource("empty_cypher")
     override fun isInvokable() = false
-    init {
+    override fun triggerCanAttach() = false
+    override fun triggerCanPayload() = false
 
-    }
 
     override fun createProjectile(
         level: Level,

@@ -9,7 +9,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 private fun AbstractCypher.isPassive(): Boolean = isNotEmpty() && category == CypherCategories.PASSIVE
 
 /** fixed length, cypher changeable, EmptyCypher autofill */
-class ArrayOfCyphers(private val capacity: Int = 1) : Iterable<AbstractCypher> {
+class ArrayOfCyphers(val capacity: Int = 1) : Iterable<AbstractCypher> {
     /** not empty and not "passive" */
     private var _bitInvokable: Long = 0
     private var _bitPassive: Long = 0
@@ -42,8 +42,9 @@ class ArrayOfCyphers(private val capacity: Int = 1) : Iterable<AbstractCypher> {
         }
     }
 
+    /** last Invokable index + 1 */
     val size : Int
-        get() = capacity
+        get() = 64 - _bitInvokable.countLeadingZeroBits()
 
     // this allows index-get: myInventory[0]
     operator fun get(index: Int): AbstractCypher = _cyphers[index]
@@ -126,6 +127,6 @@ class ArrayOfCyphers(private val capacity: Int = 1) : Iterable<AbstractCypher> {
 
 
     override fun toString(): String {
-        return _cyphers.toString()
+        return _cyphers.toList().toString()
     }
 }
