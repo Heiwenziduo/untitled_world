@@ -5,10 +5,11 @@ import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataAttach
 import net.neoforged.bus.api.SubscribeEvent
+import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.registries.datamaps.DataMapType
 import net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent
 
-
+@EventBusSubscriber
 object ModDataAttachments {
     val CYPHER_DATA_ATTACH: DataMapType<AbstractCypher, CypherDataAttach> =
         DataMapType.builder(

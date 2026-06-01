@@ -14,7 +14,6 @@ import net.minecraft.world.phys.Vec3
  * default registered cypher, like blocks:air, any cypher missing a registry name will be replaced with this.
  * */
 object EmptyCypher: AbstractProjectileCypher() {
-    override val draw = 0
     override val hide = true
     override val category = CypherCategories.OTHER
     override val resource = CypherNexus.modResource("empty_cypher")

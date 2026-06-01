@@ -2,7 +2,9 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.projectile
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.CYPHER_DATA_ATTACH
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
+import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataAttach
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
@@ -10,9 +12,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.Projectil
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.level.Level
 
-object SnowballCypher : ProjectileCypher(
-    manaDrain = 3f
-) {
+object SnowballCypher : ProjectileCypher() {
     override val resource = CypherNexus.modResource("snowball")
 
     override fun defaultAttributes(): CypherDataAttach.Builder {
@@ -23,16 +23,6 @@ object SnowballCypher : ProjectileCypher(
             .projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
     }
 
-    override fun invokeInHand(
-        helper: InvokingHelper,
-        chunk: ProjectileStateChunk,
-        data: InvokingHelper.HelperDataBundle,
-        state: InvokingHelper.HelperStateBundle,
-        options: CypherInvokingOptions
-    ) {
-        super.invokeInHand(helper, chunk, data, state, options)
-        println(attributes())
-    }
 
     override fun visualEffectOnHit(level: Level, projectile: AbstractCypherProjectile) {
         val pos = projectile.position()

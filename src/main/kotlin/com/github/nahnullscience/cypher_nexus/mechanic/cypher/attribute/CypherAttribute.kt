@@ -33,7 +33,7 @@ open class CypherAttribute(
 
 
     // ==========================================================================================================
-    fun attrRegistryHolder(): Holder<CypherAttribute> {
+    fun holder(): Holder<CypherAttribute> {
 //        val resourceKeyOptional = CypherAttributes.REGISTRY.getResourceKey(attr)
 //        return resourceKeyOptional.flatMap { CypherAttributes.REGISTRY.getHolder(resourceKeyOptional) }.orElse(null)
         return CypherAttributes.REGISTRY.getHolder(resource).get() // if this throw, means the attr is not registered

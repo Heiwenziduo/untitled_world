@@ -3,21 +3,24 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.projectile
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataAttach
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import net.minecraft.world.level.Level
 
-object LlamaSpitCypher : ProjectileCypher(
-    manaDrain = 5f
-) {
+object LlamaSpitCypher : ProjectileCypher() {
     override val resource = CypherNexus.modResource("llama_spit")
 
-    init {
-        addAttribute(CypherAttributes.DAMAGE, 1.0)
-        addAttribute(CypherAttributes.SPEED, 1.0)
-        addAttribute(CypherAttributes.EXISTING, 300.0)
-        addAttribute(CypherAttributes.GRAVITY_FACTOR, 0.06)
-        addAttribute(CypherAttributes.CRIT_CHANCE, CypherAttributeOperation.ADD,0.05)
+    override fun defaultAttributes(): CypherDataAttach.Builder {
+        return super.defaultAttributes()
+            .manaDrain(5f)
+            .recharge(1)
+            .projectileAttr(CypherAttributes.DAMAGE, 1.0)
+            .projectileAttr(CypherAttributes.SPEED, 1.0)
+            .projectileAttr(CypherAttributes.EXISTING, 300.0)
+            .projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.06)
+            .stateChunkAttr(CypherAttributes.CRIT_CHANCE, CypherAttributeOperation.ADD, 0.05)
     }
 
     override fun visualEffectOnHit(level: Level, projectile: AbstractCypherProjectile) {

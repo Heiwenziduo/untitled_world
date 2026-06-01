@@ -50,10 +50,10 @@
   "cypher.cypher_nexus.modifier.no_more_bounce.description": "No More Bounce",
   "cypher.cypher_nexus.modifier.no_more_damage": "No More Damage",
   "cypher.cypher_nexus.modifier.no_more_damage.description": "No More Damage",
-  "cypher.cypher_nexus.modifier.extend_time": "Extend Time",
-  "cypher.cypher_nexus.modifier.extend_time.description": "Extend Time",
-  "cypher.cypher_nexus.modifier.curtail_time": "Curtail Time",
-  "cypher.cypher_nexus.modifier.curtail_time.description": "Curtail Time",
+  "cypher.cypher_nexus.modifier.extend_existing": "Extend Existing",
+  "cypher.cypher_nexus.modifier.extend_existing.description": "Extend Existing",
+  "cypher.cypher_nexus.modifier.curtail_existing": "Curtail Existing",
+  "cypher.cypher_nexus.modifier.curtail_existing.description": "Curtail Existing",
   "cypher.cypher_nexus.modifier.homing": "Homing",
   "cypher.cypher_nexus.modifier.homing.description": "Homing",
   "cypher.cypher_nexus.modifier.pierce_entity": "Pierce Entity",
@@ -102,6 +102,9 @@
   "cypher.cypher_nexus.projectile.llama_spit.description": "Llama Spit",
   "cypher.cypher_nexus.projectile.spawn_egg": "\"Spawn Egg\"",
   "cypher.cypher_nexus.projectile.spawn_egg.description": "...",
+
+  "cypher.cypher_nexus.utility.refresher_ring": "Refresher Ring",
+  "cypher.cypher_nexus.utility.refresher_ring.description": "",
 
   "gui.cypher_nexus.cypher_index.": "--tmp",
 

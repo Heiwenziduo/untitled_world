@@ -2,14 +2,19 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataAttach
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothTickBehaviorHook
 import net.minecraft.world.level.Level
 
-object HomingCypher: ModifierCypher(
-    manaDrain = 50f
-), BothTickBehaviorHook {
+object HomingCypher: ModifierCypher(), BothTickBehaviorHook {
     override val resource = CypherNexus.modResource("homing")
+
+    override fun defaultAttributes(): CypherDataAttach.Builder {
+        return super.defaultAttributes()
+            .manaDrain(60f)
+    }
+
     override fun tickBehaviorBoth(
         level: Level,
         projectile: AbstractCypherProjectile,
@@ -17,10 +22,5 @@ object HomingCypher: ModifierCypher(
     ) {
         // TODO
     }
-
-    init {
-
-    }
-
 
 }

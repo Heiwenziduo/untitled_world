@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.projectile
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataAttach
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
 import net.minecraft.core.particles.ItemParticleOption
 import net.minecraft.core.particles.ParticleTypes
@@ -10,17 +11,18 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 
-object ArrowCypher : ProjectileCypher(
-    manaDrain = 10f
-) {
+object ArrowCypher : ProjectileCypher() {
     override val resource = CypherNexus.modResource("arrow")
     val stack = ItemStack(Items.ARROW)
 
-    init {
-        addAttribute(CypherAttributes.DAMAGE, 3.0)
-        addAttribute(CypherAttributes.SPEED, 1.0)
-        addAttribute(CypherAttributes.EXISTING, 300.0)
-        addAttribute(CypherAttributes.GRAVITY_FACTOR, 0.01)
+    override fun defaultAttributes(): CypherDataAttach.Builder {
+        return super.defaultAttributes()
+            .manaDrain(10f)
+            .delay(2)
+            .projectileAttr(CypherAttributes.DAMAGE, 3.0)
+            .projectileAttr(CypherAttributes.SPEED, 0.8)
+            .projectileAttr(CypherAttributes.EXISTING, 300.0)
+            .projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.01)
     }
 
     override fun visualEffectOnHit(level: Level, projectile: AbstractCypherProjectile) {

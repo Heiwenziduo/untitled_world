@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataAttach
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeRedirectPosHook
@@ -13,14 +14,17 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 
-object DaedalusCypher : ModifierCypher(
-    manaDrain = 50f
-), ServerInvokeRedirectPosHook {
+object DaedalusCypher : ModifierCypher(), ServerInvokeRedirectPosHook {
     const val MARGIN = 0.3f
+
     override val resource = CypherNexus.modResource("daedalus")
-    init {
-        addAttribute(CypherAttributes.SPEED, CypherAttributeOperation.MULTIPLY_TOTAL, 1.25)
+
+    override fun defaultAttributes(): CypherDataAttach.Builder {
+        return super.defaultAttributes()
+            .manaDrain(40f)
+            .stateChunkAttr(CypherAttributes.SPEED, CypherAttributeOperation.MULTIPLY_TOTAL, 1.25)
     }
+
     override fun redirectPosDireServer(
         level: ServerLevel,
         invoker: Entity?,

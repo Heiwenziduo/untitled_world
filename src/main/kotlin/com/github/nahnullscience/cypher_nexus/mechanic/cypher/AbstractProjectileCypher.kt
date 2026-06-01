@@ -7,12 +7,10 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
-import com.google.common.base.Optional
 import net.minecraft.core.Holder
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
-import kotlin.reflect.KClass
 
 abstract class AbstractProjectileCypher: AbstractCypher() {
     // TODO
@@ -36,11 +34,11 @@ abstract class AbstractProjectileCypher: AbstractCypher() {
         return projectile
     }
 
-    final override fun addAttribute(holder: Holder<CypherAttribute>, base: Double) = super.addAttribute(holder, base)
-
-    fun getAttrBaseOrDefault(holder: Holder<CypherAttribute>) =
-        attributeMap[holder]?.get(CypherAttributeOperation.BASE)?: holder.value().defaultValue
-    fun getAttrBaseOrDefault(attr: CypherAttribute) = getAttrBaseOrDefault(attr.attrRegistryHolder())
+    fun getAttrBaseOrDefault(holder: Holder<CypherAttribute>) = getAttrBaseOrDefault(holder.value())
+    fun getAttrBaseOrDefault(attr: CypherAttribute): Double {
+        val opMap = attributes().projectile[attr]
+        return opMap?.get(CypherAttributeOperation.BASE) ?: attr.defaultValue
+    }
 
     override fun triggerCanAttach() = true
     override fun triggerCanPayload() = true

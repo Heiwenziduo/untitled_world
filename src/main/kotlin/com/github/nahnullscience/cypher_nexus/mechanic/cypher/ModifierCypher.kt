@@ -4,12 +4,8 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import net.minecraft.core.Holder
 
-abstract class ModifierCypher (
-    override val manaDrain: Float
-) : AbstractNonProjectileCypher() {
-    init {
+abstract class ModifierCypher () : AbstractNonProjectileCypher() {
 
-    }
-    override val draw: Int = 1
     override val category: Holder<CypherCategory> = CypherCategories.MODIFIER
+    override fun defaultAttributes() = super.defaultAttributes().draw(1)
 }

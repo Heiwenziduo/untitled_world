@@ -6,9 +6,11 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataFrequen
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import net.minecraft.util.profiling.ProfilerFiller
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
+import org.spongepowered.asm.util.perf.Profiler
 
 /** cypher chain compiler */
 class InvokingHelper (
@@ -34,6 +36,7 @@ class InvokingHelper (
     }
 
     fun start() {
+        level.profiler.push("invoking-start") // F3 + L to record time cost
         while (data.draw >= 1) {
             val canContinue = step()
             if (!canContinue) break
@@ -46,6 +49,7 @@ class InvokingHelper (
             CypherNexus.LOGGER.debug("wand reload due to wrapped")
             reload()
         }
+        level.profiler.pop()
     }
 
     fun step(): Boolean {
@@ -86,7 +90,8 @@ class InvokingHelper (
     }
 
     fun wrap() = run {
-        CypherNexus.LOGGER.debug("discard {} wrap back into deck", data.discard.toString(2))
+        if (data.discard > 0) CypherNexus.LOGGER.debug("discard {} wrap back into deck", data.discard.toString(2).padStart(8, '0'))
+        else CypherNexus.LOGGER.debug("discard is empty, nothing to wrap")
         states.wrapped = true
         discard2deck()
     }
@@ -101,7 +106,6 @@ class InvokingHelper (
         data.deck = aoc.bits()
         data.hand = 0
         data.discard = 0
-        data.recharge = 0
     }
 
     // ============== bit operations ===================================================

@@ -14,13 +14,13 @@ class CNDataMapProvider(
     override fun gather(provider: HolderLookup.Provider) {
         val builder = builder(ModDataAttachments.CYPHER_DATA_ATTACH).replace(false)
 
-        val cypherLookup = provider.lookupOrThrow(Cyphers.RESOURCE_KEY)
-        cypherLookup.listElements().forEach { reference ->
-            builder.add(reference.key(), reference.value().defaultAttributes().build(), false)
-        }
-
-//        for (i in Cyphers.REGISTRY.holders()) {
-//            builder.add(i, i.value().defaultAttributes().build(), false)
+//        val cypherLookup = provider.lookupOrThrow(Cyphers.RESOURCE_KEY)
+//        cypherLookup.listElements().forEach { reference ->
+//            builder.add(reference.key(), reference.value().defaultAttributes().build(), false)
 //        }
+
+        for (i in Cyphers.REGISTRY.holders()) {
+            builder.add(i, i.value().defaultAttributes().build(), false)
+        }
     }
 }

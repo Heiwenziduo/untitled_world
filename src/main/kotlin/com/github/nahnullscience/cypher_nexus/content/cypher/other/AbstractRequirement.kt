@@ -5,14 +5,12 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
-import kotlin.math.max
 
 /** invoke the next a few cyphers only when the requirements are met */
 sealed class AbstractRequirement : AbstractNonProjectileCypher() {
-    override val manaDrain = 0f
-    override val draw = 1
     override val category = CypherCategories.OTHER
     override fun modifyStateChunk(helper: InvokingHelper, chunk: ProjectileStateChunk) = Unit
+    override fun defaultAttributes() = super.defaultAttributes().manaDrain(0f).draw(1)
 
     abstract class RequirementIf : AbstractRequirement() {
         /** true if conditions are met */

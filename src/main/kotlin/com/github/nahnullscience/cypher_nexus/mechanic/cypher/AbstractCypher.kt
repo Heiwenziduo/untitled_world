@@ -25,10 +25,14 @@ import kotlin.jvm.optionals.getOrElse
  *
  * */
 sealed class AbstractCypher: IRegisterable {
-    open val manaDrain: Float = 0f
-    open val delay: Int = 0
-    open val recharge: Int = 0
-    open val draw: Int = 0
+    val manaDrain: Float
+        get() = attributes().manaDrain
+    val draw: Int
+        get() = attributes().draw
+    val delay: Int
+        get() = attributes().delay
+    val recharge: Int
+        get() = attributes().recharge
 
     /** whether the cypher shows in the index(left side) */
     open val hide: Boolean = false
@@ -38,9 +42,7 @@ sealed class AbstractCypher: IRegisterable {
     /** use #addFlag during init */
     val flag: Int
         get() = _flag
-    private val _attributeMap = HashMap<Holder<CypherAttribute>, HashMap<CypherAttributeOperation, Double>>()
-    val attributeMap
-        get() = _attributeMap
+
     /** auto detect hooks */
     val implementedHooks: List<HookModule<*>> by lazy { // lazy init and cache result, cool
         val hookModules = CypherBehaviorHooks.REGISTRY
@@ -58,23 +60,6 @@ sealed class AbstractCypher: IRegisterable {
 
 
     abstract val category: Holder<CypherCategory>
-
-    /**
-     * add Attributes with its BASE value
-     * */
-    protected open fun addAttribute(holder: Holder<CypherAttribute>, base: Double) {
-        return addAttribute(holder, CypherAttributeOperation.BASE, base)
-    }
-    /**
-     * add Attributes with specific operator
-     * */
-    protected fun addAttribute(holder: Holder<CypherAttribute>, operator: CypherAttributeOperation, value: Double?) {
-        val map = _attributeMap.getOrPut(holder) { HashMap() }
-        if (value != null) map.compute(operator) { k,v -> operator.cumulate(v?: operator.defaultValue, value) }
-    }
-    protected fun addFlag(flags: CypherFlags) {
-        _flag = _flag or flags.value
-    }
 
 
     // = attr & data attach ==============================================================================================
@@ -128,11 +113,11 @@ sealed class AbstractCypher: IRegisterable {
     }
 
     open fun modifyStateChunk(helper: InvokingHelper, chunk: ProjectileStateChunk) {
-        _attributeMap.forEach { holder, cyMap ->
+        attributes().stateChunk.forEach { attribute, cyMap ->
             // prune 1, sub-chunk do not affect delay, spread, whatsoever. note recharge is an exception
-            if (chunk != helper.rootChunk && holder.value().applyOn == CypherAttribute.AttributeApply.INVOKING) return@forEach
+            if (chunk != helper.rootChunk && attribute.applyOn == CypherAttribute.AttributeApply.INVOKING) return@forEach
 
-            val stateMap = chunk.computedOperationMap.getOrPut(holder.value()) { HashMap() }
+            val stateMap = chunk.computedOperationMap.getOrPut(attribute) { HashMap() }
             // prune 2, if set, skip
             if (stateMap[CypherAttributeOperation.SET_ALL] != null && cyMap[CypherAttributeOperation.SET_ALL] == null) return@forEach
 
@@ -201,17 +186,17 @@ sealed class AbstractCypher: IRegisterable {
         }
 
         // keep the order attrs registered
-        for (holder in CypherAttributes.REGISTRY.holders()) {
-            if (holder.value().hide) continue
-            val opMap = _attributeMap.getOrElse(holder) { continue }
+        CypherAttributes.REGISTRY.forEach registry@ { attribute ->
+            if (attribute.hide) return@registry
+            val opMap = attributes().stateChunk.getOrElse(attribute) { return@registry }
             var values: MutableComponent? = null
-            CypherAttributeOperation.entries.forEach { op ->
-                val v = opMap.getOrElse(op) { return@forEach }
+            CypherAttributeOperation.entries.forEach op@ { op ->
+                val v = opMap.getOrElse(op) { return@op }
                 if (values == null) values = op.format(v)
                 else values.append("; ").append(op.format(v))
             }
             val comp = Component.literal("  ")
-                .append(holder.value().translation())
+                .append(attribute.translation())
                 .append(Component.literal(": "))
                 .append(values?: Component.literal("ERROR").withStyle(ChatFormatting.YELLOW))
             components.add(comp)

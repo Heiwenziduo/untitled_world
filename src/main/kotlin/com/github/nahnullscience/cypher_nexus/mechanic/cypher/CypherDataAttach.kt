@@ -37,7 +37,7 @@ data class CypherDataAttach(
         fun builder() = Builder()
     }
 
-    class Builder() {
+    open class Builder() {
         private var manaDrain: Float = 0f
         private var draw: Int? = null
         private var delay: Int? = null
@@ -46,28 +46,28 @@ data class CypherDataAttach(
         private val projectile: HashMap<CypherAttribute, HashMap<CypherAttributeOperation, Double>> = HashMap()
         private val stateChunk: HashMap<CypherAttribute, HashMap<CypherAttributeOperation, Double>> = HashMap()
 
-        fun manaDrain(float: Float): Builder = run { manaDrain = float; this@Builder }
-        fun draw(int: Int): Builder = run { draw = int; this@Builder }
-        fun delay(int: Int): Builder = run { delay = int; this@Builder }
-        fun recharge(int: Int): Builder = run { recharge = int; this@Builder }
-        fun flags(vararg flag: CypherFlags) = run { flag.forEach { flags = flags or it.value }; this }
+        open fun manaDrain(float: Float): Builder = run { manaDrain = float; this@Builder }
+        open fun draw(int: Int): Builder = run { draw = int; this@Builder }
+        open fun delay(int: Int): Builder = run { delay = int; this@Builder }
+        open fun recharge(int: Int): Builder = run { recharge = int; this@Builder }
+        open fun flags(vararg flag: CypherFlags) = run { flag.forEach { flags = flags or it.value }; this }
 
         // it seems datagen has a special lifecycle that can unpacks a holder directly (?)
-        fun projectileAttr(attr: Holder<CypherAttribute>, value: Double) = projectileAttr(attr.value(), value)
-        fun projectileAttr(attr: CypherAttribute, value: Double): Builder {
+        open fun projectileAttr(holder: Holder<CypherAttribute>, value: Double) = projectileAttr(holder.value(), value)
+        open fun projectileAttr(attr: CypherAttribute, value: Double): Builder {
             val opMap = projectile.getOrPut(attr) { HashMap() }
             opMap[CypherAttributeOperation.BASE] = value
             return this
         }
 
-        fun stateChunkAttr(attr: Holder<CypherAttribute>, operator: CypherAttributeOperation, value: Double) = stateChunkAttr(attr.value(), operator, value)
-        fun stateChunkAttr(attr: CypherAttribute, operator: CypherAttributeOperation, value: Double): Builder {
+        open fun stateChunkAttr(holder: Holder<CypherAttribute>, operator: CypherAttributeOperation, value: Double) = stateChunkAttr(holder.value(), operator, value)
+        open fun stateChunkAttr(attr: CypherAttribute, operator: CypherAttributeOperation, value: Double): Builder {
             val opMap = projectile.getOrPut(attr) { HashMap() }
             opMap[operator] = value
             return this
         }
 
-        fun build(): CypherDataAttach = CypherDataAttach(
+        open fun build(): CypherDataAttach = CypherDataAttach(
             manaDrain,
             draw ?: 0,
             delay ?: 0,

@@ -1,6 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataAttach
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
@@ -9,22 +10,56 @@ import net.minecraft.core.Holder
 
 /** easy way to create lots of simple modifiers */
 class SimpleModifier(
+    val path: String,
     manaDrain: Float,
-    path: String,
-    override val draw: Int = 1,
-    override val color: Int = 0,
-
-    override val delay: Int = 0,
-    override val recharge: Int = 0,
-) : ModifierCypher(manaDrain) {
-    override val resource = CypherNexus.modResource(path)
-    fun attribute(attribute: Holder<CypherAttribute>, operator: CypherAttributeOperation, value: Double) = run {
-        addAttribute(attribute, operator, value)
-        this@SimpleModifier
+) : CypherDataAttach.Builder() {
+    init {
+        manaDrain(manaDrain)
     }
 
-    fun flag(flag: CypherFlags) = run {
-        addFlag(flag)
-        this@SimpleModifier
+    private var _color: Int = 0
+    // register timing can't unpack holder, so use holder directly here
+    private val stateChunkHolder: HashMap<Holder<CypherAttribute>, HashMap<CypherAttributeOperation, Double>> = HashMap()
+
+    override fun manaDrain(float: Float) = run { super.manaDrain(float); this }
+    override fun draw(int: Int) = run { super.draw(int); this }
+    override fun delay(int: Int) = run { super.delay(int); this }
+    override fun recharge(int: Int) = run { super.recharge(int); this }
+    override fun flags(vararg flag: CypherFlags) = run { super.flags(*flag); this }
+    fun color(int: Int) = run { _color = int; this }
+
+    // do nothing since this is a modifier
+    override fun projectileAttr(holder: Holder<CypherAttribute>, value: Double) = this as CypherDataAttach.Builder
+
+    override fun stateChunkAttr(
+        holder: Holder<CypherAttribute>,
+        operator: CypherAttributeOperation,
+        value: Double
+    ): SimpleModifier {
+        val opMap = stateChunkHolder.getOrPut(holder) { HashMap() }
+        opMap[operator] = value
+        return this
+    }
+
+    fun attribute(
+        holder: Holder<CypherAttribute>,
+        operator: CypherAttributeOperation,
+        value: Double
+    ) = stateChunkAttr(holder, operator, value)
+
+    fun modifier(): ModifierCypher = object : ModifierCypher() {
+        override val resource = CypherNexus.modResource(path)
+        override val color = _color
+        override fun defaultAttributes() = this@SimpleModifier
+    }
+
+    override fun build(): CypherDataAttach {
+        // this timing should be fine
+        stateChunkHolder.forEach { (holder, opMap) ->
+            opMap.forEach { (op, d) ->
+                super.stateChunkAttr(holder, op, d)
+            }
+        }
+        return super.build()
     }
 }

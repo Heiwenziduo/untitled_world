@@ -4,6 +4,7 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataAttach
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
@@ -11,12 +12,12 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.Projectil
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 
 abstract class AbstractAddTrigger(
-    override val manaDrain: Float
+    private val _manaDrain: Float
 ) : AbstractNonProjectileCypher() {
-    override val draw: Int = 0
     override val category = CypherCategories.OTHER
     abstract val triggerType: TriggerType
     override fun modifyStateChunk(helper: InvokingHelper, chunk: ProjectileStateChunk) = Unit
+    override fun defaultAttributes() = super.defaultAttributes().manaDrain(_manaDrain).draw(0)
 
     override fun invokeInHand(
         helper: InvokingHelper,

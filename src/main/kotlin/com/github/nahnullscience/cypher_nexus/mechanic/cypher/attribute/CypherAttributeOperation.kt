@@ -19,8 +19,10 @@ enum class CypherAttributeOperation {
         }
         override fun formatString() = ""
     },
-    /**  */
-    SET_SELF { // TODO
+    /**
+     * // TODO
+     *  */
+    SET_SELF {
         override fun cumulate(last: Double, new: Double): Double = new
         override fun formatString() = "="
     },
