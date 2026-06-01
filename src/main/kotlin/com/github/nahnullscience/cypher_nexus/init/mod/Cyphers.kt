@@ -5,8 +5,10 @@ import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.AbstractAddTrigger
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.AbstractRequirement
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.RequirementHP
+import com.github.nahnullscience.cypher_nexus.content.cypher.other.RequirementNotPlayer
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.static_projectile.ExplosionCypher
+import com.github.nahnullscience.cypher_nexus.content.cypher.utility.RefresherRingCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
@@ -55,7 +57,9 @@ object Cyphers {
     // # will present in register order #
     // ==========================================================================================
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // projectile
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     val ARROW = registerCypher(ArrowCypher)
     val SNOWBALL = registerCypher(SnowballCypher)
     val ENDER_TELEPORTATION = registerCypher(EnderTeleportationCypher)
@@ -63,10 +67,14 @@ object Cyphers {
     val LLAMA_SPIT = registerCypher(LlamaSpitCypher)
     val SPAWN_EGG = registerCypher(SpawnEggCypher)
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // static projectile
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     val EXPLOSION = registerCypher(ExplosionCypher)
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // modifier
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     val POWER = registerCypher(
         SimpleModifier(5f, "power")
         .attribute(CypherAttributes.DAMAGE, CypherAttributeOperation.ADD, 1.0)
@@ -143,9 +151,20 @@ object Cyphers {
         SimpleModifier(5f, "quadruple_scatter", 4, COLOR_MULTI_INVOKE)
         .attribute(CypherAttributes.SPREAD, CypherAttributeOperation.ADD, 40.0))
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // passive
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // utility //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    val REFRESHER_RING = registerCypher(RefresherRingCypher)
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // other
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     val ADD_TRIGGER = registerCypher(object : AbstractAddTrigger(10f) {
         override val triggerType = TriggerType.COLLISION
         override val resource = CypherNexus.modResource("add_trigger")
@@ -163,6 +182,7 @@ object Cyphers {
 //        override val resource = CypherNexus.modResource("add_trigger_red_stone")
 //    })
     val REQUIREMENT_HP = registerCypher(RequirementHP)
+    val REQUIREMENT_NOT_PLAYER = registerCypher(RequirementNotPlayer)
     val REQUIREMENT_OTHERWISE = registerCypher(AbstractRequirement.RequirementOtherwise)
     val REQUIREMENT_ENDPOINT = registerCypher(AbstractRequirement.RequirementEndpoint)
 }

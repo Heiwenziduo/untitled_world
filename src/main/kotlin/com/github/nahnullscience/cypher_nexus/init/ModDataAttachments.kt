@@ -10,19 +10,19 @@ import net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent
 
 
 object ModDataAttachments {
-    val CYPHER_DATA_ATTACH: DataMapType<AbstractCypher, CypherDataAttach?> =
+    val CYPHER_DATA_ATTACH: DataMapType<AbstractCypher, CypherDataAttach> =
         DataMapType.builder(
-            // cypher_nexus:cypher_nexus/data_maps/cypher/cypher_data_attach.json.
+            // data/cypher_nexus/data_maps/cypher/cypher_data_attach.json.
             CypherNexus.modResource("cypher_data_attach"),
             Cyphers.RESOURCE_KEY,
             CypherDataAttach.CODEC
         ).synced(
             // The codec used for syncing. May be identical to the normal codec, but may also be
             // a codec with less fields, omitting parts of the object that are not required on the client.
-            CypherDataAttach.CODEC_STREAM,
+            CypherDataAttach.CODEC_SYNC,
             // Whether the data map is mandatory or not. Marking a data map as mandatory will disconnect clients
             // that are missing the data map on their side; this includes vanilla clients.
-            false
+            true
         ).build()
 
     @SubscribeEvent // on the mod event bus

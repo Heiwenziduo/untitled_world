@@ -7,13 +7,13 @@ import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 
 data class WandDataFrequent
-    (val manaCurrent: Float, val index: Int, val delay: Int, val recharge: Int, val deck: Long, val discard: Long) {
-    fun fromStart() = WandDataFrequent(manaCurrent, 0, delay, recharge, 0, 0)
+    (val manaCurrent: Float, val delay: Int, val recharge: Int, val deck: Long, val discard: Long) {
+    fun fromStart() = WandDataFrequent(manaCurrent, delay, recharge, 0, 0)
 
     companion object {
         val FREQUENT_DATA_CODEC: Codec<WandDataFrequent> = RecordCodecBuilder.create { it.group(
             Codec.FLOAT.fieldOf("manaCurrent").forGetter(WandDataFrequent::manaCurrent),
-            Codec.INT.fieldOf("index").forGetter(WandDataFrequent::index),
+//            Codec.INT.fieldOf("index").forGetter(WandDataFrequent::index),
             Codec.INT.fieldOf("delay").forGetter(WandDataFrequent::delay),
             Codec.INT.fieldOf("recharge").forGetter(WandDataFrequent::recharge),
             Codec.LONG.fieldOf("deck").forGetter(WandDataFrequent::deck),
@@ -22,7 +22,7 @@ data class WandDataFrequent
 
         val FREQUENT_DATA_STREAM: StreamCodec<ByteBuf, WandDataFrequent> = StreamCodec.composite(
                 ByteBufCodecs.FLOAT, WandDataFrequent::manaCurrent,
-            ByteBufCodecs.INT, WandDataFrequent::index,
+//            ByteBufCodecs.INT, WandDataFrequent::index,
             ByteBufCodecs.INT, WandDataFrequent::delay,
             ByteBufCodecs.INT, WandDataFrequent::recharge,
             /* @doc
@@ -36,6 +36,6 @@ data class WandDataFrequent
             ByteBufCodecs.VAR_LONG, WandDataFrequent::discard,
                 ::WandDataFrequent)
 
-        val DEFAULT = WandDataFrequent(0f, 0, 0, 0, 0, 0)
+        val DEFAULT = WandDataFrequent(0f, 0, 0, 0, 0)
     }
 }

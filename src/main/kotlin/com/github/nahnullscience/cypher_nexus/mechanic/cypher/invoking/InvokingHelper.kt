@@ -29,8 +29,7 @@ class InvokingHelper (
         // define the order of bits go from right to left, which is inverse compare to the order of the cypherArray
         // number 5L (0b...0101) represents the first and the third cyphers
         if (data.deck == 0L) {
-            data.deck = aoc.bits()
-            data.discard = 0
+            init()
         }
     }
 
@@ -44,9 +43,8 @@ class InvokingHelper (
 
         if (states.wrapped) {
             // force a reload
-            data.index = 0
-            data.deck = 0
-            data.discard = aoc.bits()
+            CypherNexus.LOGGER.debug("wand reload due to wrapped")
+            reload()
         }
     }
 
@@ -85,6 +83,25 @@ class InvokingHelper (
         deck2hand(index)
         data.manaCurrent -= cy.manaDrain
         return cy
+    }
+
+    fun wrap() = run {
+        CypherNexus.LOGGER.debug("discard {} wrap back into deck", data.discard.toString(2))
+        states.wrapped = true
+        discard2deck()
+    }
+
+    fun reload() {
+        data.deck = 0
+        data.hand = 0
+        data.discard = 0
+    }
+
+    fun init() {
+        data.deck = aoc.bits()
+        data.hand = 0
+        data.discard = 0
+        data.recharge = 0
     }
 
     // ============== bit operations ===================================================
@@ -133,7 +150,6 @@ class InvokingHelper (
     }
     /** aka. wrap, return true if there is something to wrap */
     fun discard2deck(): Boolean {
-        CypherNexus.LOGGER.debug("discard {} wrap back into deck", data.discard.toString(2))
         val old = data.discard
         data.deck = data.deck or data.discard
         data.discard = 0
@@ -144,7 +160,6 @@ class InvokingHelper (
 
     data class HelperDataBundle (
         var draw: Int,
-        var index: Int,
         var delay: Int,
         var recharge: Int,
         var manaCurrent: Float,
@@ -154,13 +169,13 @@ class InvokingHelper (
         var deck: Long = 0,
         var discard: Long = 0,
     ) {
-        fun frequentData() = WandDataFrequent(manaCurrent, index, delay, recharge, deck, discard)
+        fun frequentData() = WandDataFrequent(manaCurrent, delay, recharge, deck, discard)
         companion object {
             fun of(draw: Int, frequent: WandDataFrequent): HelperDataBundle {
-                return HelperDataBundle(draw, frequent.index, frequent.delay, frequent.recharge, frequent.manaCurrent, 0, frequent.deck, frequent.discard)
+                return HelperDataBundle(draw, frequent.delay, frequent.recharge, frequent.manaCurrent, 0, frequent.deck, frequent.discard)
             }
             fun of(invariable: WandDataInvariable, frequent: WandDataFrequent): HelperDataBundle {
-                return HelperDataBundle(invariable.chunkI.draw, frequent.index, invariable.chunkI.castDelay, frequent.recharge + invariable.chunkI.rechargeTime, frequent.manaCurrent, 0, frequent.deck, frequent.discard)
+                return HelperDataBundle(invariable.chunkI.draw, invariable.chunkI.castDelay, frequent.recharge + invariable.chunkI.rechargeTime, frequent.manaCurrent, 0, frequent.deck, frequent.discard)
             }
         }
     }

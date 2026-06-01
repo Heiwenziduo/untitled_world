@@ -1,12 +1,11 @@
 package com.github.nahnullscience.cypher_nexus.utility.mod
 
-import com.github.nahnullscience.cypher_nexus.content.cypher.other.AbstractRequirement
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 
 
-private fun AbstractCypher.isPassive(): Boolean = isNotEmpty() && category == CypherCategories.PASSIVE
+private fun AbstractCypher.isPassive(): Boolean = isNotEmpty() && category == CypherCategories.WAND_MODULE
 
 /** fixed length, cypher changeable, EmptyCypher autofill */
 class ArrayOfCyphers(val capacity: Int = 1) : Iterable<AbstractCypher> {

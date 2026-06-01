@@ -66,7 +66,7 @@ object WandDataOverlay : LayeredDraw.Layer {
                 0.5f)
         }
         val rechargeProgress = (recharge0 - frequent.recharge) / recharge0
-        if (rechargeProgress < 1f && frequent.index == 0) {
+        if (rechargeProgress < 1f && frequent.deck == 0L) {
             drawProgressBar(guiGraphics, startX, startY, barWidth, 3, rechargeProgress,
                 0xFF228B22.toInt(),
                 0xFF32CD32.toInt(),

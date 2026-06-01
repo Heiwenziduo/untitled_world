@@ -15,12 +15,6 @@ object SnowballCypher : ProjectileCypher(
 ) {
     override val resource = CypherNexus.modResource("snowball")
 
-    init {
-        addAttribute(CypherAttributes.SPEED, 0.8)
-        addAttribute(CypherAttributes.EXISTING, 300.0)
-        addAttribute(CypherAttributes.GRAVITY_FACTOR, 0.03)
-    }
-
     override fun defaultAttributes(): CypherDataAttach.Builder {
         return super.defaultAttributes()
             .manaDrain(3f)

@@ -48,7 +48,7 @@ abstract class AbstractItemWand(
         val (invariable, highPayload, frequent) = getWandData(stack, player)?: return
         var flag = false
         val (maxMana, manaRegen) = invariable.chunkF
-        var (manaCurrent, index, delay, recharge, ) = frequent
+        var (manaCurrent, delay, recharge, deck) = frequent
         if (manaCurrent < maxMana) {
             manaCurrent = min(manaCurrent + manaRegen, maxMana)
             flag = true
@@ -58,7 +58,7 @@ abstract class AbstractItemWand(
             delay--
             flag = true
         }
-        if (index == 0 && recharge > 0) {
+        if (deck == 0L && recharge > 0) {
             recharge--
             flag = true
         }
@@ -66,7 +66,7 @@ abstract class AbstractItemWand(
         // FIXME use timestamp instead of checking every tick, which may lead to massive network pressure
         if (flag) stack.set(
             ModDataComponents.WAND_FREQUENT,
-            WandDataFrequent(manaCurrent, index, delay, recharge, frequent.deck, frequent.discard)
+            WandDataFrequent(manaCurrent, delay, recharge, frequent.deck, frequent.discard)
         )
     }
 

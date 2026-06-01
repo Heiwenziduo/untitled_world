@@ -79,8 +79,10 @@ sealed class AbstractCypher: IRegisterable {
 
     // = attr & data attach ==============================================================================================
 
-    fun holder(): Holder.Reference<AbstractCypher> = Cyphers.REGISTRY.getHolder(resource).getOrElse()
-    { throw CypherNotFoundException("$resource not exist") }
+//    fun holder(): Holder.Reference<AbstractCypher> = Cyphers.REGISTRY.getHolder(resource).getOrElse()
+//    { throw CypherNotFoundException("$resource not exist") }
+
+    fun holder(): Holder<AbstractCypher> = Cyphers.REGISTRY.wrapAsHolder(this)
 
     private fun attributesData() = holder().getData(CYPHER_DATA_ATTACH)
 
@@ -117,7 +119,7 @@ sealed class AbstractCypher: IRegisterable {
             var cy = helper.drawNext()
             if (cy == null) {
                 CypherNexus.LOGGER.debug("[{}] want a wrap", this)
-                val wrap = helper.discard2deck() // wrap
+                val wrap = helper.wrap()
                 if (!wrap) break // nothing to wrap, break
                 cy = helper.drawNext()
             }

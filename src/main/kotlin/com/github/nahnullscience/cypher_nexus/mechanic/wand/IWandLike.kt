@@ -75,7 +75,7 @@ interface IWandLike {
     }
 
     fun validateConduct(frequent: WandDataFrequent): Boolean {
-        val disable = frequent.delay > 0 || (frequent.index == 0 && frequent.recharge > 0)
+        val disable = frequent.delay > 0 || (frequent.deck == 0L && frequent.recharge > 0)
         return !disable
     }
 

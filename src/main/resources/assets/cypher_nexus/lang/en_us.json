@@ -24,7 +24,8 @@
   "cypher.category.cypher_nexus.projectile": "Projectile",
   "cypher.category.cypher_nexus.static_projectile": "Static",
   "cypher.category.cypher_nexus.modifier": "Modifier",
-  "cypher.category.cypher_nexus.passive": "Passive",
+  "cypher.category.cypher_nexus.wand_module": "Wand Module",
+  "cypher.category.cypher_nexus.utility": "Utility",
   "cypher.category.cypher_nexus.other": "Other",
 
   "cypher.cypher_nexus.modifier.power": "Power",
