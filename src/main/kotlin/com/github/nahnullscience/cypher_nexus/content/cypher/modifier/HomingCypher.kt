@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataAttach
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothTickBehaviorHook
 import net.minecraft.world.level.Level
@@ -10,7 +10,7 @@ import net.minecraft.world.level.Level
 object HomingCypher: ModifierCypher(), BothTickBehaviorHook {
     override val resource = CypherNexus.modResource("homing")
 
-    override fun defaultAttributes(): CypherDataAttach.Builder {
+    override fun defaultAttributes(): CypherDataMap.Builder {
         return super.defaultAttributes()
             .manaDrain(60f)
     }

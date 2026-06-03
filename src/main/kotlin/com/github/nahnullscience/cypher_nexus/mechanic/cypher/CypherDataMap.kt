@@ -9,7 +9,7 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.core.Holder
 
-data class CypherDataAttach(
+data class CypherDataMap(
     val manaDrain: Float,
     val draw: Int,
     val delay: Int,
@@ -20,17 +20,17 @@ data class CypherDataAttach(
     val stateChunk: Map<CypherAttribute, Map<CypherAttributeOperation, Double>>,
 ) {
     companion object {
-        val CODEC: Codec<CypherDataAttach> = RecordCodecBuilder.create() { it.group(
-            Codec.FLOAT.fieldOf("manaDrain").forGetter(CypherDataAttach::manaDrain),
-            Codec.intRange(0, 99).fieldOf("draw").orElse(0).forGetter(CypherDataAttach::draw),
-            Codec.INT.fieldOf("delay").orElse(0).forGetter(CypherDataAttach::delay),
-            Codec.INT.fieldOf("recharge").orElse(0).forGetter(CypherDataAttach::recharge),
-            Codec.INT.fieldOf("flags").orElse(0).forGetter(CypherDataAttach::flags),
+        val CODEC: Codec<CypherDataMap> = RecordCodecBuilder.create() { it.group(
+            Codec.FLOAT.fieldOf("manaDrain").forGetter(CypherDataMap::manaDrain),
+            Codec.intRange(0, 99).fieldOf("draw").orElse(0).forGetter(CypherDataMap::draw),
+            Codec.INT.fieldOf("delay").orElse(0).forGetter(CypherDataMap::delay),
+            Codec.INT.fieldOf("recharge").orElse(0).forGetter(CypherDataMap::recharge),
+            Codec.INT.fieldOf("flags").orElse(0).forGetter(CypherDataMap::flags),
             Codec.unboundedMap(CYPHER_ATTRIBUTE, CYPHER_OPERATION_MAP)
-                    .fieldOf("projectile").orElse(HashMap()).forGetter(CypherDataAttach::projectile),
+                    .fieldOf("projectile").orElse(HashMap()).forGetter(CypherDataMap::projectile),
             Codec.unboundedMap(CYPHER_ATTRIBUTE, CYPHER_OPERATION_MAP)
-                    .fieldOf("stateChunk").orElse(HashMap()).forGetter(CypherDataAttach::stateChunk),
-        ).apply(it, ::CypherDataAttach) }
+                    .fieldOf("stateChunk").orElse(HashMap()).forGetter(CypherDataMap::stateChunk),
+        ).apply(it, ::CypherDataMap) }
 
         val CODEC_SYNC = CODEC
 
@@ -62,12 +62,12 @@ data class CypherDataAttach(
 
         open fun stateChunkAttr(holder: Holder<CypherAttribute>, operator: CypherAttributeOperation, value: Double) = stateChunkAttr(holder.value(), operator, value)
         open fun stateChunkAttr(attr: CypherAttribute, operator: CypherAttributeOperation, value: Double): Builder {
-            val opMap = projectile.getOrPut(attr) { HashMap() }
+            val opMap = stateChunk.getOrPut(attr) { HashMap() }
             opMap[operator] = value
             return this
         }
 
-        open fun build(): CypherDataAttach = CypherDataAttach(
+        open fun build(): CypherDataMap = CypherDataMap(
             manaDrain,
             draw ?: 0,
             delay ?: 0,

@@ -2,20 +2,17 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataFrequent
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
-import net.minecraft.util.profiling.ProfilerFiller
-import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
-import org.spongepowered.asm.util.perf.Profiler
 
 /** cypher chain compiler */
 class InvokingHelper (
     val level: Level,
-    val invoker: LivingEntity?,
+    val invoker: Entity?,
     val stack: ItemStack?,
 
     val wandStats: WandDataInvariable,
@@ -37,6 +34,8 @@ class InvokingHelper (
 
     fun start() {
         level.profiler.push("invoking-start") // F3 + L to record time cost
+        CypherNexus.LOGGER.debug("invoking start, prepare cyphers: {}", aoc)
+
         while (data.draw >= 1) {
             val canContinue = step()
             if (!canContinue) break
@@ -49,6 +48,8 @@ class InvokingHelper (
             CypherNexus.LOGGER.debug("wand reload due to wrapped")
             reload()
         }
+
+        CypherNexus.LOGGER.debug("invoking finish: {}", data)
         level.profiler.pop()
     }
 
@@ -66,7 +67,7 @@ class InvokingHelper (
     fun drawNext(): AbstractCypher? {
         // find the index of the first '1' (last '0', in fact) starting from the right.
         val drawIndex = data.deck.countTrailingZeroBits()
-        if (drawIndex >= aoc.size) return null
+        if (drawIndex >= aoc.invokableSize) return null
         return draw(drawIndex)
     }
 
@@ -167,21 +168,12 @@ class InvokingHelper (
         var delay: Int,
         var recharge: Int,
         var manaCurrent: Float,
-
-        var hand: Long = 0,
         /** R -> L, invokable only */
         var deck: Long = 0,
         var discard: Long = 0,
     ) {
-        fun frequentData() = WandDataFrequent(manaCurrent, delay, recharge, deck, discard)
-        companion object {
-            fun of(draw: Int, frequent: WandDataFrequent): HelperDataBundle {
-                return HelperDataBundle(draw, frequent.delay, frequent.recharge, frequent.manaCurrent, 0, frequent.deck, frequent.discard)
-            }
-            fun of(invariable: WandDataInvariable, frequent: WandDataFrequent): HelperDataBundle {
-                return HelperDataBundle(invariable.chunkI.draw, invariable.chunkI.castDelay, frequent.recharge + invariable.chunkI.rechargeTime, frequent.manaCurrent, 0, frequent.deck, frequent.discard)
-            }
-        }
+        var hand: Long = 0
+
     }
 
     data class HelperStateBundle (

@@ -1,6 +1,7 @@
 package com.github.nahnullscience.cypher_nexus
 
 import com.github.nahnullscience.cypher_nexus.init.ModBlocks
+import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.init.ModDataLootFunctions
 import com.github.nahnullscience.cypher_nexus.init.ModDataSerializers
@@ -55,6 +56,7 @@ object CypherNexus {
         ModDataComponents.register()
         ModDataSerializers.register()
         ModDataLootFunctions.register()
+        ModDataAttachments.register()
 
         ModTabs.register()
 

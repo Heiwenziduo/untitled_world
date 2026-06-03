@@ -34,7 +34,7 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
             val ok = requirement(helper, chunk, data, state, options)
             var otherwise = -1
             var endpoint = -1
-            for (i in currentIndex until helper.aoc.size) {
+            for (i in currentIndex until helper.aoc.invokableSize) {
                 val cy = helper.aoc[i]
                 if (cy is RequirementOtherwise) otherwise = i
                 if (cy is RequirementEndpoint) {

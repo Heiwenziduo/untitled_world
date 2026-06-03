@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataAttach
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
@@ -12,9 +12,10 @@ import net.minecraft.core.Holder
 class SimpleModifier(
     val path: String,
     manaDrain: Float,
-) : CypherDataAttach.Builder() {
+) : CypherDataMap.Builder() {
     init {
         manaDrain(manaDrain)
+        draw(1)
     }
 
     private var _color: Int = 0
@@ -29,7 +30,7 @@ class SimpleModifier(
     fun color(int: Int) = run { _color = int; this }
 
     // do nothing since this is a modifier
-    override fun projectileAttr(holder: Holder<CypherAttribute>, value: Double) = this as CypherDataAttach.Builder
+    override fun projectileAttr(holder: Holder<CypherAttribute>, value: Double) = this as CypherDataMap.Builder
 
     override fun stateChunkAttr(
         holder: Holder<CypherAttribute>,
@@ -53,7 +54,7 @@ class SimpleModifier(
         override fun defaultAttributes() = this@SimpleModifier
     }
 
-    override fun build(): CypherDataAttach {
+    override fun build(): CypherDataMap {
         // this timing should be fine
         stateChunkHolder.forEach { (holder, opMap) ->
             opMap.forEach { (op, d) ->

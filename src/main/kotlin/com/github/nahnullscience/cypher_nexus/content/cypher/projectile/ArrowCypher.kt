@@ -3,7 +3,7 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.projectile
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataAttach
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
 import net.minecraft.core.particles.ItemParticleOption
 import net.minecraft.core.particles.ParticleTypes
@@ -15,7 +15,7 @@ object ArrowCypher : ProjectileCypher() {
     override val resource = CypherNexus.modResource("arrow")
     val stack = ItemStack(Items.ARROW)
 
-    override fun defaultAttributes(): CypherDataAttach.Builder {
+    override fun defaultAttributes(): CypherDataMap.Builder {
         return super.defaultAttributes()
             .manaDrain(10f)
             .delay(2)

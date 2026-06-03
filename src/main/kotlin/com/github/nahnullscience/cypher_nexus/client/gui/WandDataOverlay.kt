@@ -1,7 +1,8 @@
 package com.github.nahnullscience.cypher_nexus.client.gui
 
+import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataFrequent
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInstance
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
@@ -20,6 +21,7 @@ object WandDataOverlay : LayeredDraw.Layer {
         if (Minecraft.getInstance().options.hideGui || player == null || player.isSpectator) {
             return
         }
+        // TODO wands at other slots
         val wandMain = player.getItemInHand(InteractionHand.MAIN_HAND)
         val wandOff = player.getItemInHand(InteractionHand.OFF_HAND)
 
@@ -27,19 +29,17 @@ object WandDataOverlay : LayeredDraw.Layer {
         listOf(wandMain, wandOff).withIndex().forEach { (i, stack) ->
             val wand = stack.item
             if (stack.isEmpty || wand !is IWandLike) return@forEach
-            val wandData = wand.getWandData(stack, player)
-            val (invariable, _, frequent) = wandData?: return@forEach
-            val manaMax = invariable.chunkF.manaMax
+            val wandData = wand.getWandData(stack, player) ?: return@forEach
 
-            // val align = if (i == 0) StatsAlign.RIGHT else StatsAlign.LEFT
+            // since item is a wand, instance should already exist
+            val instance = player.getData(WAND_DATA_MAP).getOrPutInstance(wandData, wand, player.level())
 
-            // FIXME read max-delay/recharge from helper
-            renderWand(guiGraphics, i, frequent, manaMax, 20f, 20f, stack)
+            renderWand(guiGraphics, i, instance, stack)
         }
 
     }
 
-    private fun renderWand(guiGraphics: GuiGraphics, offset: Int, frequent: WandDataFrequent, manaMax: Float, delay0: Float, recharge0: Float, wandSack: ItemStack) {
+    private fun renderWand(guiGraphics: GuiGraphics, offset: Int, instance: WandDataInstance, wandSack: ItemStack) {
         val screenWidth = guiGraphics.guiWidth()
         val screenHeight = guiGraphics.guiHeight()
 
@@ -51,28 +51,30 @@ object WandDataOverlay : LayeredDraw.Layer {
         guiGraphics.renderItem(wandSack, screenWidth - margin, startY - 2)
 
         // draw bars one by one
-        val manaProgress = frequent.manaCurrent / manaMax
+        val manaProgress = instance.manaRegenPercent()
         drawProgressBar(guiGraphics, startX, startY, barWidth, 5, manaProgress,
             0xFF00BFFF.toInt(),
             0xFF00FFFF.toInt(),
             0.5f)
         startY += 8 // Move down for the next bar
 
-        val castDelayProgress = (delay0 - frequent.delay) / delay0
+        val castDelayProgress = instance.delayPercent()
         if (castDelayProgress < 1f) {
             drawProgressBar(guiGraphics, startX, startY, barWidth, 3, castDelayProgress,
-                0xFFFF8C00.toInt(),
-                0xFFFFD700.toInt(),
-                0.5f)
-        }
-        val rechargeProgress = (recharge0 - frequent.recharge) / recharge0
-        if (rechargeProgress < 1f && frequent.deck == 0L) {
-            drawProgressBar(guiGraphics, startX, startY, barWidth, 3, rechargeProgress,
                 0xFF228B22.toInt(),
                 0xFF32CD32.toInt(),
                 0.5f)
         }
 
+        if (instance.isRecharging) {
+            val rechargeProgress = instance.rechargePercent()
+            if (rechargeProgress < 1f) {
+                drawProgressBar(guiGraphics, startX, startY, barWidth, 3, rechargeProgress,
+                    0xFFFF8C00.toInt(),
+                    0xFFFFD700.toInt(),
+                    0.5f)
+            }
+        }
 
     }
 

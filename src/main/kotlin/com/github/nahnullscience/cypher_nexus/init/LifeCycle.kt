@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.event
+package com.github.nahnullscience.cypher_nexus.init
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import net.neoforged.bus.api.SubscribeEvent

@@ -29,16 +29,16 @@
     },
     "cypher_nexus:antigravity": {
       "delay": 0,
-      "draw": 0,
+      "draw": 1,
       "flags": 0,
       "manaDrain": 1.0,
-      "projectile": {
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
         "cypher_nexus:gravity_factor": {
           "multiply_base": -0.66
         }
-      },
-      "recharge": 0,
-      "stateChunk": {}
+      }
     },
     "cypher_nexus:arrow": {
       "delay": 2,
@@ -64,58 +64,58 @@
     },
     "cypher_nexus:bouncy": {
       "delay": 0,
-      "draw": 0,
+      "draw": 1,
       "flags": 0,
       "manaDrain": 5.0,
-      "projectile": {
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
         "cypher_nexus:bounce": {
           "add": 10.0
         }
-      },
-      "recharge": 0,
-      "stateChunk": {}
+      }
     },
     "cypher_nexus:brisk": {
       "delay": 0,
-      "draw": 0,
+      "draw": 1,
       "flags": 0,
       "manaDrain": 5.0,
-      "projectile": {
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
         "cypher_nexus:damage": {
           "add": 1.0
         },
         "cypher_nexus:speed": {
           "multiply_total": 2.0
         }
-      },
-      "recharge": 0,
-      "stateChunk": {}
+      }
     },
     "cypher_nexus:curtail_existing": {
       "delay": -3,
-      "draw": 0,
+      "draw": 1,
       "flags": 0,
       "manaDrain": 10.0,
-      "projectile": {
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
         "cypher_nexus:existing": {
           "add": -42.0
         }
-      },
-      "recharge": 0,
-      "stateChunk": {}
+      }
     },
     "cypher_nexus:daedalus": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 40.0,
-      "projectile": {
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
         "cypher_nexus:speed": {
           "multiply_total": 1.25
         }
-      },
-      "recharge": 0,
-      "stateChunk": {}
+      }
     },
     "cypher_nexus:double_invoking": {
       "delay": 0,
@@ -131,13 +131,13 @@
       "draw": 2,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
         "cypher_nexus:spread": {
           "add": 20.0
         }
-      },
-      "recharge": 0,
-      "stateChunk": {}
+      }
     },
     "cypher_nexus:empty_cypher": {
       "delay": 0,
@@ -181,7 +181,7 @@
       "stateChunk": {}
     },
     "cypher_nexus:explosion": {
-      "delay": 0,
+      "delay": 13,
       "draw": 0,
       "flags": 66,
       "manaDrain": 80.0,
@@ -190,21 +190,21 @@
           "base": 2.0
         }
       },
-      "recharge": 0,
+      "recharge": 8,
       "stateChunk": {}
     },
     "cypher_nexus:extend_existing": {
       "delay": 5,
-      "draw": 0,
+      "draw": 1,
       "flags": 0,
       "manaDrain": 40.0,
-      "projectile": {
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
         "cypher_nexus:existing": {
           "add": 80.0
         }
-      },
-      "recharge": 0,
-      "stateChunk": {}
+      }
     },
     "cypher_nexus:fiery": {
       "delay": 0,
@@ -217,10 +217,12 @@
     },
     "cypher_nexus:heavily_strong": {
       "delay": 3,
-      "draw": 0,
+      "draw": 1,
       "flags": 0,
       "manaDrain": 20.0,
-      "projectile": {
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
         "cypher_nexus:damage": {
           "add": 4.0
         },
@@ -236,9 +238,7 @@
         "cypher_nexus:speed": {
           "multiply_total": 0.75
         }
-      },
-      "recharge": 0,
-      "stateChunk": {}
+      }
     },
     "cypher_nexus:homing": {
       "delay": 0,
@@ -249,15 +249,21 @@
       "recharge": 0,
       "stateChunk": {}
     },
+    "cypher_nexus:inner_force": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 10.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {}
+    },
     "cypher_nexus:llama_spit": {
       "delay": 0,
       "draw": 0,
       "flags": 0,
       "manaDrain": 5.0,
       "projectile": {
-        "cypher_nexus:crit_chance": {
-          "add": 0.05
-        },
         "cypher_nexus:damage": {
           "base": 1.0
         },
@@ -272,59 +278,63 @@
         }
       },
       "recharge": 1,
-      "stateChunk": {}
+      "stateChunk": {
+        "cypher_nexus:crit_chance": {
+          "add": 0.05
+        }
+      }
     },
     "cypher_nexus:mana_surge": {
       "delay": 4,
-      "draw": 0,
+      "draw": 1,
       "flags": 0,
       "manaDrain": -40.0,
-      "projectile": {
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
         "cypher_nexus:gravity_factor": {
           "multiply_base": -0.66
         }
-      },
-      "recharge": 0,
-      "stateChunk": {}
+      }
     },
     "cypher_nexus:no_more_bounce": {
       "delay": 0,
-      "draw": 0,
+      "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
         "cypher_nexus:bounce": {
           "set_all": 0.0
         }
-      },
-      "recharge": 0,
-      "stateChunk": {}
+      }
     },
     "cypher_nexus:no_more_damage": {
       "delay": 0,
-      "draw": 0,
+      "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
         "cypher_nexus:damage": {
           "set_all": 0.0
         }
-      },
-      "recharge": 0,
-      "stateChunk": {}
+      }
     },
     "cypher_nexus:nullifier": {
       "delay": -4,
-      "draw": 0,
+      "draw": 1,
       "flags": 0,
       "manaDrain": 14.0,
-      "projectile": {
+      "projectile": {},
+      "recharge": -4,
+      "stateChunk": {
         "cypher_nexus:existing": {
           "set_all": 1.0
         }
-      },
-      "recharge": -4,
-      "stateChunk": {}
+      }
     },
     "cypher_nexus:octuple_invoking": {
       "delay": 0,
@@ -337,7 +347,7 @@
     },
     "cypher_nexus:peaceful": {
       "delay": 0,
-      "draw": 0,
+      "draw": 1,
       "flags": 8,
       "manaDrain": 5.0,
       "projectile": {},
@@ -346,32 +356,32 @@
     },
     "cypher_nexus:pierce_entity": {
       "delay": 0,
-      "draw": 0,
+      "draw": 1,
       "flags": 3,
       "manaDrain": 110.0,
-      "projectile": {
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
         "cypher_nexus:damage": {
           "add": -5.0
         }
-      },
-      "recharge": 0,
-      "stateChunk": {}
+      }
     },
     "cypher_nexus:power": {
       "delay": 1,
-      "draw": 0,
+      "draw": 1,
       "flags": 0,
       "manaDrain": 5.0,
-      "projectile": {
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
         "cypher_nexus:damage": {
           "add": 1.0
         },
         "cypher_nexus:recoil": {
           "add": 1.0
         }
-      },
-      "recharge": 0,
-      "stateChunk": {}
+      }
     },
     "cypher_nexus:quadruple_invoking": {
       "delay": 0,
@@ -387,13 +397,13 @@
       "draw": 4,
       "flags": 0,
       "manaDrain": 5.0,
-      "projectile": {
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
         "cypher_nexus:spread": {
           "add": 40.0
         }
-      },
-      "recharge": 0,
-      "stateChunk": {}
+      }
     },
     "cypher_nexus:refresher_ring": {
       "delay": 0,
@@ -413,7 +423,7 @@
       "recharge": 0,
       "stateChunk": {}
     },
-    "cypher_nexus:requirement_hp": {
+    "cypher_nexus:requirement_low_hp": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
@@ -442,16 +452,16 @@
     },
     "cypher_nexus:reverse_gravity": {
       "delay": 0,
-      "draw": 0,
+      "draw": 1,
       "flags": 0,
       "manaDrain": 1.0,
-      "projectile": {
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
         "cypher_nexus:gravity_factor": {
           "multiply_total": -1.0
         }
-      },
-      "recharge": 0,
-      "stateChunk": {}
+      }
     },
     "cypher_nexus:snowball": {
       "delay": 0,
@@ -505,13 +515,13 @@
       "draw": 3,
       "flags": 0,
       "manaDrain": 1.0,
-      "projectile": {
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
         "cypher_nexus:spread": {
           "add": 30.0
         }
-      },
-      "recharge": 0,
-      "stateChunk": {}
+      }
     }
   }
 }

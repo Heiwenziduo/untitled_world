@@ -14,11 +14,15 @@ import java.util.UUID
 /**
  * holds wand invariable data, separate into chunks
  * */
-data class WandDataInvariable(val chunkF: WandDataChunkF, val chunkI: WandDataChunkI, val chunkL: WandDataChunkL, val chunkU: WandDataChunkU) {
+data class WandDataInvariable(
+    val uuid: String,
+    val chunkF: WandDataChunkF,
+    val chunkI: WandDataChunkI,
+    val chunkL: WandDataChunkL,
+) {
     data class WandDataChunkF(val manaMax: Float, val manaRegen: Float, val wandLength: Float,)
     data class WandDataChunkI(val capacity: Int, val draw: Int, val castDelay: Int, val rechargeTime: Int,)
     data class WandDataChunkL(val alwaysCast: List<AbstractCypher>)
-    data class WandDataChunkU(val uuid: String)
 
     class Builder() {
         var manaMax: Float = 99f
@@ -42,11 +46,11 @@ data class WandDataInvariable(val chunkF: WandDataChunkF, val chunkI: WandDataCh
 
         fun build() : WandDataInvariable {
             return WandDataInvariable(
+                UUID.randomUUID().toString(),
                 WandDataChunkF(manaMax, manaRegen, wandLength),
                 WandDataChunkI(capacity, draw, castDelay, rechargeTime),
                 WandDataChunkL(alwaysCast),
-                WandDataChunkU(UUID.randomUUID().toString())
-            )
+                )
         }
     }
 
@@ -70,15 +74,12 @@ data class WandDataInvariable(val chunkF: WandDataChunkF, val chunkI: WandDataCh
                 .fieldOf("alwaysCast")
                 .forGetter(WandDataChunkL::alwaysCast)
         ).apply(it, ::WandDataChunkL) }
-        val CHUNK3_CODEX: Codec<WandDataChunkU> = RecordCodecBuilder.create { it.group(
-            Codec.STRING.fieldOf("uuid").forGetter(WandDataChunkU::uuid)
-        ).apply(it, ::WandDataChunkU) }
 
         val INVARIABLE_DATA_CODEC: Codec<WandDataInvariable> = RecordCodecBuilder.create { it.group(
+            Codec.STRING.fieldOf("uuid").forGetter(WandDataInvariable::uuid),
             CHUNK0_CODEX.fieldOf("chunkF").forGetter(WandDataInvariable::chunkF),
             CHUNK1_CODEX.fieldOf("chunkI").forGetter(WandDataInvariable::chunkI),
             CHUNK2_CODEX.fieldOf("chunkL").forGetter(WandDataInvariable::chunkL),
-            CHUNK3_CODEX.fieldOf("chunkU").forGetter(WandDataInvariable::chunkU)
         ).apply(it, ::WandDataInvariable) }
 
 
@@ -96,16 +97,12 @@ data class WandDataInvariable(val chunkF: WandDataChunkF, val chunkI: WandDataCh
         val CHUNK2_STREAM: StreamCodec<RegistryFriendlyByteBuf, WandDataChunkL> =
             ByteBufCodecs.registry(Cyphers.RESOURCE_KEY).apply(ByteBufCodecs.list())
                 .map(::WandDataChunkL, WandDataChunkL::alwaysCast)
-        val CHUNK3_STREAM: StreamCodec<ByteBuf, WandDataChunkU> = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8, WandDataChunkU::uuid,
-            ::WandDataChunkU
-        )
 
         val INVARIABLE_DATA_STREAM: StreamCodec<RegistryFriendlyByteBuf, WandDataInvariable> = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8, WandDataInvariable::uuid,
             CHUNK0_STREAM, WandDataInvariable::chunkF,
             CHUNK1_STREAM, WandDataInvariable::chunkI,
             CHUNK2_STREAM, WandDataInvariable::chunkL,
-            CHUNK3_STREAM, WandDataInvariable::chunkU,
             ::WandDataInvariable
         )
 
@@ -114,12 +111,12 @@ data class WandDataInvariable(val chunkF: WandDataChunkF, val chunkI: WandDataCh
             // FIXME this only call once, can't gen random uuid
             get() {
                 val data = WandDataInvariable(
+                    UUID.randomUUID().toString(),
                     WandDataChunkF(300f, 3f, 1.2f),
                     WandDataChunkI(6, 1, 12, 15),
                     WandDataChunkL(listOf()),
-                    WandDataChunkU(UUID.randomUUID().toString())
+
                 )
-                println(data.chunkU)
                 return data
             }
 

@@ -1,6 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.network
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.AbstractItemWand
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
@@ -9,7 +10,7 @@ import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.network.handling.IPayloadContext
 
-/** client counterpart resides in com.github.heiwenziduo.cypher_nexus.client.network */
+/** client counterpart resides in cypher_nexus.client.network */
 object ServerPayloadHandler {
     fun editWandCyphers(data: ServerboundEditWandCyphers, context: IPayloadContext) {
         println("server receive package -> editWandCyphers: \n$data")
@@ -22,7 +23,7 @@ object ServerPayloadHandler {
                 for (i in 0..8) {
                     val stack0 = player.inventory.getItem(i)
                     if (!stack0.isEmpty && stack0.item is IWandLike) {
-                        val uuidW = stack0.get(ModDataComponents.WAND_INVARIABLE)?.chunkU?.uuid
+                        val uuidW = stack0.get(ModDataComponents.WAND_INVARIABLE)?.uuid
                         if (uuidW == data.uuid) {
                             stack = stack0
                             return@findWand
@@ -30,7 +31,7 @@ object ServerPayloadHandler {
                     }
                 }
                 val stack1 = player.getItemBySlot(EquipmentSlot.OFFHAND)
-                if (!stack1.isEmpty && stack1.item is IWandLike && stack1.get(ModDataComponents.WAND_INVARIABLE)?.chunkU?.uuid == data.uuid) {
+                if (!stack1.isEmpty && stack1.item is IWandLike && stack1.get(ModDataComponents.WAND_INVARIABLE)?.uuid == data.uuid) {
                     stack = stack1
                     return@findWand
                 }
@@ -38,8 +39,8 @@ object ServerPayloadHandler {
             }
 
             if (!stack.isEmpty) {
-                AbstractItemWand.Companion.editWand(stack, data.cyphers)
-                AbstractItemWand.Companion.resetIndex(stack)
+                AbstractItemWand.editWand(stack, data.cyphers)
+                player.getData(WAND_DATA_MAP).updateWandStats(stack, stack.item as IWandLike, player.level())
             }
 
         }.exceptionally {

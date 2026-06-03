@@ -41,12 +41,10 @@ object CypherAttributes {
     // ================================ casting process
 //    val MANA_DRAIN = registerAttribute("mana_drain")
 //    val DRAW = registerAttribute("draw")
-    /** unit is "tick", cast to int at last */
-    // TODO check data-driven
-    val CAST_DELAY = registerAttribute("cast_delay", 0.0, target = CypherAttribute.AttributeApply.INVOKING)
-    /** unit is "tick", cast to int at last */
-    // TODO check data-driven
-    val RECHARGE_TIME = registerAttribute("recharge_time", 0.0, target = CypherAttribute.AttributeApply.INVOKING)
+//    /** unit is "tick", cast to int at last */
+//    val CAST_DELAY = registerAttribute("cast_delay", 0.0, target = CypherAttribute.AttributeApply.INVOKING)
+//    /** unit is "tick", cast to int at last */
+//    val RECHARGE_TIME = registerAttribute("recharge_time", 0.0, target = CypherAttribute.AttributeApply.INVOKING)
     /** degree */
     val SPREAD = registerAttribute("spread", 0.0, 0.0, 720.0, target = CypherAttribute.AttributeApply.INVOKING)
     val RECOIL = registerAttribute("recoil", 0.0, 0.0, 10.0, target = CypherAttribute.AttributeApply.INVOKING, hide = true)
@@ -63,7 +61,7 @@ object CypherAttributes {
     val EXISTING = registerAttribute("existing", 300.0, hide = true)
     val EFFECT_RADIUS = registerAttribute("effect_redius", 1.0, 0.125, 8.0)
     /** int, bounce times */
-    val BOUNCE = registerAttribute("bounce", 0.0, 0.0, 50.0)
+    val BOUNCE = registerAttribute("bounce", 0.0, 0.0, 100.0)
     /** how much it falls each tick */
     val GRAVITY_FACTOR = registerAttribute("gravity_factor", 0.0, -8.0, 8.0, hide = true)
     /** deltaMovement * (1 - Friction) each tick, 0.01 by default */

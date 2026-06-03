@@ -1,7 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.init
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataFrequent
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
 import net.minecraft.core.component.DataComponentType
@@ -27,7 +26,7 @@ object ModDataComponents {
         DEFERRED_REGISTER.registerComponentType("wand_high_payload")
         { it.persistent(WandDataHighPayload.Companion.HIGH_PAYLOAD_DATA_CODEC).networkSynchronized(WandDataHighPayload.Companion.HIGH_PAYLOAD_DATA_STREAM) }
 
-    val WAND_FREQUENT: Supplier<DataComponentType<WandDataFrequent>> =
-        DEFERRED_REGISTER.registerComponentType("wand_frequent")
-        { it.persistent(WandDataFrequent.Companion.FREQUENT_DATA_CODEC).networkSynchronized(WandDataFrequent.Companion.FREQUENT_DATA_STREAM) }
+//    val WAND_FREQUENT: Supplier<DataComponentType<WandDataFrequent>> =
+//        DEFERRED_REGISTER.registerComponentType("wand_frequent")
+//        { it.persistent(WandDataFrequent.Companion.FREQUENT_DATA_CODEC).networkSynchronized(WandDataFrequent.Companion.FREQUENT_DATA_STREAM) }
 }

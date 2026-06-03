@@ -3,7 +3,7 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataAttach
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeRedirectPosHook
@@ -19,7 +19,7 @@ object DaedalusCypher : ModifierCypher(), ServerInvokeRedirectPosHook {
 
     override val resource = CypherNexus.modResource("daedalus")
 
-    override fun defaultAttributes(): CypherDataAttach.Builder {
+    override fun defaultAttributes(): CypherDataMap.Builder {
         return super.defaultAttributes()
             .manaDrain(40f)
             .stateChunkAttr(CypherAttributes.SPEED, CypherAttributeOperation.MULTIPLY_TOTAL, 1.25)

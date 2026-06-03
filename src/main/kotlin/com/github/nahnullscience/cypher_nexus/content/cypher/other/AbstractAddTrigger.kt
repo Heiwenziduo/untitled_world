@@ -4,7 +4,6 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataAttach
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
@@ -30,7 +29,7 @@ abstract class AbstractAddTrigger(
         val startIndex = data.deck.countTrailingZeroBits()
         var attachIndex = startIndex
         var cy: AbstractProjectileCypher = EmptyCypher
-        while (attachIndex < helper.aoc.size) {
+        while (attachIndex < helper.aoc.invokableSize) {
             // step 1, find target projectile cypher
             val cy0 = helper.aoc[attachIndex]
             attachIndex++
@@ -53,7 +52,7 @@ abstract class AbstractAddTrigger(
             // step 2, find payload
             var index1 = attachIndex
             var find = false
-            while (index1 < helper.aoc.size) {
+            while (index1 < helper.aoc.invokableSize) {
                 val cy1 = helper.aoc[index1]
                 index1++
                 if (cy1 is AbstractProjectileCypher && cy1.triggerCanPayload()) {

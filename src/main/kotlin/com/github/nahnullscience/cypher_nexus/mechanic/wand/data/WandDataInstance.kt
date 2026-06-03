@@ -1,0 +1,102 @@
+package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
+
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
+import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
+import net.minecraft.world.entity.Entity
+
+/** hold variable wand data, and handle invoking modules */
+class WandDataInstance(
+    val invariable: WandDataInvariable,
+    // val aoc: ArrayOfCyphers, // player may edit the wand after the instance has been created
+    val isClient: Boolean
+) {
+    val manaMax = invariable.chunkF.manaMax
+    val manaRegen = invariable.chunkF.manaRegen
+    private var _manaCurrent = 0f
+    private var _delayCurrent = 0
+    private var _rechargeCurrent = 0
+    private var _delay0 = 0
+    private var _recharge0 = 0
+    private var _deck = 0L
+    private var _discard = 0L
+    private var _lastModifyTime = 0L
+
+    init {
+        _manaCurrent = manaMax
+    }
+    val manaCurrent
+        get(): Float = _manaCurrent
+    val delay
+        get(): Int = _delayCurrent
+    val recharge
+        get(): Int = _rechargeCurrent
+    val isRecharging
+        get(): Boolean = _rechargeCurrent > 0 && _deck == 0L
+    val lastModifyTime
+        get(): Long = _lastModifyTime
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    fun tick(entity: Entity) {
+        _manaCurrent += manaRegen
+        _manaCurrent = _manaCurrent.coerceAtMost(manaMax)
+
+        if (_delayCurrent > 0) _delayCurrent--
+        if (_deck == 0L && _rechargeCurrent > 0) _rechargeCurrent--
+
+        _lastModifyTime = entity.level().gameTime
+    }
+
+    /**  */
+    fun updateWandStats() {
+        _deck = 0
+        _discard = 0
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    fun canInvoke() = !(_delayCurrent > 0 || (_deck == 0L && _rechargeCurrent > 0))
+
+    fun rightClickModule() {
+
+    }
+
+    fun leftClickModule() {
+
+    }
+
+    fun middleClickModule() {
+
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    fun manaRegenPercent() = manaCurrent / manaMax
+    fun delayPercent() = (_delay0.toFloat() - _delayCurrent) / _delay0
+    fun rechargePercent() = (_recharge0.toFloat() - _rechargeCurrent) / _recharge0
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    fun toHelperDataBundle() = InvokingHelper.HelperDataBundle(
+        draw = invariable.chunkI.draw,
+        delay = invariable.chunkI.castDelay,
+        recharge = invariable.chunkI.rechargeTime + _rechargeCurrent,
+        manaCurrent = _manaCurrent,
+        deck = _deck,
+        discard = _discard
+    )
+
+    fun updateHelperData(bundle: InvokingHelper.HelperDataBundle) {
+        _manaCurrent        =   bundle.manaCurrent
+        _delayCurrent       =   bundle.delay
+        _rechargeCurrent    =   bundle.recharge
+        _delay0             =   bundle.delay
+        _recharge0          =   bundle.recharge
+        _deck               =   bundle.deck
+        _discard            =   bundle.discard
+    }
+
+    data class ServerSide(
+        var deck: Long = 0L,
+        var discard: Long = 0L,
+        var tickCount: Long = 0L,
+    )
+}

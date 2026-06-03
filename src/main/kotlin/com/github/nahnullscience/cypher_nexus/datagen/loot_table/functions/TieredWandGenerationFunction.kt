@@ -5,11 +5,8 @@ import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.init.ModDataLootFunctions.TIERED_WAND_GENERATION
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataFrequent
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
-import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.AOC_CODEC
-import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.CYPHER_LIST
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlaggable
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.mojang.serialization.Codec
@@ -78,7 +75,7 @@ class TieredWandGenerationFunction(
 
         stack.set(ModDataComponents.WAND_INVARIABLE, invariable)
         stack.set(ModDataComponents.WAND_HIGH_PAYLOAD, highPayload) // TODO gen random aoc
-        stack.set(ModDataComponents.WAND_FREQUENT, WandDataFrequent.DEFAULT)
+//        stack.set(ModDataComponents.WAND_FREQUENT, WandDataFrequent.DEFAULT)
 
         CypherNexus.LOGGER.debug("tier{} wand is generated\ntoken{}\n{}", tier, attrMap,invariable)
         return stack

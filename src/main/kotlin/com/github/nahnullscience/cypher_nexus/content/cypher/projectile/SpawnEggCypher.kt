@@ -3,7 +3,7 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.projectile
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataAttach
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
@@ -20,7 +20,7 @@ object SpawnEggCypher : ProjectileCypher() {
     override val resource = CypherNexus.modResource("spawn_egg")
     val egg = ItemStack(Items.EGG)
 
-    override fun defaultAttributes(): CypherDataAttach.Builder {
+    override fun defaultAttributes(): CypherDataMap.Builder {
         return super.defaultAttributes()
             .manaDrain(20f)
             .draw(1)

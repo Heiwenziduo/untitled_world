@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.CYPHER_DATA_ATTACH
+import com.github.nahnullscience.cypher_nexus.init.ModDataMaps.CYPHER_DATA_ATTACH
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
@@ -9,17 +9,14 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAt
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
-import com.github.nahnullscience.cypher_nexus.utility.exception.CypherNotFoundException
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.ChatFormatting
 import net.minecraft.core.Holder
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.ResourceLocation
-import kotlin.jvm.optionals.getOrElse
 
 /**
  *
@@ -71,7 +68,7 @@ sealed class AbstractCypher: IRegisterable {
 
     private fun attributesData() = holder().getData(CYPHER_DATA_ATTACH)
 
-    open fun defaultAttributes(): CypherDataAttach.Builder = CypherDataAttach.builder()
+    open fun defaultAttributes(): CypherDataMap.Builder = CypherDataMap.builder()
 
     fun attributes() = attributesData() ?: run { CypherNexus.LOGGER.warn("cypher $this missing attributes data, this may cause lag"); defaultAttributes().build() }
 
@@ -113,15 +110,15 @@ sealed class AbstractCypher: IRegisterable {
     }
 
     open fun modifyStateChunk(helper: InvokingHelper, chunk: ProjectileStateChunk) {
-        attributes().stateChunk.forEach { attribute, cyMap ->
+        attributes().stateChunk.forEach { attribute, opMap ->
             // prune 1, sub-chunk do not affect delay, spread, whatsoever. note recharge is an exception
             if (chunk != helper.rootChunk && attribute.applyOn == CypherAttribute.AttributeApply.INVOKING) return@forEach
 
             val stateMap = chunk.computedOperationMap.getOrPut(attribute) { HashMap() }
             // prune 2, if set, skip
-            if (stateMap[CypherAttributeOperation.SET_ALL] != null && cyMap[CypherAttributeOperation.SET_ALL] == null) return@forEach
+            if (stateMap[CypherAttributeOperation.SET_ALL] != null && opMap[CypherAttributeOperation.SET_ALL] == null) return@forEach
 
-            cyMap.forEach { operator, value ->
+            opMap.forEach { operator, value ->
                 if (operator != CypherAttributeOperation.BASE && operator != CypherAttributeOperation.SET_SELF) {
                     stateMap.compute(operator) { op, v -> operator.cumulate(v?: operator.defaultValue, value) }
                 }
@@ -145,15 +142,12 @@ sealed class AbstractCypher: IRegisterable {
 
     // since cyphers are in the same registry, their names are unlikely to repeat,
     // but using category prefix can make it tidy
-    private fun translationKey(): String = "cypher.${resource.namespace}.${category.value().registryName()}.${resource.path}"
-
     /**
-     * lang-JSON key: cypher.{MOD_ID}.{cypher_category}.{cypher_name}?.{key}
-     * @param key represents name if empty
+     * lang-JSON key: cypher.{MOD_ID}.{cypher_category}.{cypher_name}
      * */
-    open fun translation(key: TranslationKey?): MutableComponent =
-        Component.translatable("${translationKey()}${if (key==null) "" else ".$key"}")
-    override fun translation(): MutableComponent = translation(null)
+    private fun translationKey() = "cypher.${resource.namespace}.${category.value().registryName()}.${resource.path}"
+    override fun translation(): MutableComponent = Component.translatable(translationKey())
+    open fun description(): MutableComponent = Component.translatable("${translationKey()}.description")
 
     /** icons: {MOD_ID}/textures/cypher/{cypher_category}/{cypher_name}.png */
     open fun texture(): ResourceLocation =
@@ -178,11 +172,27 @@ sealed class AbstractCypher: IRegisterable {
         components.add(mana)
 
         if (draw > 1) {
-            val draw = Component.literal("  ")
+            val compon = Component.literal("  ")
                 .append(Component.translatable("cypher.attribute.${CypherNexus.MOD_ID}.draw"))
                 .append(Component.literal(": "))
                 .append(Component.literal("$draw").withStyle(ChatFormatting.YELLOW))
-            components.add(draw)
+            components.add(compon)
+        }
+
+        if (delay != 0) {
+            val compon = Component.literal("  ")
+                .append(Component.translatable("cypher.attribute.${CypherNexus.MOD_ID}.delay"))
+                .append(Component.literal(": "))
+                .append(Component.literal("$delay").withStyle(ChatFormatting.YELLOW))
+            components.add(compon)
+        }
+
+        if (recharge != 0) {
+            val compon = Component.literal("  ")
+                .append(Component.translatable("cypher.attribute.${CypherNexus.MOD_ID}.recharge"))
+                .append(Component.literal(": "))
+                .append(Component.literal("$recharge").withStyle(ChatFormatting.YELLOW))
+            components.add(compon)
         }
 
         // keep the order attrs registered
@@ -205,16 +215,6 @@ sealed class AbstractCypher: IRegisterable {
         components
     }
 
-
-
-    enum class TranslationKey() {
-        DESCRIPTION, // -> .description
-        ;
-
-        override fun toString(): String {
-            return this.name.lowercase()
-        }
-    }
 
     data class CypherInvokingOptions(
         val drawEnabled: Boolean = true,

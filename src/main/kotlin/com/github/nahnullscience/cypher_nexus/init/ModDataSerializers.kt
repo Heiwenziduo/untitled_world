@@ -18,7 +18,7 @@ import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 object ModDataSerializers {
 
     val DEFERRED_REGISTER: DeferredRegister<EntityDataSerializer<*>> =
-        DeferredRegister.create(NeoForgeRegistries.Keys.ENTITY_DATA_SERIALIZERS, CypherNexus.MOD_ID)
+        DeferredRegister.create(NeoForgeRegistries.ENTITY_DATA_SERIALIZERS, CypherNexus.MOD_ID)
 
     fun register() {
         DEFERRED_REGISTER.register(MOD_BUS)

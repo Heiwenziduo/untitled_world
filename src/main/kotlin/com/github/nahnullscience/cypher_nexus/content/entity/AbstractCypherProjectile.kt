@@ -200,6 +200,7 @@ open class AbstractCypherProjectile(entityType: EntityType<out Projectile>, leve
     override fun tick() {
         // called on both server side and client side
         if (firstTick) { // start from tickCount == 1
+            // FIXME entity desync "positon-flash" always happen at around first time they sync
             hooks?.playHooks(CypherBehaviorHooks.FIRST_TICK_BOTH)
             { h, i -> h.firstTickBoth(level(), this, i) }
 

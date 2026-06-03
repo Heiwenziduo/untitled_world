@@ -42,7 +42,7 @@ class ArrayOfCyphers(val capacity: Int = 1) : Iterable<AbstractCypher> {
     }
 
     /** last Invokable index + 1 */
-    val size : Int
+    val invokableSize : Int
         get() = 64 - _bitInvokable.countLeadingZeroBits()
 
     // this allows index-get: myInventory[0]
@@ -67,6 +67,8 @@ class ArrayOfCyphers(val capacity: Int = 1) : Iterable<AbstractCypher> {
     /** Empty -> null */
     fun toNullableList(): List<AbstractCypher?> = _cyphers.map { if (it.isEmpty()) null else it }
     fun copy(): ArrayOfCyphers = ArrayOfCyphers(_cyphers.toList())
+    fun isEmpty() = (_bitInvokable or _bitPassive) == 0L
+    fun isNotEmpty() = !isEmpty()
 
     /** find the first Empty then replace that with given cypher
      * @return the replaced index, -1 if no empty */

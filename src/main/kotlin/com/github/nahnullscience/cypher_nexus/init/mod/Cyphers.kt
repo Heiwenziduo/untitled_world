@@ -4,10 +4,11 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.AbstractAddTrigger
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.AbstractRequirement
-import com.github.nahnullscience.cypher_nexus.content.cypher.other.RequirementHP
+import com.github.nahnullscience.cypher_nexus.content.cypher.other.RequirementLowHP
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.RequirementNotPlayer
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.static_projectile.ExplosionCypher
+import com.github.nahnullscience.cypher_nexus.content.cypher.utility.InnerForceCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.RefresherRingCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
@@ -83,7 +84,7 @@ object Cyphers {
             .modifier())
     val BRISK = registerCypher(
         SimpleModifier("brisk", 5f)
-            .attribute(CypherAttributes.DAMAGE, CypherAttributeOperation.ADD, 1.0)
+            .delay(-1)
             .attribute(CypherAttributes.SPEED, CypherAttributeOperation.MULTIPLY_TOTAL, 2.0)
             .modifier())
     val FIERY = registerCypher(FieryCypher)
@@ -93,12 +94,11 @@ object Cyphers {
             .modifier())
     val ANTIGRAVITY = registerCypher(
         SimpleModifier("antigravity", 1f)
-            .attribute(CypherAttributes.GRAVITY_FACTOR, CypherAttributeOperation.MULTIPLY_BASE, -0.66)
+            .attribute(CypherAttributes.GRAVITY_FACTOR, CypherAttributeOperation.ADD, -0.03)
             .modifier())
     val MANA_SURGE = registerCypher(
         SimpleModifier("mana_surge", -40f)
             .delay(4)
-            .attribute(CypherAttributes.GRAVITY_FACTOR, CypherAttributeOperation.MULTIPLY_BASE, -0.66)
             .modifier())
     val HEAVILY_STRONG = registerCypher(
         SimpleModifier("heavily_strong", 20f)
@@ -128,12 +128,12 @@ object Cyphers {
     val EXTEND_EXISTING = registerCypher(
         SimpleModifier("extend_existing", 40f)
             .delay(5)
-            .attribute(CypherAttributes.EXISTING, CypherAttributeOperation.ADD, 80.0)
+            .attribute(CypherAttributes.EXISTING, CypherAttributeOperation.ADD, 40.0)
             .modifier())
     val CURTAIL_EXISTING = registerCypher(
         SimpleModifier("curtail_existing", 10f)
             .delay(-3)
-            .attribute(CypherAttributes.EXISTING, CypherAttributeOperation.ADD, -42.0)
+            .attribute(CypherAttributes.EXISTING, CypherAttributeOperation.ADD, -32.0)
             .modifier())
 
     val HOMING = registerCypher(HomingCypher)
@@ -150,7 +150,7 @@ object Cyphers {
             .attribute(CypherAttributes.EXISTING, CypherAttributeOperation.SET_ALL, 1.0)
             .modifier())
 
-    const val COLOR_MULTI_INVOKE = 0xFF98A087.toInt()
+    const val COLOR_MULTI_INVOKE = 0xFF4EF3D3.toInt()
     val DOUBLE_INVOKING = registerCypher(
         SimpleModifier("double_invoking", 1f)
             .draw(2)
@@ -199,6 +199,7 @@ object Cyphers {
     // utility //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    val INNER_FORCE = registerCypher(InnerForceCypher)
     val REFRESHER_RING = registerCypher(RefresherRingCypher)
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -220,7 +221,7 @@ object Cyphers {
 //        override val triggerType = TriggerType.RED_STONE
 //        override val resource = CypherNexus.modResource("add_trigger_red_stone")
 //    })
-    val REQUIREMENT_HP = registerCypher(RequirementHP)
+    val REQUIREMENT_HP = registerCypher(RequirementLowHP)
     val REQUIREMENT_NOT_PLAYER = registerCypher(RequirementNotPlayer)
     val REQUIREMENT_OTHERWISE = registerCypher(AbstractRequirement.RequirementOtherwise)
     val REQUIREMENT_ENDPOINT = registerCypher(AbstractRequirement.RequirementEndpoint)

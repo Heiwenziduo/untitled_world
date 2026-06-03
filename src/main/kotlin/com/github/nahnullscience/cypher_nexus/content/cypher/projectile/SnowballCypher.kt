@@ -2,20 +2,16 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.projectile
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
-import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.CYPHER_DATA_ATTACH
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
-import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataAttach
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.level.Level
 
 object SnowballCypher : ProjectileCypher() {
     override val resource = CypherNexus.modResource("snowball")
 
-    override fun defaultAttributes(): CypherDataAttach.Builder {
+    override fun defaultAttributes(): CypherDataMap.Builder {
         return super.defaultAttributes()
             .manaDrain(3f)
             .projectileAttr(CypherAttributes.SPEED, 0.8)

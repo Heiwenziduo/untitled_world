@@ -256,7 +256,7 @@ class CypherIndexScreen(
 
     private fun renderCypherIcon(guiGraphics: GuiGraphics, cypher: AbstractCypher, x: Int, y: Int) {
         if (cypher !is EmptyCypher) {
-            val borderColor = if (cypher.color > 0) cypher.color else cypher.category.value().color
+            val borderColor = if (cypher.color != 0) cypher.color else cypher.category.value().color
             guiGraphics.renderOutline(x - 1, y - 1, ICON_SIZE + 2, ICON_SIZE + 2, borderColor)
             guiGraphics.blit(cypher.texture(), x, y, 0f, 0f, ICON_SIZE, ICON_SIZE, ICON_TEXTURE, ICON_TEXTURE)
         }
@@ -268,7 +268,7 @@ class CypherIndexScreen(
 
         val titleText = cypher.translation().withStyle(ChatFormatting.GOLD)
         components.add(ClientTooltipComponent.create(titleText.visualOrderText))
-        val descText = cypher.translation(AbstractCypher.TranslationKey.DESCRIPTION).withStyle(ChatFormatting.GRAY)
+        val descText = cypher.description().withStyle(ChatFormatting.GRAY)
         components.add(CypherDescriptionTooltip(CypherDescriptionTooltip.TooltipDataBundle(descText, cypher.texture())))
 
         // TODO too ugly
@@ -327,6 +327,7 @@ class CypherIndexScreen(
                 val row = i / cols
                 val x = reX + PADDING + col * ITEM_SIZE
                 val y = reY + PADDING + (row * ITEM_SIZE)
+                // FIXME index out of length
                 val cypher = currentEditCyphers[i]
 
                 renderWandBlocks(guiGraphics, cypher, x, y)
@@ -353,15 +354,15 @@ class CypherIndexScreen(
 
     private fun pickWand() {
         if (hasEdited && currentInvariableData != null) {
-            val u = currentInvariableData!!.chunkU.uuid
+            val u = currentInvariableData!!.uuid
             editedMap.put(u, currentEditCyphers.toList())
         }
         if (wandList.isNotEmpty()) {
             hasEdited = false
             println("pickwand: $wandList\n$wandListIndex") // TODO
             val currentStack = wandList[wandListIndex]
-            currentInvariableData = currentStack?.get(ModDataComponents.WAND_INVARIABLE)
-            val highPayload = currentStack?.get(ModDataComponents.WAND_HIGH_PAYLOAD)
+            currentInvariableData = currentStack.get(ModDataComponents.WAND_INVARIABLE)
+            val highPayload = currentStack.get(ModDataComponents.WAND_HIGH_PAYLOAD)
             if (highPayload != null) {
                 currentEditCyphers = highPayload.cypherList.copy()
             }
@@ -377,7 +378,7 @@ class CypherIndexScreen(
         super.onClose()
         // TODO send msg to server
         if (hasEdited && currentInvariableData != null) {
-            val u = currentInvariableData!!.chunkU.uuid
+            val u = currentInvariableData!!.uuid
             PacketDistributor.sendToServer(ServerboundEditWandCyphers(u, currentEditCyphers.toList()))
         }
         editedMap.forEach { uu, cyphers ->
