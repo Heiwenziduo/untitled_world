@@ -308,7 +308,7 @@ open class AbstractCypherProjectile(entityType: EntityType<out Projectile>, leve
 
             val direction = VectorUtility.getDireFromHit(hitPoint, targetBox)
             if (hitPoint == null || direction == null) { // this block should not be reached
-                if (!level().isClientSide) CypherNexus.LOGGER.fatal("hitPoint == null || direction == null\n$direction")
+                if (!level().isClientSide) CypherNexus.LOGGER.error("hitPoint == null || direction == null\n$direction")
                 return defaultReturn
             }
 

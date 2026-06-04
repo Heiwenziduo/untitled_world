@@ -38,9 +38,8 @@ class CypherIndexBlock(): Block(
 //            Minecraft.getInstance().setScreen(CypherIndexScreen(CypherData.cypherMap))
 //        }
         if (!level.isClientSide) {
-            PacketDistributor.sendToPlayer(player as ServerPlayer, ClientboundOpenIndexScreen(
-                CypherData.Companion.cyphersUnhide, CypherData.Companion.cyphersPlayerUnlocked(player)
-            )
+                PacketDistributor.sendToPlayer(player as ServerPlayer, ClientboundOpenIndexScreen(
+                CypherData.cyphersUnhide, CypherData.cyphersPlayerUnlocked(player))
             )
         }
         return InteractionResult.SUCCESS

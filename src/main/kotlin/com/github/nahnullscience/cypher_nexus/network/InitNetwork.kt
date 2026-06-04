@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.network
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.client.network.ClientPayloadHandler
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundOpenIndexScreen
+import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
 import com.github.nahnullscience.cypher_nexus.network.server.ServerboundEditWandCyphers
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
@@ -34,6 +35,12 @@ object InitNetwork {
             ClientboundOpenIndexScreen.Companion.TYPE,
             ClientboundOpenIndexScreen.Companion.STREAM,
             ClientPayloadHandler::openIndexScreen
+        )
+
+        registrar.playToClient(
+            ClientboundSyncWandInstance.Companion.TYPE,
+            ClientboundSyncWandInstance.Companion.STREAM,
+            ClientPayloadHandler::syncWandInstance
         )
 
         registrar.playToServer(

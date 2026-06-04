@@ -47,23 +47,24 @@ object CypherAttributes {
 //    val RECHARGE_TIME = registerAttribute("recharge_time", 0.0, target = CypherAttribute.AttributeApply.INVOKING)
     /** degree */
     val SPREAD = registerAttribute("spread", 0.0, 0.0, 720.0, target = CypherAttribute.AttributeApply.INVOKING)
-    val RECOIL = registerAttribute("recoil", 0.0, 0.0, 10.0, target = CypherAttribute.AttributeApply.INVOKING, hide = true)
+    val RECOIL = registerAttribute("recoil", 0.0, 0.0, 1000.0, target = CypherAttribute.AttributeApply.INVOKING, hide = true)
 
 
     // ================================ projectile
     val DAMAGE = registerAttribute("damage", 0.0, sync = false)
     /** 1.00 <-> 100% */
     val CRIT_CHANCE = registerAttribute("crit_chance", 0.0, 0.0, sync = false)
-    val KNOCKBACK = registerAttribute("knockback", 0.0, 0.0, 114.514 ,sync = false, hide = true)
+    val KNOCKBACK = registerAttribute("knockback", 0.0, 0.0, 1000.0, sync = false, hide = true)
+    val FORTUNE_LEVEL = registerAttribute("fortune", 0.0, -1.0, 100.0, sync = false, hide = true)
     /** block per tick, but will show block/sec */
-    val SPEED = registerAttribute("speed", 0.0, 0.0, 8.0)
+    val SPEED = registerAttribute("speed", 0.0, 0.0, 16.0)
     /** tick */
-    val EXISTING = registerAttribute("existing", 300.0, hide = true)
-    val EFFECT_RADIUS = registerAttribute("effect_redius", 1.0, 0.125, 8.0)
+    val EXISTING = registerAttribute("existing", 300.0)
+    val EFFECT_RADIUS = registerAttribute("effect_redius", 1.0, 0.125, 16.0)
     /** int, bounce times */
     val BOUNCE = registerAttribute("bounce", 0.0, 0.0, 100.0)
     /** how much it falls each tick */
-    val GRAVITY_FACTOR = registerAttribute("gravity_factor", 0.0, -8.0, 8.0, hide = true)
+    val GRAVITY_FACTOR = registerAttribute("gravity_factor", 0.0, -1.0, 1.0, hide = true)
     /** deltaMovement * (1 - Friction) each tick, 0.01 by default */
     val FRICTION_FACTOR = registerAttribute("friction_factor", 0.01, -9.0, 1.0, hide = true)
 }

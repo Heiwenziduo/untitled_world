@@ -8,7 +8,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 private fun AbstractCypher.isPassive(): Boolean = isNotEmpty() && category == CypherCategories.WAND_MODULE
 
 /** fixed length, cypher changeable, EmptyCypher autofill */
-class ArrayOfCyphers(val capacity: Int = 1) : Iterable<AbstractCypher> {
+class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
     /** not empty and not "passive" */
     private var _bitInvokable: Long = 0
     private var _bitPassive: Long = 0
@@ -17,7 +17,7 @@ class ArrayOfCyphers(val capacity: Int = 1) : Iterable<AbstractCypher> {
 
     companion object {
         /** O(n) */
-        fun of(list: List<AbstractCypher?>) : ArrayOfCyphers = ArrayOfCyphers(list)
+        fun of(list: List<AbstractCypher?>) = ArrayOfCyphers(list)
 
         const val MAX_LENGTH = 64 // max length capped at a Long-bits count, guess this is quite enough
     }

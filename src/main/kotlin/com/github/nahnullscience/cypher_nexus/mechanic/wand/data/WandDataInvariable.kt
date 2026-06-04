@@ -18,28 +18,29 @@ data class WandDataInvariable(
     val uuid: String,
     val chunkF: WandDataChunkF,
     val chunkI: WandDataChunkI,
-    val chunkL: WandDataChunkL,
+    val chunkL: WandDataChunkL = WandDataChunkL(listOf()),
 ) {
-    data class WandDataChunkF(val manaMax: Float, val manaRegen: Float, val wandLength: Float,)
-    data class WandDataChunkI(val capacity: Int, val draw: Int, val castDelay: Int, val rechargeTime: Int,)
-    data class WandDataChunkL(val alwaysCast: List<AbstractCypher>)
+    data class WandDataChunkF(val manaMax: Float, val manaRegen: Float, val wandLength: Float, val spread: Float)
+    data class WandDataChunkI(val draw: Int, val castDelay: Int, val rechargeTime: Int,)
+    data class WandDataChunkL(val alwaysInvoke: List<AbstractCypher>)
 
     class Builder() {
-        var manaMax: Float = 99f
-        var manaRegen: Float = 0.9f
-        var wandLength: Float = 0.9f
+        var manaMax: Float = 100f
+        var manaRegen: Float = 1f
+        var wandLength: Float = 1f
+        var spread: Float = 0f
 
-        var capacity: Int = 2
         var draw: Int = 1
         var castDelay: Int = 10
         var rechargeTime: Int = 15
 
-        val alwaysCast = mutableListOf<AbstractCypher>()
+        val alwaysInvoke = mutableListOf<AbstractCypher>()
 
         fun manaMax(v: Float) : Builder = run { manaMax += v; this }
         fun manaRegen(v: Float) : Builder = run { manaRegen += v; this }
         fun wandLength(v: Float) : Builder = run { wandLength = v; this }
-        fun capacity(v: Int) : Builder = run { capacity = v; this }
+        fun spread(v: Float) : Builder = run { spread = v; this }
+
         fun draw(v: Int) : Builder = run { draw = v; this }
         fun castDelay(v: Int) : Builder = run { castDelay -= v; this }
         fun rechargeTime(v: Int) : Builder = run { rechargeTime -= v; this }
@@ -47,9 +48,9 @@ data class WandDataInvariable(
         fun build() : WandDataInvariable {
             return WandDataInvariable(
                 UUID.randomUUID().toString(),
-                WandDataChunkF(manaMax, manaRegen, wandLength),
-                WandDataChunkI(capacity, draw, castDelay, rechargeTime),
-                WandDataChunkL(alwaysCast),
+                WandDataChunkF(manaMax, manaRegen, wandLength, spread),
+                WandDataChunkI(draw, castDelay, rechargeTime),
+                WandDataChunkL(alwaysInvoke),
                 )
         }
     }
@@ -61,9 +62,9 @@ data class WandDataInvariable(
             Codec.FLOAT.fieldOf("manaMax").forGetter(WandDataChunkF::manaMax),
             Codec.FLOAT.fieldOf("manaRegen").forGetter(WandDataChunkF::manaRegen),
             Codec.FLOAT.fieldOf("wandLength").forGetter(WandDataChunkF::wandLength),
+            Codec.FLOAT.fieldOf("spread").forGetter(WandDataChunkF::spread),
         ).apply(it, ::WandDataChunkF) }
         val CHUNK1_CODEX: Codec<WandDataChunkI> = RecordCodecBuilder.create { it.group(
-            Codec.INT.fieldOf("capacity").forGetter(WandDataChunkI::capacity),
             Codec.INT.fieldOf("draw").forGetter(WandDataChunkI::draw),
             Codec.INT.fieldOf("castDelay").forGetter(WandDataChunkI::castDelay),
             Codec.INT.fieldOf("rechargeTime").forGetter(WandDataChunkI::rechargeTime),
@@ -71,8 +72,8 @@ data class WandDataInvariable(
         val CHUNK2_CODEX: Codec<WandDataChunkL> = RecordCodecBuilder.create { it.group(
             Cyphers.REGISTRY
                 .byNameCodec().listOf()
-                .fieldOf("alwaysCast")
-                .forGetter(WandDataChunkL::alwaysCast)
+                .fieldOf("alwaysInvoke")
+                .forGetter(WandDataChunkL::alwaysInvoke)
         ).apply(it, ::WandDataChunkL) }
 
         val INVARIABLE_DATA_CODEC: Codec<WandDataInvariable> = RecordCodecBuilder.create { it.group(
@@ -87,16 +88,16 @@ data class WandDataInvariable(
             ByteBufCodecs.FLOAT, WandDataChunkF::manaMax,
             ByteBufCodecs.FLOAT, WandDataChunkF::manaRegen,
             ByteBufCodecs.FLOAT, WandDataChunkF::wandLength,
+            ByteBufCodecs.FLOAT, WandDataChunkF::spread,
             ::WandDataChunkF)
         val CHUNK1_STREAM: StreamCodec<ByteBuf, WandDataChunkI> = StreamCodec.composite(
-            ByteBufCodecs.INT, WandDataChunkI::capacity,
             ByteBufCodecs.INT, WandDataChunkI::draw,
             ByteBufCodecs.INT, WandDataChunkI::castDelay,
             ByteBufCodecs.INT, WandDataChunkI::rechargeTime,
             ::WandDataChunkI)
         val CHUNK2_STREAM: StreamCodec<RegistryFriendlyByteBuf, WandDataChunkL> =
             ByteBufCodecs.registry(Cyphers.RESOURCE_KEY).apply(ByteBufCodecs.list())
-                .map(::WandDataChunkL, WandDataChunkL::alwaysCast)
+                .map(::WandDataChunkL, WandDataChunkL::alwaysInvoke)
 
         val INVARIABLE_DATA_STREAM: StreamCodec<RegistryFriendlyByteBuf, WandDataInvariable> = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8, WandDataInvariable::uuid,
@@ -112,13 +113,19 @@ data class WandDataInvariable(
             get() {
                 val data = WandDataInvariable(
                     UUID.randomUUID().toString(),
-                    WandDataChunkF(300f, 3f, 1.2f),
-                    WandDataChunkI(6, 1, 12, 15),
+                    WandDataChunkF(300f, 3f, 1.2f, 0f),
+                    WandDataChunkI(1, 12, 15),
                     WandDataChunkL(listOf()),
 
                 )
                 return data
             }
+
+        val TEST_GOOD_WAND = WandDataInvariable(
+            uuid = "mythical",
+            chunkF = WandDataChunkF(3000f, 30f, 1.6f, 7f),
+            chunkI = WandDataChunkI(1, 6, 10),
+        )
 
 //        val SUB_INVOKER : WandDataInvariable = WandDataInvariable(
 //            WandDataChunkF(1.0E9f, 0f, 0f),

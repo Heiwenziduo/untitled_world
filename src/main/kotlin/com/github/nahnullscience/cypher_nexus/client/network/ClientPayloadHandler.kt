@@ -2,7 +2,9 @@ package com.github.nahnullscience.cypher_nexus.client.network
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.client.gui.CypherIndexScreen
+import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundOpenIndexScreen
+import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.mod.CypherUtility
 import net.minecraft.client.Minecraft
 import net.neoforged.api.distmarker.Dist
@@ -34,5 +36,16 @@ object ClientPayloadHandler {
             CypherNexus.LOGGER.warn(it.message)
             return@exceptionally null
         }
+    }
+
+    fun syncWandInstance(data: ClientboundSyncWandInstance, context: IPayloadContext) {
+        println("client receive package -> syncWandInstance: \n$data")
+        val player = context.player()
+        player.getData(WAND_DATA_MAP)[data.uuid]?.syncDataClient(
+            data.mana,
+            data.delay,
+            data.recharge,
+            data.deck
+        )
     }
 }

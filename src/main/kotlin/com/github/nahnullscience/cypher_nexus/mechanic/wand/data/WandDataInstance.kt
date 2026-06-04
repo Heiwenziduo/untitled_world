@@ -1,14 +1,16 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
 
+import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandDataBundle
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.world.entity.Entity
 
 /** hold variable wand data, and handle invoking modules */
 class WandDataInstance(
     val invariable: WandDataInvariable,
-    // val aoc: ArrayOfCyphers, // player may edit the wand after the instance has been created
-    val isClient: Boolean
+    val isClient: Boolean,
+    private var aoc: ArrayOfCyphers, // player may edit the wand after the instance has been created
 ) {
     val manaMax = invariable.chunkF.manaMax
     val manaRegen = invariable.chunkF.manaRegen
@@ -47,9 +49,22 @@ class WandDataInstance(
     }
 
     /**  */
-    fun updateWandStats() {
+    fun updateWandStatsServer(bundle: WandDataBundle) {
+        if (isClient) CypherNexus.LOGGER.error("server method calls on client side: updateWandStatsServer")
         _deck = 0
         _discard = 0
+        _rechargeCurrent = 0
+        aoc = bundle.highPayload.cypherArray
+    }
+
+    fun syncDataClient(mana: Float, delay: Int, recharge: Int, deck: Long) {
+        if (!isClient) CypherNexus.LOGGER.error("client method calls on server side: syncDataClient")
+        _manaCurrent     = mana
+        _delayCurrent    = delay
+        _rechargeCurrent = recharge
+        _delay0          = delay
+        _recharge0       = recharge
+        _deck            = deck
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,9 +109,4 @@ class WandDataInstance(
         _discard            =   bundle.discard
     }
 
-    data class ServerSide(
-        var deck: Long = 0L,
-        var discard: Long = 0L,
-        var tickCount: Long = 0L,
-    )
 }

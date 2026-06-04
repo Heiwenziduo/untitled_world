@@ -11,7 +11,7 @@ import net.minecraft.world.level.Level
 // maybe player only?
 class WandDataMap {
     companion object {
-        const val RESET_TICK_COUNT = 6000
+        const val RESET_TICK_COUNT = 1200
     }
 
     private val _map = HashMap<String, WandDataInstance>()
@@ -25,13 +25,15 @@ class WandDataMap {
         }
     }
 
+    operator fun get(uuid: String) = _map[uuid]
+
     fun getOrPutInstance(bundle: WandDataBundle, wand: IWandLike, level: Level): WandDataInstance {
         val uuid = bundle.invariable.uuid
         if (_map[uuid] == null) {
             CypherNexus.LOGGER.debug("wand-like {} just created an {} sided instance", wand, if (level.isClientSide) "client" else "server" )
         }
         return _map.getOrPut(uuid)
-        { WandDataInstance(bundle.invariable, level.isClientSide) }
+        { WandDataInstance(bundle.invariable, level.isClientSide, bundle.highPayload.cypherArray) }
     }
     fun getOrPutInstance(stack: ItemStack, wand: IWandLike, level: Level): WandDataInstance? {
         val invariable = stack.get(ModDataComponents.WAND_INVARIABLE) ?: return null
@@ -40,6 +42,14 @@ class WandDataMap {
     }
 
 
-    fun updateWandStats(bundle: WandDataBundle, wand: IWandLike, level: Level) = getOrPutInstance(bundle, wand, level).updateWandStats()
-    fun updateWandStats(stack: ItemStack,  wand: IWandLike, level: Level) = getOrPutInstance(stack, wand, level)?.updateWandStats()
+    /** main scene is to edit cyphers */
+    fun updateWandStats(bundle: WandDataBundle, wand: IWandLike, level: Level) = run {
+        if (level.isClientSide) return@run
+        getOrPutInstance(bundle, wand, level).updateWandStatsServer(bundle)
+    }
+    fun updateWandStats(stack: ItemStack,  wand: IWandLike, level: Level) {
+        val invariable = stack.get(ModDataComponents.WAND_INVARIABLE) ?: return
+        val highPayload = stack.get(ModDataComponents.WAND_HIGH_PAYLOAD) ?: return
+        return updateWandStats(WandDataBundle(invariable, highPayload), wand, level)
+    }
 }

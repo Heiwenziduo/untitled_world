@@ -2,10 +2,14 @@ package com.github.nahnullscience.cypher_nexus.mechanic.wand
 
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
+import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
+import net.neoforged.neoforge.network.PacketDistributor
 
 /**
  * ---casting logics here---
@@ -34,7 +38,7 @@ interface IWandLike {
         val instance = invoker.getData(WAND_DATA_MAP).getOrPutInstance(wandData, this, level)
 
         if (!instance.canInvoke()) {
-            println("casting rejected due to: $instance")
+//            println("casting rejected due to: $instance")
             return false
         }
 
@@ -46,14 +50,23 @@ interface IWandLike {
             invoker,
             stack,
             wandData.invariable,
-            wandData.highPayload.cypherList,
+            wandData.highPayload.cypherArray,
             helperBundle,
             getInvokePosDire(level, invoker, wandData.invariable.chunkF.wandLength),
         )
         helper.start()
 
-        // retrieve data from helper and write to components
+        // retrieve data from helper and sync to instance of both sides
         instance.updateHelperData(helperBundle)
+        if (invoker is ServerPlayer) PacketDistributor.sendToPlayer(invoker,
+            ClientboundSyncWandInstance(
+                wandData.invariable.uuid,
+                helperBundle.manaCurrent,
+                helperBundle.delay,
+                helperBundle.recharge,
+                helperBundle.deck
+                )
+        )
 
         return true
     }

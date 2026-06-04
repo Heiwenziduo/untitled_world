@@ -67,7 +67,7 @@ class CypherIndexScreen(
     private var wandListIndex = 0
     private val editedMap = HashMap<String, List<AbstractCypher>>()
     // private var currentStack: ItemStack? = null
-    private var currentEditCyphers = ArrayOfCyphers()
+    private var currentEditCyphers = ArrayOfCyphers(1)
     private var currentInvariableData: WandDataInvariable? = null
     private var hasEdited = false
 
@@ -316,13 +316,13 @@ class CypherIndexScreen(
 
         if (currentInvariableData != null) {
             val (manaMax, manaRegen) = currentInvariableData!!.chunkF
-            val (capacity, draw, castDelay, rechargeTime) = currentInvariableData!!.chunkI
+            val (draw, castDelay, rechargeTime) = currentInvariableData!!.chunkI
 
             guiGraphics.drawString(font, currentStack.hoverName, reX + 24, WAND_BLOCK_MARGIN, WHITE)
             guiGraphics.drawString(font, "manaMax: $manaMax", reX + 24, WAND_BLOCK_MARGIN + 20, WHITE)
             guiGraphics.drawString(font, "manaRegen: $manaRegen", reX + 56, WAND_BLOCK_MARGIN + 20, WHITE)
 
-            for (i in 0..capacity - 1) {
+            for (i in 0 until currentEditCyphers.capacity) {
                 val col = i % cols
                 val row = i / cols
                 val x = reX + PADDING + col * ITEM_SIZE
@@ -364,7 +364,7 @@ class CypherIndexScreen(
             currentInvariableData = currentStack.get(ModDataComponents.WAND_INVARIABLE)
             val highPayload = currentStack.get(ModDataComponents.WAND_HIGH_PAYLOAD)
             if (highPayload != null) {
-                currentEditCyphers = highPayload.cypherList.copy()
+                currentEditCyphers = highPayload.cypherArray.copy()
             }
         }
         println("pickwand: $currentEditCyphers") // TODO

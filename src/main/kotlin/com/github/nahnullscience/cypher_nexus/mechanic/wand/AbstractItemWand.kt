@@ -67,11 +67,10 @@ abstract class AbstractItemWand(
 
     override fun getWandData(stack: ItemStack?, caster: Entity?): WandDataBundle? {
         if (stack != null && !stack.isEmpty) {
-            val invariable = stack.get(ModDataComponents.WAND_INVARIABLE)
-            val highPayload = stack.get(ModDataComponents.WAND_HIGH_PAYLOAD)
+            val invariable = stack.get(ModDataComponents.WAND_INVARIABLE) ?: return null
+            val highPayload = stack.get(ModDataComponents.WAND_HIGH_PAYLOAD) ?: return null
 
-            if (invariable != null && highPayload != null)
-                return WandDataBundle(invariable, highPayload)
+            return WandDataBundle(invariable, highPayload)
         }
         return null
     }

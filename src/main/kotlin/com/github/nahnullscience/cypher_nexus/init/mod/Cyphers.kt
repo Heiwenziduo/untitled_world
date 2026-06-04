@@ -88,12 +88,12 @@ object Cyphers {
             .attribute(CypherAttributes.SPEED, CypherAttributeOperation.MULTIPLY_TOTAL, 2.0)
             .modifier())
     val FIERY = registerCypher(FieryCypher)
-    val REVERSE_GRAVITY = registerCypher(
-        SimpleModifier("reverse_gravity", 1f)
-            .attribute(CypherAttributes.GRAVITY_FACTOR, CypherAttributeOperation.MULTIPLY_TOTAL, -1.0)
-            .modifier())
+//    val REVERSE_GRAVITY = registerCypher(
+//        SimpleModifier("reverse_gravity", 1f)
+//            .attribute(CypherAttributes.GRAVITY_FACTOR, CypherAttributeOperation.MULTIPLY_TOTAL, -1.0)
+//            .modifier())
     val ANTIGRAVITY = registerCypher(
-        SimpleModifier("antigravity", 1f)
+        SimpleModifier("antigravity", 2f)
             .attribute(CypherAttributes.GRAVITY_FACTOR, CypherAttributeOperation.ADD, -0.03)
             .modifier())
     val MANA_SURGE = registerCypher(

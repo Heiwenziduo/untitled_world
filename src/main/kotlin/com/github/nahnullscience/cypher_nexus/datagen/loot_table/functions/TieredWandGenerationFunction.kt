@@ -65,13 +65,14 @@ class TieredWandGenerationFunction(
         val invariable = WandDataInvariable.builder()
             .manaMax(attrMap[WandPropertyPreference.MANA_MAX]?.toFloat()?.times(WandPropertyPreference.MANA_MAX.rate)?.plus(random.nextFloat() * WandPropertyPreference.MANA_MAX.rate) ?: 0f)
             .manaRegen(attrMap[WandPropertyPreference.MANA_REGEN]?.toFloat()?.times(WandPropertyPreference.MANA_REGEN.rate)?.plus(random.nextFloat() * WandPropertyPreference.MANA_REGEN.rate) ?: 0f)
-            .capacity(attrMap[WandPropertyPreference.CAPA]?.times(WandPropertyPreference.CAPA.rate)?.plus(1)?.toInt() ?: 2)
+//            .capacity(attrMap[WandPropertyPreference.CAPA]?.times(WandPropertyPreference.CAPA.rate)?.plus(1)?.toInt() ?: 2)
             .draw(attrMap[WandPropertyPreference.DRAW]?.times(WandPropertyPreference.DRAW.rate)?.plus(1)?.toInt() ?: 1)
             .castDelay(attrMap[WandPropertyPreference.DELAY]?.times(WandPropertyPreference.DELAY.rate)?.toInt() ?: 0)
             .rechargeTime(attrMap[WandPropertyPreference.RECHARGE]?.times(WandPropertyPreference.RECHARGE.rate)?.toInt() ?: 0)
             .build()
 
-        val highPayload = WandDataHighPayload(ArrayOfCyphers(invariable.chunkI.capacity))
+        val capacity = WandPropertyPreference.CAPA.rate.toInt()
+        val highPayload = WandDataHighPayload(ArrayOfCyphers(capacity))
 
         stack.set(ModDataComponents.WAND_INVARIABLE, invariable)
         stack.set(ModDataComponents.WAND_HIGH_PAYLOAD, highPayload) // TODO gen random aoc
