@@ -1,5 +1,21 @@
 {
   "values": {
+    "cypher_nexus:accelerating": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 5.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
+        "cypher_nexus:friction_factor": {
+          "multiply_base": -6.0
+        },
+        "cypher_nexus:speed": {
+          "multiply_total": 0.375
+        }
+      }
+    },
     "cypher_nexus:add_trigger": {
       "delay": 0,
       "draw": 0,
@@ -27,16 +43,25 @@
       "recharge": 0,
       "stateChunk": {}
     },
+    "cypher_nexus:all_invoking": {
+      "delay": 0,
+      "draw": 99,
+      "flags": 0,
+      "manaDrain": 200.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {}
+    },
     "cypher_nexus:antigravity": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 1.0,
+      "manaDrain": 2.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {
         "cypher_nexus:gravity_factor": {
-          "multiply_base": -0.66
+          "add": -0.03
         }
       }
     },
@@ -62,6 +87,22 @@
       "recharge": 0,
       "stateChunk": {}
     },
+    "cypher_nexus:bloodlust": {
+      "delay": 3,
+      "draw": 1,
+      "flags": 1,
+      "manaDrain": 20.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
+        "cypher_nexus:damage": {
+          "add": 3.0
+        },
+        "cypher_nexus:recoil": {
+          "add": 2.0
+        }
+      }
+    },
     "cypher_nexus:bouncy": {
       "delay": 0,
       "draw": 1,
@@ -83,9 +124,6 @@
       "projectile": {},
       "recharge": 0,
       "stateChunk": {
-        "cypher_nexus:damage": {
-          "add": 1.0
-        },
         "cypher_nexus:speed": {
           "multiply_total": 2.0
         }
@@ -100,7 +138,7 @@
       "recharge": 0,
       "stateChunk": {
         "cypher_nexus:existing": {
-          "add": -42.0
+          "add": -32.0
         }
       }
     },
@@ -114,6 +152,22 @@
       "stateChunk": {
         "cypher_nexus:speed": {
           "multiply_total": 1.25
+        }
+      }
+    },
+    "cypher_nexus:decelerating": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 5.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
+        "cypher_nexus:friction_factor": {
+          "multiply_base": 4.0
+        },
+        "cypher_nexus:speed": {
+          "multiply_total": 1.625
         }
       }
     },
@@ -202,7 +256,7 @@
       "recharge": 0,
       "stateChunk": {
         "cypher_nexus:existing": {
-          "add": 80.0
+          "add": 40.0
         }
       }
     },
@@ -216,18 +270,15 @@
       "stateChunk": {}
     },
     "cypher_nexus:heavily_strong": {
-      "delay": 3,
+      "delay": 4,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 20.0,
+      "manaDrain": 30.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {
         "cypher_nexus:damage": {
           "add": 4.0
-        },
-        "cypher_nexus:friction_factor": {
-          "multiply_base": 1.0
         },
         "cypher_nexus:gravity_factor": {
           "add": 0.01
@@ -285,17 +336,13 @@
       }
     },
     "cypher_nexus:mana_surge": {
-      "delay": 4,
+      "delay": 5,
       "draw": 1,
       "flags": 0,
       "manaDrain": -40.0,
       "projectile": {},
       "recharge": 0,
-      "stateChunk": {
-        "cypher_nexus:gravity_factor": {
-          "multiply_base": -0.66
-        }
-      }
+      "stateChunk": {}
     },
     "cypher_nexus:no_more_bounce": {
       "delay": 0,
@@ -405,6 +452,67 @@
         }
       }
     },
+    "cypher_nexus:quick_load": {
+      "delay": -3,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 15.0,
+      "projectile": {},
+      "recharge": -6,
+      "stateChunk": {}
+    },
+    "cypher_nexus:randomize": {
+      "delay": -3,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 3.0,
+      "projectile": {},
+      "recharge": -5,
+      "stateChunk": {
+        "cypher_nexus:spread": {
+          "add": 720.0
+        }
+      }
+    },
+    "cypher_nexus:recoil": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 5.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
+        "cypher_nexus:recoil": {
+          "add": 20.0
+        }
+      }
+    },
+    "cypher_nexus:recoil_damper": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 5.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
+        "cypher_nexus:recoil": {
+          "add": -20.0
+        }
+      }
+    },
+    "cypher_nexus:reduce_spread": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 1.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
+        "cypher_nexus:spread": {
+          "add": -60.0
+        }
+      }
+    },
     "cypher_nexus:refresher_ring": {
       "delay": 0,
       "draw": 0,
@@ -449,19 +557,6 @@
       "projectile": {},
       "recharge": 0,
       "stateChunk": {}
-    },
-    "cypher_nexus:reverse_gravity": {
-      "delay": 0,
-      "draw": 1,
-      "flags": 0,
-      "manaDrain": 1.0,
-      "projectile": {},
-      "recharge": 0,
-      "stateChunk": {
-        "cypher_nexus:gravity_factor": {
-          "multiply_total": -1.0
-        }
-      }
     },
     "cypher_nexus:snowball": {
       "delay": 0,

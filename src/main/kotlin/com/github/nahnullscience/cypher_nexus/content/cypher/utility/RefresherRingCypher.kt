@@ -16,6 +16,8 @@ object RefresherRingCypher : AbstractNonProjectileCypher() {
             .manaDrain(20f)
             .recharge(-8)
     }
+
+    override fun triggerInterplay() = true
     override fun invokeInHand(
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
@@ -32,6 +34,5 @@ object RefresherRingCypher : AbstractNonProjectileCypher() {
         }
         state.alreadyRefreshed = true
         helper.init()
-//        helper.data.recharge = 0
     }
 }

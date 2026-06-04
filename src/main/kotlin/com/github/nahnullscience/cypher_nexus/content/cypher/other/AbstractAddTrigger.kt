@@ -2,6 +2,7 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.other
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
@@ -15,7 +16,11 @@ abstract class AbstractAddTrigger(
 ) : AbstractNonProjectileCypher() {
     override val category = CypherCategories.OTHER
     abstract val triggerType: TriggerType
-    override fun modifyStateChunk(helper: InvokingHelper, chunk: ProjectileStateChunk) = Unit
+    override fun modifyStateChunk(
+        helper: InvokingHelper,
+        data: InvokingHelper.HelperDataBundle,
+        chunk: ProjectileStateChunk
+    ) = Unit
     override fun defaultAttributes() = super.defaultAttributes().manaDrain(_manaDrain).draw(0)
 
     override fun invokeInHand(
@@ -25,29 +30,36 @@ abstract class AbstractAddTrigger(
         state: InvokingHelper.HelperStateBundle,
         options: CypherInvokingOptions
     ) {
+
         CypherNexus.LOGGER.debug("[{}] is invoked", this)
         val startIndex = data.deck.countTrailingZeroBits()
         var attachIndex = startIndex
-        var cy: AbstractProjectileCypher = EmptyCypher
+        var cy: AbstractCypher = EmptyCypher
         while (attachIndex < helper.aoc.invokableSize) {
             // step 1, find target projectile cypher
             val cy0 = helper.aoc[attachIndex]
             attachIndex++
             if (!cy0.isInvokable()) continue
 
-            cy0.modifyStateChunk(helper, chunk)
+            cy0.modifyStateChunk(helper, data, chunk)
 
-            if (cy0 is AbstractProjectileCypher && cy0.triggerCanAttach()) {
+            if (cy0.triggerInterplay()) {
                 cy = cy0
                 break
             }
         }
 
         if (cy.isNotEmpty()) {
+            if (cy !is AbstractProjectileCypher) {
+                // to fit Noita mechanic, let's agree a NonProj cypher with #triggerCanAttach == ture will terminate add trigger-s
+                // for example, refresher-ring
+                CypherNexus.LOGGER.debug("[{}] attach process terminate due to [{}]", this, cy)
+                return
+            }
+
             // discard if attach is found
             CypherNexus.LOGGER.debug("[{}] find trigger attachable [{}]", this, cy)
             helper.deck2discard(startIndex, attachIndex)
-            // TODO check cy#related-projectile to fit Noita mechanic (like blood magic)
 
             // step 2, find payload
             var index1 = attachIndex
@@ -55,7 +67,8 @@ abstract class AbstractAddTrigger(
             while (index1 < helper.aoc.invokableSize) {
                 val cy1 = helper.aoc[index1]
                 index1++
-                if (cy1 is AbstractProjectileCypher && cy1.triggerCanPayload()) {
+                if (cy1 is AbstractProjectileCypher && cy1.triggerInterplay()) {
+//                if (cy1.triggerInterplay()) { // consider ignore whether projectile
                     find = true
                     break
                 }

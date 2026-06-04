@@ -37,7 +37,7 @@ object SpawnEggCypher : ProjectileCypher() {
         }
     }
 
-    override fun addToStateChunk(helper: InvokingHelper, chunk: ProjectileStateChunk): ProjectileStateChunk {
+    override fun addToStateChunk(chunk: ProjectileStateChunk): ProjectileStateChunk {
         val subState = ProjectileStateChunk()
         chunk.addProjectile(ProjectileNode(this, subState, TriggerType.COLLISION))
         return subState

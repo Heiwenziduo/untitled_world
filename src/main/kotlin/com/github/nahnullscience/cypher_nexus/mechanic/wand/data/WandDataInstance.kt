@@ -4,7 +4,9 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandDataBundle
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
+import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.phys.Vec3
 
 /** hold variable wand data, and handle invoking modules */
 class WandDataInstance(
@@ -83,10 +85,19 @@ class WandDataInstance(
 
     }
 
+    fun recoilModule(invoker: Entity, recoil: Double, invokePosDire: PosDirePair) {
+        // TODO recoil module
+        // for now, push invoker for ease
+        println("do some recoil: $recoil   ${side()}")
+        val dire = if (invokePosDire.direction != Vec3.ZERO) invokePosDire.direction
+        else invoker.eyePosition.vectorTo(invokePosDire.position)
+        invoker.push(dire.normalize().scale(recoil))
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fun manaRegenPercent() = manaCurrent / manaMax
-    fun delayPercent() = (_delay0.toFloat() - _delayCurrent) / _delay0
-    fun rechargePercent() = (_recharge0.toFloat() - _rechargeCurrent) / _recharge0
+    fun manaRegenPercent(partialTick: Float) = (manaCurrent + partialTick * manaRegen) / manaMax
+    fun delayPercent(partialTick: Float) = (_delay0.toFloat() - _delayCurrent + partialTick) / _delay0
+    fun rechargePercent(partialTick: Float) = (_recharge0.toFloat() - _rechargeCurrent + partialTick) / _recharge0
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,4 +120,6 @@ class WandDataInstance(
         _discard            =   bundle.discard
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    private fun side() = if (isClient) "client" else "server"
 }

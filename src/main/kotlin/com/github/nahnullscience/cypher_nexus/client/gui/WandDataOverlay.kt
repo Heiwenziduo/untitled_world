@@ -25,6 +25,8 @@ object WandDataOverlay : LayeredDraw.Layer {
         val wandMain = player.getItemInHand(InteractionHand.MAIN_HAND)
         val wandOff = player.getItemInHand(InteractionHand.OFF_HAND)
 
+        val partialTick = deltaTracker.getGameTimeDeltaPartialTick(true)
+
         // in the future maybe we can show multiple wands data, combine #gatherWand Event
         listOf(wandMain, wandOff).withIndex().forEach { (i, stack) ->
             val wand = stack.item
@@ -34,12 +36,18 @@ object WandDataOverlay : LayeredDraw.Layer {
             // since item is a wand, instance should already exist
             val instance = player.getData(WAND_DATA_MAP).getOrPutInstance(wandData, wand, player.level())
 
-            renderWand(guiGraphics, i, instance, stack)
+            renderWand(guiGraphics, i, instance, stack, partialTick)
         }
 
     }
 
-    private fun renderWand(guiGraphics: GuiGraphics, offset: Int, instance: WandDataInstance, wandSack: ItemStack) {
+    private fun renderWand(
+        guiGraphics: GuiGraphics,
+        offset: Int,
+        instance: WandDataInstance,
+        wandSack: ItemStack,
+        partialTick: Float
+    ) {
         val screenWidth = guiGraphics.guiWidth()
         val screenHeight = guiGraphics.guiHeight()
 
@@ -51,14 +59,14 @@ object WandDataOverlay : LayeredDraw.Layer {
         guiGraphics.renderItem(wandSack, screenWidth - margin, startY - 2)
 
         // draw bars one by one
-        val manaProgress = instance.manaRegenPercent()
+        val manaProgress = instance.manaRegenPercent(partialTick)
         drawProgressBar(guiGraphics, startX, startY, barWidth, 5, manaProgress,
             0xFF00BFFF.toInt(),
             0xFF00FFFF.toInt(),
             0.5f)
         startY += 8 // Move down for the next bar
 
-        val castDelayProgress = instance.delayPercent()
+        val castDelayProgress = instance.delayPercent(partialTick)
         if (castDelayProgress < 1f) {
             drawProgressBar(guiGraphics, startX, startY, barWidth, 3, castDelayProgress,
                 0xFF228B22.toInt(),
@@ -67,7 +75,7 @@ object WandDataOverlay : LayeredDraw.Layer {
         }
 
         if (instance.isRecharging) {
-            val rechargeProgress = instance.rechargePercent()
+            val rechargeProgress = instance.rechargePercent(partialTick)
             if (rechargeProgress < 1f) {
                 drawProgressBar(guiGraphics, startX, startY, barWidth, 3, rechargeProgress,
                     0xFFFF8C00.toInt(),
@@ -138,8 +146,4 @@ object WandDataOverlay : LayeredDraw.Layer {
         }
     }
 
-    enum class StatsAlign {
-        RIGHT,
-        LEFT
-    }
 }

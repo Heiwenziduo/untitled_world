@@ -5,6 +5,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.StaticProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothBeforeDiscardHook
+import net.minecraft.world.level.ExplosionDamageCalculator
 
 abstract class AbstractStaticSummoner() : StaticProjectileCypher(), BothBeforeDiscardHook {
 
@@ -13,5 +14,11 @@ abstract class AbstractStaticSummoner() : StaticProjectileCypher(), BothBeforeDi
             .flags(CypherFlags.PIERCE_ENTITY)
             .flags(CypherFlags.CONSTANT_EXISTING)
             .projectileAttr(CypherAttributes.EXISTING, 2.0)
+    }
+
+    companion object {
+        // TODO
+        val EXPLOSION_DAMAGE_CALCULATOR: ExplosionDamageCalculator = ExplosionDamageCalculator()
+
     }
 }

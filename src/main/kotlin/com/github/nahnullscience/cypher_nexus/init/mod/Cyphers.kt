@@ -82,10 +82,34 @@ object Cyphers {
             .attribute(CypherAttributes.DAMAGE, CypherAttributeOperation.ADD, 1.0)
             .attribute(CypherAttributes.RECOIL, CypherAttributeOperation.ADD, 1.0)
             .modifier())
+    val BLOODLUST = registerCypher(
+        SimpleModifier("bloodlust", 20f)
+            .delay(3)
+            .attribute(CypherAttributes.DAMAGE, CypherAttributeOperation.ADD, 3.0)
+            .attribute(CypherAttributes.RECOIL, CypherAttributeOperation.ADD, 2.0)
+            .flags(CypherFlags.HURT_OWNER)
+            .modifier())
+    val HEAVILY_STRONG = registerCypher(
+        SimpleModifier("heavily_strong", 30f)
+            .delay(4)
+            .attribute(CypherAttributes.DAMAGE, CypherAttributeOperation.ADD, 4.0)
+            .attribute(CypherAttributes.SPEED, CypherAttributeOperation.MULTIPLY_TOTAL, 0.75)
+            .attribute(CypherAttributes.RECOIL, CypherAttributeOperation.ADD, 4.0)
+            .attribute(CypherAttributes.GRAVITY_FACTOR, CypherAttributeOperation.ADD, 0.01)
+            .modifier())
     val BRISK = registerCypher(
         SimpleModifier("brisk", 5f)
-            .delay(-1)
             .attribute(CypherAttributes.SPEED, CypherAttributeOperation.MULTIPLY_TOTAL, 2.0)
+            .modifier())
+    val ACCELERATING = registerCypher(
+        SimpleModifier("accelerating", 5f)
+            .attribute(CypherAttributes.SPEED, CypherAttributeOperation.MULTIPLY_TOTAL, 0.375)
+            .attribute(CypherAttributes.FRICTION_FACTOR, CypherAttributeOperation.MULTIPLY_BASE, -6.0)
+            .modifier())
+    val DECELERATION = registerCypher(
+        SimpleModifier("decelerating", 5f)
+            .attribute(CypherAttributes.SPEED, CypherAttributeOperation.MULTIPLY_TOTAL, 1.625)
+            .attribute(CypherAttributes.FRICTION_FACTOR, CypherAttributeOperation.MULTIPLY_BASE, 4.0)
             .modifier())
     val FIERY = registerCypher(FieryCypher)
 //    val REVERSE_GRAVITY = registerCypher(
@@ -96,18 +120,18 @@ object Cyphers {
         SimpleModifier("antigravity", 2f)
             .attribute(CypherAttributes.GRAVITY_FACTOR, CypherAttributeOperation.ADD, -0.03)
             .modifier())
+    val GRAVITY = registerCypher(
+        SimpleModifier("gravity", 2f)
+            .attribute(CypherAttributes.GRAVITY_FACTOR, CypherAttributeOperation.ADD, 0.02)
+            .modifier())
     val MANA_SURGE = registerCypher(
         SimpleModifier("mana_surge", -40f)
-            .delay(4)
+            .delay(5)
             .modifier())
-    val HEAVILY_STRONG = registerCypher(
-        SimpleModifier("heavily_strong", 20f)
-            .delay(3)
-            .attribute(CypherAttributes.DAMAGE, CypherAttributeOperation.ADD, 4.0)
-            .attribute(CypherAttributes.SPEED, CypherAttributeOperation.MULTIPLY_TOTAL, 0.75)
-            .attribute(CypherAttributes.RECOIL, CypherAttributeOperation.ADD, 4.0)
-            .attribute(CypherAttributes.GRAVITY_FACTOR, CypherAttributeOperation.ADD, 0.01)
-            .attribute(CypherAttributes.FRICTION_FACTOR, CypherAttributeOperation.MULTIPLY_BASE, 1.0)
+    val QUICK_LOAD = registerCypher(
+        SimpleModifier("quick_load", 15f)
+            .delay(-3)
+            .recharge(-6)
             .modifier())
     val PEACEFUL = registerCypher(
         SimpleModifier("peaceful", 5f)
@@ -135,6 +159,24 @@ object Cyphers {
             .delay(-3)
             .attribute(CypherAttributes.EXISTING, CypherAttributeOperation.ADD, -32.0)
             .modifier())
+    val REDUCE_SPREAD = registerCypher(
+        SimpleModifier("reduce_spread", 1f)
+            .attribute(CypherAttributes.SPREAD, CypherAttributeOperation.ADD, -60.0)
+            .modifier())
+    val RANDOMIZE = registerCypher(
+        SimpleModifier("randomize", 3f)
+            .delay(-3)
+            .recharge(-5)
+            .attribute(CypherAttributes.SPREAD, CypherAttributeOperation.ADD, 720.0)
+            .modifier())
+    val RECOIL = registerCypher(
+        SimpleModifier("recoil", 5f)
+            .attribute(CypherAttributes.RECOIL, CypherAttributeOperation.ADD, 20.0)
+            .modifier())
+    val RECOIL_DAMPER = registerCypher(
+        SimpleModifier("recoil_damper", 5f)
+            .attribute(CypherAttributes.RECOIL, CypherAttributeOperation.ADD, -20.0)
+            .modifier())
 
     val HOMING = registerCypher(HomingCypher)
     val PIERCE_ENTITY = registerCypher(
@@ -148,6 +190,10 @@ object Cyphers {
             .delay(-4)
             .recharge(-4)
             .attribute(CypherAttributes.EXISTING, CypherAttributeOperation.SET_ALL, 1.0)
+            .modifier())
+    val FORTUNE = registerCypher(
+        SimpleModifier("fortune", 150f)
+            .attribute(CypherAttributes.FORTUNE_LEVEL, CypherAttributeOperation.ADD, 1.0)
             .modifier())
 
     const val COLOR_MULTI_INVOKE = 0xFF4EF3D3.toInt()
@@ -171,6 +217,11 @@ object Cyphers {
             .draw(8)
             .color(COLOR_MULTI_INVOKE)
             .modifier())
+    val ALL_INVOKING = registerCypher(
+        SimpleModifier("all_invoking", 200f)
+            .draw(99)
+            .color(COLOR_MULTI_INVOKE)
+            .modifier())
     val DOUBLE_SCATTER = registerCypher(
         SimpleModifier("double_scatter", 0f)
             .draw(2)
@@ -191,7 +242,7 @@ object Cyphers {
             .modifier())
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // passive
+    // wand module
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 

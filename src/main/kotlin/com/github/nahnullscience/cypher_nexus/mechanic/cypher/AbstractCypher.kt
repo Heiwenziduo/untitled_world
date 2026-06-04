@@ -50,9 +50,13 @@ sealed class AbstractCypher: IRegisterable {
     fun isEmpty() = this is EmptyCypher
     fun isNotEmpty() = !isEmpty()
     /** use for AddTrigger series */
-    open fun triggerCanAttach() = false
-    /** use for AddTrigger series */
-    open fun triggerCanPayload() = false
+    // here only 4 situations:
+    // ProjectileCypher with #triggerInterplay == true (default),   this allows trigger to attach and seen as a payload,
+    //                                                              once a decent attachment is found, cyphers within the add-trigger and the attachment will be discarded
+    // ProjectileCypher with #triggerInterplay == false,            add trigger-s will ignore the cypher, for example, the Notes
+    // NonProjectileCypher with #triggerInterplay == true,          will terminate the searching process & cancel the discarding after, for example, blood-magic
+    // NonProjectileCypher with #triggerInterplay == false (default), simply modify the state-chunk
+    open fun triggerInterplay() = false
     open fun isInvokable() = true
 
 
@@ -82,14 +86,30 @@ sealed class AbstractCypher: IRegisterable {
         options: CypherInvokingOptions = CypherInvokingOptions()
     ) {
         CypherNexus.LOGGER.debug("[{}] is invoked", this)
-        modifyStateChunk(helper, chunk)
+        if (chunk == helper.rootChunk) data.delay += delay
+        data.recharge += recharge
+
+        modifyStateChunk(helper, data, chunk)
         var forwardState = chunk
         if (this is AbstractProjectileCypher) {
-            forwardState = addToStateChunk(helper, chunk)
+            forwardState = addToStateChunk(chunk)
         }
 
-        if (options.drawEnabled) handleDraws(helper, forwardState, data, state, options)
+        handleDraws(helper, forwardState, data, state, options)
     }
+
+    protected open fun canDraw(
+        helper: InvokingHelper,
+        chunk: ProjectileStateChunk,
+        data: InvokingHelper.HelperDataBundle,
+        state: InvokingHelper.HelperStateBundle,
+        options: CypherInvokingOptions = CypherInvokingOptions()
+    ): Boolean {
+        if (!options.drawEnabled) return false
+        if (isRecursive && options.recursiveDepth >= 2) return false
+        return true
+    }
+
     protected fun handleDraws(
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
@@ -97,6 +117,7 @@ sealed class AbstractCypher: IRegisterable {
         state: InvokingHelper.HelperStateBundle,
         options: CypherInvokingOptions = CypherInvokingOptions()
     ) {
+        if (canDraw(helper, chunk, data, state, options))
         for (i in 0 until draw) {
             var cy = helper.drawNext()
             if (cy == null) {
@@ -109,7 +130,7 @@ sealed class AbstractCypher: IRegisterable {
         }
     }
 
-    open fun modifyStateChunk(helper: InvokingHelper, chunk: ProjectileStateChunk) {
+    open fun modifyStateChunk(helper: InvokingHelper, data: InvokingHelper.HelperDataBundle, chunk: ProjectileStateChunk) {
         attributes().stateChunk.forEach { attribute, opMap ->
             // prune 1, sub-chunk do not affect delay, spread, whatsoever. note recharge is an exception
             if (chunk != helper.rootChunk && attribute.applyOn == CypherAttribute.AttributeApply.INVOKING) return@forEach

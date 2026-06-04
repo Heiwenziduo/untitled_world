@@ -56,7 +56,7 @@ object CypherAttributes {
     val CRIT_CHANCE = registerAttribute("crit_chance", 0.0, 0.0, sync = false)
     val KNOCKBACK = registerAttribute("knockback", 0.0, 0.0, 1000.0, sync = false, hide = true)
     val FORTUNE_LEVEL = registerAttribute("fortune", 0.0, -1.0, 100.0, sync = false, hide = true)
-    /** block per tick, but will show block/sec */
+    /** initial speed, in unit block per tick, will show block/sec to player */
     val SPEED = registerAttribute("speed", 0.0, 0.0, 16.0)
     /** tick */
     val EXISTING = registerAttribute("existing", 300.0)

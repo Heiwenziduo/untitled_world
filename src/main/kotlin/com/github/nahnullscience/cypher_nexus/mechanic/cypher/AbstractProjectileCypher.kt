@@ -4,7 +4,6 @@ import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProje
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import net.minecraft.core.Holder
@@ -15,7 +14,7 @@ import net.minecraft.world.phys.Vec3
 abstract class AbstractProjectileCypher: AbstractCypher() {
     // TODO
     //open val projectile: KClass<AbstractCypherProjectile> = AbstractCypherProjectile::class
-    open fun addToStateChunk(helper: InvokingHelper, chunk: ProjectileStateChunk): ProjectileStateChunk {
+    open fun addToStateChunk(chunk: ProjectileStateChunk): ProjectileStateChunk {
         val node = ProjectileNode(this, null)
         return chunk.addProjectile(node) // forward state
     }
@@ -29,7 +28,15 @@ abstract class AbstractProjectileCypher: AbstractCypher() {
         node: ProjectileNode,
         parentHooks: HookContainer?
     ): AbstractCypherProjectile {
-        val projectile = AbstractCypherProjectile(level, invoker, this, direction, shootState, node, parentHooks)
+        val projectile = AbstractCypherProjectile(
+            level,
+            invoker,
+            this,
+            direction,
+            shootState,
+            node,
+            parentHooks
+        )
         projectile.setPos(startPos)
         return projectile
     }
@@ -40,8 +47,7 @@ abstract class AbstractProjectileCypher: AbstractCypher() {
         return opMap?.get(CypherAttributeOperation.BASE) ?: attr.defaultValue
     }
 
-    override fun triggerCanAttach() = true
-    override fun triggerCanPayload() = true
+    override fun triggerInterplay() = true
 
     // due to cost, should prioritise these to hook on expire
     /** called when projectile hits something

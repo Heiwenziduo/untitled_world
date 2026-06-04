@@ -9,7 +9,11 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.Projectil
 /** invoke the next a few cyphers only when the requirements are met */
 sealed class AbstractRequirement : AbstractNonProjectileCypher() {
     override val category = CypherCategories.OTHER
-    override fun modifyStateChunk(helper: InvokingHelper, chunk: ProjectileStateChunk) = Unit
+    override fun modifyStateChunk(
+        helper: InvokingHelper,
+        data: InvokingHelper.HelperDataBundle,
+        chunk: ProjectileStateChunk
+    ) = Unit
     override fun defaultAttributes() = super.defaultAttributes().manaDrain(0f).draw(1)
 
     abstract class RequirementIf : AbstractRequirement() {
@@ -66,7 +70,7 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
                 }
             }
 
-            if (options.drawEnabled) handleDraws(helper, chunk, data, state, options)
+            handleDraws(helper, chunk, data, state, options)
         }
     }
 

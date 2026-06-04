@@ -66,6 +66,10 @@ abstract class AbstractItemWand(
     }
 
     override fun getWandData(stack: ItemStack?, caster: Entity?): WandDataBundle? {
+        /* @doc
+         * Any component values within the map should be treated as immutable.
+         * Always call #set or one of its referring methods discussed below after modifying the value of a data component.
+         * */
         if (stack != null && !stack.isEmpty) {
             val invariable = stack.get(ModDataComponents.WAND_INVARIABLE) ?: return null
             val highPayload = stack.get(ModDataComponents.WAND_HIGH_PAYLOAD) ?: return null
@@ -74,20 +78,6 @@ abstract class AbstractItemWand(
         }
         return null
     }
-
-//    override fun setWandData(
-//        stack: ItemStack?,
-//        invariable: WandDataInvariable?,
-//        highPayload: WandDataHighPayload?,
-//        frequent: WandDataFrequent
-//    ) {
-//        /* @doc
-//         * Any component values within the map should be treated as immutable.
-//         * Always call #set or one of its referring methods discussed below after modifying the value of a data component.
-//         * */
-//
-//        stack?.set(ModDataComponents.WAND_FREQUENT, frequent)
-//    }
 
     /** for an Item Wand, pos and dire just use the living's view vector */
     override fun getInvokePosDire(level: Level, invoker: Entity, wandLength: Float): PosDirePair {

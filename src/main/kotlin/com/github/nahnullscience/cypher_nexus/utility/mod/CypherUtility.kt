@@ -8,11 +8,13 @@ import kotlin.collections.forEach
 
 object CypherUtility {
     fun attributeCalculator(opMap: HashMap<CypherAttributeOperation, Double>, base: Double) : Double {
+        val s = opMap[CypherAttributeOperation.SET_ALL]
+        if (s != null) return s
+
         val a = opMap.getOrDefault(CypherAttributeOperation.ADD, CypherAttributeOperation.ADD.defaultValue)
         val m1 = opMap.getOrDefault(CypherAttributeOperation.MULTIPLY_BASE, CypherAttributeOperation.MULTIPLY_BASE.defaultValue)
         val m2 = opMap.getOrDefault(CypherAttributeOperation.MULTIPLY_TOTAL, CypherAttributeOperation.MULTIPLY_TOTAL.defaultValue)
-        val s = opMap[CypherAttributeOperation.SET_ALL]
-        return s ?: ((base + a) * (m1 + 1) * m2)
+        return ((base + a) * (m1 + 1) * m2)
     }
 
     fun sortCyphersByCategory(list: List<AbstractCypher>): Map<CypherCategory, List<AbstractCypher>> {

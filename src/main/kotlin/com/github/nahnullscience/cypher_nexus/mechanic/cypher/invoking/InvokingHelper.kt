@@ -1,7 +1,9 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
@@ -13,7 +15,6 @@ import net.minecraft.world.level.Level
 class InvokingHelper (
     val level: Level,
     val invoker: Entity?,
-    val stack: ItemStack?,
 
     val wandStats: WandDataInvariable,
     val aoc: ArrayOfCyphers,
@@ -21,7 +22,7 @@ class InvokingHelper (
     /** direction doesn't have to be normalized */
     val invokePosDire: PosDirePair,
 ) {
-    val rootChunk = ProjectileStateChunk()
+    val rootChunk = ProjectileStateChunk.root(this)
     val states = HelperStateBundle()
 
     init {
@@ -32,6 +33,16 @@ class InvokingHelper (
         }
     }
 
+    fun wandInstance(): WandDataInstance? {
+        val has = invoker?.hasData(WAND_DATA_MAP)
+        if (has ?: return null)
+            return invoker
+            .getData(WAND_DATA_MAP)
+            .getOrPutInstance(wandStats, aoc, null, level)
+        return null
+    }
+
+    // =================================================================================
     fun start() {
         level.profiler.push("invoking-start") // F3 + L to record time cost
         CypherNexus.LOGGER.debug("invoking start, prepare cyphers: {}", aoc)
@@ -40,7 +51,7 @@ class InvokingHelper (
             val canContinue = step()
             if (!canContinue) break
         }
-        rootChunk.release(level, invoker, invokePosDire)
+        rootChunk.release(level, invoker, invoker, invokePosDire)
         hand2discard()
 
         if (states.wrapped) {
@@ -63,6 +74,7 @@ class InvokingHelper (
         return false
     }
 
+    // =================================================================================
     /** non-empty-cypher, null if deck is empty */
     fun drawNext(): AbstractCypher? {
         // find the index of the first '1' (last '0', in fact) starting from the right.

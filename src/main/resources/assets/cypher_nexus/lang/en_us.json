@@ -70,6 +70,8 @@
   "cypher.cypher_nexus.modifier.quadruple_invoking.description": "Quadruple Invoking",
   "cypher.cypher_nexus.modifier.octuple_invoking": "Octuple Invoking",
   "cypher.cypher_nexus.modifier.octuple_invoking.description": "Octuple Invoking",
+  "cypher.cypher_nexus.modifier.all_invoking": "All In",
+  "cypher.cypher_nexus.modifier.all_invoking.description": "All Invoking",
   "cypher.cypher_nexus.modifier.double_scatter": "Double Invoking Scatter",
   "cypher.cypher_nexus.modifier.double_scatter.description": "Double Invoking Scatter",
   "cypher.cypher_nexus.modifier.treble_scatter": "Treble Invoking Scatter",

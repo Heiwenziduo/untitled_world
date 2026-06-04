@@ -6,7 +6,6 @@ import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWand
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.neoforged.neoforge.network.PacketDistributor
@@ -48,7 +47,6 @@ interface IWandLike {
         val helper = InvokingHelper(
             level,
             invoker,
-            stack,
             wandData.invariable,
             wandData.highPayload.cypherArray,
             helperBundle,

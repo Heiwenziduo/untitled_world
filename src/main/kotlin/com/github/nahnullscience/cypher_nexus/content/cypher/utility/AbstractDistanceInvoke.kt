@@ -13,7 +13,7 @@ abstract class AbstractDistanceInvoke(
 ) : AbstractProjectileCypher() {
     override val category = CypherCategories.UTILITY
 
-    override fun addToStateChunk(helper: InvokingHelper, chunk: ProjectileStateChunk): ProjectileStateChunk {
+    override fun addToStateChunk(chunk: ProjectileStateChunk): ProjectileStateChunk {
         val subState = ProjectileStateChunk()
         chunk.addProjectile(ProjectileNode(this, subState, TriggerType.DEATH))
         return subState
