@@ -47,7 +47,7 @@ class WandDataInstance(
         if (_delayCurrent > 0) _delayCurrent--
         if (_deck == 0L && _rechargeCurrent > 0) _rechargeCurrent--
 
-        _lastModifyTime = entity.level().gameTime
+        _lastModifyTime = entity.level().gameTime // mark the last modify level tick for GC
     }
 
     /**  */
@@ -72,6 +72,7 @@ class WandDataInstance(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     fun canInvoke() = !(_delayCurrent > 0 || (_deck == 0L && _rechargeCurrent > 0))
+    fun isBeginning() = _deck == 0L
 
     fun rightClickModule() {
 
@@ -88,10 +89,14 @@ class WandDataInstance(
     fun recoilModule(invoker: Entity, recoil: Double, invokePosDire: PosDirePair) {
         // TODO recoil module
         // for now, push invoker for ease
-        println("do some recoil: $recoil   ${side()}")
+//        println("do some recoil: $recoil   ${side()}")
+
+        // since it is the client side that is Player position authoritative
+        // this logic should run on both side, client for smooth movement, server for verification
         val dire = if (invokePosDire.direction != Vec3.ZERO) invokePosDire.direction
         else invoker.eyePosition.vectorTo(invokePosDire.position)
-        invoker.push(dire.normalize().scale(recoil))
+        val recoil0 = recoil / 20
+        invoker.push(dire.normalize().scale(recoil0).reverse())
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,7 +109,7 @@ class WandDataInstance(
     fun toHelperDataBundle() = InvokingHelper.HelperDataBundle(
         draw = invariable.chunkI.draw,
         delay = invariable.chunkI.castDelay,
-        recharge = invariable.chunkI.rechargeTime + _rechargeCurrent,
+        recharge = if (isBeginning()) invariable.chunkI.rechargeTime else _rechargeCurrent,
         manaCurrent = _manaCurrent,
         deck = _deck,
         discard = _discard

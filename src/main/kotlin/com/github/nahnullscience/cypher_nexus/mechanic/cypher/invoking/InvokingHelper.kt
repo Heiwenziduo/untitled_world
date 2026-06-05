@@ -25,6 +25,9 @@ class InvokingHelper (
     val rootChunk = ProjectileStateChunk.root(this)
     val states = HelperStateBundle()
 
+    val isClientSide
+        get() = level.isClientSide
+
     init {
         // define the order of bits go from right to left, which is inverse compare to the order of the cypherArray
         // number 5L (0b...0101) represents the first and the third cyphers

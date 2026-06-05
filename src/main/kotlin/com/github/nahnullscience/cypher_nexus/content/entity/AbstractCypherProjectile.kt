@@ -158,12 +158,8 @@ open class AbstractCypherProjectile(
 
         initAttributes(shootState)
         setDirection(direction)
-    }
 
-    init {
-        CypherNexus.LOGGER.debug("create projectile {}", _cypher)
-        CypherFlags.printFlag(enabledFlags)
-        printModifiedAttrMap()
+        printDebugMsg()
     }
 
     // ==================================================================================================================
@@ -219,6 +215,8 @@ open class AbstractCypherProjectile(
             if (level().isClientSide) {
                 println("firstTickCheckOnClient: $_cypher") // attrs are synced from the start
             }
+
+            // if (!level().isClientSide) deltaMovement = Vec3.ZERO // deltaMovement will auto-sync to client, but not immediately
         }
 
 //        updateInWaterStateAndDoFluidPushing()
@@ -384,9 +382,11 @@ open class AbstractCypherProjectile(
     // ==================================================================================================================
     // ==================================================================================================================
     /** ProjectileStateBlock#release */
-    fun releasePayload(posDire: PosDirePair) = _payload?.release(level(), this, owner, posDire)
-    fun releasePayload() = releasePayload(PosDirePair(position(), deltaMovement.reverse()))
-    fun trigger(type: TriggerType) = if (type == _trigger) releasePayload() else Unit
+    private fun releasePayload(posDire: PosDirePair) = _payload?.release(level(), this, owner, posDire)
+    fun trigger(type: TriggerType) {
+        // TODO
+        if (type == _trigger) releasePayload(PosDirePair(position(), deltaMovement.reverse()))
+    }
 
     // ==================================================================================================================
     // ==================================================================================================================
@@ -463,12 +463,20 @@ open class AbstractCypherProjectile(
 
     // ==================================================================================================================
     // ==================================================================================================================
+    private fun printDebugMsg() {
+        CypherNexus.LOGGER.debug("create projectile {}: {}", this, _cypher)
+        CypherFlags.printFlag(enabledFlags)
+        printModifiedAttrMap()
+    }
+
     private fun printModifiedAttrMap() {
         _attributeMap.forEach { a, v ->
             println("$a: $v")
         }
         if (_attributeMap.isEmpty()) println("projectile $_cypher has no modified attributes")
     }
+
+
 
     // ==================================================================================================================
     // ==================================================================================================================

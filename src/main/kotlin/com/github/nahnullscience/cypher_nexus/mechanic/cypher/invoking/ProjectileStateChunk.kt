@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level
 
 class ProjectileStateChunk private constructor (
     private var charge: Int,
+    /** only root has access to the helper */
     private val helper: InvokingHelper?
 ) : IFlaggable {
     /** normal chunk can only release once */
@@ -31,9 +32,6 @@ class ProjectileStateChunk private constructor (
     private val projectiles = mutableListOf<ProjectileNode>()
 
     fun release(level: Level, directInvoker: Entity?, owner: Entity?, posDire: PosDirePair) {
-        if (level.isClientSide) return
-        if (charge-- <= 0) return
-
         // do recoil only on root
         if (directInvoker != null && directInvoker == owner && helper != null) {
             val recoilMap = computedOperationMap[CypherAttributes.RECOIL.value()]
@@ -44,6 +42,8 @@ class ProjectileStateChunk private constructor (
             }
         }
 
+        if (level.isClientSide) return
+        if (charge-- <= 0) return
         for ((i, node) in projectiles.withIndex()) {
 
             val proj = node.instance.createProjectile(

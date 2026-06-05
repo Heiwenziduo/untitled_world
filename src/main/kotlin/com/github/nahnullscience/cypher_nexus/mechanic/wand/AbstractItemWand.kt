@@ -43,10 +43,10 @@ abstract class AbstractItemWand(
 
     override fun getUseDuration(stack: ItemStack, entity: LivingEntity) = 100
     override fun onUseTick(level: Level, invoker: LivingEntity, stack: ItemStack, remainingUseDuration: Int) {
+
         // will call on both sides
-        if (!level.isClientSide) {
-            tryConduct(level, invoker, stack)
-        }
+        tryConduct(level, invoker, stack)
+
         //println(remainingUseDuration) // #getUseDuration() - used ticks, resets to full if reach 0
     }
 

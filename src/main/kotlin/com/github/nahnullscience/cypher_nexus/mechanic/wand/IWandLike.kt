@@ -26,11 +26,13 @@ interface IWandLike {
 
 
     /**
-     * try a manual "draw", may not success due to delay/recharge/disabled/noMana/E.D. e.t.c.
+     * call on BOTH sides.
+     * server side is responsible for projectile generation, authorise mana / deck / delay check.
+     * client side is for user info overlay, and wand module functions.
      * TODO let fake-player/machine can cast cyphers
      * */
     fun tryConduct(level: Level, invoker: Entity, stack: ItemStack?): Boolean {
-        if (level.isClientSide) return false
+
         val wandData = getWandData(stack, invoker) ?: return false
 
         // data-attach (create if not present)
@@ -40,8 +42,6 @@ interface IWandLike {
 //            println("casting rejected due to: $instance")
             return false
         }
-
-//        CypherNexus.LOGGER.debug("read from data component: {}\n\n\n", wandData)
 
         val helperBundle = instance.toHelperDataBundle()
         val helper = InvokingHelper(
@@ -56,7 +56,10 @@ interface IWandLike {
 
         // retrieve data from helper and sync to instance of both sides
         instance.updateHelperData(helperBundle)
-        if (invoker is ServerPlayer) PacketDistributor.sendToPlayer(invoker,
+
+        // TODO replace this with a periodical sync
+        if (invoker is ServerPlayer) PacketDistributor.sendToPlayer(
+            invoker,
             ClientboundSyncWandInstance(
                 wandData.invariable.uuid,
                 helperBundle.manaCurrent,
