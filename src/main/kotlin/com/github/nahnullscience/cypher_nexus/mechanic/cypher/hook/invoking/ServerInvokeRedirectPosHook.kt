@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule.HookType.PROJECTILE
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair

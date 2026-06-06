@@ -1,13 +1,12 @@
 package com.github.nahnullscience.cypher_nexus.client.gui
 
+import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
 import com.github.nahnullscience.cypher_nexus.network.server.ServerboundEditWandCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
-import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphics
@@ -255,7 +254,7 @@ class CypherIndexScreen(
     }
 
     private fun renderCypherIcon(guiGraphics: GuiGraphics, cypher: AbstractCypher, x: Int, y: Int) {
-        if (cypher !is EmptyCypher) {
+        if (cypher.isNotEmpty()) {
             val borderColor = if (cypher.color != 0) cypher.color else cypher.category.value().color
             guiGraphics.renderOutline(x - 1, y - 1, ICON_SIZE + 2, ICON_SIZE + 2, borderColor)
             guiGraphics.blit(cypher.texture(), x, y, 0f, 0f, ICON_SIZE, ICON_SIZE, ICON_TEXTURE, ICON_TEXTURE)
@@ -263,7 +262,7 @@ class CypherIndexScreen(
     }
     private fun renderCypherTooltip(guiGraphics: GuiGraphics, cypher: AbstractCypher, mouseX: Int, mouseY: Int) {
         if (HoverContext.isHolding) return
-        if (cypher is EmptyCypher) return
+        if (cypher.isEmpty()) return
         val components = mutableListOf<ClientTooltipComponent>()
 
         val titleText = cypher.translation().withStyle(ChatFormatting.GOLD)
@@ -425,10 +424,8 @@ class CypherIndexScreen(
                 if (isHolding) return
                 _hoverCypher = value
             }
-        val isHoveringNonEmpty
-            get() = hoverCypher != null && hoverCypher !is EmptyCypher
-        val isHovering
-            get() = hoverCypher != null
+        val isHoveringNonEmpty get() = hoverCypher != null && hoverCypher!!.isNotEmpty()
+        val isHovering get() = hoverCypher != null
         var isHolding = false
         var wandSlotNew = 0
         private var _wandSlotOld = -1

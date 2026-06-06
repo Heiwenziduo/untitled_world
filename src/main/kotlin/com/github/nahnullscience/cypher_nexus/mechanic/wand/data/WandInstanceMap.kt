@@ -9,8 +9,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 
-// maybe player only?
-class WandDataMap {
+class WandInstanceMap {
     companion object {
         const val RESET_TICK_COUNT = 1200
         private fun side(level: Level) = if (level.isClientSide) "client" else "server"

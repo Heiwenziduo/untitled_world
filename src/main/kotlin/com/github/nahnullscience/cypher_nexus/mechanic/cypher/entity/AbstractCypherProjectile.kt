@@ -1,13 +1,9 @@
-package com.github.nahnullscience.cypher_nexus.content.entity
+package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.init.ModDataSerializers
-import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
@@ -33,28 +29,43 @@ import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
-import net.minecraft.world.phys.*
-import java.util.*
+import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.EntityHitResult
+import net.minecraft.world.phys.HitResult
+import net.minecraft.world.phys.Vec3
+import java.util.HashMap
+import java.util.Optional
 import kotlin.jvm.optionals.getOrNull
 
-// TODO abs
-open class AbstractCypherProjectile(
-    entityType: EntityType<out Projectile>,
+abstract class AbstractCypherProjectile(
+    entityType: EntityType<out AbstractCypherProjectile>,
     level: Level
 ) : Projectile(entityType, level), IFlaggable {
     companion object {
         const val CLIP_MARGIN = 0.2f
 
-        /** generate projectile with raw attributes */
-        fun from(level: Level, cypher0: AbstractProjectileCypher, invoker: Entity?, direction: Vec3? = Vec3.ZERO) : AbstractCypherProjectile {
-            return AbstractCypherProjectile(level, cypher0, invoker, direction)
+        /** generate projectile with attributes initialized */
+        fun <T : AbstractCypherProjectile> create(
+            entityType: EntityType<T>,
+            level: Level,
+            invoker: Entity?,
+            direction: Vec3? = null,
+            shootState: ProjectileStateChunk,
+            node: ProjectileNode,
+            stateHooks: HookContainer?
+        ) : T {
+            if (level.isClientSide) throw IllegalStateException("Try to create projectile [$entityType] on client side.")
+            val proj = entityType.create(level) ?: throw IllegalStateException("Failed to create projectile [$entityType].")
+            proj.initialize(invoker, direction, shootState, node, stateHooks)
+            return proj
         }
 
 
-        val CYPHER: EntityDataAccessor<AbstractCypher> = SynchedEntityData.defineId(
-            AbstractCypherProjectile::class.java,
-            ModDataSerializers.CYPHER_DATA.get())
-        //        val CYPHER_LIST: EntityDataAccessor<List<AbstractCypher>> = SynchedEntityData.defineId(
+//        val CYPHER: EntityDataAccessor<AbstractCypher> = SynchedEntityData.defineId(
+//            AbstractCypherProjectile::class.java,
+//            ModDataSerializers.CYPHER_DATA.get())
+//        val CYPHER_LIST: EntityDataAccessor<List<AbstractCypher>> = SynchedEntityData.defineId(
 //            AbstractCypherProjectile::class.java,
 //            ModDataSerializers.CYPHER_LIST_DATA.get())
         val FLAG: EntityDataAccessor<Int> = SynchedEntityData.defineId(
@@ -74,38 +85,44 @@ open class AbstractCypherProjectile(
             EntityDataSerializers.FLOAT)
     }
     override fun defineSynchedData(builder: SynchedEntityData.Builder) {
-        builder.define(CYPHER, EmptyCypher)
         builder.define(FLAG, 0)
         builder.define(EXISTING, 1)
         builder.define(BOUNCE, 0)
         builder.define(GRAVITY, 0f)
         builder.define(SPEED_FACTOR, 0.99f)
     }
+    override fun onSyncedDataUpdated(key: EntityDataAccessor<*>) {
+        super.onSyncedDataUpdated(key)
+    }
+
+    override fun onAddedToLevel() {
+        super.onAddedToLevel()
+    }
 
     // ==================================================================================================================
     // ==================================================================================================================
-    private var _cypher: AbstractProjectileCypher
-        get() = entityData.get(CYPHER) as AbstractProjectileCypher
-        set(value) = entityData.set(CYPHER, value)
-    val cypher
-        get() = _cypher
+    abstract val cypher: AbstractProjectileCypher
+    private var _existing: Int = 0
+    val existing get() = _existing
+
     /** a flag is basically a bundle of booleans */
     override var enabledFlags: Int
         get() = entityData.get(FLAG)
         set(value) = entityData.set(FLAG, value)
 
-    var existing: Int
-        get() = entityData.get(EXISTING)
-        set(value) = entityData.set(EXISTING, value)
+//    var existing: Int
+//        get() = entityData.get(EXISTING)
+//        set(value) = entityData.set(EXISTING, value)
+
     var bounce: Int
         get() = entityData.get(BOUNCE)
-        set(value) = entityData.set(BOUNCE, value)
+        private set(value) = entityData.set(BOUNCE, value)
     var gravity: Float
         get() = entityData.get(GRAVITY)
-        set(value) = entityData.set(GRAVITY, value)
+        private set(value) = entityData.set(GRAVITY, value)
     var speedFactor: Float
         get() = entityData.get(SPEED_FACTOR)
-        set(value) = entityData.set(SPEED_FACTOR, value)
+        private set(value) = entityData.set(SPEED_FACTOR, value)
 
 
 //    /** the direct entity create the projectile, invoker could be another projectile if trigger */
@@ -113,7 +130,7 @@ open class AbstractCypherProjectile(
 //    val invoker
 //        get() = _invoker
     /** position where the cypher was invoked initially, before any hook modify */
-    private var _invokedPosition: Vec3? = null
+//    private var _invokedPosition: Vec3? = null
 //    /** position where the cypher was invoked initially, before any hook modify */
 //    var invokedPosition
 //        get() = _invokedPosition
@@ -124,42 +141,66 @@ open class AbstractCypherProjectile(
     private val _attributeMap = HashMap<CypherAttribute, Double>()
     /** store bounce points triggered in one tick */
     protected val bouncePoints = mutableListOf<Vec3>()
-    protected val bounceTick
-        get() = bouncePoints.isNotEmpty()
+    protected val bounceTick get() = bouncePoints.isNotEmpty()
 
     private var hooks: HookContainer? = null
     private var _trigger = TriggerType.NONE
     private var _payload: ProjectileStateChunk? = null
-    val payload: ProjectileStateChunk?
-        get() = _payload
+    val payload: ProjectileStateChunk? get() = _payload
 
     // ==================================================================================================================
     // ==================================================================================================================
-    /** create a plain projectile of the given cypher */
-    private constructor(level: Level, cypher0: AbstractProjectileCypher, invoker: Entity?, direction: Vec3? = null) :
-        this(ModEntities.CYPHER_PROJECTILE.get(), level) {
+//    constructor(entityType: EntityType<out AbstractCypherProjectile>, level: Level) : super(entityType, level)
+//    /** create a plain projectile of the given cypher */
+//    private constructor(entityType: EntityType<out AbstractCypherProjectile>, level: Level, invoker: Entity?, direction: Vec3? = null
+//    ) : this(entityType, level) {
+//        owner = invoker
+//        enableFlag(cypher.flag)
+//        setHooks(null)
+//        setDirection(direction)
+//    }
+//
+//    /**  */
+//    constructor(
+//        entityType: EntityType<out AbstractCypherProjectile>,
+//        level: Level,
+//        invoker: Entity?,
+//        direction: Vec3? = null,
+//        shootState: ProjectileStateChunk,
+//        node: ProjectileNode,
+//        parentHooks: HookContainer?
+//    ) : this(entityType, level) {
+//        owner = invoker
+//        enabledFlags = shootState.enabledFlags or cypher.flag
+//        _payload = node.payload
+//        _trigger = node.trigger
+//        setHooks(parentHooks)
+//
+//        initAttributes(shootState)
+//        setDirection(direction)
+//
+//        printDebugMsg()
+//    }
+    private var isInitialized = false
+    private fun initialize(
+        invoker: Entity?,
+        direction: Vec3? = null,
+        shootState: ProjectileStateChunk,
+        node: ProjectileNode,
+        stateHooks: HookContainer?
+    ) {
+        if (isInitialized) CypherNexus.LOGGER.debug("{} is already initialized", this)
         owner = invoker
-        _cypher = cypher0
-        enableFlag(_cypher.flag)
-        setHooks(null)
-        setDirection(direction)
-    }
-
-    constructor(
-        level: Level, invoker: Entity?, cypher0: AbstractProjectileCypher, direction: Vec3? = null,
-        shootState: ProjectileStateChunk, node: ProjectileNode, parentHooks: HookContainer?) :
-        this(ModEntities.CYPHER_PROJECTILE.get(), level) {
-        owner = invoker
-        _cypher = cypher0
-        enabledFlags = shootState.enabledFlags or _cypher.flag
+        enabledFlags = shootState.enabledFlags or cypher.flag
         _payload = node.payload
         _trigger = node.trigger
-        setHooks(parentHooks)
 
+        setHooks(stateHooks)
         initAttributes(shootState)
         setDirection(direction)
 
         printDebugMsg()
+        isInitialized = true
     }
 
     // ==================================================================================================================
@@ -170,20 +211,20 @@ open class AbstractCypherProjectile(
             if (haveFlag(CypherFlags.CONSTANT_EXISTING) && CypherAttributes.EXISTING.`is`(attr.resource)) return@forEach
 
             _attributeMap.compute(attr) { a, v ->
-                val def = _cypher.getAttrBaseOrDefault(attr)
+                val def = cypher.getAttrBaseOrDefault(attr)
                 val final = CypherUtility.attributeCalculator(opMap, def)
                 attr.restrictRange(final)
             }
         }
 
-        existing = getAttrOrProjDefault(CypherAttributes.EXISTING).toInt()
+        _existing = getAttrOrProjDefault(CypherAttributes.EXISTING).toInt()
         bounce = getAttrOrProjDefault(CypherAttributes.BOUNCE).toInt()
         gravity = getAttrOrProjDefault(CypherAttributes.GRAVITY_FACTOR).toFloat()
         speedFactor = 1f - getAttrOrProjDefault(CypherAttributes.FRICTION_FACTOR).toFloat()
     }
 
     protected fun setDirection(direction: Vec3? = null) {
-        moveDirection = direction?.normalize()?: owner?.lookAngle?.normalize()?: moveDirection
+        moveDirection = direction?.normalize() ?: owner?.lookAngle?.normalize() ?: moveDirection
         if (moveDirection != Vec3.ZERO){
             deltaMovement = moveDirection.scale(getAttrOrProjDefault(CypherAttributes.SPEED))
             // FIXME inertia behavior seems strange
@@ -195,10 +236,11 @@ open class AbstractCypherProjectile(
         setPos(pair.position)
         setDirection(pair.direction)
     }
+//    fun setPosInitial(vec3: Vec3) = run { _invokedPosition = vec3 }
 
     protected fun setHooks(parent: HookContainer?) {
         hooks = HookContainer(Optional.ofNullable(parent))
-        hooks?.add(_cypher)
+        hooks?.add(cypher)
     }
 
 
@@ -213,7 +255,7 @@ open class AbstractCypherProjectile(
             { h, i -> h.firstTickBoth(level(), this, i) }
 
             if (level().isClientSide) {
-                println("firstTickCheckOnClient: $_cypher") // attrs are synced from the start
+                println("firstTickCheckOnClient: $cypher") // attrs are synced from the start
             }
 
             // if (!level().isClientSide) deltaMovement = Vec3.ZERO // deltaMovement will auto-sync to client, but not immediately
@@ -231,18 +273,18 @@ open class AbstractCypherProjectile(
         modifierTick()
 
         if (tickCount == 20) trigger(TriggerType.TIMER_20)
-        if (existing < 0 || existing == tickCount) {
+        if (_existing < 0 || _existing == tickCount) {
             // here's a trick, if player make existing-time exactly equal to 0, projectile will last till the game quit
             discardCy(DiscardReason.EXPIRE)
         }
     }
 
 
-    protected fun modifierTick() {}
+    protected open fun modifierTick() {}
     /**
      * check hit-result and set delta-movement here
      * */
-    protected fun projectileTick() {
+    protected open fun projectileTick() {
         /*
          * deltaMovement: the movement for the "next tick", client smooth animation relay on this
          * // an AABB check is used everyTick every vanilla projectile, sounds outrageous, but is ok in performance
@@ -394,7 +436,7 @@ open class AbstractCypherProjectile(
         // trigger on client
         super.handleEntityEvent(id)
         if (id.toInt() == 3) {
-            _cypher.visualEffectOnHit(level(), this)
+//            cypher.visualEffectOnHit(level(), this)
         }
     }
 
@@ -412,7 +454,7 @@ open class AbstractCypherProjectile(
     // ==================================================================================================================
     fun getAttribute(attr: CypherAttribute): Double? = _attributeMap.get(attr)
     fun getAttribute(holer: Holder<CypherAttribute>): Double? = getAttribute(holer.value())
-    fun getAttrOrProjDefault(attr: CypherAttribute): Double = _attributeMap[attr] ?: _cypher.getAttrBaseOrDefault(attr)
+    fun getAttrOrProjDefault(attr: CypherAttribute): Double = _attributeMap[attr] ?: cypher.getAttrBaseOrDefault(attr)
     /** computedOperationMap > projectileCypher-base > attr#default */
     fun getAttrOrProjDefault(holer: Holder<CypherAttribute>): Double = getAttrOrProjDefault(holer.value())
 
@@ -452,7 +494,7 @@ open class AbstractCypherProjectile(
             }
             else -> {
                 if (reason == DiscardReason.EXPIRE) {
-                    if (level().isClientSide) _cypher.visualEffectOnExpire(level(), this)
+//                    if (level().isClientSide) cypher.visualEffectOnExpire(level(), this)
                 }
                 hooks?.playHooks(CypherBehaviorHooks.BEFORE_DISCARD_BOTH)
                 { h, i -> h.beforeDiscardBoth(level(), this, i, reason) }
@@ -464,16 +506,14 @@ open class AbstractCypherProjectile(
     // ==================================================================================================================
     // ==================================================================================================================
     private fun printDebugMsg() {
-        CypherNexus.LOGGER.debug("create projectile {}: {}", this, _cypher)
-        CypherFlags.printFlag(enabledFlags)
-        printModifiedAttrMap()
-    }
+        CypherNexus.LOGGER.debug("create projectile {}: {}", this, cypher)
+        CypherFlags.Companion.printFlag(enabledFlags)
 
-    private fun printModifiedAttrMap() {
+        // modified AttrMap
         _attributeMap.forEach { a, v ->
             println("$a: $v")
         }
-        if (_attributeMap.isEmpty()) println("projectile $_cypher has no modified attributes")
+        if (_attributeMap.isEmpty()) println("projectile $cypher has no modified attributes")
     }
 
 
@@ -489,6 +529,8 @@ open class AbstractCypherProjectile(
         HIT_ENTITY,
         /** through a collapse with block */
         HIT_BLOCK,
+        /**  */
+        TRANSFORMED,
 
         /** by some special reason */
         ERASE,

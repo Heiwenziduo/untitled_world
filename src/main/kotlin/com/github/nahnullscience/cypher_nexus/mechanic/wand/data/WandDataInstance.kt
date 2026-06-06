@@ -28,16 +28,11 @@ class WandDataInstance(
     init {
         _manaCurrent = manaMax
     }
-    val manaCurrent
-        get(): Float = _manaCurrent
-    val delay
-        get(): Int = _delayCurrent
-    val recharge
-        get(): Int = _rechargeCurrent
-    val isRecharging
-        get(): Boolean = _rechargeCurrent > 0 && _deck == 0L
-    val lastModifyTime
-        get(): Long = _lastModifyTime
+    val manaCurrent get(): Float = _manaCurrent
+    val delay get(): Int = _delayCurrent
+    val recharge get(): Int = _rechargeCurrent
+    val isRecharging get(): Boolean = _rechargeCurrent > 0 && _deck == 0L
+    val lastModifyTime get(): Long = _lastModifyTime
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     fun tick(entity: Entity) {
@@ -86,6 +81,7 @@ class WandDataInstance(
 
     }
 
+    /** should call on both sides */
     fun recoilModule(invoker: Entity, recoil: Double, invokePosDire: PosDirePair) {
         // TODO recoil module
         // for now, push invoker for ease

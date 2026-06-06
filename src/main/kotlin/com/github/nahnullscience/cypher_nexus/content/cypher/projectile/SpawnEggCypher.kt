@@ -1,12 +1,12 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.projectile
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
@@ -18,7 +18,9 @@ import net.minecraft.world.level.Level
 
 object SpawnEggCypher : ProjectileCypher() {
     override val resource = CypherNexus.modResource("spawn_egg")
-    val egg = ItemStack(Items.EGG)
+    override val projectileType = ModEntities.CYPHER_SPAWN_EGG
+
+//    val egg = ItemStack(Items.EGG)
 
     override fun defaultAttributes(): CypherDataMap.Builder {
         return super.defaultAttributes()
@@ -30,12 +32,12 @@ object SpawnEggCypher : ProjectileCypher() {
             .projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
     }
 
-    override fun visualEffectOnHit(level: Level, projectile: AbstractCypherProjectile) {
-        val pos = projectile.position()
-        for (i in 0..7) {
-            level.addParticle(ItemParticleOption(ParticleTypes.ITEM, egg), pos.x, pos.y, pos.z, 0.0, 0.0, 0.0)
-        }
-    }
+//    override fun visualEffectOnHit(level: Level, projectile: AbstractCypherProjectile) {
+//        val pos = projectile.position()
+//        for (i in 0..7) {
+//            level.addParticle(ItemParticleOption(ParticleTypes.ITEM, egg), pos.x, pos.y, pos.z, 0.0, 0.0, 0.0)
+//        }
+//    }
 
     override fun addToStateChunk(chunk: ProjectileStateChunk): ProjectileStateChunk {
         val subState = ProjectileStateChunk()

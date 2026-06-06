@@ -1,6 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.client.cypher
 
-import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource

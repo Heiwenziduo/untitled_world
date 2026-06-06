@@ -22,14 +22,10 @@ import net.minecraft.resources.ResourceLocation
  *
  * */
 sealed class AbstractCypher: IRegisterable {
-    val manaDrain: Float
-        get() = attributes().manaDrain
-    val draw: Int
-        get() = attributes().draw
-    val delay: Int
-        get() = attributes().delay
-    val recharge: Int
-        get() = attributes().recharge
+    val manaDrain: Float get() = attributes().manaDrain
+    val draw: Int get() = attributes().draw
+    val delay: Int get() = attributes().delay
+    val recharge: Int get() = attributes().recharge
 
     /** whether the cypher shows in the index(left side) */
     open val hide: Boolean = false
@@ -37,8 +33,7 @@ sealed class AbstractCypher: IRegisterable {
     open val color: Int = 0
     private var _flag: Int = 0
     /** use #addFlag during init */
-    val flag: Int
-        get() = _flag
+    val flag: Int get() = _flag
 
     /** auto detect hooks */
     val implementedHooks: List<HookModule<*>> by lazy { // lazy init and cache result, cool
@@ -86,8 +81,6 @@ sealed class AbstractCypher: IRegisterable {
         options: CypherInvokingOptions = CypherInvokingOptions()
     ) {
         CypherNexus.LOGGER.debug("[{}] is invoked", this)
-        if (chunk == helper.rootChunk) data.delay += delay
-        data.recharge += recharge
 
         modifyStateChunk(helper, data, chunk)
         var forwardState = chunk
@@ -131,6 +124,9 @@ sealed class AbstractCypher: IRegisterable {
     }
 
     open fun modifyStateChunk(helper: InvokingHelper, data: InvokingHelper.HelperDataBundle, chunk: ProjectileStateChunk) {
+        if (chunk == helper.rootChunk) data.delay += delay
+        data.recharge += recharge
+
         attributes().stateChunk.forEach { attribute, opMap ->
             // prune 1, sub-chunk do not affect delay, spread, whatsoever. note recharge is an exception
             if (chunk != helper.rootChunk && attribute.applyOn == CypherAttribute.AttributeApply.INVOKING) return@forEach

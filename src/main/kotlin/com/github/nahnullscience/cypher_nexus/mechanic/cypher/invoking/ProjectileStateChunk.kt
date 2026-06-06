@@ -42,6 +42,7 @@ class ProjectileStateChunk private constructor (
             }
         }
 
+        // handle entities only on server
         if (level.isClientSide) return
         if (charge-- <= 0) return
         for ((i, node) in projectiles.withIndex()) {
@@ -55,10 +56,10 @@ class ProjectileStateChunk private constructor (
                 node,
                 hooks)
 
-            val newPair = hooks.cumulateHooks(CypherBehaviorHooks.INVOKE_REDIRECT_POS_SERVER, posDire)
+            val newPosPair = hooks.cumulateHooks(CypherBehaviorHooks.INVOKE_REDIRECT_POS_SERVER, posDire)
             { h, l, pair -> h.redirectPosDireServer(level as ServerLevel, directInvoker, proj, l, pair, i) }
 
-            proj.setDirection(newPair)
+            proj.setDirection(newPosPair)
             level.addFreshEntity(proj)
         }
     }

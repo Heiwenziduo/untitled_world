@@ -1,7 +1,15 @@
 package com.github.nahnullscience.cypher_nexus.init
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.content.entity.Arrow
+import com.github.nahnullscience.cypher_nexus.content.entity.EnderRecall
+import com.github.nahnullscience.cypher_nexus.content.entity.EnderTeleportation
+import com.github.nahnullscience.cypher_nexus.content.entity.LlamaSpit
+import com.github.nahnullscience.cypher_nexus.content.entity.Snowball
+import com.github.nahnullscience.cypher_nexus.content.entity.SpawnEgg
+import com.github.nahnullscience.cypher_nexus.content.entity.statics.SummonExplosion
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
+import com.mojang.datafixers.types.templates.Sum
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
@@ -17,15 +25,30 @@ object ModEntities {
         DEFERRED_REGISTER.register(MOD_BUS)
     }
 
-    val CYPHER_PROJECTILE: Supplier<EntityType<AbstractCypherProjectile>> =
-        DEFERRED_REGISTER.register("cypher_projectile") { resource ->
-            EntityType.Builder.of({ t, l -> AbstractCypherProjectile(t, l) }, MobCategory.MISC)
+    fun <T : AbstractCypherProjectile> register(
+        name: String,
+        factory: EntityType.EntityFactory<T>,
+        category: MobCategory = MobCategory.MISC
+    ): Supplier<EntityType<T>> {
+        return DEFERRED_REGISTER.register(name) { resource ->
+            EntityType.Builder.of(factory, category)
                 .cypherBasic()
                 .build(resource.path)
         }
+    }
+
+    val CYPHER_ARROW = register("cypher_arrow", ::Arrow)
+    val CYPHER_SNOWBALL = register("cypher_snowball", ::Snowball)
+    val CYPHER_ENDER_TELEPORTATION = register("cypher_ender_teleportation", ::EnderTeleportation)
+    val CYPHER_ENDER_RECALL = register("cypher_ender_recall", ::EnderRecall)
+    val CYPHER_SPAWN_EGG = register("cypher_spawn_egg", ::SpawnEgg)
+    val CYPHER_LLAMA_SPIT = register("cypher_llama_spit", ::LlamaSpit)
+
+    val CYPHER_EXPLOSION = register("cypher_explosion", ::SummonExplosion)
 }
 
-private fun EntityType.Builder<AbstractCypherProjectile>.cypherBasic(updateInterval: Int = 10): EntityType.Builder<AbstractCypherProjectile> {
+private fun <T : AbstractCypherProjectile> EntityType.Builder<T>.cypherBasic(updateInterval: Int = 10)
+: EntityType.Builder<T> {
     sized(0.125f, 0.125f)
     // Prevents the entity from being saved to disk.
     noSave()

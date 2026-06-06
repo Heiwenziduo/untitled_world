@@ -1,11 +1,17 @@
 package com.github.nahnullscience.cypher_nexus.client
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.client.cypher.CypherVisualizerRegistry
-import com.github.nahnullscience.cypher_nexus.client.cypher.CypherProjectileRenderer
 import com.github.nahnullscience.cypher_nexus.client.gui.WandDataOverlay
+import com.github.nahnullscience.cypher_nexus.client.renderer.ArrowCypherRenderer
+import com.github.nahnullscience.cypher_nexus.client.renderer.LlamaSpitCypherRenderer
+import com.github.nahnullscience.cypher_nexus.client.renderer.SimpleItemProjectileRenderer
+import com.github.nahnullscience.cypher_nexus.client.renderer.SimpleSummonerRenderer
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
-import net.minecraft.client.Minecraft
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
+import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.Items
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
@@ -14,6 +20,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent
 import net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers.DEBUG_OVERLAY
+import java.util.function.Supplier
 
 @EventBusSubscriber(modid = CypherNexus.MOD_ID, value = [Dist.CLIENT])
 object ClientSetup {
@@ -28,11 +35,12 @@ object ClientSetup {
      */
     @SubscribeEvent
     private fun onClientStarting(event: FMLClientSetupEvent) {
-        CypherNexus.LOGGER.info("HELLO FROM CLIENT SETUP")
-        CypherNexus.LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().user.name)
-        // only on physical client
-        // sided setup is the last step of 4-step neo lifecycle, here registry is fully prepared
-        CypherVisualizerRegistry.init()
+//        CypherNexus.LOGGER.info("HELLO FROM CLIENT SETUP")
+//        CypherNexus.LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().user.name)
+
+//        // only on physical client
+//        // sided setup is the last step of 4-step neo lifecycle, here registry is fully prepared
+//        CypherVisualizerRegistry.init()
     }
 
 //    @SubscribeEvent
@@ -43,7 +51,22 @@ object ClientSetup {
     // ===================== entity renderer ================================
     @SubscribeEvent
     private fun registerEntityRenderers(event: RegisterRenderers) {
-        event.registerEntityRenderer(ModEntities.CYPHER_PROJECTILE.get()) { context -> CypherProjectileRenderer(context) }
+
+        //////////////////////////////////////////////////////////////////////////////
+        // projectile
+        //////////////////////////////////////////////////////////////////////////////
+        event.registerEntityRenderer(ModEntities.CYPHER_ARROW.get(), ::ArrowCypherRenderer)
+        event.registerRenderer(ModEntities.CYPHER_LLAMA_SPIT, ::LlamaSpitCypherRenderer)
+
+        event.registerItemProjectile(ModEntities.CYPHER_SNOWBALL, Items.SNOWBALL)
+        event.registerItemProjectile(ModEntities.CYPHER_ENDER_RECALL, Items.ENDER_PEARL)
+        event.registerItemProjectile(ModEntities.CYPHER_ENDER_TELEPORTATION, Items.ENDER_PEARL)
+        event.registerItemProjectile(ModEntities.CYPHER_SPAWN_EGG, Items.EGG)
+
+        //////////////////////////////////////////////////////////////////////////////
+        // static
+        //////////////////////////////////////////////////////////////////////////////
+        event.registerRenderer(ModEntities.CYPHER_EXPLOSION, ::SimpleSummonerRenderer)
     }
 
 //    @SubscribeEvent
@@ -60,3 +83,13 @@ object ClientSetup {
         event.registerBelow(DEBUG_OVERLAY, CypherNexus.modResource("wand_data"), WandDataOverlay)
     }
 }
+
+private fun RegisterRenderers.registerItemProjectile(
+    cypherEntity: Supplier<out EntityType<out AbstractCypherProjectile>>,
+    item: Item
+) = registerEntityRenderer(cypherEntity.get()) { context -> SimpleItemProjectileRenderer(context, item) }
+
+private fun <T : AbstractCypherProjectile> RegisterRenderers.registerRenderer(
+    cypherEntity: Supplier<out EntityType<out T>>,
+    factory: EntityRendererProvider<T>
+) = registerEntityRenderer(cypherEntity.get(), factory)

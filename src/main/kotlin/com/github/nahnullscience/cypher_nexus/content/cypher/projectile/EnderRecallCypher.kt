@@ -1,7 +1,8 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.projectile
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.init.ModEntities
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothBeforeDiscardHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothFirstTickHook
@@ -9,6 +10,8 @@ import net.minecraft.world.level.Level
 
 object EnderRecallCypher : ProjectileCypher(), BothBeforeDiscardHook, BothFirstTickHook {
     override val resource = CypherNexus.modResource("ender_recall")
+    override val projectileType = ModEntities.CYPHER_ENDER_RECALL
+
     override fun beforeDiscardBoth(
         level: Level,
         projectile: AbstractCypherProjectile,
@@ -22,11 +25,11 @@ object EnderRecallCypher : ProjectileCypher(), BothBeforeDiscardHook, BothFirstT
         strength: Int
     ) {
         if (!level.isClientSide) {
-            val pos = projectile.position()
-            val teleportation = AbstractCypherProjectile.from(level, EnderTeleportationCypher, projectile.owner, )
-            teleportation.setPos(pos)
-            teleportation.existing = 100 // recall after 5seconds, at most
-            level.addFreshEntity(teleportation)
+//            val pos = projectile.position()
+//            val teleportation = AbstractCypherProjectile.from(level, EnderTeleportationCypher, projectile.owner, )
+//            teleportation.setPos(pos)
+//            teleportation.existing = 100 // recall after 5seconds, at most
+//            level.addFreshEntity(teleportation)
         }
     }
 

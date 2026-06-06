@@ -1,7 +1,8 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.projectile
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.init.ModEntities
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
@@ -13,7 +14,9 @@ import net.minecraft.world.level.Level
 
 object ArrowCypher : ProjectileCypher() {
     override val resource = CypherNexus.modResource("arrow")
-    val stack = ItemStack(Items.ARROW)
+    override val projectileType = ModEntities.CYPHER_ARROW
+
+//    val stack = ItemStack(Items.ARROW)
 
     override fun defaultAttributes(): CypherDataMap.Builder {
         return super.defaultAttributes()
@@ -25,12 +28,12 @@ object ArrowCypher : ProjectileCypher() {
             .projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.01)
     }
 
-    override fun visualEffectOnHit(level: Level, projectile: AbstractCypherProjectile) {
-        // check: ItemParticleOption(ParticleTypes.ITEM, itemstack), and ParticleTypes.ITEM_SNOWBALL
-        val pos = projectile.position()
-        for (i in 0..7) {
-            level.addParticle(ItemParticleOption(ParticleTypes.ITEM, stack),
-                pos.x, pos.y, pos.z, 0.0, 0.0, 0.0)
-        }
-    }
+//    override fun visualEffectOnHit(level: Level, projectile: AbstractCypherProjectile) {
+//        // check: ItemParticleOption(ParticleTypes.ITEM, itemstack), and ParticleTypes.ITEM_SNOWBALL
+//        val pos = projectile.position()
+//        for (i in 0..7) {
+//            level.addParticle(ItemParticleOption(ParticleTypes.ITEM, stack),
+//                pos.x, pos.y, pos.z, 0.0, 0.0, 0.0)
+//        }
+//    }
 }

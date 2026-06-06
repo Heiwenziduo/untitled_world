@@ -1,34 +1,26 @@
-package com.github.nahnullscience.cypher_nexus.client.cypher.visualizer
+package com.github.nahnullscience.cypher_nexus.client.renderer
 
-import com.github.nahnullscience.cypher_nexus.client.cypher.ICypherVisualizer
-import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.ArrowCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.content.entity.Arrow
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import com.mojang.math.Axis
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.RenderType
-import net.minecraft.client.renderer.block.BlockRenderDispatcher
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher
-import net.minecraft.client.renderer.entity.ItemRenderer
+import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.entity.TippableArrowRenderer.NORMAL_ARROW_LOCATION
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.util.Mth
 
-object ArrowVi : ICypherVisualizer {
-    override fun cypher() = ArrowCypher
-
-    /** {net.minecraft.client.renderer.entity.ArrowRenderer} */
+class ArrowCypherRenderer (
+    context: EntityRendererProvider.Context
+) : AbstractCypherRenderer<Arrow>(context) {
     override fun render(
-        projectile: AbstractCypherProjectile,
+        projectile: Arrow,
         entityYaw: Float,
         partialTick: Float,
         poseStack: PoseStack,
         bufferSource: MultiBufferSource,
-        packedLight: Int,
-        itemRenderer: ItemRenderer,
-        blockRenderer: BlockRenderDispatcher,
-        entityRenderDispatcher: EntityRenderDispatcher
+        packedLight: Int
     ) {
         poseStack.pushPose()
         poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partialTick, projectile.yRotO, projectile.yRot) - 90.0f))
@@ -75,7 +67,8 @@ object ArrowVi : ICypherVisualizer {
         poseStack.popPose()
     }
 
-    fun vertex(
+
+    private fun vertex(
         pose: PoseStack.Pose,
         consumer: VertexConsumer,
         x: Int,

@@ -7,7 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothBeforeDiscardHook
 import net.minecraft.world.level.ExplosionDamageCalculator
 
-abstract class AbstractStaticSummoner() : StaticProjectileCypher(), BothBeforeDiscardHook {
+abstract class AbstractStaticSummonerCypher() : StaticProjectileCypher(), BothBeforeDiscardHook {
 
     override fun defaultAttributes(): CypherDataMap.Builder {
         return super.defaultAttributes()

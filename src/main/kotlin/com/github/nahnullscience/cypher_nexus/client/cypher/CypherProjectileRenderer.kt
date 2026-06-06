@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.client.cypher
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.block.BlockRenderDispatcher
@@ -36,9 +36,9 @@ class CypherProjectileRenderer(
 //                projectile, entityYaw, partialTick, poseStack, bufferSource, packedLight, itemRenderer, blockRenderer, entityRenderDispatcher
 //            )
 //        }
-        CypherVisualizerRegistry.get(projectile.cypher)?.render(
-            projectile, entityYaw, partialTick, poseStack, bufferSource, packedLight, itemRenderer, blockRenderer, entityRenderDispatcher
-        )
+//        CypherVisualizerRegistry.get(projectile.cypher)?.render(
+//            projectile, entityYaw, partialTick, poseStack, bufferSource, packedLight, itemRenderer, blockRenderer, entityRenderDispatcher
+//        )
 
         poseStack.popPose()
     }
