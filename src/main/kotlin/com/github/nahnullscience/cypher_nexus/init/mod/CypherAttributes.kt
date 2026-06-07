@@ -60,7 +60,7 @@ object CypherAttributes {
     val SPEED = registerAttribute("speed", 0.0, 0.0, 16.0)
     /** tick */
     val EXISTING = registerAttribute("existing", 300.0)
-    val EFFECT_RADIUS = registerAttribute("effect_redius", 1.0, 0.125, 16.0)
+    val EFFECT_RADIUS = registerAttribute("effect_redius", 1.0, 0.0625, 16.0)
     /** int, bounce times */
     val BOUNCE = registerAttribute("bounce", 0.0, 0.0, 100.0)
     /** how much it falls each tick */

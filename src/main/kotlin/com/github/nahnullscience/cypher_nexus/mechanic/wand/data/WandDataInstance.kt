@@ -12,6 +12,7 @@ import net.minecraft.world.phys.Vec3
 class WandDataInstance(
     val invariable: WandDataInvariable,
     val isClient: Boolean,
+    // TODO update client aoc when wand edit (item-component is auto synced, but the reference inside instance is not)
     private var aoc: ArrayOfCyphers, // player may edit the wand after the instance has been created
 ) {
     val manaMax = invariable.chunkF.manaMax
@@ -45,7 +46,7 @@ class WandDataInstance(
         _lastModifyTime = entity.level().gameTime // mark the last modify level tick for GC
     }
 
-    /**  */
+    /** when cypher-list is edited */
     fun updateWandStatsServer(bundle: WandDataBundle) {
         if (isClient) CypherNexus.LOGGER.error("server method calls on client side: updateWandStatsServer")
         _deck = 0

@@ -34,5 +34,6 @@ object RefresherRingCypher : AbstractNonProjectileCypher() {
         }
         state.alreadyRefreshed = true
         helper.init()
+        data.recharge = 0
     }
 }

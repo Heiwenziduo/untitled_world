@@ -3,9 +3,11 @@ package com.github.nahnullscience.cypher_nexus.init.mod
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.AbstractAddTrigger
+import com.github.nahnullscience.cypher_nexus.content.cypher.other.AbstractDivideBy
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.AbstractRequirement
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.RequirementLowHP
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.RequirementNotPlayer
+import com.github.nahnullscience.cypher_nexus.content.cypher.other.RequirementOddHand
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.static_projectile.ExplosionCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.InnerForceCypher
@@ -274,6 +276,12 @@ object Cyphers {
 //    })
     val REQUIREMENT_HP = registerCypher(RequirementLowHP)
     val REQUIREMENT_NOT_PLAYER = registerCypher(RequirementNotPlayer)
+    val REQUIREMENT_ODD_HAND = registerCypher(RequirementOddHand)
     val REQUIREMENT_OTHERWISE = registerCypher(AbstractRequirement.RequirementOtherwise)
     val REQUIREMENT_ENDPOINT = registerCypher(AbstractRequirement.RequirementEndpoint)
+
+    val D2 = registerCypher(AbstractDivideBy.D2)
+    val D3 = registerCypher(AbstractDivideBy.D3)
+    val D4 = registerCypher(AbstractDivideBy.D4)
+    val D10 = registerCypher(AbstractDivideBy.D10)
 }

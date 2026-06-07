@@ -22,7 +22,7 @@ object ClientPayloadHandler {
 
     fun openIndexScreen(data: ClientboundOpenIndexScreen, context: IPayloadContext) {
         // Do something with the data, on the network thread, heavy computation should be done before pass to main thread
-        println("client receive package -> openIndexScreen: \n$data")
+//        println("client receive package -> openIndexScreen: \n$data")
 
         val map = CypherUtility.sortCyphersByCategory(data.cyphersTotal) // TODO
         context.enqueueWork {

@@ -62,16 +62,7 @@ abstract class AbstractCypherProjectile(
         }
 
 
-//        val CYPHER: EntityDataAccessor<AbstractCypher> = SynchedEntityData.defineId(
-//            AbstractCypherProjectile::class.java,
-//            ModDataSerializers.CYPHER_DATA.get())
-//        val CYPHER_LIST: EntityDataAccessor<List<AbstractCypher>> = SynchedEntityData.defineId(
-//            AbstractCypherProjectile::class.java,
-//            ModDataSerializers.CYPHER_LIST_DATA.get())
         val FLAG: EntityDataAccessor<Int> = SynchedEntityData.defineId(
-            AbstractCypherProjectile::class.java,
-            EntityDataSerializers.INT)
-        val EXISTING: EntityDataAccessor<Int> = SynchedEntityData.defineId(
             AbstractCypherProjectile::class.java,
             EntityDataSerializers.INT)
         val BOUNCE: EntityDataAccessor<Int> = SynchedEntityData.defineId(
@@ -86,7 +77,6 @@ abstract class AbstractCypherProjectile(
     }
     override fun defineSynchedData(builder: SynchedEntityData.Builder) {
         builder.define(FLAG, 0)
-        builder.define(EXISTING, 1)
         builder.define(BOUNCE, 0)
         builder.define(GRAVITY, 0f)
         builder.define(SPEED_FACTOR, 0.99f)
@@ -102,7 +92,7 @@ abstract class AbstractCypherProjectile(
     // ==================================================================================================================
     // ==================================================================================================================
     abstract val cypher: AbstractProjectileCypher
-    private var _existing: Int = 0
+    private var _existing: Int = 1
     val existing get() = _existing
 
     /** a flag is basically a bundle of booleans */
@@ -139,6 +129,8 @@ abstract class AbstractCypherProjectile(
 
     // should be immutable after initialization
     private val _attributeMap = HashMap<CypherAttribute, Double>()
+    protected var bounceCount = 0
+    open val canBounce: Boolean get() = bounceCount < bounce
     /** store bounce points triggered in one tick */
     protected val bouncePoints = mutableListOf<Vec3>()
     protected val bounceTick get() = bouncePoints.isNotEmpty()
@@ -150,37 +142,6 @@ abstract class AbstractCypherProjectile(
 
     // ==================================================================================================================
     // ==================================================================================================================
-//    constructor(entityType: EntityType<out AbstractCypherProjectile>, level: Level) : super(entityType, level)
-//    /** create a plain projectile of the given cypher */
-//    private constructor(entityType: EntityType<out AbstractCypherProjectile>, level: Level, invoker: Entity?, direction: Vec3? = null
-//    ) : this(entityType, level) {
-//        owner = invoker
-//        enableFlag(cypher.flag)
-//        setHooks(null)
-//        setDirection(direction)
-//    }
-//
-//    /**  */
-//    constructor(
-//        entityType: EntityType<out AbstractCypherProjectile>,
-//        level: Level,
-//        invoker: Entity?,
-//        direction: Vec3? = null,
-//        shootState: ProjectileStateChunk,
-//        node: ProjectileNode,
-//        parentHooks: HookContainer?
-//    ) : this(entityType, level) {
-//        owner = invoker
-//        enabledFlags = shootState.enabledFlags or cypher.flag
-//        _payload = node.payload
-//        _trigger = node.trigger
-//        setHooks(parentHooks)
-//
-//        initAttributes(shootState)
-//        setDirection(direction)
-//
-//        printDebugMsg()
-//    }
     private var isInitialized = false
     private fun initialize(
         invoker: Entity?,
@@ -203,8 +164,6 @@ abstract class AbstractCypherProjectile(
         isInitialized = true
     }
 
-    // ==================================================================================================================
-    // ==================================================================================================================
     protected fun initAttributes(shootState: ProjectileStateChunk) {
         shootState.computedOperationMap.forEach { (attr, opMap) ->
             if (!attr.isProjectileAttribute) return@forEach
@@ -236,8 +195,6 @@ abstract class AbstractCypherProjectile(
         setPos(pair.position)
         setDirection(pair.direction)
     }
-//    fun setPosInitial(vec3: Vec3) = run { _invokedPosition = vec3 }
-
     protected fun setHooks(parent: HookContainer?) {
         hooks = HookContainer(Optional.ofNullable(parent))
         hooks?.add(cypher)
@@ -275,7 +232,7 @@ abstract class AbstractCypherProjectile(
         if (tickCount == 20) trigger(TriggerType.TIMER_20)
         if (_existing < 0 || _existing == tickCount) {
             // here's a trick, if player make existing-time exactly equal to 0, projectile will last till the game quit
-            discardCy(DiscardReason.EXPIRE)
+            discardCypher(DiscardReason.EXPIRE)
         }
     }
 
@@ -344,7 +301,7 @@ abstract class AbstractCypherProjectile(
             onHit(hitResultStep) // or hitTargetOrDeflectSelf(hitResult)
             val canPierce = hitResultStep is BlockHitResult && haveFlag(CypherFlags.PIERCE_BLOCK)
                     || hitResultStep is EntityHitResult && haveFlag(CypherFlags.PIERCE_ENTITY)
-            if (bounce <= 0 || canPierce) break
+            if (!canBounce || canPierce) break
 
             val targetBox = when(hitResultStep) {
                 is EntityHitResult -> hitResultStep.entity.boundingBox.inflate(CLIP_MARGIN.toDouble())
@@ -369,7 +326,7 @@ abstract class AbstractCypherProjectile(
                 Direction.WEST, Direction.EAST -> deltaMoveStep.multiply(-1.0, 1.0, 1.0)
             }
             startPosStep = hitPoint
-            bounce--
+            bounceCount++
             bouncePoints.add(hitPoint)
 
             // handle next bounce
@@ -403,9 +360,9 @@ abstract class AbstractCypherProjectile(
         val canPierce =
             result is BlockHitResult && haveFlag(CypherFlags.PIERCE_BLOCK) ||
             result is EntityHitResult && haveFlag(CypherFlags.PIERCE_ENTITY)
-        if (!canPierce && bounce <= 0) {
+        if (!canPierce && !canBounce) {
             level().broadcastEntityEvent(this, 3) // combine with #handleEntityEvent
-            discardCy(if (result.type == HitResult.Type.BLOCK) DiscardReason.HIT_BLOCK else DiscardReason.HIT_ENTITY)
+            discardCypher(if (result.type == HitResult.Type.BLOCK) DiscardReason.HIT_BLOCK else DiscardReason.HIT_ENTITY)
         }
 
     }
@@ -485,7 +442,7 @@ abstract class AbstractCypherProjectile(
 
 
 
-    protected fun discardCy(reason: DiscardReason) {
+    protected fun discardCypher(reason: DiscardReason) {
         if (level().isClientSide) return
         trigger(TriggerType.DEATH)
         when(reason){

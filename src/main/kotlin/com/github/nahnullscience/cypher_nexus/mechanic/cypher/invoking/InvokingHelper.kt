@@ -8,7 +8,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvaria
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 
 /** cypher chain compiler */
@@ -76,6 +75,23 @@ class InvokingHelper (
     }
 
     // =================================================================================
+    /** peek the next cypher in the deck, null if empty
+     *  @param next the next x-th cypher */
+    fun peekNext(next: Int = 0): AbstractCypher? {
+        var peekIndex = data.deck.countTrailingZeroBits()
+        var stepIndex = peekIndex
+        var tmpDeck = data.deck shr (stepIndex + 1)
+
+        for (i in 0 until next) {
+            stepIndex = tmpDeck.countTrailingZeroBits()
+            peekIndex += ++stepIndex // step
+            tmpDeck = tmpDeck shr stepIndex
+            if (peekIndex >= aoc.invokableSize) return null
+        }
+
+        return aoc.getInvokableOrNull(peekIndex)
+    }
+
     /** non-empty-cypher, null if deck is empty */
     fun drawNext(): AbstractCypher? {
         // find the index of the first '1' (last '0', in fact) starting from the right.
@@ -117,14 +133,14 @@ class InvokingHelper (
     }
 
     fun init() {
-        data.deck = aoc.bits()
+        data.deck = aoc.bits() // really?
         data.hand = 0
         data.discard = 0
     }
 
     // ============== bit operations ===================================================
 
-    fun deck2hand(index: Int): AbstractCypher? {
+    private fun deck2hand(index: Int): AbstractCypher? {
         val cy = aoc[index]
         data.deck = data.deck and (1L shl index).inv()
         data.hand = data.hand or (1L shl index)
@@ -148,7 +164,7 @@ class InvokingHelper (
         val next = (data.deck shr start).countTrailingZeroBits() + start
         deck2discard(next)
     }
-    /** start <= ... < end */
+    /** from <= ... < until */
     fun deck2discard(from: Int, until: Int) {
         val filter = ((1L shl from) - 1).inv()
         val filter1 = ((1L shl until) - 1) and filter
@@ -189,8 +205,10 @@ class InvokingHelper (
 
     }
 
+    /** for special data persist along the invoking */
     data class HelperStateBundle (
         var wrapped: Boolean = false,
         var alreadyRefreshed: Boolean = false,
+        var divideByChainLength: Int = 0,
     )
 }

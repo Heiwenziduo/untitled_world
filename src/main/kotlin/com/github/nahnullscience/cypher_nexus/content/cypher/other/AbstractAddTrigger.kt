@@ -42,6 +42,7 @@ abstract class AbstractAddTrigger(
             if (!cy0.isInvokable()) continue
 
             cy0.modifyStateChunk(helper, data, chunk)
+            CypherNexus.LOGGER.debug("[{}] modify the state through [{}]", this, cy0)
 
             if (cy0.triggerInterplay()) {
                 cy = cy0

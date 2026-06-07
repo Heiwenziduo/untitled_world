@@ -48,7 +48,7 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
                 if (cy is RequirementIf) break
             }
 
-            CypherNexus.LOGGER.debug("[{}] requirement is {} met", this, if (ok) "" else "not")
+            CypherNexus.LOGGER.debug("[{}] requirement is {}met", this, if (ok) "" else "not ")
             if (ok) {
                 if (otherwise > 0) {
                     if (endpoint > 0) helper.deck2discard(otherwise, endpoint + 1)

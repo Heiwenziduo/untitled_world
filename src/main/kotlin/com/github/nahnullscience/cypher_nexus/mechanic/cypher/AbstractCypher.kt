@@ -80,7 +80,7 @@ sealed class AbstractCypher: IRegisterable {
         state: InvokingHelper.HelperStateBundle,
         options: CypherInvokingOptions = CypherInvokingOptions()
     ) {
-        CypherNexus.LOGGER.debug("[{}] is invoked", this)
+        CypherNexus.LOGGER.debug("[{}] is invoked and modifies the state", this)
 
         modifyStateChunk(helper, data, chunk)
         var forwardState = chunk
@@ -142,7 +142,6 @@ sealed class AbstractCypher: IRegisterable {
             }
         }
         if (this is AbstractNonProjectileCypher) {
-            CypherNexus.LOGGER.debug("[{}] modifies the state", this)
             // hooks on NonProjectile affect the Block, hooks on Projectile only affect itself
             chunk.attachHooks(this)
             chunk.enableFlags(flag)
@@ -233,10 +232,13 @@ sealed class AbstractCypher: IRegisterable {
     }
 
 
+    /**
+     * not persist, unmodifiable, invoke option for single cypher.
+     * generally should create new one each time instead of passing the old one.
+     * */
     data class CypherInvokingOptions(
         val drawEnabled: Boolean = true,
         val recursiveDepth: Int = 0,
-    ) {
-
-    }
+        val divideByDepth: Int = 0
+    )
 }

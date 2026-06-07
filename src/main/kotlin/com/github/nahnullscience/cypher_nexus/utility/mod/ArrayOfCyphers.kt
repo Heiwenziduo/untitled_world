@@ -1,11 +1,10 @@
 package com.github.nahnullscience.cypher_nexus.utility.mod
 
-import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 
 
-private fun AbstractCypher.isPassive(): Boolean = isNotEmpty() && category == CypherCategories.WAND_MODULE
+private fun AbstractCypher.isPassive(): Boolean = isNotEmpty() && !isInvokable()
 
 /** fixed length, cypher changeable, EmptyCypher autofill */
 class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
@@ -124,6 +123,12 @@ class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
             return _cyphers[t]
         }
         return null
+    }
+
+    fun getInvokableOrNull(index: Int): AbstractCypher? {
+        if (index >= capacity) return null
+        val cy = this[index]
+        return if (cy.isPassive() || cy.isEmpty()) null else cy
     }
 
 
