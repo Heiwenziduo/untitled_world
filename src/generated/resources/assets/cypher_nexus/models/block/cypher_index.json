@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "cypher_nexus:block/test_cube"
+    "all": "cypher_nexus:block/cypher_index"
   }
 }

@@ -1,44 +1,38 @@
 package com.github.nahnullscience.cypher_nexus.client.renderer
 
+import com.github.nahnullscience.cypher_nexus.client.cypher.CypherRenderState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
 import com.mojang.blaze3d.vertex.PoseStack
-import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.entity.EntityRendererProvider
-import net.minecraft.client.renderer.entity.ItemRenderer
+import net.minecraft.client.renderer.state.level.CameraRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemDisplayContext
-import net.minecraft.world.item.ItemStack
 
 class SimpleItemProjectileRenderer <CY : AbstractCypherProjectile> (
     context: EntityRendererProvider.Context,
     item: Item
 ) : AbstractCypherRenderer<CY>(context) {
-    private val itemRenderer: ItemRenderer = context.itemRenderer
-    private val stack = ItemStack(item)
 
-    override fun render(
-        projectile: CY,
-        entityYaw: Float,
-        partialTick: Float,
+
+    val scale = 0.5f
+    override fun submit(
+        state: CypherRenderState,
         poseStack: PoseStack,
-        bufferSource: MultiBufferSource,
-        packedLight: Int
+        submitNodeCollector: SubmitNodeCollector,
+        camera: CameraRenderState,
     ) {
         poseStack.pushPose()
-        poseStack.scale(.5f, .5f, .5f)
-        poseStack.mulPose(entityRenderDispatcher.cameraOrientation())
-        itemRenderer
-            .renderStatic(
-                stack,
-                ItemDisplayContext.FIXED,
-                packedLight,
-                OverlayTexture.NO_OVERLAY,
-                poseStack,
-                bufferSource,
-                projectile.level(),
-                projectile.id
-            )
+        poseStack.scale(scale, scale, scale)
+        poseStack.mulPose(camera.orientation)
+//        state.item.submit(
+//            poseStack,
+//            submitNodeCollector,
+//            state.lightCoords,
+//            OverlayTexture.NO_OVERLAY,
+//            state.outlineColor
+//        )
         poseStack.popPose()
+        super.submit(state, poseStack, submitNodeCollector, camera)
     }
 }

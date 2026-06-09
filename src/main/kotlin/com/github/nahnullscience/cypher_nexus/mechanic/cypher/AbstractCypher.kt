@@ -8,15 +8,15 @@ import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.ChatFormatting
 import net.minecraft.core.Holder
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 
 /**
  *
@@ -166,9 +166,8 @@ sealed class AbstractCypher: IRegisterable {
     open fun description(): MutableComponent = Component.translatable("${translationKey()}.description")
 
     /** icons: {MOD_ID}/textures/cypher/{cypher_category}/{cypher_name}.png */
-    open fun texture(): ResourceLocation =
-        ResourceLocation.fromNamespaceAndPath("${resource.namespace}",
-            "textures/cypher/${category.value().registryName()}/${resource.path}.png")
+    open fun texture(): Identifier =
+        Identifier.fromNamespaceAndPath(resource.namespace, "textures/cypher/${category.value().registryName()}/${resource.path}.png")
 
     /** detailed tooltip in index-screen */
     open val attributesTooltip: List<MutableComponent> by lazy {

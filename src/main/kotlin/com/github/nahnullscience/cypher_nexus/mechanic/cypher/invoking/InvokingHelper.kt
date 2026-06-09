@@ -44,7 +44,7 @@ class InvokingHelper (
 
     // =================================================================================
     fun start() {
-        level.profiler.push("invoking-start") // F3 + L to record time cost
+        // level.profiler.push("invoking-start") // F3 + L to record time cost
         CypherNexus.LOGGER.debug("invoking start, prepare cyphers: {}", aoc)
 
         while (data.draw >= 1) {
@@ -61,7 +61,7 @@ class InvokingHelper (
         }
 
         CypherNexus.LOGGER.debug("invoking finish: {}", data)
-        level.profiler.pop()
+        // level.profiler.pop()
     }
 
     fun step(): Boolean {

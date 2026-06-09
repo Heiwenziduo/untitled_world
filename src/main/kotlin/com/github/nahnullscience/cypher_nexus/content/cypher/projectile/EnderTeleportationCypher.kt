@@ -8,7 +8,9 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothBeforeDiscardHook
+import net.minecraft.core.particles.ColorParticleOption
 import net.minecraft.core.particles.ParticleTypes
+import net.minecraft.core.particles.PowerParticleOption
 import net.minecraft.world.level.Level
 
 object EnderTeleportationCypher : ProjectileCypher(), BothBeforeDiscardHook {
@@ -27,7 +29,8 @@ object EnderTeleportationCypher : ProjectileCypher(), BothBeforeDiscardHook {
         }
         for (i in 0..7) {
             level.addParticle(
-                ParticleTypes.DRAGON_BREATH,
+//                ColorParticleOption.create(ParticleTypes.DRAGON_BREATH, 114f, 51f, 4f),
+                PowerParticleOption.create(ParticleTypes.DRAGON_BREATH, 1f),
                 pos.x, pos.y, pos.z,
                 0.0, -0.1, 0.0)
         }

@@ -1,13 +1,11 @@
 package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.*
-import com.github.nahnullscience.cypher_nexus.content.cypher.other.AbstractAddTrigger
-import com.github.nahnullscience.cypher_nexus.content.cypher.other.AbstractDivideBy
-import com.github.nahnullscience.cypher_nexus.content.cypher.other.AbstractRequirement
-import com.github.nahnullscience.cypher_nexus.content.cypher.other.RequirementLowHP
-import com.github.nahnullscience.cypher_nexus.content.cypher.other.RequirementNotPlayer
-import com.github.nahnullscience.cypher_nexus.content.cypher.other.RequirementOddHand
+import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.DaedalusCypher
+import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.FieryCypher
+import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.HomingCypher
+import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.SimpleModifier
+import com.github.nahnullscience.cypher_nexus.content.cypher.other.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.static_projectile.ExplosionCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.InnerForceCypher
@@ -20,11 +18,12 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerTy
 import com.github.nahnullscience.cypher_nexus.utility.exception.CypherNotFoundException
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
+import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
 import net.neoforged.neoforge.registries.DeferredRegister
 import net.neoforged.neoforge.registries.RegistryBuilder
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
+import kotlin.jvm.optionals.getOrNull
 
 /**
  *
@@ -45,11 +44,10 @@ object Cyphers {
         return DEFERRED_REGISTER.register(cypher.resource.path) { -> cypher }
     }
 
-    fun getCypher(resource: ResourceLocation): AbstractCypher? = REGISTRY.get(resource)
-    fun getCypherOrThrow(resource: ResourceLocation): AbstractCypher {
-        val c = REGISTRY.get(resource)
-        if (c == null) throw CypherNotFoundException("missing cypher: ${resource.namespace}-${resource.path}")
-        return c
+    fun getCypher(resource: Identifier): AbstractCypher? = REGISTRY.getValue(resource)
+    fun getCypherOrThrow(resource: Identifier): AbstractCypher {
+        return getCypher(resource) ?:
+        throw CypherNotFoundException("missing cypher: ${resource.namespace}-${resource.path}")
     }
 
 

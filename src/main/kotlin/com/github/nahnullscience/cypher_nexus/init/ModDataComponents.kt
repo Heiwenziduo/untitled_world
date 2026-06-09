@@ -26,7 +26,4 @@ object ModDataComponents {
         DEFERRED_REGISTER.registerComponentType("wand_high_payload")
         { it.persistent(WandDataHighPayload.Companion.HIGH_PAYLOAD_DATA_CODEC).networkSynchronized(WandDataHighPayload.Companion.HIGH_PAYLOAD_DATA_STREAM) }
 
-//    val WAND_FREQUENT: Supplier<DataComponentType<WandDataFrequent>> =
-//        DEFERRED_REGISTER.registerComponentType("wand_frequent")
-//        { it.persistent(WandDataFrequent.Companion.FREQUENT_DATA_CODEC).networkSynchronized(WandDataFrequent.Companion.FREQUENT_DATA_STREAM) }
 }

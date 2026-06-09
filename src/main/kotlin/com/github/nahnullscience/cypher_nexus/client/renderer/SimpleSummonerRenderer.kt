@@ -8,14 +8,5 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider
 class SimpleSummonerRenderer <CY : AbstractStaticSummoner> (
     context: EntityRendererProvider.Context
 ) : AbstractCypherRenderer<CY>(context) {
-    override fun render(
-        projectile: CY,
-        entityYaw: Float,
-        partialTick: Float,
-        poseStack: PoseStack,
-        bufferSource: MultiBufferSource,
-        packedLight: Int
-    ) {
 
-    }
 }

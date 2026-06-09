@@ -119,5 +119,6 @@
 
   "item_group.cypher_nexus": "Cypher Nexus",
 
-  "item.cypher_nexus.basic_wand": "Basic Wand"
+  "item.cypher_nexus.tiered_wand": "Tier Wand",
+  "item.cypher_nexus.mythical_stick": "Mythical Staff"
 }

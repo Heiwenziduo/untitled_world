@@ -8,14 +8,5 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider
 class LlamaSpitCypherRenderer (
     context: EntityRendererProvider.Context
 ) : AbstractCypherRenderer<LlamaSpit>(context) {
-    override fun render(
-        projectile: LlamaSpit,
-        entityYaw: Float,
-        partialTick: Float,
-        poseStack: PoseStack,
-        bufferSource: MultiBufferSource,
-        packedLight: Int
-    ) {
 
-    }
 }

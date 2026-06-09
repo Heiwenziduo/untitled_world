@@ -1,13 +1,6 @@
 package com.github.nahnullscience.cypher_nexus
 
-import com.github.nahnullscience.cypher_nexus.init.ModBlocks
-import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments
-import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
-import com.github.nahnullscience.cypher_nexus.init.ModDataLootFunctions
-import com.github.nahnullscience.cypher_nexus.init.ModDataSerializers
-import com.github.nahnullscience.cypher_nexus.init.ModEntities
-import com.github.nahnullscience.cypher_nexus.init.ModItems
-import com.github.nahnullscience.cypher_nexus.init.ModTabs
+import com.github.nahnullscience.cypher_nexus.init.*
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
@@ -18,7 +11,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.common.Mod
@@ -42,8 +35,8 @@ object CypherNexus {
 
     val LOGGER: Logger = LogManager.getLogger(MOD_ID)
 
-    fun modResource(path: String): ResourceLocation =
-        ResourceLocation.fromNamespaceAndPath(MOD_ID, path)
+    fun modResource(path: String): Identifier =
+        Identifier.fromNamespaceAndPath(MOD_ID, path)
 
     fun modTranslation(namespace: String, path: String = ""): MutableComponent =
         Component.translatable("$namespace.$MOD_ID${if (!path.isEmpty()) ".$path" else ""}")

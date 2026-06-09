@@ -5,16 +5,16 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInstance
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.client.gui.LayeredDraw
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.util.Mth
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.ItemStack
+import net.neoforged.neoforge.client.gui.GuiLayer
 
-object WandDataOverlay : LayeredDraw.Layer {
+object WandDataOverlay : GuiLayer {
 
     override fun render(
-        guiGraphics: GuiGraphics,
+        guiGraphics: GuiGraphicsExtractor,
         deltaTracker: DeltaTracker
     ) {
         val player = Minecraft.getInstance().player
@@ -42,7 +42,7 @@ object WandDataOverlay : LayeredDraw.Layer {
     }
 
     private fun renderWand(
-        guiGraphics: GuiGraphics,
+        guiGraphics: GuiGraphicsExtractor,
         offset: Int,
         instance: WandDataInstance,
         wandSack: ItemStack,
@@ -56,7 +56,7 @@ object WandDataOverlay : LayeredDraw.Layer {
         val startX = screenWidth - barWidth - margin
         var startY = screenHeight - 16 * (offset + 1)
 
-        guiGraphics.renderItem(wandSack, screenWidth - margin, startY - 2)
+        guiGraphics.item(wandSack, screenWidth - margin, startY - 2)
 
         // draw bars one by one
         val manaProgress = instance.manaRegenPercent(partialTick)
@@ -87,7 +87,7 @@ object WandDataOverlay : LayeredDraw.Layer {
     }
 
     private fun drawProgressBar(
-        guiGraphics: GuiGraphics,
+        guiGraphics: GuiGraphicsExtractor,
         x: Int,
         y: Int,
         width: Int,

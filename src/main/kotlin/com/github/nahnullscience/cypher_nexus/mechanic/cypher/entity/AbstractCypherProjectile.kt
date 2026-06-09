@@ -18,24 +18,22 @@ import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
-import net.minecraft.world.phys.AABB
-import net.minecraft.world.phys.BlockHitResult
-import net.minecraft.world.phys.EntityHitResult
-import net.minecraft.world.phys.HitResult
-import net.minecraft.world.phys.Vec3
-import java.util.HashMap
-import java.util.Optional
+import net.minecraft.world.level.storage.ValueInput
+import net.minecraft.world.level.storage.ValueOutput
+import net.minecraft.world.phys.*
+import java.util.*
 import kotlin.jvm.optionals.getOrNull
 
 abstract class AbstractCypherProjectile(
@@ -48,15 +46,16 @@ abstract class AbstractCypherProjectile(
         /** generate projectile with attributes initialized */
         fun <T : AbstractCypherProjectile> create(
             entityType: EntityType<T>,
-            level: Level,
+            level: ServerLevel,
             invoker: Entity?,
             direction: Vec3? = null,
             shootState: ProjectileStateChunk,
             node: ProjectileNode,
             stateHooks: HookContainer?
         ) : T {
-            if (level.isClientSide) throw IllegalStateException("Try to create projectile [$entityType] on client side.")
-            val proj = entityType.create(level) ?: throw IllegalStateException("Failed to create projectile [$entityType].")
+//            if (level.isClientSide) throw IllegalStateException("Try to create projectile [$entityType] on client side.")
+            val proj = entityType.create(level, EntitySpawnReason.SPAWN_ITEM_USE) ?:
+            throw IllegalStateException("Failed to create projectile [$entityType].")
             proj.initialize(invoker, direction, shootState, node, stateHooks)
             return proj
         }
@@ -151,7 +150,7 @@ abstract class AbstractCypherProjectile(
         stateHooks: HookContainer?
     ) {
         if (isInitialized) CypherNexus.LOGGER.debug("{} is already initialized", this)
-        owner = invoker
+        setOwner(invoker)
         enabledFlags = shootState.enabledFlags or cypher.flag
         _payload = node.payload
         _trigger = node.trigger
@@ -183,7 +182,7 @@ abstract class AbstractCypherProjectile(
     }
 
     protected fun setDirection(direction: Vec3? = null) {
-        moveDirection = direction?.normalize() ?: owner?.lookAngle?.normalize() ?: moveDirection
+        moveDirection = direction?.normalize() ?: getOwner()?.lookAngle?.normalize() ?: moveDirection
         if (moveDirection != Vec3.ZERO){
             deltaMovement = moveDirection.scale(getAttrOrProjDefault(CypherAttributes.SPEED))
             // FIXME inertia behavior seems strange
@@ -256,7 +255,7 @@ abstract class AbstractCypherProjectile(
 //            val blockHit = level().clip(ClipContext(position(), deltaMovement, ClipContext.Block.COLLIDER, fluidCheck, this))
 //        }
 
-        checkInsideBlocks() // trigger #onInsideBlock
+        //checkInsideBlocks() // trigger #onInsideBlock
 
         updateRotation()
 
@@ -371,7 +370,8 @@ abstract class AbstractCypherProjectile(
         val entity = result.entity
         if (notHaveFlag(CypherFlags.NO_DAMAGE)) {
             val damage = getAttrOrProjDefault(CypherAttributes.DAMAGE)
-            entity.hurt(damageSources().thrown(this, owner), damage.toFloat())
+            if (level() is ServerLevel)
+            entity.hurtServer(level() as ServerLevel, damageSources().thrown(this, getOwner()), damage.toFloat())
         }
     }
     override fun onHitBlock(result: BlockHitResult) {
@@ -381,7 +381,7 @@ abstract class AbstractCypherProjectile(
     // ==================================================================================================================
     // ==================================================================================================================
     /** ProjectileStateBlock#release */
-    private fun releasePayload(posDire: PosDirePair) = _payload?.release(level(), this, owner, posDire)
+    private fun releasePayload(posDire: PosDirePair) = _payload?.release(level(), this, getOwner(), posDire)
     fun trigger(type: TriggerType) {
         // TODO
         if (type == _trigger) releasePayload(PosDirePair(position(), deltaMovement.reverse()))
@@ -418,8 +418,8 @@ abstract class AbstractCypherProjectile(
 
     // ==================================================================================================================
     // ==================================================================================================================
-    override fun readAdditionalSaveData(compound: CompoundTag) = Unit
-    override fun addAdditionalSaveData(compound: CompoundTag) = Unit
+    override fun readAdditionalSaveData(input: ValueInput) = Unit
+    override fun addAdditionalSaveData(output: ValueOutput) = Unit
     override fun getPickResult(): ItemStack? = null // null by default, this is the creative mod middle button pick result
     override fun isPickable() = false // false by default, entirely disable the picking activity
     /**
@@ -436,9 +436,9 @@ abstract class AbstractCypherProjectile(
 //    override fun pick(hitDistance: Double, partialTicks: Float, hitFluids: Boolean): HitResult {
 //        return super.pick(hitDistance, partialTicks, hitFluids)
 //    }
-    override fun hurt(source: DamageSource, amount: Float) = false
+    override fun hurtServer(level: ServerLevel, source: DamageSource, damage: Float) = false
+    override fun hurtClient(source: DamageSource) = false
     override fun ignoreExplosion(explosion: Explosion) = true // this prevents projectile getting kinetic energy from explosion
-
 
 
 

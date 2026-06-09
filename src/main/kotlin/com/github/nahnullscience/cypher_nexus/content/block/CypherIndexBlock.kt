@@ -8,6 +8,7 @@ import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.BlockHitResult
 import net.neoforged.neoforge.network.PacketDistributor
@@ -15,15 +16,7 @@ import net.neoforged.neoforge.network.PacketDistributor
 /**
  *
  * */
-class CypherIndexBlock(): Block(
-    Properties.of()
-        .lightLevel { 15 }
-        .strength(3.0f)
-        .explosionResistance(1200.0f)
-) {
-    init {
-
-    }
+class CypherIndexBlock(property: BlockBehaviour.Properties): Block(property) {
 
     override fun useWithoutItem(
         state: BlockState,

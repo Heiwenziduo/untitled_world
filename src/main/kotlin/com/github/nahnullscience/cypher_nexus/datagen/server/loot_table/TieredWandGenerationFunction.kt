@@ -1,8 +1,7 @@
-package com.github.nahnullscience.cypher_nexus.datagen.loot_table.functions
+package com.github.nahnullscience.cypher_nexus.datagen.server.loot_table
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
-import com.github.nahnullscience.cypher_nexus.init.ModDataLootFunctions.TIERED_WAND_GENERATION
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
@@ -18,6 +17,7 @@ import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunct
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition
 import net.minecraft.world.level.storage.loot.providers.number.NumberProvider
 import net.minecraft.world.level.storage.loot.providers.number.NumberProviders
+import kotlin.math.sqrt
 
 class TieredWandGenerationFunction(
     conditions: List<LootItemCondition>,
@@ -26,7 +26,7 @@ class TieredWandGenerationFunction(
 //    private val invoke: ArrayOfCyphers? = null,
 //    private val etch: List<AbstractCypher>? = null
 ) : LootItemConditionalFunction(conditions) {
-    override fun getType() = TIERED_WAND_GENERATION.get()
+    override fun codec(): MapCodec<out LootItemConditionalFunction> = CODEC
 
     override fun run(stack: ItemStack, context: LootContext): ItemStack {
         if (stack.item !is IWandLike) return stack
@@ -52,7 +52,7 @@ class TieredWandGenerationFunction(
             val p = weight.toDouble() / remainWeight
             val mean = remainToken * p
             val variance = remainToken * p * (1 - p)
-            val stdDev = kotlin.math.sqrt(variance)
+            val stdDev = sqrt(variance)
 
             var allocated = (mean + random.nextGaussian() * stdDev).toInt()
             allocated = allocated.coerceIn(0, remainWeight)

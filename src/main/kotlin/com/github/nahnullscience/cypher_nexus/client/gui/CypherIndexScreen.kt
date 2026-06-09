@@ -9,21 +9,22 @@ import com.github.nahnullscience.cypher_nexus.network.server.ServerboundEditWand
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.gui.screens.advancements.AdvancementsScreen
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
-import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner
+import net.minecraft.client.input.MouseButtonEvent
+import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.item.ItemStack
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.api.distmarker.OnlyIn
-import net.neoforged.neoforge.network.PacketDistributor
+import net.neoforged.neoforge.client.network.ClientPacketDistributor
 import kotlin.math.ceil
 import kotlin.math.max
 
-@OnlyIn(Dist.CLIENT)
 class CypherIndexScreen(
     val cypherMap: Map<CypherCategory, List<AbstractCypher>> = mapOf()
 ): Screen(Component.empty()) {
@@ -102,8 +103,8 @@ class CypherIndexScreen(
         totalHeight = blocks.sumOf { block -> block.blockHeight }
     }
 
-    override fun render(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, partialTick: Float) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick)
+    override fun extractBackground(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTick: Float) {
+        super.extractBackground(guiGraphics, mouseX, mouseY, partialTick)
 //        super.renderBackground(guiGraphics, mouseX, mouseY, partialTick)
         HoverContext.reset()
         guiGraphics.fill(0, 0, this.width, this.height, 0x99333333.toInt())
@@ -150,13 +151,13 @@ class CypherIndexScreen(
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY)
     }
 
-    override fun mouseClicked(mouseX: Double, mouseY: Double, button: Int): Boolean {
+    override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
         // button 0 is the left mouse button
-        if (button == 0) {
+        if (event.button() == 0) {
             // Check if the user clicked horizontally within the scrollbar area
-            if (maxScroll > 0 && mouseX >= scrollbarX && mouseX <= scrollbarX + SCROLLBAR_WIDTH) {
+            if (maxScroll > 0 && event.x >= scrollbarX && event.x <= scrollbarX + SCROLLBAR_WIDTH) {
                 isDraggingScrollbar = true
-                updateScrollFromMouse(mouseY)
+                updateScrollFromMouse(event.y)
                 return true
             }
 
@@ -175,21 +176,21 @@ class CypherIndexScreen(
                 return true
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button)
+        return super.mouseClicked(event, doubleClick)
     }
 
-    override fun mouseDragged(mouseX: Double, mouseY: Double, button: Int, dragX: Double, dragY: Double): Boolean {
+    override fun mouseDragged(event: MouseButtonEvent, dx: Double, dy: Double): Boolean {
         // handle scrollbar
         if (isDraggingScrollbar) {
-            updateScrollFromMouse(mouseY)
+            updateScrollFromMouse(dy)
             return true
         }
-        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY)
+        return super.mouseDragged(event, dx, dy)
     }
 
-    override fun mouseReleased(mouseX: Double, mouseY: Double, button: Int): Boolean {
+    override fun mouseReleased(event: MouseButtonEvent): Boolean {
         // handle scrollbar
-        if (button == 0) {
+        if (event.button() == 0) {
             if (isDraggingScrollbar) {
                 isDraggingScrollbar = false
                 return true
@@ -211,20 +212,20 @@ class CypherIndexScreen(
                 return true
             }
         }
-        return super.mouseReleased(mouseX, mouseY, button)
+        return super.mouseReleased(event)
     }
 
 
     // ===========================================================================================================
     // ===========================================================================================================
-    private fun renderCypherGrid(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int, block: CategoryBlock) {
+    private fun renderCypherGrid(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, block: CategoryBlock) {
         if (!block.show) return
         val reY = block.reY
 
         // if (reY > this.height) return // out of border
 
         // render category title
-        guiGraphics.drawString(font, block.title, MARGIN, reY - 12, WHITE, )
+        guiGraphics.text(font, block.title, MARGIN, reY - 12, WHITE)
         ////////////////////////
 
         val cols = indexColumns
@@ -253,14 +254,26 @@ class CypherIndexScreen(
         }
     }
 
-    private fun renderCypherIcon(guiGraphics: GuiGraphics, cypher: AbstractCypher, x: Int, y: Int) {
+    private fun renderCypherIcon(graphics: GuiGraphicsExtractor, cypher: AbstractCypher, x: Int, y: Int) {
         if (cypher.isNotEmpty()) {
             val borderColor = if (cypher.color != 0) cypher.color else cypher.category.value().color
-            guiGraphics.renderOutline(x - 1, y - 1, ICON_SIZE + 2, ICON_SIZE + 2, borderColor)
-            guiGraphics.blit(cypher.texture(), x, y, 0f, 0f, ICON_SIZE, ICON_SIZE, ICON_TEXTURE, ICON_TEXTURE)
+            graphics.outline(x - 1, y - 1, ICON_SIZE + 2, ICON_SIZE + 2, borderColor)
+//            graphics.blit(cypher.texture(), x, y, x + ICON_SIZE, y + ICON_SIZE, 0f, 0f, 0f, 0f)
+            graphics.blit(
+                RenderPipelines.GUI_TEXTURED,
+                cypher.texture(),
+                x,
+                y,
+                0.0f,
+                0.0f,
+                ICON_SIZE,
+                ICON_SIZE,
+                ICON_TEXTURE,
+                ICON_TEXTURE
+            )
         }
     }
-    private fun renderCypherTooltip(guiGraphics: GuiGraphics, cypher: AbstractCypher, mouseX: Int, mouseY: Int) {
+    private fun renderCypherTooltip(guiGraphics: GuiGraphicsExtractor, cypher: AbstractCypher, mouseX: Int, mouseY: Int) {
         if (HoverContext.isHolding) return
         if (cypher.isEmpty()) return
         val components = mutableListOf<ClientTooltipComponent>()
@@ -268,17 +281,17 @@ class CypherIndexScreen(
         val titleText = cypher.translation().withStyle(ChatFormatting.GOLD)
         components.add(ClientTooltipComponent.create(titleText.visualOrderText))
         val descText = cypher.description().withStyle(ChatFormatting.GRAY)
-        components.add(CypherDescriptionTooltip(CypherDescriptionTooltip.TooltipDataBundle(descText, cypher.texture())))
+//        components.add(CypherDescriptionTooltip(CypherDescriptionTooltip.TooltipDataBundle(descText, cypher.texture())))
 
         // TODO too ugly
         for (c in cypher.attributesTooltip) {
             components.add(ClientTooltipComponent.create(c.visualOrderText))
         }
 
-        guiGraphics.renderTooltipInternal(font, components, mouseX, mouseY, DefaultTooltipPositioner.INSTANCE)
+//        guiGraphics.setComponentTooltipForNextFrame(font, components, mouseX, mouseY, DefaultTooltipPositioner.INSTANCE)
     }
 
-    private fun renderScrollbar(guiGraphics: GuiGraphics) {
+    private fun renderScrollbar(guiGraphics: GuiGraphicsExtractor) {
         if (maxScroll <= 0) return
         val scrollY = (scrollOffset / maxScroll * (this.height - scrollbarHeight)).toInt()
         // Draw track and thumb
@@ -299,7 +312,7 @@ class CypherIndexScreen(
 
     // ===========================================================================================================
     // ===========================================================================================================
-    private fun renderWandData(guiGraphics: GuiGraphics, mouseX: Int, mouseY: Int) {
+    private fun renderWandData(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
         val reX = indexWidth + WAND_BLOCK_MARGIN
         val reY = WAND_BLOCK_MARGIN + 32
         val cols = max(1, (indexWidth - 2 * WAND_BLOCK_MARGIN) / ITEM_SIZE)
@@ -311,15 +324,15 @@ class CypherIndexScreen(
 //        }
 
         val currentStack = wandList[wandListIndex]
-        guiGraphics.renderItem(currentStack, reX, WAND_BLOCK_MARGIN)
+        guiGraphics.item(currentStack, reX, WAND_BLOCK_MARGIN)
 
         if (currentInvariableData != null) {
             val (manaMax, manaRegen) = currentInvariableData!!.chunkF
             val (draw, castDelay, rechargeTime) = currentInvariableData!!.chunkI
 
-            guiGraphics.drawString(font, currentStack.hoverName, reX + 24, WAND_BLOCK_MARGIN, WHITE)
-            guiGraphics.drawString(font, "manaMax: $manaMax", reX + 24, WAND_BLOCK_MARGIN + 20, WHITE)
-            guiGraphics.drawString(font, "manaRegen: $manaRegen", reX + 56, WAND_BLOCK_MARGIN + 20, WHITE)
+            guiGraphics.text(font, currentStack.hoverName, reX + 24, WAND_BLOCK_MARGIN, WHITE)
+            guiGraphics.text(font, "manaMax: $manaMax", reX + 24, WAND_BLOCK_MARGIN + 20, WHITE)
+            guiGraphics.text(font, "manaRegen: $manaRegen", reX + 56, WAND_BLOCK_MARGIN + 20, WHITE)
 
             for (i in 0 until currentEditCyphers.capacity) {
                 val col = i % cols
@@ -347,7 +360,7 @@ class CypherIndexScreen(
         // wand data grid
     }
 
-    private fun renderWandBlocks(guiGraphics: GuiGraphics, cypher: AbstractCypher, x: Int, y: Int) {
+    private fun renderWandBlocks(guiGraphics: GuiGraphicsExtractor, cypher: AbstractCypher, x: Int, y: Int) {
         guiGraphics.fill(x, y, x + ICON_SIZE, y + ICON_SIZE, 0xFF444444.toInt()) // bg
     }
 
@@ -378,14 +391,15 @@ class CypherIndexScreen(
         // TODO send msg to server
         if (hasEdited && currentInvariableData != null) {
             val u = currentInvariableData!!.uuid
-            PacketDistributor.sendToServer(ServerboundEditWandCyphers(u, currentEditCyphers.toList()))
+            ClientPacketDistributor.sendToServer(ServerboundEditWandCyphers(u, currentEditCyphers.toList()))
         }
         editedMap.forEach { uu, cyphers ->
-            PacketDistributor.sendToServer(ServerboundEditWandCyphers(uu, cyphers))
+            ClientPacketDistributor.sendToServer(ServerboundEditWandCyphers(uu, cyphers))
         }
     }
 
 
+    @OnlyIn(Dist.CLIENT)
     private inner class CategoryBlock(
         val category: CypherCategory,
         val list: List<AbstractCypher>,
@@ -407,6 +421,7 @@ class CypherIndexScreen(
             get() = blocks.filter { it.index < index }.sumOf { it.blockHeight } + CATEGORY_TITLE_PADDING
     }
 
+    @OnlyIn(Dist.CLIENT)
     private enum class HoverType() {
         CYPHER_INDEX,
         CYPHER_WAND,
@@ -414,6 +429,7 @@ class CypherIndexScreen(
         NONE
     }
 
+    @OnlyIn(Dist.CLIENT)
     private object HoverContext {
         var hoverType = HoverType.NONE
         private var _hoverCypher: AbstractCypher? = null

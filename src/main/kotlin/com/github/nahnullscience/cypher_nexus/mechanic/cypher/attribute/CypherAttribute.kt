@@ -5,7 +5,7 @@ import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.core.Holder
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import kotlin.math.max
 import kotlin.math.min
 
@@ -13,7 +13,7 @@ import kotlin.math.min
  * a bit like vanilla LivingEntity's Attribute system
  * */
 open class CypherAttribute(
-    override val resource: ResourceLocation,
+    override val resource: Identifier,
     val defaultValue: Double,
     val min: Double,
     val max: Double,
@@ -36,7 +36,7 @@ open class CypherAttribute(
     fun holder(): Holder<CypherAttribute> {
 //        val resourceKeyOptional = CypherAttributes.REGISTRY.getResourceKey(attr)
 //        return resourceKeyOptional.flatMap { CypherAttributes.REGISTRY.getHolder(resourceKeyOptional) }.orElse(null)
-        return CypherAttributes.REGISTRY.getHolder(resource).get() // if this throw, means the attr is not registered
+        return CypherAttributes.REGISTRY.get(resource).get() // if this throw, means the attr is not registered
     }
 
     override fun toString(): String {

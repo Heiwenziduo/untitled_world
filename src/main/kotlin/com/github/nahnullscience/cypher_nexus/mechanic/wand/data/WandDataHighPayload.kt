@@ -12,8 +12,7 @@ import net.minecraft.network.codec.StreamCodec
  * */
 data class WandDataHighPayload(val cypherArray: ArrayOfCyphers) {
     companion object {
-
-        val DEFAULT = WandDataHighPayload(ArrayOfCyphers(6))
+        fun of(capacity: Int) = WandDataHighPayload(ArrayOfCyphers(capacity))
 
 //        val SPELL_DATA_CODEC: Codec<AbstractCypher> = ResourceLocation.CODEC.xmap(
 //            { id -> ModCyphers.REGISTRY.get(id) }, // How to read (String ID -> Cypher Object)

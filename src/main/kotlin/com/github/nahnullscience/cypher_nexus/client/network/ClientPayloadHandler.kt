@@ -17,7 +17,6 @@ import net.neoforged.neoforge.network.handling.IPayloadContext
  * register payload handler on desired side (client here) ->
  * use PacketDistributor.sendToPlayer method to send package
  * */
-@OnlyIn(Dist.CLIENT)
 object ClientPayloadHandler {
 
     fun openIndexScreen(data: ClientboundOpenIndexScreen, context: IPayloadContext) {

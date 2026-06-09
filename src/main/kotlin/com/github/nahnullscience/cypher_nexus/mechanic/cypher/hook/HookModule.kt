@@ -1,11 +1,11 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook
 
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.Identifier
 import kotlin.reflect.KClass
 
 class HookModule <out HOOK : Any> (
-    override val resource: ResourceLocation,
+    override val resource: Identifier,
     val hook: KClass<out HOOK>,
     val sync: Boolean,
     val type: HookType,
@@ -17,7 +17,7 @@ class HookModule <out HOOK : Any> (
     }
 
     enum class HookType {
-        INVOKING, // FIXME necessary? since invoking process always on server
+        INVOKING,
         PROJECTILE
     }
 }

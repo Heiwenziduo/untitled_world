@@ -18,8 +18,7 @@ import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 import java.util.function.Supplier
 
 object ModEntities {
-    val DEFERRED_REGISTER: DeferredRegister<EntityType<*>> =
-        DeferredRegister.create(Registries.ENTITY_TYPE, CypherNexus.MOD_ID)
+    val DEFERRED_REGISTER: DeferredRegister.Entities = DeferredRegister.createEntities(CypherNexus.MOD_ID)
 
     fun register() {
         DEFERRED_REGISTER.register(MOD_BUS)
@@ -28,13 +27,10 @@ object ModEntities {
     fun <T : AbstractCypherProjectile> register(
         name: String,
         factory: EntityType.EntityFactory<T>,
-        category: MobCategory = MobCategory.MISC
+        category: MobCategory = MobCategory.MISC,
+        updateInterval: Int = 10
     ): Supplier<EntityType<T>> {
-        return DEFERRED_REGISTER.register(name) { resource ->
-            EntityType.Builder.of(factory, category)
-                .cypherBasic()
-                .build(resource.path)
-        }
+        return DEFERRED_REGISTER.registerEntityType(name, factory, category) { builder -> builder.cypherBasic(updateInterval) }
     }
 
     val CYPHER_ARROW = register("cypher_arrow", ::Arrow)
@@ -47,7 +43,7 @@ object ModEntities {
     val CYPHER_EXPLOSION = register("cypher_explosion", ::SummonExplosion)
 }
 
-private fun <T : AbstractCypherProjectile> EntityType.Builder<T>.cypherBasic(updateInterval: Int = 10)
+private fun <T : AbstractCypherProjectile> EntityType.Builder<T>.cypherBasic(updateInterval: Int)
 : EntityType.Builder<T> {
     sized(0.125f, 0.125f)
     // Prevents the entity from being saved to disk.

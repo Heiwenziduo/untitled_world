@@ -19,7 +19,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
 import net.neoforged.neoforge.client.event.EntityRenderersEvent
 import net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent
-import net.neoforged.neoforge.client.gui.VanillaGuiLayers.DEBUG_OVERLAY
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers.CONTEXTUAL_INFO_BAR
 import java.util.function.Supplier
 
 @EventBusSubscriber(modid = CypherNexus.MOD_ID, value = [Dist.CLIENT])
@@ -80,7 +80,7 @@ object ClientSetup {
 
     @SubscribeEvent
     private fun registerGuiLayersEvent(event: RegisterGuiLayersEvent) {
-        event.registerBelow(DEBUG_OVERLAY, CypherNexus.modResource("wand_data"), WandDataOverlay)
+        event.registerBelow(CONTEXTUAL_INFO_BAR, CypherNexus.modResource("wand_data"), WandDataOverlay)
     }
 }
 

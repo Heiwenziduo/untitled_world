@@ -4,8 +4,8 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
+import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
-import net.minecraft.resources.ResourceLocation
 import net.neoforged.neoforge.registries.DeferredRegister
 import net.neoforged.neoforge.registries.RegistryBuilder
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
@@ -28,7 +28,7 @@ object CypherCategories {
     fun registerCategory(category: CypherCategory): Holder<CypherCategory> =
         DEFERRED_REGISTER.register(category.resource.path) { -> category }
 
-    fun getCategory(resource: ResourceLocation): CypherCategory? = REGISTRY.get(resource)
+    fun getCategory(resource: Identifier): CypherCategory? = REGISTRY.getValue(resource)
 
     val PROJECTILE_RESOURCE = CypherNexus.modResource("projectile")
     val STATIC_PROJECTILE_RESOURCE = CypherNexus.modResource("static_projectile")

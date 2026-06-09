@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "cypher_nexus:block/test_cube"
+      "model": "cypher_nexus:block/cypher_index"
     }
   }
 }

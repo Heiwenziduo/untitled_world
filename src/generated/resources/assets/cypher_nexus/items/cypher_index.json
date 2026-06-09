@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "cypher_nexus:block/cypher_index"
+  }
+}

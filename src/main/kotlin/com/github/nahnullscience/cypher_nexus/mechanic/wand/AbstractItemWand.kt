@@ -7,15 +7,17 @@ import com.github.nahnullscience.cypher_nexus.mechanic.event.CNEvents
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.InteractionHand
-import net.minecraft.world.InteractionResultHolder
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.UseAnim
+import net.minecraft.world.item.ItemUseAnimation
 import net.minecraft.world.level.Level
 
 abstract class AbstractItemWand(
@@ -24,18 +26,18 @@ abstract class AbstractItemWand(
     properties.stacksTo(1)
 ), IWandLike  {
     abstract override val isEditableWand: Boolean
-    override fun getUseAnimation(stack: ItemStack) = UseAnim.CUSTOM
-    override fun use(level: Level, player: Player, usedHand: InteractionHand): InteractionResultHolder<ItemStack> {
+    override fun getUseAnimation(stack: ItemStack) = ItemUseAnimation.SPYGLASS
+    override fun use(level: Level, player: Player, usedHand: InteractionHand): InteractionResult {
         val stack = player.getItemInHand(usedHand)
         val f = CNEvents.canConductWand(player, stack, usedHand, level)
         if (f) {
             player.startUsingItem(usedHand)
-            return InteractionResultHolder.consume(stack)
+            return InteractionResult.CONSUME
         }
-        return InteractionResultHolder.fail(stack)
+        return InteractionResult.FAIL
     }
 
-    override fun releaseUsing(stack: ItemStack, level: Level, livingEntity: LivingEntity, timeCharged: Int) {}
+    override fun releaseUsing(stack: ItemStack, level: Level, livingEntity: LivingEntity, timeCharged: Int) = false
 
 //    override fun useOnRelease(stack: ItemStack): Boolean {
 //        return super.useOnRelease(stack)
@@ -51,18 +53,19 @@ abstract class AbstractItemWand(
     }
 
 
-    override fun inventoryTick(stack: ItemStack, level: Level, entity: Entity, slotId: Int, isSelected: Boolean) {
+    override fun inventoryTick(stack: ItemStack, level: ServerLevel, entity: Entity, slot: EquipmentSlot?) {
         //if (level.isClientSide) return
 
         // Mob do not implement Container, but can access its inventory through the seven EquipmentSlot enum values:
         // MAINHAND, OFFHAND, FEET, LEGS, CHEST, HEAD, and BODY (where BODY is used for horse and dog armor).
         // entity is Mob && entity.getItemBySlot()
-        if (entity is Player && (slotId in 0..8 || slotId == Inventory.SLOT_OFFHAND)) { // nine hotbar slots (indices 0-8).
-            val dataInstance = entity.getData(WAND_DATA_MAP)
-                .getOrPutInstance(getWandData(stack, entity) ?: return, this, level)
 
-            dataInstance.tick(entity)
-        }
+//        if (entity is Player && (slotId in 0..8 || slotId == Inventory.SLOT_OFFHAND)) { // nine hotbar slots (indices 0-8).
+//            val dataInstance = entity.getData(WAND_DATA_MAP)
+//                .getOrPutInstance(getWandData(stack, entity) ?: return, this, level)
+//
+//            dataInstance.tick(entity)
+//        }
     }
 
     override fun getWandData(stack: ItemStack?, caster: Entity?): WandDataBundle? {

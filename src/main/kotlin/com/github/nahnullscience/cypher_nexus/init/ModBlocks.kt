@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.init
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.block.CypherIndexBlock
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockBehaviour.Properties
 import net.neoforged.neoforge.registries.DeferredRegister
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 import thedarkcolour.kotlinforforge.neoforge.forge.getValue
@@ -22,8 +23,9 @@ object ModBlocks {
      * DeferredHolder<R, T extends R> is a subclass of Supplier<T>.
      * "by" make it automatically go inside the container and get the Block itself instead of a DeferredHolder<Block, T extends Block>.
      * */
-    val CYPHER_INDEX_BLOCK: Block by DEFERRED_REGISTER.register("cypher_index") {
-        registryName ->
-        CypherIndexBlock()
-    }
+    val CYPHER_INDEX_BLOCK: Block by DEFERRED_REGISTER.registerBlock("cypher_index", ::CypherIndexBlock)
+    { -> Properties.of()
+        .lightLevel { 15 }
+        .strength(3.0f)
+        .explosionResistance(1200.0f) }
 }

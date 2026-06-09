@@ -43,7 +43,7 @@ class ProjectileStateChunk private constructor (
         }
 
         // handle entities only on server
-        if (level.isClientSide) return
+        if (level !is ServerLevel) return
         if (charge-- <= 0) return
         for ((i, node) in projectiles.withIndex()) {
 
