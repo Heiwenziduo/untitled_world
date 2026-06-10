@@ -9,6 +9,7 @@ import net.minecraft.resources.Identifier
 import net.minecraft.world.inventory.tooltip.TooltipComponent
 
 /** special tooltip to put string and image in one line */
+// TODO check ClientBundleTooltip
 class CypherDescriptionTooltip (private val data: TooltipDataBundle) : ClientTooltipComponent {
     // Height is the max of the icon (16px) and text height, plus some padding
     override fun getHeight(font: Font): Int = 20

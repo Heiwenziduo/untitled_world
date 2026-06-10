@@ -3,7 +3,7 @@ package com.github.nahnullscience.cypher_nexus.client.gui
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
+import com.github.nahnullscience.cypher_nexus.mechanic.event.CNEvents
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
 import com.github.nahnullscience.cypher_nexus.network.server.ServerboundEditWandCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
@@ -11,15 +11,13 @@ import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
-import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
-import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.client.network.ClientPacketDistributor
+import java.util.*
 import kotlin.math.ceil
 import kotlin.math.max
 
@@ -61,7 +59,7 @@ class CypherIndexScreen(
 
     // ======== wand design ===============
 //    private var draggedCypher: AbstractCypher? = null
-    private val wandList = mutableListOf<ItemStack>()
+    private var wandList = listOf<ItemStack>()
     private var wandListIndex = 0
     private val editedMap = HashMap<String, List<AbstractCypher>>()
     // private var currentStack: ItemStack? = null
@@ -74,16 +72,10 @@ class CypherIndexScreen(
         // instance will be created each time player open the screen
         val localPlayer = Minecraft.getInstance().player
         if (localPlayer != null) {
-            for (i in 0..8) {
-                val stack = localPlayer.inventory.getItem(i)
-                if (!stack.isEmpty && stack.item is IWandLike) {
-                    wandList.add(stack)
-                    if (localPlayer.mainHandItem == stack) wandListIndex = wandList.size - 1
-                }
+            wandList = CNEvents.gatherWands(localPlayer).wands()
+            for (i in wandList.indices) {
+                if (localPlayer.mainHandItem == wandList[i]) wandListIndex = i
             }
-            val stack = localPlayer.getItemBySlot(EquipmentSlot.OFFHAND)
-            if (!stack.isEmpty && stack.item is IWandLike) wandList.add(stack)
-            // TODO gatherWandsEvent
         }
         // println("get all wands in player hotbar\n$wandList")
         pickWand()
@@ -274,19 +266,25 @@ class CypherIndexScreen(
     private fun renderCypherTooltip(graphics: GuiGraphicsExtractor, cypher: AbstractCypher, mouseX: Int, mouseY: Int) {
         if (HoverContext.isHolding) return
         if (cypher.isEmpty()) return
-        val components = mutableListOf<ClientTooltipComponent>()
-
-        val titleText = cypher.translation().withStyle(ChatFormatting.GOLD)
-        components.add(ClientTooltipComponent.create(titleText.visualOrderText))
-        val descriptionText = cypher.description().withStyle(ChatFormatting.GRAY)
-//        components.add(CypherDescriptionTooltip(CypherDescriptionTooltip.TooltipDataBundle(descText, cypher.texture())))
-
         // FIXME too ugly
-        for (c in cypher.attributesTooltip) {
-            components.add(ClientTooltipComponent.create(c.visualOrderText))
-        }
+//        val components = mutableListOf<ClientTooltipComponent>()
+//
+//        val titleText = cypher.translation().withStyle(ChatFormatting.GOLD)
+//        components.add(ClientTooltipComponent.create(titleText.visualOrderText))
+//        val descriptionText = cypher.description().withStyle(ChatFormatting.GRAY)
+////        components.add(CypherDescriptionTooltip(CypherDescriptionTooltip.TooltipDataBundle(descText, cypher.texture())))
+//
+//        for (c in cypher.attributesTooltip) {
+//            components.add(ClientTooltipComponent.create(c.visualOrderText))
+//        }
+//
+//        graphics.tooltip(font, components, mouseX, mouseY, DefaultTooltipPositioner.INSTANCE, null)
 
-        graphics.tooltip(font, components, mouseX, mouseY, DefaultTooltipPositioner.INSTANCE, null)
+        val componentsList = mutableListOf<Component>()
+        val titleText = cypher.translation().withStyle(ChatFormatting.GOLD)
+        componentsList.add(titleText)
+        componentsList.addAll(cypher.attributesTooltip)
+        graphics.setTooltipForNextFrame(font, componentsList, Optional.empty(), mouseX, mouseY)
     }
 
     private fun renderScrollbar(graphics: GuiGraphicsExtractor) {
@@ -365,7 +363,7 @@ class CypherIndexScreen(
     private fun pickWand() {
         if (hasEdited && currentInvariableData != null) {
             val u = currentInvariableData!!.uuid
-            editedMap.put(u, currentEditCyphers.toList())
+            editedMap[u] = currentEditCyphers.toList()
         }
         if (wandList.isNotEmpty()) {
             hasEdited = false
@@ -391,7 +389,7 @@ class CypherIndexScreen(
             val u = currentInvariableData!!.uuid
             ClientPacketDistributor.sendToServer(ServerboundEditWandCyphers(u, currentEditCyphers.toList()))
         }
-        editedMap.forEach { uu, cyphers ->
+        editedMap.forEach { (uu, cyphers) ->
             ClientPacketDistributor.sendToServer(ServerboundEditWandCyphers(uu, cyphers))
         }
     }

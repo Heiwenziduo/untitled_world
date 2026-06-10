@@ -8,7 +8,6 @@ import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.util.Mth
-import net.minecraft.world.InteractionHand
 import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.client.gui.GuiLayer
 
@@ -27,7 +26,7 @@ object WandDataOverlay : GuiLayer {
 
 
         // in the future maybe we can show multiple wands data, combine #gatherWand Event
-        CNEvents.gatherRenderingWands(player).wands().withIndex().forEach { (i, stack) ->
+        CNEvents.gatherWandsRendering(player).wands().withIndex().forEach { (i, stack) ->
             val wand = stack.item
             if (stack.isEmpty || wand !is IWandLike) return@forEach
             val wandData = wand.getWandData(stack, player) ?: return@forEach

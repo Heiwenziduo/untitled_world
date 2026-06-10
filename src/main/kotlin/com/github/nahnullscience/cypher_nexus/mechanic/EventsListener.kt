@@ -5,15 +5,11 @@ import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_
 import com.github.nahnullscience.cypher_nexus.mechanic.event.CNEvents
 import com.github.nahnullscience.cypher_nexus.mechanic.event.PlayerGatherWandEvent
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandInstanceMap
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.player.Inventory.SLOT_OFFHAND
-import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.ItemStack
 import net.neoforged.bus.api.EventPriority
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.event.entity.player.PlayerEvent
 import net.neoforged.neoforge.event.entity.player.PlayerEvent.StartTracking
 import net.neoforged.neoforge.event.tick.EntityTickEvent
 import net.neoforged.neoforge.event.tick.PlayerTickEvent
@@ -37,7 +33,7 @@ object EventsListener {
     private fun wandInstanceUpdatePlayer(event: PlayerTickEvent.Post) {
         val player = event.entity
         val map = player.getData(WAND_DATA_MAP)
-        val wands = CNEvents.gatherTickingWands(player).wands()
+        val wands = CNEvents.gatherWands(player).wands()
         wands.forEach { wand ->
             map.getOrPutInstance(
                 (wand.item as IWandLike).getWandData(wand, player) ?: return@forEach,
