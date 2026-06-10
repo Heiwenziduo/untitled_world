@@ -6,6 +6,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandDataBundle
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 
 /** hold variable wand data, and handle invoking modules */
@@ -25,6 +26,7 @@ class WandInstance(
     private var _deck = 0L
     private var _discard = 0L
     private var _lastModifyTime = 0L
+    private var _lastInvokeTime = 0L
 
     init {
         _manaCurrent = manaMax
@@ -34,6 +36,7 @@ class WandInstance(
     val recharge get(): Int = _rechargeCurrent
     val isRecharging get(): Boolean = _rechargeCurrent > 0 && _deck == 0L
     val lastModifyTime get(): Long = _lastModifyTime
+    val lastInvokeTime get(): Long = _lastInvokeTime
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     fun tick(entity: Entity) {
@@ -46,23 +49,8 @@ class WandInstance(
         _lastModifyTime = entity.level().gameTime // mark the last modify level tick for GC
     }
 
-    /** when cypher-list is edited */
-    fun updateWandStatsServer(bundle: WandDataBundle) {
-        if (isClient) CypherNexus.LOGGER.error("server method calls on client side: updateWandStatsServer")
-        _deck = 0
-        _discard = 0
-        _rechargeCurrent = 0
-        aoc = bundle.highPayload.cypherArray
-    }
-
-    fun syncDataClient(mana: Float, delay: Int, recharge: Int, deck: Long) {
-        if (!isClient) CypherNexus.LOGGER.error("client method calls on server side: syncDataClient")
-        _manaCurrent     = mana
-        _delayCurrent    = delay
-        _rechargeCurrent = recharge
-        _delay0          = delay
-        _recharge0       = recharge
-        _deck            = deck
+    fun invokeFinish(level: Level) {
+        _lastInvokeTime = level.gameTime
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,6 +92,26 @@ class WandInstance(
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /** when cypher-list is edited */
+    fun updateWandStatsServer(bundle: WandDataBundle) {
+        if (isClient) CypherNexus.LOGGER.error("server method calls on client side: updateWandStatsServer")
+        _deck = 0
+        _discard = 0
+        _rechargeCurrent = 0
+        aoc = bundle.highPayload.cypherArray
+    }
+
+    fun syncDataClient(mana: Float, delay: Int, recharge: Int, deck: Long) {
+        if (!isClient) CypherNexus.LOGGER.error("client method calls on server side: syncDataClient")
+        _manaCurrent     = mana
+        _delayCurrent    = delay
+        _rechargeCurrent = recharge
+        _delay0          = delay
+        _recharge0       = recharge
+        _deck            = deck
+    }
+
     fun toHelperDataBundle() = InvokingHelper.HelperDataBundle(
         draw = invariable.chunkI.draw,
         delay = invariable.chunkI.castDelay,

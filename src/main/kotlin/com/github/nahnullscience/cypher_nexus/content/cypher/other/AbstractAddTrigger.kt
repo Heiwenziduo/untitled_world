@@ -7,9 +7,12 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProject
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
+import kotlin.math.max
 
 abstract class AbstractAddTrigger(
     private val _manaDrain: Float
@@ -23,16 +26,17 @@ abstract class AbstractAddTrigger(
     ) = Unit
     override fun defaultAttributes() = super.defaultAttributes().manaDrain(_manaDrain).draw(0)
 
-    override fun invokeInHand(
+    override fun invoke(
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
-        data: InvokingHelper.HelperDataBundle,
-        state: InvokingHelper.HelperStateBundle,
-        options: CypherInvokingOptions
+        data: HelperDataBundle,
+        state: InvokingStateBundle,
+        relativeIndex: Int
     ) {
-
         CypherNexus.LOGGER.debug("[{}] is invoked", this)
-        val startIndex = data.deck.countTrailingZeroBits()
+        val startIndex = helper.peekNextIndex(relativeIndex + 1)
+        if (startIndex == -1) return // this means AddTrigger is the last one in deck
+
         var attachIndex = startIndex
         var cy: AbstractCypher = EmptyCypher
         while (attachIndex < helper.aoc.invokableSize) {
@@ -79,7 +83,7 @@ abstract class AbstractAddTrigger(
                 val subChunk = ProjectileStateChunk(Int.MAX_VALUE)
                 chunk.addProjectile(ProjectileNode(cy, subChunk, triggerType))
                 val payload = helper.drawNext()
-                payload?.invokeInHand(helper, subChunk, data, state, options)
+                payload?.invokeInHand(helper, subChunk, data, state)
             } else {
                 chunk.addProjectile(ProjectileNode(cy, null))
             }

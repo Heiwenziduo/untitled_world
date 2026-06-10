@@ -20,18 +20,4 @@ object EmptyCypher: AbstractCypher() {
     override fun isInvokable() = false
     override fun triggerInterplay() = false
 
-//    override fun createProjectile(
-//        level: Level,
-//        invoker: Entity?,
-//        startPos: Vec3,
-//        direction: Vec3?,
-//        shootState: ProjectileStateChunk,
-//        node: ProjectileNode,
-//        stateHooks: HookContainer?
-//    ): AbstractCypherProjectile {
-//        // do nothing
-//        CypherNexus.LOGGER.debug("Empty#createProjectile is called.")
-//        return super.createProjectile(level, invoker, startPos, direction, shootState, node, null)
-//    }
-
 }

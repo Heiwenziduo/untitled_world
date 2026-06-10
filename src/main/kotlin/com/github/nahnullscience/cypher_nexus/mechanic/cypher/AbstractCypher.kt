@@ -3,13 +3,15 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataMaps.CYPHER_DATA_ATTACH
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes.RECOIL
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.ChatFormatting
@@ -17,6 +19,7 @@ import net.minecraft.core.Holder
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.Identifier
+import net.minecraft.server.level.ServerPlayer
 
 /**
  *
@@ -72,13 +75,29 @@ sealed class AbstractCypher: IRegisterable {
     fun attributes() = attributesData() ?: run { CypherNexus.LOGGER.warn("cypher $this missing attributes data, this may cause lag"); defaultAttributes().build() }
 
     // ============================================================================================================
-    /** call super# unless you know what you are doing */
-    open fun invokeInHand(
+    /** when invoke from helper#draw */
+    fun invokeInHand(
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
         data: InvokingHelper.HelperDataBundle,
-        state: InvokingHelper.HelperStateBundle,
-        options: CypherInvokingOptions = CypherInvokingOptions()
+        state: InvokingHelper.InvokingStateBundle,
+    ) {
+        invoke(helper, chunk, data, state, 63 - data.hand.countLeadingZeroBits())
+
+        if (helper.invoker is ServerPlayer) {
+            // TODO award stats
+        }
+    }
+
+    /** call super# for basic behaviors
+     * @param relativeIndex represent current cypher's Index in the AoC */
+    // the depth-first tree
+    open fun invoke(
+        helper: InvokingHelper,
+        chunk: ProjectileStateChunk,
+        data: InvokingHelper.HelperDataBundle,
+        state: InvokingHelper.InvokingStateBundle,
+        relativeIndex: Int
     ) {
         CypherNexus.LOGGER.debug("[{}] is invoked and modifies the state", this)
 
@@ -88,18 +107,17 @@ sealed class AbstractCypher: IRegisterable {
             forwardState = addToStateChunk(chunk)
         }
 
-        handleDraws(helper, forwardState, data, state, options)
+        handleDraws(helper, forwardState, data, state)
     }
 
     protected open fun canDraw(
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
         data: InvokingHelper.HelperDataBundle,
-        state: InvokingHelper.HelperStateBundle,
-        options: CypherInvokingOptions = CypherInvokingOptions()
+        state: InvokingHelper.InvokingStateBundle,
     ): Boolean {
-        if (!options.drawEnabled) return false
-        if (isRecursive && options.recursiveDepth >= 2) return false
+        if (!state.drawEnabled) return false
+        if (isRecursive && state.recursiveDepth >= 2) return false
         return true
     }
 
@@ -107,10 +125,9 @@ sealed class AbstractCypher: IRegisterable {
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
         data: InvokingHelper.HelperDataBundle,
-        state: InvokingHelper.HelperStateBundle,
-        options: CypherInvokingOptions = CypherInvokingOptions()
+        state: InvokingHelper.InvokingStateBundle,
     ) {
-        if (canDraw(helper, chunk, data, state, options))
+        if (canDraw(helper, chunk, data, state))
         for (i in 0 until draw) {
             var cy = helper.drawNext()
             if (cy == null) {
@@ -127,15 +144,15 @@ sealed class AbstractCypher: IRegisterable {
         if (chunk == helper.rootChunk) data.delay += delay
         data.recharge += recharge
 
-        attributes().stateChunk.forEach { attribute, opMap ->
-            // prune 1, sub-chunk do not affect delay, spread, whatsoever. note recharge is an exception
-            if (chunk != helper.rootChunk && attribute.applyOn == CypherAttribute.AttributeApply.INVOKING) return@forEach
+        attributes().stateChunk.forEach { (attribute, cyMap) ->
+            var targetChunk = chunk
+            if (RECOIL.`is`(attribute.resource)) targetChunk = helper.rootChunk
 
-            val stateMap = chunk.computedOperationMap.getOrPut(attribute) { HashMap() }
-            // prune 2, if set, skip
-            if (stateMap[CypherAttributeOperation.SET_ALL] != null && opMap[CypherAttributeOperation.SET_ALL] == null) return@forEach
+            val stateMap = targetChunk.computedOperationMap.getOrPut(attribute) { HashMap() }
+            // prune: if set, skip
+            if (stateMap[CypherAttributeOperation.SET_ALL] != null && cyMap[CypherAttributeOperation.SET_ALL] == null) return@forEach
 
-            opMap.forEach { operator, value ->
+            cyMap.forEach { (operator, value) ->
                 if (operator != CypherAttributeOperation.BASE && operator != CypherAttributeOperation.SET_SELF) {
                     stateMap.compute(operator) { op, v -> operator.cumulate(v?: operator.defaultValue, value) }
                 }
@@ -229,15 +246,4 @@ sealed class AbstractCypher: IRegisterable {
 
         components
     }
-
-
-    /**
-     * not persist, unmodifiable, invoke option for single cypher.
-     * generally should create new one each time instead of passing the old one.
-     * */
-    data class CypherInvokingOptions(
-        val drawEnabled: Boolean = true,
-        val recursiveDepth: Int = 0,
-        val divideByDepth: Int = 0
-    )
 }

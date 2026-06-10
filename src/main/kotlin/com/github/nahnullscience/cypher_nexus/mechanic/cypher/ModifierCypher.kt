@@ -6,6 +6,7 @@ import net.minecraft.core.Holder
 
 abstract class ModifierCypher () : AbstractNonProjectileCypher() {
 
-    override val category: Holder<CypherCategory> = CypherCategories.MODIFIER
+    final override val category: Holder<CypherCategory> = CypherCategories.MODIFIER
+
     override fun defaultAttributes() = super.defaultAttributes().draw(1)
 }

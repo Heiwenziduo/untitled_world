@@ -44,6 +44,7 @@ interface IWandLike {
             return false
         }
 
+        // TODO consider move these inside Instance logic
         val helperBundle = instance.toHelperDataBundle()
         val helper = InvokingHelper(
             level,
@@ -54,20 +55,8 @@ interface IWandLike {
             getInvokePosDire(level, invoker, wandData.invariable.chunkF.wandLength),
         )
         helper.start()
-
-        // retrieve data from helper and sync to instance of both sides
-        instance.updateHelperData(helperBundle)
-
-        if (invoker is ServerPlayer) PacketDistributor.sendToPlayer(
-            invoker,
-            ClientboundSyncWandInstance(
-                wandData.invariable.uuid,
-                helperBundle.manaCurrent,
-                helperBundle.delay,
-                helperBundle.recharge,
-                helperBundle.deck
-            )
-        )
+        helper.finalizeInvoking()
+        instance.updateHelperData(helperBundle) // retrieve data from helper and sync to instance of both sides
 
         return true
     }

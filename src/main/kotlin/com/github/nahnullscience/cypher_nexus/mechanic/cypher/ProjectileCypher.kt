@@ -4,6 +4,6 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 
 abstract class ProjectileCypher() : AbstractProjectileCypher() {
 
-    override val category = CypherCategories.PROJECTILE
+    final override val category = CypherCategories.PROJECTILE
 
 }

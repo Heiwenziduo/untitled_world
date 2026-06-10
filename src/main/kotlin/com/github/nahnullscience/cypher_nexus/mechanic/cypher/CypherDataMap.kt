@@ -9,6 +9,7 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.core.Holder
 
+/** attributes JSON config */
 data class CypherDataMap(
     val manaDrain: Float,
     val draw: Int,

@@ -4,7 +4,10 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
+import kotlin.math.max
 
 /** invoke the next a few cyphers only when the requirements are met */
 sealed class AbstractRequirement : AbstractNonProjectileCypher() {
@@ -22,23 +25,24 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
             helper: InvokingHelper,
             chunk: ProjectileStateChunk,
             data: InvokingHelper.HelperDataBundle,
-            state: InvokingHelper.HelperStateBundle,
-            options: CypherInvokingOptions
+            state: InvokingHelper.InvokingStateBundle,
         ) : Boolean
 
-        override fun invokeInHand(
+        override fun invoke(
             helper: InvokingHelper,
             chunk: ProjectileStateChunk,
-            data: InvokingHelper.HelperDataBundle,
-            state: InvokingHelper.HelperStateBundle,
-            options: CypherInvokingOptions
+            data: HelperDataBundle,
+            state: InvokingStateBundle,
+            relativeIndex: Int
         ) {
             CypherNexus.LOGGER.debug("[{}] is invoked", this)
-            val currentIndex = data.deck.countTrailingZeroBits()
-            val ok = requirement(helper, chunk, data, state, options)
+            val startIndex = helper.peekNextIndex(relativeIndex + 1)
+            if (startIndex == -1) return handleDraws(helper, chunk, data, state)
+
+            val ok = requirement(helper, chunk, data, state)
             var otherwise = -1
             var endpoint = -1
-            for (i in currentIndex until helper.aoc.invokableSize) {
+            for (i in startIndex until helper.aoc.invokableSize) {
                 val cy = helper.aoc[i]
                 if (cy is RequirementOtherwise) otherwise = i
                 if (cy is RequirementEndpoint) {
@@ -60,17 +64,17 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
                 }
             } else {
                 if (otherwise > 0) {
-                    helper.deck2discard(currentIndex, otherwise + 1)
+                    helper.deck2discard(startIndex, otherwise + 1)
                     // if there is an "else", discard everything between them
                     // in this specific case, endpoint search is unnecessary... well
                 } else if (endpoint > 0) {
-                    helper.deck2discard(currentIndex, endpoint + 1)
+                    helper.deck2discard(startIndex, endpoint + 1)
                 } else {
-                    helper.deck2discard(currentIndex)
+                    helper.deckNext2discard(relativeIndex)
                 }
             }
 
-            handleDraws(helper, chunk, data, state, options)
+            handleDraws(helper, chunk, data, state)
         }
     }
 

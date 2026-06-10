@@ -10,8 +10,7 @@ object RequirementNotPlayer : AbstractRequirement.RequirementIf() {
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
         data: InvokingHelper.HelperDataBundle,
-        state: InvokingHelper.HelperStateBundle,
-        options: CypherInvokingOptions
+        state: InvokingHelper.InvokingStateBundle,
     ): Boolean {
         return helper.invoker !is Player
     }

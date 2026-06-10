@@ -3,12 +3,13 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandInstance
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
+import kotlin.math.max
 
 /** cypher chain compiler */
 class InvokingHelper (
@@ -22,7 +23,7 @@ class InvokingHelper (
     val invokePosDire: PosDirePair,
 ) {
     val rootChunk = ProjectileStateChunk.root(this)
-    val states = HelperStateBundle()
+    val states = InvokingStateBundle()
     val isClientSide = level.isClientSide
 
     init {
@@ -51,7 +52,6 @@ class InvokingHelper (
             val canContinue = step()
             if (!canContinue) break
         }
-        rootChunk.release(level, invoker, invoker, invokePosDire)
         hand2discard()
 
         if (states.wrapped) {
@@ -59,9 +59,12 @@ class InvokingHelper (
             CypherNexus.LOGGER.debug("wand reload due to wrapped")
             reload()
         }
-
         CypherNexus.LOGGER.debug("invoking finish: {}", data)
         // level.profiler.pop()
+    }
+    fun finalizeInvoking() {
+        rootChunk.release(level, invoker, invoker, invokePosDire)
+        wandInstance()?.invokeFinish(level)
     }
 
     fun step(): Boolean {
@@ -77,19 +80,29 @@ class InvokingHelper (
     // =================================================================================
     /** peek the next cypher in the deck, null if empty
      *  @param next the next x-th cypher */
-    fun peekNext(next: Int = 0): AbstractCypher? {
-        var peekIndex = data.deck.countTrailingZeroBits()
-        var stepIndex = peekIndex
-        var tmpDeck = data.deck shr (stepIndex + 1)
+//    fun peekNext(next: Int = 0): AbstractCypher? {
+//        var peekIndex = data.deck.countTrailingZeroBits()
+//        var stepIndex = peekIndex
+//        var tmpDeck = data.deck shr (stepIndex + 1)
+//
+//        for (i in 0 until next) {
+//            stepIndex = tmpDeck.countTrailingZeroBits()
+//            peekIndex += ++stepIndex // step
+//            tmpDeck = tmpDeck shr stepIndex
+//            if (peekIndex >= aoc.invokableSize) return null
+//        }
+//
+//        return aoc.getInvokableOrNull(peekIndex)
+//    }
 
-        for (i in 0 until next) {
-            stepIndex = tmpDeck.countTrailingZeroBits()
-            peekIndex += ++stepIndex // step
-            tmpDeck = tmpDeck shr stepIndex
-            if (peekIndex >= aoc.invokableSize) return null
-        }
-
-        return aoc.getInvokableOrNull(peekIndex)
+    /** @return next invokable index in Deck, -1 if non */
+    fun peekNextIndex(startFrom: Int = 0): Int {
+        val start = max(startFrom, data.deck.countTrailingZeroBits())
+        return aoc.nextInvokableIndex(start)
+    }
+    fun peekNext(startFrom: Int = 0): AbstractCypher? {
+        val start = max(startFrom, data.deck.countTrailingZeroBits())
+        return aoc.nextInvokable(start)
     }
 
     /** non-empty-cypher, null if deck is empty */
@@ -141,9 +154,11 @@ class InvokingHelper (
     // ============== bit operations ===================================================
 
     private fun deck2hand(index: Int): AbstractCypher? {
-        val cy = aoc[index]
-        data.deck = data.deck and (1L shl index).inv()
-        data.hand = data.hand or (1L shl index)
+        val cy = aoc.getInvokableOrNull(index)
+        if (cy != null) {
+            data.deck = data.deck and (1L shl index).inv()
+            data.hand = data.hand or (1L shl index)
+        }
         return cy
     }
     fun hand2discard() {
@@ -164,7 +179,7 @@ class InvokingHelper (
         val next = (data.deck shr start).countTrailingZeroBits() + start
         deck2discard(next)
     }
-    /** from <= ... < until */
+    /** batch discard: from <= ... < until */
     fun deck2discard(from: Int, until: Int) {
         val filter = ((1L shl from) - 1).inv()
         val filter1 = ((1L shl until) - 1) and filter
@@ -179,11 +194,11 @@ class InvokingHelper (
 
         for (i in toDiscard.countTrailingZeroBits() until 64 - toDiscard.countLeadingZeroBits()) {
             val cy = aoc[i]
-            if (cy.isInvokable()) CypherNexus.LOGGER.debug("[{}] bunch-discard from deck", cy)
+            if (cy.isInvokable()) CypherNexus.LOGGER.debug("[{}] batch-discard from deck", cy)
         }
     }
     /** aka. wrap, return true if there is something to wrap */
-    fun discard2deck(): Boolean {
+    private fun discard2deck(): Boolean {
         val old = data.discard
         data.deck = data.deck or data.discard
         data.discard = 0
@@ -202,13 +217,18 @@ class InvokingHelper (
         var discard: Long = 0,
     ) {
         var hand: Long = 0
-
     }
 
     /** for special data persist along the invoking */
-    data class HelperStateBundle (
+    data class InvokingStateBundle (
         var wrapped: Boolean = false,
         var alreadyRefreshed: Boolean = false,
+
+        var drawEnabled: Boolean = true,
+        var isCopiedCypher: Boolean = false,
+        var recursiveDepth: Int = 0,
         var divideByChainLength: Int = 0,
-    )
+    ) {
+        // val map = ... // attach additional data if desire
+    }
 }

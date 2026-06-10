@@ -10,8 +10,7 @@ object RequirementLowHP : AbstractRequirement.RequirementIf() {
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
         data: InvokingHelper.HelperDataBundle,
-        state: InvokingHelper.HelperStateBundle,
-        options: CypherInvokingOptions
+        state: InvokingHelper.InvokingStateBundle,
     ): Boolean {
         if (helper.invoker !is LivingEntity) return false
         return helper.invoker.health / helper.invoker.maxHealth <= 0.25

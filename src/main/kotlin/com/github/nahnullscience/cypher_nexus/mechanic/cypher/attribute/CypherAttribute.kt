@@ -22,14 +22,9 @@ open class CypherAttribute(
     /** whether the attr will show on tooltips */
     val hide: Boolean = false,
 ): IRegisterable {
-    val isProjectileAttribute: Boolean
-        get() = applyOn == AttributeApply.PROJECTILE
+    val isProjectileAttribute: Boolean get() = applyOn == AttributeApply.PROJECTILE
 
-    init {
-        // UntitledWorld.LOGGER.debug("CypherAttribute created: {}", resource.toString())
-    }
-
-    fun restrictRange(v: Double) = max(min(max, v), min)
+    fun restrictRange(v: Double) = v.coerceIn(min, max)
 
 
     // ==========================================================================================================
@@ -39,9 +34,7 @@ open class CypherAttribute(
         return CypherAttributes.REGISTRY.get(resource).get() // if this throw, means the attr is not registered
     }
 
-    override fun toString(): String {
-        return "attribute_${resource.path}"
-    }
+    override fun toString(): String = "attribute_${resource.path}"
 
     /** lang-JSON key: cypher.attribute.{MOD_ID}.{attribute_name} */
     override fun translation(): MutableComponent =
@@ -49,17 +42,24 @@ open class CypherAttribute(
 
 
     enum class AttributeApply {
+        /** Invoking attributes will not cumulate on projectile-entity */
         INVOKING,
         PROJECTILE
     }
 
-//    class Builder(val resource: ResourceLocation) {
-//        val defaultValue: Double = 0.0
-//        val min: Double = -Double.MAX_VALUE
-//        val max: Double = Double.MAX_VALUE
-//        val sync: Boolean = true
-//        val applyOn: AttributeApply = AttributeApply.INVOKING
-//        val hide: Boolean = false
-//        fun build() = CypherAttribute
-//    }
+    class Builder(val resource: Identifier) {
+        private var defaultValue: Double = 0.0
+        private var min: Double = -Double.MAX_VALUE
+        private var max: Double = Double.MAX_VALUE
+        private var sync: Boolean = true
+        private var applyOn: AttributeApply = AttributeApply.PROJECTILE
+        private var hide: Boolean = false
+        fun build() = CypherAttribute(resource, defaultValue, min, max, sync, applyOn, hide)
+        fun default(value: Double): Builder = run { defaultValue = value; this }
+        fun min(value: Double): Builder = run { min = value ; this }
+        fun max(value: Double): Builder = run { max = value ; this }
+        fun notSync(): Builder = run { sync = false ; this }
+        fun applyOn(value: AttributeApply): Builder = run { applyOn = value ; this }
+        fun hide(): Builder = run { hide = true ; this }
+    }
 }

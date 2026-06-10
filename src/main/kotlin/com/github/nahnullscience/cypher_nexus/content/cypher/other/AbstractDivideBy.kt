@@ -7,6 +7,8 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProject
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 
 abstract class AbstractDivideBy() : AbstractNonProjectileCypher() {
@@ -17,53 +19,39 @@ abstract class AbstractDivideBy() : AbstractNonProjectileCypher() {
     abstract val divideBy: Int
     abstract val chainPositionLimit: Int
 
-//    init {
-//        require(divideBy > 0)
-//    }
-
-    override fun invokeInHand(
+    override fun invoke(
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
-        data: InvokingHelper.HelperDataBundle,
-        state: InvokingHelper.HelperStateBundle,
-        options: CypherInvokingOptions
+        data: HelperDataBundle,
+        state: InvokingStateBundle,
+        relativeIndex: Int
     ) {
-        // FIXME too lag, create too much CypherInvokingOptions
-        // FIXME relative index is needed, nor cyphers like add-trigger-s may not work
-        super.invokeInHand(helper, chunk, data, state, options)
-        if (state.divideByChainLength < options.divideByDepth)
-            state.divideByChainLength = options.divideByDepth
+        super.invoke(helper, chunk, data, state, relativeIndex)
 
-        val target = helper.peekNext(options.divideByDepth) ?: return // step++ avoid infinite loop
+        val targetIndex = helper.peekNextIndex(relativeIndex + 1)
+        val target = helper.peekNext(relativeIndex + 1) ?: return // step++ avoid infinite loop
+
         CypherNexus.LOGGER.debug("[{}] will copy: [{}]", this, target)
 
-        val canGoDeeper = options.divideByDepth < chainPositionLimit
+        val currentDepth = state.divideByChainLength++
 
-        val option1 = CypherInvokingOptions(
-            false,
-            options.recursiveDepth,
-            options.divideByDepth + 1
-        )
+        val canGoDeeper =  state.divideByChainLength <= chainPositionLimit
 
         // first copy with draw-disabled, others with draw-enabled // every Dx exceed its position limit will turn to "D1"
-        target.invokeInHand(helper, chunk, data, state, option1)
+        state.drawEnabled = false
+        target.invoke(helper, chunk, data, state, targetIndex)
+        state.drawEnabled = true
         if (canGoDeeper) {
-            val option2 = CypherInvokingOptions(
-                true,
-                options.recursiveDepth,
-                options.divideByDepth + 1
-            )
             for (i in 0 until divideBy - 1) {
-                target.invokeInHand(helper, chunk, data, state, option2)
+                target.invoke(helper, chunk, data, state, targetIndex)
             }
         }
-
         // if this is the beginning of one chain, do discard based on chain length
-        if (options.divideByDepth == 0) {
+        if (currentDepth == 0) {
             CypherNexus.LOGGER.debug("divide by chain finish, discard next {}", state.divideByChainLength + 1)
             for (i in 0 .. state.divideByChainLength) helper.deckNext2discard()
-            state.divideByChainLength = 0
         }
+        state.divideByChainLength = currentDepth
     }
 
     object D2 : AbstractDivideBy() {

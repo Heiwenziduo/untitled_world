@@ -9,8 +9,7 @@ object RequirementOddHand : AbstractRequirement.RequirementIf() {
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
         data: InvokingHelper.HelperDataBundle,
-        state: InvokingHelper.HelperStateBundle,
-        options: CypherInvokingOptions
+        state: InvokingHelper.InvokingStateBundle,
     ): Boolean {
         return helper.data.hand.countOneBits() and 1 > 0 // odd number cards in hand, go
     }

@@ -21,7 +21,7 @@ class SimpleItemProjectileRenderer <CY> (
     val scale = 0.5f
 
     init {
-        println("SimpleItemProjectileRenderer init")
+        // println("SimpleItemProjectileRenderer init") // called when load into main menu
     }
 
     override fun submit(

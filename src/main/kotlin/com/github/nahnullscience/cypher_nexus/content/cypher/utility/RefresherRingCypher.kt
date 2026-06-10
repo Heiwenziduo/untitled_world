@@ -5,6 +5,8 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 
 object RefresherRingCypher : AbstractNonProjectileCypher() {
@@ -18,14 +20,14 @@ object RefresherRingCypher : AbstractNonProjectileCypher() {
     }
 
     override fun triggerInterplay() = true
-    override fun invokeInHand(
+    override fun invoke(
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
-        data: InvokingHelper.HelperDataBundle,
-        state: InvokingHelper.HelperStateBundle,
-        options: CypherInvokingOptions
+        data: HelperDataBundle,
+        state: InvokingStateBundle,
+        relativeIndex: Int
     ) {
-        super.invokeInHand(helper, chunk, data, state, options)
+        super.invoke(helper, chunk, data, state, relativeIndex)
         if (state.alreadyRefreshed) {
             // terminate invoking process if meet again
             // this only prevent drawing new cards, current invoking cypher will continue its function

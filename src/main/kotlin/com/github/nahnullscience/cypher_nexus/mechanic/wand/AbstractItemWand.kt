@@ -5,20 +5,23 @@ import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.event.CNEvents
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandInstance
+import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.ItemUseAnimation
 import net.minecraft.world.level.Level
+import net.neoforged.neoforge.network.PacketDistributor
 
 abstract class AbstractItemWand(
     properties: Properties = Properties()
@@ -26,6 +29,12 @@ abstract class AbstractItemWand(
     properties.stacksTo(1)
 ), IWandLike  {
     abstract override val isEditableWand: Boolean
+    fun instance(stack: ItemStack, level: Level, invoker: Entity) : WandInstance? {
+        val wandData = getWandData(stack, invoker) ?: return null
+        return if (invoker.hasData(WAND_DATA_MAP)) invoker.getData(WAND_DATA_MAP)[wandData.invariable.uuid]
+        else null
+    }
+
     override fun getUseAnimation(stack: ItemStack) = ItemUseAnimation.SPYGLASS
     override fun use(level: Level, player: Player, usedHand: InteractionHand): InteractionResult {
         val stack = player.getItemInHand(usedHand)
@@ -37,19 +46,38 @@ abstract class AbstractItemWand(
         return InteractionResult.FAIL
     }
 
-    override fun releaseUsing(stack: ItemStack, level: Level, livingEntity: LivingEntity, timeCharged: Int) = false
+    override fun releaseUsing(stack: ItemStack, level: Level, invoker: LivingEntity, remainingUseDuration: Int) : Boolean {
+        // println("releaseUsing $level") // call on both sides
+        // NOTE if using is stopped by changing the stack (drop, switch, etc.), this function will not be called
+        if (invoker !is ServerPlayer) return false
+        val wandData = getWandData(stack, invoker) ?: return false
 
-//    override fun useOnRelease(stack: ItemStack): Boolean {
-//        return super.useOnRelease(stack)
-//    }
+        val instance = invoker.getData(WAND_DATA_MAP).getOrPutInstance(wandData, this, level)
+        val useTime = getUseDuration(stack, invoker) - remainingUseDuration
+        if (level.gameTime - useTime >= instance.lastInvokeTime) return false // stop sync if no conduction performed
 
-    override fun getUseDuration(stack: ItemStack, entity: LivingEntity) = 100
+        // FIXME this causes client delay / recharge bar flash, try sync somewhere else
+        val helperBundle = instance.toHelperDataBundle()
+        PacketDistributor.sendToPlayer(
+            invoker,
+            ClientboundSyncWandInstance(
+                wandData.invariable.uuid,
+                helperBundle.manaCurrent,
+                helperBundle.delay,
+                helperBundle.recharge,
+                helperBundle.deck
+            )
+        )
+        return true
+    }
+
+
+    override fun getUseDuration(stack: ItemStack, entity: LivingEntity) = 72000
     override fun onUseTick(level: Level, invoker: LivingEntity, stack: ItemStack, remainingUseDuration: Int) {
+        //println(remainingUseDuration) // #getUseDuration() - used ticks, resets to full if reach 0
 
         // will call on both sides
         tryConduct(level, invoker, stack)
-
-        //println(remainingUseDuration) // #getUseDuration() - used ticks, resets to full if reach 0
     }
 
 
