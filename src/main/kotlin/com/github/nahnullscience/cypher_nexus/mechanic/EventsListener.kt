@@ -2,18 +2,29 @@ package com.github.nahnullscience.cypher_nexus.mechanic
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
+import com.github.nahnullscience.cypher_nexus.mechanic.event.CNEvents
+import com.github.nahnullscience.cypher_nexus.mechanic.event.PlayerGatherWandEvent
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandInstanceMap
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.entity.player.Inventory.SLOT_OFFHAND
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.ItemStack
 import net.neoforged.bus.api.EventPriority
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.event.entity.player.PlayerEvent
+import net.neoforged.neoforge.event.entity.player.PlayerEvent.StartTracking
 import net.neoforged.neoforge.event.tick.EntityTickEvent
+import net.neoforged.neoforge.event.tick.PlayerTickEvent
 
 
 @EventBusSubscriber(modid = CypherNexus.MOD_ID)
 object EventsListener {
 
+    // tick the wand-data-map to perform GC
     @SubscribeEvent(priority = EventPriority.NORMAL)
-    fun tickWandDataMap(tickEvent: EntityTickEvent.Post) {
+    private fun tickWandDataMap(tickEvent: EntityTickEvent.Post) {
         // fired on both sides
         if (tickEvent.entity.hasData(WAND_DATA_MAP)) {
             val dataMap = tickEvent.entity.getData(WAND_DATA_MAP)
@@ -21,10 +32,52 @@ object EventsListener {
         }
     }
 
+    // tick player activated wands and perform basic logic, like generating mana
     @SubscribeEvent(priority = EventPriority.NORMAL)
-    fun copyWandDataOnDeath(event: PlayerEvent.Clone) {
-        if (event.isWasDeath && event.original.hasData(WAND_DATA_MAP)) {
-            "o.O"
+    private fun wandInstanceUpdatePlayer(event: PlayerTickEvent.Post) {
+        val player = event.entity
+        val map = player.getData(WAND_DATA_MAP)
+        val wands = CNEvents.gatherTickingWands(player).wands()
+        wands.forEach { wand ->
+            map.getOrPutInstance(
+                (wand.item as IWandLike).getWandData(wand, player) ?: return@forEach,
+                (wand.item as IWandLike),
+                player.level()
+            ).tick(player)
         }
     }
+
+    // collect wands in hotbar & offhand
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    private fun gatherWandsTicking(event: PlayerGatherWandEvent.Ticking) {
+        val player = event.entity
+        for (i in 0 until 9) {
+            val stack = player.inventory.getItem(i)
+            if (IWandLike.validItemWand(stack)) event.addWand(stack)
+        }
+        val offHand = player.inventory.getItem(SLOT_OFFHAND)
+        if (IWandLike.validItemWand(offHand)) event.addWand(offHand)
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    private fun gatherWandsRendering(event: PlayerGatherWandEvent.Rendering) {
+        val player = event.entity
+//        val mainHand = player.inventory.selectedItem
+//        val offHand = player.inventory.getItem(SLOT_OFFHAND)
+        val mainHand = player.getItemInHand(InteractionHand.MAIN_HAND)
+        val offHand = player.getItemInHand(InteractionHand.OFF_HAND)
+        if (IWandLike.validItemWand(mainHand)) event.addWand(mainHand)
+        if (IWandLike.validItemWand(offHand)) event.addWand(offHand)
+    }
+
+    private fun tackingCypherProjectiles(event: StartTracking) {
+        // TODO consider availability
+    }
+
+//    @SubscribeEvent(priority = EventPriority.NORMAL)
+//    private fun copyWandDataOnDeath(event: PlayerEvent.Clone) {
+//        if (event.isWasDeath && event.original.hasData(WAND_DATA_MAP)) {
+//            "o.O"
+//        }
+//    }
 }

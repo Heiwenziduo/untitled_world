@@ -11,16 +11,14 @@ import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
-import net.minecraft.client.gui.screens.advancements.AdvancementsScreen
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.network.chat.Component
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.item.ItemStack
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import net.neoforged.neoforge.client.network.ClientPacketDistributor
 import kotlin.math.ceil
 import kotlin.math.max
@@ -218,14 +216,14 @@ class CypherIndexScreen(
 
     // ===========================================================================================================
     // ===========================================================================================================
-    private fun renderCypherGrid(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, block: CategoryBlock) {
+    private fun renderCypherGrid(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, block: CategoryBlock) {
         if (!block.show) return
         val reY = block.reY
 
         // if (reY > this.height) return // out of border
 
         // render category title
-        guiGraphics.text(font, block.title, MARGIN, reY - 12, WHITE)
+        graphics.text(font, block.title, MARGIN, reY - 12, WHITE)
         ////////////////////////
 
         val cols = indexColumns
@@ -238,15 +236,15 @@ class CypherIndexScreen(
 
             // Optimization: Only render if the icon is actually visible on screen
             if (y + ICON_SIZE > 0 && y < this.height) {
-                renderCypherIcon(guiGraphics, cypher, x, y)
+                renderCypherIcon(graphics, cypher, x, y)
 
                 // Draw the actual icon, should fit ICON_SIZE
                 // Draw a background slot for the Cypher
                 // Render tooltip if hovered
                 val isHovered = mouseX in x..(x + ICON_SIZE) && mouseY in y..(y + ICON_SIZE)
                 if (isHovered) {
-                    guiGraphics.fill(x, y, x + ICON_SIZE, y + ICON_SIZE, 0x33FFFFFF.toInt())
-                    renderCypherTooltip(guiGraphics, cypher, mouseX, mouseY)
+                    graphics.fill(x, y, x + ICON_SIZE, y + ICON_SIZE, 0x33FFFFFF.toInt())
+                    renderCypherTooltip(graphics, cypher, mouseX, mouseY)
                     HoverContext.hoverType = HoverType.CYPHER_INDEX
                     HoverContext.hoverCypher = cypher
                 }
@@ -273,30 +271,30 @@ class CypherIndexScreen(
             )
         }
     }
-    private fun renderCypherTooltip(guiGraphics: GuiGraphicsExtractor, cypher: AbstractCypher, mouseX: Int, mouseY: Int) {
+    private fun renderCypherTooltip(graphics: GuiGraphicsExtractor, cypher: AbstractCypher, mouseX: Int, mouseY: Int) {
         if (HoverContext.isHolding) return
         if (cypher.isEmpty()) return
         val components = mutableListOf<ClientTooltipComponent>()
 
         val titleText = cypher.translation().withStyle(ChatFormatting.GOLD)
         components.add(ClientTooltipComponent.create(titleText.visualOrderText))
-        val descText = cypher.description().withStyle(ChatFormatting.GRAY)
+        val descriptionText = cypher.description().withStyle(ChatFormatting.GRAY)
 //        components.add(CypherDescriptionTooltip(CypherDescriptionTooltip.TooltipDataBundle(descText, cypher.texture())))
 
-        // TODO too ugly
+        // FIXME too ugly
         for (c in cypher.attributesTooltip) {
             components.add(ClientTooltipComponent.create(c.visualOrderText))
         }
 
-//        guiGraphics.setComponentTooltipForNextFrame(font, components, mouseX, mouseY, DefaultTooltipPositioner.INSTANCE)
+        graphics.tooltip(font, components, mouseX, mouseY, DefaultTooltipPositioner.INSTANCE, null)
     }
 
-    private fun renderScrollbar(guiGraphics: GuiGraphicsExtractor) {
+    private fun renderScrollbar(graphics: GuiGraphicsExtractor) {
         if (maxScroll <= 0) return
         val scrollY = (scrollOffset / maxScroll * (this.height - scrollbarHeight)).toInt()
         // Draw track and thumb
-        guiGraphics.fill(scrollbarX, 0, scrollbarX + SCROLLBAR_WIDTH, this.height, 0xFF111111.toInt())
-        guiGraphics.fill(scrollbarX, scrollY, scrollbarX + SCROLLBAR_WIDTH, scrollY + scrollbarHeight, 0xFFAAAAAA.toInt())
+        graphics.fill(scrollbarX, 0, scrollbarX + SCROLLBAR_WIDTH, this.height, 0xFF111111.toInt())
+        graphics.fill(scrollbarX, scrollY, scrollbarX + SCROLLBAR_WIDTH, scrollY + scrollbarHeight, 0xFFAAAAAA.toInt())
     }
 
     // Custom helper method to calculate the new offset
@@ -312,27 +310,27 @@ class CypherIndexScreen(
 
     // ===========================================================================================================
     // ===========================================================================================================
-    private fun renderWandData(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
+    private fun renderWandData(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int) {
         val reX = indexWidth + WAND_BLOCK_MARGIN
         val reY = WAND_BLOCK_MARGIN + 32
         val cols = max(1, (indexWidth - 2 * WAND_BLOCK_MARGIN) / ITEM_SIZE)
 
-        guiGraphics.fill(reX, WAND_BLOCK_MARGIN, width - WAND_BLOCK_MARGIN, height - WAND_BLOCK_MARGIN, 0xCC333333.toInt())
+        graphics.fill(reX, WAND_BLOCK_MARGIN, width - WAND_BLOCK_MARGIN, height - WAND_BLOCK_MARGIN, 0xCC333333.toInt())
 //        if (wandList.isEmpty()) {
 //            guiGraphics.drawCenteredString(font, "No Wand Data", (width * 0.75).toInt(), (height * 0.5).toInt(), 0xCC999999.toInt())
 //            return
 //        }
 
         val currentStack = wandList[wandListIndex]
-        guiGraphics.item(currentStack, reX, WAND_BLOCK_MARGIN)
+        graphics.item(currentStack, reX, WAND_BLOCK_MARGIN)
 
         if (currentInvariableData != null) {
             val (manaMax, manaRegen) = currentInvariableData!!.chunkF
             val (draw, castDelay, rechargeTime) = currentInvariableData!!.chunkI
 
-            guiGraphics.text(font, currentStack.hoverName, reX + 24, WAND_BLOCK_MARGIN, WHITE)
-            guiGraphics.text(font, "manaMax: $manaMax", reX + 24, WAND_BLOCK_MARGIN + 20, WHITE)
-            guiGraphics.text(font, "manaRegen: $manaRegen", reX + 56, WAND_BLOCK_MARGIN + 20, WHITE)
+            graphics.text(font, currentStack.hoverName, reX + 24, WAND_BLOCK_MARGIN, WHITE)
+            graphics.text(font, "manaMax: $manaMax", reX + 24, WAND_BLOCK_MARGIN + 20, WHITE)
+            graphics.text(font, "manaRegen: $manaRegen", reX + 56, WAND_BLOCK_MARGIN + 20, WHITE)
 
             for (i in 0 until currentEditCyphers.capacity) {
                 val col = i % cols
@@ -342,12 +340,12 @@ class CypherIndexScreen(
                 // FIXME index out of length
                 val cypher = currentEditCyphers[i]
 
-                renderWandBlocks(guiGraphics, cypher, x, y)
-                renderCypherIcon(guiGraphics, cypher, x, y)
+                renderWandBlocks(graphics, cypher, x, y)
+                renderCypherIcon(graphics, cypher, x, y)
                 val isHovered = mouseX in x..(x + ICON_SIZE) && mouseY in y..(y + ICON_SIZE)
                 if (isHovered) {
-                    guiGraphics.fill(x, y, x + ICON_SIZE, y + ICON_SIZE, 0x33FFFFFF.toInt())
-                    renderCypherTooltip(guiGraphics, cypher, mouseX, mouseY)
+                    graphics.fill(x, y, x + ICON_SIZE, y + ICON_SIZE, 0x33FFFFFF.toInt())
+                    renderCypherTooltip(graphics, cypher, mouseX, mouseY)
                     HoverContext.hoverType = HoverType.CYPHER_WAND
                     HoverContext.hoverCypher = cypher
                     HoverContext.wandSlotNew = i
@@ -360,8 +358,8 @@ class CypherIndexScreen(
         // wand data grid
     }
 
-    private fun renderWandBlocks(guiGraphics: GuiGraphicsExtractor, cypher: AbstractCypher, x: Int, y: Int) {
-        guiGraphics.fill(x, y, x + ICON_SIZE, y + ICON_SIZE, 0xFF444444.toInt()) // bg
+    private fun renderWandBlocks(graphics: GuiGraphicsExtractor, cypher: AbstractCypher, x: Int, y: Int) {
+        graphics.fill(x, y, x + ICON_SIZE, y + ICON_SIZE, 0xFF444444.toInt()) // bg
     }
 
     private fun pickWand() {
@@ -399,7 +397,6 @@ class CypherIndexScreen(
     }
 
 
-    @OnlyIn(Dist.CLIENT)
     private inner class CategoryBlock(
         val category: CypherCategory,
         val list: List<AbstractCypher>,
@@ -421,7 +418,6 @@ class CypherIndexScreen(
             get() = blocks.filter { it.index < index }.sumOf { it.blockHeight } + CATEGORY_TITLE_PADDING
     }
 
-    @OnlyIn(Dist.CLIENT)
     private enum class HoverType() {
         CYPHER_INDEX,
         CYPHER_WAND,
@@ -429,7 +425,6 @@ class CypherIndexScreen(
         NONE
     }
 
-    @OnlyIn(Dist.CLIENT)
     private object HoverContext {
         var hoverType = HoverType.NONE
         private var _hoverCypher: AbstractCypher? = null

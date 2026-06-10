@@ -16,7 +16,8 @@ import net.neoforged.neoforge.network.PacketDistributor
  * */
 interface IWandLike {
 
-    fun getWandData(stack: ItemStack?, caster: Entity?): WandDataBundle?
+    /** itemStack Or entityInvoker */
+    fun getWandData(stack: ItemStack?, invoker: Entity?): WandDataBundle?
 
     /** direction doesn't have to be normalized */
     fun getInvokePosDire(level: Level, invoker: Entity, wandLength: Float): PosDirePair
@@ -57,7 +58,6 @@ interface IWandLike {
         // retrieve data from helper and sync to instance of both sides
         instance.updateHelperData(helperBundle)
 
-        // TODO replace this with a periodical sync
         if (invoker is ServerPlayer) PacketDistributor.sendToPlayer(
             invoker,
             ClientboundSyncWandInstance(
@@ -66,11 +66,15 @@ interface IWandLike {
                 helperBundle.delay,
                 helperBundle.recharge,
                 helperBundle.deck
-                )
+            )
         )
 
         return true
     }
 
 
+
+    companion object {
+        fun validItemWand(stack: ItemStack): Boolean = !stack.isEmpty && stack.item is IWandLike
+    }
 }

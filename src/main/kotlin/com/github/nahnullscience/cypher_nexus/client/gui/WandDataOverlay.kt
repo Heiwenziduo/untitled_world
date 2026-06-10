@@ -1,8 +1,9 @@
 package com.github.nahnullscience.cypher_nexus.client.gui
 
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
+import com.github.nahnullscience.cypher_nexus.mechanic.event.CNEvents
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInstance
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandInstance
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -21,14 +22,12 @@ object WandDataOverlay : GuiLayer {
         if (Minecraft.getInstance().options.hideGui || player == null || player.isSpectator) {
             return
         }
-        // TODO wands at other slots
-        val wandMain = player.getItemInHand(InteractionHand.MAIN_HAND)
-        val wandOff = player.getItemInHand(InteractionHand.OFF_HAND)
 
         val partialTick = deltaTracker.getGameTimeDeltaPartialTick(true)
 
+
         // in the future maybe we can show multiple wands data, combine #gatherWand Event
-        listOf(wandMain, wandOff).withIndex().forEach { (i, stack) ->
+        CNEvents.gatherRenderingWands(player).wands().withIndex().forEach { (i, stack) ->
             val wand = stack.item
             if (stack.isEmpty || wand !is IWandLike) return@forEach
             val wandData = wand.getWandData(stack, player) ?: return@forEach
@@ -44,7 +43,7 @@ object WandDataOverlay : GuiLayer {
     private fun renderWand(
         guiGraphics: GuiGraphicsExtractor,
         offset: Int,
-        instance: WandDataInstance,
+        instance: WandInstance,
         wandSack: ItemStack,
         partialTick: Float
     ) {

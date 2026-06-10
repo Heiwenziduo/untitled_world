@@ -9,7 +9,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
 
 /** hold variable wand data, and handle invoking modules */
-class WandDataInstance(
+class WandInstance(
     val invariable: WandDataInvariable,
     val isClient: Boolean,
     // TODO update client aoc when wand edit (item-component is auto synced, but the reference inside instance is not)
@@ -68,6 +68,7 @@ class WandDataInstance(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     fun canInvoke() = !(_delayCurrent > 0 || (_deck == 0L && _rechargeCurrent > 0))
+        .also { println("${side()} invoke check: delay=$_delayCurrent, recharge=$_rechargeCurrent") }
     fun isBeginning() = _deck == 0L
 
     fun rightClickModule() {
@@ -86,7 +87,7 @@ class WandDataInstance(
     fun recoilModule(invoker: Entity, recoil: Double, invokePosDire: PosDirePair) {
         // TODO recoil module
         // for now, push invoker for ease
-//        println("do some recoil: $recoil   ${side()}")
+        println("do some recoil: $recoil   ${side()}")
 
         // since it is the client side that is Player position authoritative
         // this logic should run on both side, client for smooth movement, server for verification
@@ -124,4 +125,5 @@ class WandDataInstance(
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private fun side() = if (isClient) "client" else "server"
+    override fun toString() = "wand-instance: ${invariable.uuid}"
 }

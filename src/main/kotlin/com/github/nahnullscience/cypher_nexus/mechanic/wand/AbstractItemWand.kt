@@ -54,21 +54,18 @@ abstract class AbstractItemWand(
 
 
     override fun inventoryTick(stack: ItemStack, level: ServerLevel, entity: Entity, slot: EquipmentSlot?) {
-        //if (level.isClientSide) return
+        // call through (living#aistep)EntityEquipment#tick / (player#aistep)Inventory#tick -> stack#tick -> item#tick
+        // inventory 0-35, does not contain equipment-slots, so everything tick once per tick
 
-        // Mob do not implement Container, but can access its inventory through the seven EquipmentSlot enum values:
-        // MAINHAND, OFFHAND, FEET, LEGS, CHEST, HEAD, and BODY (where BODY is used for horse and dog armor).
-        // entity is Mob && entity.getItemBySlot()
-
-//        if (entity is Player && (slotId in 0..8 || slotId == Inventory.SLOT_OFFHAND)) { // nine hotbar slots (indices 0-8).
-//            val dataInstance = entity.getData(WAND_DATA_MAP)
-//                .getOrPutInstance(getWandData(stack, entity) ?: return, this, level)
-//
-//            dataInstance.tick(entity)
-//        }
+        if (entity is Player) return // tick player hotbar through events, since that runs on both sides
+        if (slot == EquipmentSlot.MAINHAND || slot == EquipmentSlot.OFFHAND) {
+            val dataInstance = entity.getData(WAND_DATA_MAP)
+                .getOrPutInstance(getWandData(stack, entity) ?: return, this, level)
+            dataInstance.tick(entity)
+        }
     }
 
-    override fun getWandData(stack: ItemStack?, caster: Entity?): WandDataBundle? {
+    override fun getWandData(stack: ItemStack?, invoker: Entity?): WandDataBundle? {
         /* @doc
          * Any component values within the map should be treated as immutable.
          * Always call #set or one of its referring methods discussed below after modifying the value of a data component.

@@ -15,7 +15,7 @@ class WandInstanceMap {
         private fun side(level: Level) = if (level.isClientSide) "client" else "server"
     }
 
-    private val _map = HashMap<String, WandDataInstance>()
+    private val _map = HashMap<String, WandInstance>()
 
 
     /** do some garbage collection and free memory */
@@ -23,23 +23,24 @@ class WandInstanceMap {
         if (entity.tickCount % RESET_TICK_COUNT != 0) return
         CypherNexus.LOGGER.debug("{} side wand data map GC: {}", side(entity.level()), entity)
         _map.entries.removeIf { (uu, instance) ->
-            entity.level().gameTime - instance.lastModifyTime >= RESET_TICK_COUNT
+            (entity.level().gameTime - instance.lastModifyTime >= RESET_TICK_COUNT)
+                .also { if (it) CypherNexus.LOGGER.debug("remove {}", instance) }
         }
     }
 
-    operator fun get(uuid: String) = _map[uuid]
+    operator fun get(uuid: String): WandInstance? = _map[uuid]
 
-    fun getOrPutInstance(invariable: WandDataInvariable, cypherArray: ArrayOfCyphers, wand: IWandLike?, level: Level): WandDataInstance {
+    fun getOrPutInstance(invariable: WandDataInvariable, cypherArray: ArrayOfCyphers, wand: IWandLike?, level: Level): WandInstance {
         val uuid = invariable.uuid
         if (_map[uuid] == null) {
-            CypherNexus.LOGGER.debug("wand-like {} just created an {} sided instance\nuuid: {}", wand, side(level), uuid)
+            CypherNexus.LOGGER.debug("wand-like [{}] just created a {} sided instance with uuid: {}", wand, side(level), uuid)
         }
         return _map.getOrPut(uuid)
-        { WandDataInstance(invariable, level.isClientSide, cypherArray) }
+        { WandInstance(invariable, level.isClientSide, cypherArray) }
     }
     fun getOrPutInstance(bundle: WandDataBundle, wand: IWandLike?, level: Level) =
         getOrPutInstance(bundle.invariable, bundle.highPayload.cypherArray, wand, level)
-    fun getOrPutInstance(stack: ItemStack, wand: IWandLike, level: Level): WandDataInstance? {
+    fun getOrPutInstance(stack: ItemStack, wand: IWandLike, level: Level): WandInstance? {
         val invariable = stack.get(ModDataComponents.WAND_INVARIABLE) ?: return null
         val highPayload = stack.get(ModDataComponents.WAND_HIGH_PAYLOAD) ?: return null
         return getOrPutInstance(WandDataBundle(invariable, highPayload), wand, level)

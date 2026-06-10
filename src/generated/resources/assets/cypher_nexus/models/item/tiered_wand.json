@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/handheld_rod",
   "textures": {
-    "layer0": "cypher_nexus:item/basic_wand"
+    "layer0": "cypher_nexus:item/tiered_wand"
   }
 }

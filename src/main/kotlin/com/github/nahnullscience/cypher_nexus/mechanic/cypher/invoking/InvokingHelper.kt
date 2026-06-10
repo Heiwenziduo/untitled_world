@@ -3,7 +3,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInstance
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
@@ -33,7 +33,7 @@ class InvokingHelper (
         }
     }
 
-    fun wandInstance(): WandDataInstance? {
+    fun wandInstance(): WandInstance? {
         val has = invoker?.hasData(WAND_DATA_MAP)
         if (has ?: return null)
             return invoker
@@ -45,7 +45,7 @@ class InvokingHelper (
     // =================================================================================
     fun start() {
         // level.profiler.push("invoking-start") // F3 + L to record time cost
-        CypherNexus.LOGGER.debug("invoking start, prepare cyphers: {}", aoc)
+        CypherNexus.LOGGER.debug("invoking start, prepare cyphers")
 
         while (data.draw >= 1) {
             val canContinue = step()

@@ -1,19 +1,17 @@
 package com.github.nahnullscience.cypher_nexus.client.renderer
 
-import com.github.nahnullscience.cypher_nexus.client.cypher.CypherRenderState
+import com.github.nahnullscience.cypher_nexus.client.cypher.CypherProjectileRenderState
 import com.github.nahnullscience.cypher_nexus.content.entity.Arrow
 import com.mojang.blaze3d.vertex.PoseStack
-import com.mojang.math.Axis
 import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.state.level.CameraRenderState
-import net.minecraft.client.renderer.texture.OverlayTexture
 
 class ArrowCypherRenderer (
     context: EntityRendererProvider.Context
-) : AbstractCypherRenderer<Arrow>(context) {
+) : AbstractCypherRenderer<Arrow, CypherProjectileRenderState>(context) {
     override fun submit(
-        state: CypherRenderState,
+        state: CypherProjectileRenderState,
         poseStack: PoseStack,
         submitNodeCollector: SubmitNodeCollector,
         camera: CameraRenderState
@@ -34,4 +32,6 @@ class ArrowCypherRenderer (
         poseStack.popPose()
         super.submit(state, poseStack, submitNodeCollector, camera)
     }
+
+    override fun createRenderState() = CypherProjectileRenderState()
 }

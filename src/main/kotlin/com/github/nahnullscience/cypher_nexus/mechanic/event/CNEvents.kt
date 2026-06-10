@@ -12,4 +12,12 @@ object CNEvents {
         val event = NeoForge.EVENT_BUS.post(PlayerConductsWandEvent(player, wand, hand, level))
         return !event.isCanceled
     }
+
+    fun gatherTickingWands(player: Player): PlayerGatherWandEvent.Ticking {
+        return NeoForge.EVENT_BUS.post(PlayerGatherWandEvent.Ticking(player))
+    }
+
+    fun gatherRenderingWands(player: Player): PlayerGatherWandEvent.Rendering {
+        return NeoForge.EVENT_BUS.post(PlayerGatherWandEvent.Rendering(player))
+    }
 }

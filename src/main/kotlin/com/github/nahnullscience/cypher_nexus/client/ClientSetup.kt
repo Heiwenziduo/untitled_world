@@ -10,8 +10,7 @@ import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.item.Item
-import net.minecraft.world.item.Items
+import net.minecraft.world.entity.projectile.ItemSupplier
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
@@ -56,17 +55,17 @@ object ClientSetup {
         // projectile
         //////////////////////////////////////////////////////////////////////////////
         event.registerEntityRenderer(ModEntities.CYPHER_ARROW.get(), ::ArrowCypherRenderer)
-        event.registerRenderer(ModEntities.CYPHER_LLAMA_SPIT, ::LlamaSpitCypherRenderer)
+        event.registerProjectile(ModEntities.CYPHER_LLAMA_SPIT, ::LlamaSpitCypherRenderer)
 
-        event.registerItemProjectile(ModEntities.CYPHER_SNOWBALL, Items.SNOWBALL)
-        event.registerItemProjectile(ModEntities.CYPHER_ENDER_RECALL, Items.ENDER_PEARL)
-        event.registerItemProjectile(ModEntities.CYPHER_ENDER_TELEPORTATION, Items.ENDER_PEARL)
-        event.registerItemProjectile(ModEntities.CYPHER_SPAWN_EGG, Items.EGG)
+        event.registerItemProjectile(ModEntities.CYPHER_SNOWBALL)
+        event.registerItemProjectile(ModEntities.CYPHER_ENDER_RECALL)
+        event.registerItemProjectile(ModEntities.CYPHER_ENDER_TELEPORTATION)
+        event.registerItemProjectile(ModEntities.CYPHER_SPAWN_EGG)
 
         //////////////////////////////////////////////////////////////////////////////
         // static
         //////////////////////////////////////////////////////////////////////////////
-        event.registerRenderer(ModEntities.CYPHER_EXPLOSION, ::SimpleSummonerRenderer)
+        event.registerProjectile(ModEntities.CYPHER_EXPLOSION, ::SimpleSummonerRenderer)
     }
 
 //    @SubscribeEvent
@@ -84,12 +83,12 @@ object ClientSetup {
     }
 }
 
-private fun RegisterRenderers.registerItemProjectile(
-    cypherEntity: Supplier<out EntityType<out AbstractCypherProjectile>>,
-    item: Item
-) = registerEntityRenderer(cypherEntity.get()) { context -> SimpleItemProjectileRenderer(context, item) }
+private fun <CY> RegisterRenderers.registerItemProjectile (
+    cypherEntity: Supplier<out EntityType<out CY>>,
+) where CY : AbstractCypherProjectile, CY : ItemSupplier
+        = registerEntityRenderer(cypherEntity.get()) { context -> SimpleItemProjectileRenderer(context) }
 
-private fun <T : AbstractCypherProjectile> RegisterRenderers.registerRenderer(
+private fun <T : AbstractCypherProjectile> RegisterRenderers.registerProjectile(
     cypherEntity: Supplier<out EntityType<out T>>,
     factory: EntityRendererProvider<T>
 ) = registerEntityRenderer(cypherEntity.get(), factory)
