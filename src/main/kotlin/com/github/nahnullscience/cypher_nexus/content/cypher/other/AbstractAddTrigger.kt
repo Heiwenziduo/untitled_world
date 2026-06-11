@@ -12,7 +12,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingH
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
-import kotlin.math.max
 
 abstract class AbstractAddTrigger(
     private val _manaDrain: Float
@@ -33,7 +32,7 @@ abstract class AbstractAddTrigger(
         state: InvokingStateBundle,
         relativeIndex: Int
     ) {
-        CypherNexus.LOGGER.debug("[{}] is invoked", this)
+        CypherNexus.debugCypher { "[$this] is invoked" }
         val startIndex = helper.peekNextIndex(relativeIndex + 1)
         if (startIndex == -1) return // this means AddTrigger is the last one in deck
 
@@ -46,7 +45,7 @@ abstract class AbstractAddTrigger(
             if (!cy0.isInvokable()) continue
 
             cy0.modifyStateChunk(helper, data, chunk)
-            CypherNexus.LOGGER.debug("[{}] modify the state through [{}]", this, cy0)
+            CypherNexus.debugCypher { "[$this] modify the state through [$cy0]" }
 
             if (cy0.triggerInterplay()) {
                 cy = cy0
@@ -58,12 +57,12 @@ abstract class AbstractAddTrigger(
             if (cy !is AbstractProjectileCypher) {
                 // to fit Noita mechanic, let's agree a NonProj cypher with #triggerCanAttach == ture will terminate add trigger-s
                 // for example, refresher-ring
-                CypherNexus.LOGGER.debug("[{}] attach process terminate due to [{}]", this, cy)
+                CypherNexus.debugCypher { "[$this] attach process terminate due to [$cy]" }
                 return
             }
 
             // discard if attach is found
-            CypherNexus.LOGGER.debug("[{}] find trigger attachable [{}]", this, cy)
+            CypherNexus.debugCypher { "[$this] find trigger attachable [$cy]" }
             helper.deck2discard(startIndex, attachIndex)
 
             // step 2, find payload
@@ -79,7 +78,7 @@ abstract class AbstractAddTrigger(
                 }
             }
             if (find) {
-                CypherNexus.LOGGER.debug("invoke [{}] with payload", cy)
+                CypherNexus.debugCypher { "invoke [$cy] with payload" }
                 val subChunk = ProjectileStateChunk(Int.MAX_VALUE)
                 chunk.addProjectile(ProjectileNode(cy, subChunk, triggerType))
                 val payload = helper.drawNext()

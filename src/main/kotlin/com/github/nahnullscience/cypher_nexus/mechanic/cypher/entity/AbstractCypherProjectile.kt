@@ -56,10 +56,15 @@ abstract class AbstractCypherProjectile(
             node: ProjectileNode,
             stateHooks: HookContainer?
         ) : T {
-//            if (level.isClientSide) throw IllegalStateException("Try to create projectile [$entityType] on client side.")
             val proj = entityType.create(level, EntitySpawnReason.SPAWN_ITEM_USE) ?:
             throw IllegalStateException("Failed to create projectile [$entityType].")
             proj.initialize(invoker, direction, shootState, node, stateHooks)
+            return proj
+        }
+
+        fun <T : AbstractCypherProjectile> createRaw(entityType: EntityType<T>, level: ServerLevel) : T {
+            val proj = entityType.create(level, EntitySpawnReason.SPAWN_ITEM_USE) ?:
+            throw IllegalStateException("Failed to create projectile [$entityType].")
             return proj
         }
 
@@ -100,7 +105,9 @@ abstract class AbstractCypherProjectile(
     abstract val cypherHolder: Holder<out AbstractProjectileCypher>
     val cypher get() = cypherHolder.value()
     private var _existing: Int = 1
-    val existing get() = _existing
+    var existing
+        get() = _existing
+        set(value) { _existing = value }
 
     /** a flag is basically a bundle of booleans */
     override var enabledFlags: Int
@@ -479,16 +486,17 @@ abstract class AbstractCypherProjectile(
     // ==================================================================================================================
     private fun printDebugMsg() {
         CypherNexus.LOGGER.debug("create projectile {}: {}", this, cypher)
-        CypherFlags.Companion.printFlag(enabledFlags)
+        CypherFlags.printFlag(enabledFlags)
 
         // modified AttrMap
-        _attributeMap.forEach { a, v ->
+        _attributeMap.forEach { (a, v) ->
             println("$a: $v")
         }
         if (_attributeMap.isEmpty()) println("projectile $cypher has no modified attributes")
     }
 
-
+    override fun hashCode() = super.hashCode()
+    override fun equals(other: Any?) = if (other is Entity) other.id == this.id else false
 
     // ==================================================================================================================
     // ==================================================================================================================

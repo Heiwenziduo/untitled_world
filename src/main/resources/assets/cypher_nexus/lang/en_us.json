@@ -17,7 +17,7 @@
   "cypher.attribute.cypher_nexus.crit_chance": "Crit",
   "cypher.attribute.cypher_nexus.speed": "Speed",
   "cypher.attribute.cypher_nexus.existing": "Existing",
-  "cypher.attribute.cypher_nexus.effect_redius": "Redius",
+  "cypher.attribute.cypher_nexus.effect_radius": "Radius",
   "cypher.attribute.cypher_nexus.bounce": "Bounce",
   "cypher.attribute.cypher_nexus.gravity_factor": "Gravity",
 

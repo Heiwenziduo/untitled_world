@@ -31,7 +31,7 @@ abstract class AbstractDivideBy() : AbstractNonProjectileCypher() {
         val targetIndex = helper.peekNextIndex(relativeIndex + 1)
         val target = helper.peekNext(relativeIndex + 1) ?: return // step++ avoid infinite loop
 
-        CypherNexus.LOGGER.debug("[{}] will copy: [{}]", this, target)
+        CypherNexus.debugCypher { "[$this] will copy: [$target]" }
 
         val currentDepth = state.divideByChainLength++
 
@@ -46,9 +46,10 @@ abstract class AbstractDivideBy() : AbstractNonProjectileCypher() {
                 target.invoke(helper, chunk, data, state, targetIndex)
             }
         }
+        // FIXME discard index is wrong
         // if this is the beginning of one chain, do discard based on chain length
         if (currentDepth == 0) {
-            CypherNexus.LOGGER.debug("divide by chain finish, discard next {}", state.divideByChainLength + 1)
+            CypherNexus.debugCypher { "divide by chain finish, discard next ${state.divideByChainLength + 1}" }
             for (i in 0 .. state.divideByChainLength) helper.deckNext2discard()
         }
         state.divideByChainLength = currentDepth

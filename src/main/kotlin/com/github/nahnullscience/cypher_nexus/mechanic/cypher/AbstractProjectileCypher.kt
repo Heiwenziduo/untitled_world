@@ -47,12 +47,4 @@ abstract class AbstractProjectileCypher : AbstractCypher() {
     fun getAttrBaseOrDefault(attr: CypherAttribute): Double = attributes().projectile[attr] ?: attr.defaultValue
 
     override fun triggerInterplay() = true
-
-    // due to cost, should prioritise these to hook on expire
-//    /** called when projectile hits something
-//     * @param level on client side. due to cost, should prioritise these to hook-on-expire */
-//    open fun visualEffectOnHit(level: Level, projectile: AbstractCypherProjectile) {}
-//    /** called when projectile naturally expire
-//    * @param level on client side. due to cost, should prioritise these to hook-on-expire */
-//    open fun visualEffectOnExpire(level: Level, projectile: AbstractCypherProjectile) {}
 }

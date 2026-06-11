@@ -7,7 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCat
 import kotlin.collections.forEach
 
 object CypherUtility {
-    fun attributeCalculator(opMap: HashMap<CypherAttributeOperation, Double>, base: Double) : Double {
+    fun attributeCalculator(opMap: Map<CypherAttributeOperation, Double>, base: Double) : Double {
         val s = opMap[CypherAttributeOperation.SET_ALL]
         if (s != null) return s
 
@@ -19,7 +19,7 @@ object CypherUtility {
 
     fun sortCyphersByCategory(list: List<AbstractCypher>): Map<CypherCategory, List<AbstractCypher>> {
         val map = mutableMapOf<CypherCategory, MutableList<AbstractCypher>>()
-        CypherCategories.REGISTRY.toList().forEach { category -> map.put(category, mutableListOf()) } // this will keep map in category registry order
+        CypherCategories.REGISTRY.toList().forEach { category -> map[category] = mutableListOf() } // this will keep map in category registry order
         list.forEach { cypher ->
             val list0 = map.getValue(cypher.category.value())
             list0.add(cypher)

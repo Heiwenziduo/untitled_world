@@ -46,7 +46,7 @@ class InvokingHelper (
     // =================================================================================
     fun start() {
         // level.profiler.push("invoking-start") // F3 + L to record time cost
-        CypherNexus.LOGGER.debug("invoking start, prepare cyphers")
+        CypherNexus.debugCypher { "invoking start, prepare cyphers" }
 
         while (data.draw >= 1) {
             val canContinue = step()
@@ -56,10 +56,10 @@ class InvokingHelper (
 
         if (states.wrapped) {
             // force a reload
-            CypherNexus.LOGGER.debug("wand reload due to wrapped")
+            CypherNexus.debugCypher { "wand reload due to wrapped" }
             reload()
         }
-        CypherNexus.LOGGER.debug("invoking finish: {}", data)
+        CypherNexus.debugCypher { "invoking finish: $data" }
         // level.profiler.pop()
     }
     fun finalizeInvoking() {
@@ -116,14 +116,14 @@ class InvokingHelper (
     /** non-empty */
     private fun draw(index: Int): AbstractCypher? {
         val cy = aoc[index]
-        CypherNexus.LOGGER.debug("draw [{}], the {}th cypher", cy, index + 1)
+        CypherNexus.debugCypher { "draw [$cy], the ${index + 1}th cypher" }
         if (cy.isEmpty()) {
             // this should not happen
             CypherNexus.LOGGER.error("draw [empty]: $index in $aoc, this should not happen")
             return null
         }
         if (data.manaCurrent < cy.manaDrain) {
-            CypherNexus.LOGGER.debug("mana not enough, [{}] discards directly", cy)
+            CypherNexus.debugCypher { "mana not enough, [$cy] discards directly" }
             deck2discard(index)
             return drawNext()
         }
@@ -133,8 +133,8 @@ class InvokingHelper (
     }
 
     fun wrap() = run {
-        if (data.discard > 0) CypherNexus.LOGGER.debug("discard {} wrap back into deck", data.discard.toString(2).padStart(8, '0'))
-        else CypherNexus.LOGGER.debug("discard is empty, nothing to wrap")
+        if (data.discard > 0) CypherNexus.debugCypher { "discard ${data.discard.toString(2).padStart(8, '0')} wrap back into deck" }
+        else CypherNexus.debugCypher { "discard is empty, nothing to wrap" }
         states.wrapped = true
         discard2deck()
     }
@@ -172,7 +172,7 @@ class InvokingHelper (
         data.discard = data.discard or (1L shl index)
 
         val cy = aoc[index]
-        CypherNexus.LOGGER.debug("[{}] discard from deck", cy)
+        CypherNexus.debugCypher { "[$cy] discard from deck" }
     }
     /** discard next invokable */
     fun deckNext2discard(start: Int = 0) {
@@ -185,16 +185,16 @@ class InvokingHelper (
         val filter1 = ((1L shl until) - 1) and filter
         val toDiscard = data.deck and filter1
 
-//        CypherNexus.LOGGER.debug("deck before bunch-discard: {}", data.deck.toString(2).padStart(20, '0'))
+//        CypherNexus.LOGGER.debugCypher("deck before bunch-discard: {}", data.deck.toString(2).padStart(20, '0'))
 
         data.deck = data.deck and toDiscard.inv()
         data.discard = data.discard or toDiscard
 
-//        CypherNexus.LOGGER.debug("deck after bunch-discard: {}", data.deck.toString(2).padStart(20, '0'))
+//        CypherNexus.LOGGER.debugCypher("deck after bunch-discard: {}", data.deck.toString(2).padStart(20, '0'))
 
         for (i in toDiscard.countTrailingZeroBits() until 64 - toDiscard.countLeadingZeroBits()) {
             val cy = aoc[i]
-            if (cy.isInvokable()) CypherNexus.LOGGER.debug("[{}] batch-discard from deck", cy)
+            if (cy.isInvokable()) CypherNexus.debugCypher { "[$cy] batch-discard from deck" }
         }
     }
     /** aka. wrap, return true if there is something to wrap */

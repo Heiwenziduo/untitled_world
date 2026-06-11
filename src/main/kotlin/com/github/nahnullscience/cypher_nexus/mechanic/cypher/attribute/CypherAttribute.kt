@@ -26,6 +26,9 @@ open class CypherAttribute(
 
     fun restrictRange(v: Double) = v.coerceIn(min, max)
 
+//    override fun hashCode(): Int {
+//        return super.hashCode()
+//    }
 
     // ==========================================================================================================
     fun holder(): Holder<CypherAttribute> {

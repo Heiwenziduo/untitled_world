@@ -7,7 +7,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingH
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
-import kotlin.math.max
 
 /** invoke the next a few cyphers only when the requirements are met */
 sealed class AbstractRequirement : AbstractNonProjectileCypher() {
@@ -35,7 +34,7 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
             state: InvokingStateBundle,
             relativeIndex: Int
         ) {
-            CypherNexus.LOGGER.debug("[{}] is invoked", this)
+            CypherNexus.debugCypher { "[$this] is invoked and modifies the state" }
             val startIndex = helper.peekNextIndex(relativeIndex + 1)
             if (startIndex == -1) return handleDraws(helper, chunk, data, state)
 
@@ -52,7 +51,7 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
                 if (cy is RequirementIf) break
             }
 
-            CypherNexus.LOGGER.debug("[{}] requirement is {}met", this, if (ok) "" else "not ")
+            CypherNexus.debugCypher { "[$this] requirement is ${if (ok) "" else "not "}met" }
             if (ok) {
                 if (otherwise > 0) {
                     if (endpoint > 0) helper.deck2discard(otherwise, endpoint + 1)

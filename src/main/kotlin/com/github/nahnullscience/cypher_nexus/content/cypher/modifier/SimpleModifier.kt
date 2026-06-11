@@ -7,6 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAt
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import net.minecraft.core.Holder
+import java.util.EnumMap
 
 /** easy way to create lots of simple modifiers */
 class SimpleModifier(
@@ -20,7 +21,7 @@ class SimpleModifier(
 
     private var _color: Int = 0
     // register timing can't unpack holder, so use holder directly here
-    private val stateChunkHolder: HashMap<Holder<CypherAttribute>, HashMap<CypherAttributeOperation, Double>> = HashMap()
+    private val stateChunkHolder: HashMap<Holder<CypherAttribute>, EnumMap<CypherAttributeOperation, Double>> = HashMap()
 
     override fun manaDrain(float: Float) = run { super.manaDrain(float); this }
     override fun draw(int: Int) = run { super.draw(int); this }
@@ -37,7 +38,7 @@ class SimpleModifier(
         operator: CypherAttributeOperation,
         value: Double
     ): SimpleModifier {
-        val opMap = stateChunkHolder.getOrPut(holder) { HashMap() }
+        val opMap = stateChunkHolder.getOrPut(holder) { EnumMap(CypherAttributeOperation::class.java) }
         opMap[operator] = value
         return this
     }

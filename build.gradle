@@ -3,8 +3,7 @@ plugins {
     id 'maven-publish'
     id 'idea'
     id 'net.neoforged.moddev' version '2.0.141'
-    // Adds the Kotlin Gradle plugin
-    id 'org.jetbrains.kotlin.jvm' version '2.2.20'
+    id 'org.jetbrains.kotlin.jvm' version '2.4.0' // Kotlin Gradle plugin
 }
 
 version = mod_version
@@ -23,6 +22,7 @@ base {
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+//compileKotlin.compilerOptions.jvmTarget = JvmTarget.JVM_25
 
 neoForge {
     // Specify the version of NeoForge to use.

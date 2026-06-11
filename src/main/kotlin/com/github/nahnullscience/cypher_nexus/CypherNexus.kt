@@ -17,7 +17,6 @@ import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.common.Mod
 import net.neoforged.neoforge.event.server.ServerStartingEvent
 import net.neoforged.neoforge.registries.NewRegistryEvent
-import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import kotlin.time.Duration.Companion.seconds
@@ -34,15 +33,30 @@ object CypherNexus {
     const val MOD_ID: String = "cypher_nexus"
 
     val LOGGER: Logger = LogManager.getLogger(MOD_ID)
+    val LOGGER_CYPHER: Logger = LogManager.getLogger("${MOD_ID}_cyphers")
 
-    fun modResource(path: String): Identifier =
-        Identifier.fromNamespaceAndPath(MOD_ID, path)
+    inline fun debugCypher(supplier: () -> String) {
+        if (false)
+        LOGGER.debug(supplier.invoke())
+    }
+    inline fun debug(supplier: () -> String) {
+        LOGGER.debug(supplier.invoke())
+    }
+    inline fun info(supplier: () -> String) {
+        LOGGER.info(supplier.invoke())
+    }
+    inline fun warn(supplier: () -> String) {
+        LOGGER.warn(supplier.invoke())
+    }
+
+    fun modResource(path: String) = Identifier.fromNamespaceAndPath(MOD_ID, path)
 
     fun modTranslation(namespace: String, path: String = ""): MutableComponent =
         Component.translatable("$namespace.$MOD_ID${if (!path.isEmpty()) ".$path" else ""}")
 
     init {
-        LOGGER.log(Level.INFO, "Hello world!")
+        LOGGER.info("Hello world!")
+
         ModBlocks.register()
         ModItems.register()
         ModEntities.register()
@@ -72,9 +86,9 @@ object CypherNexus {
 //        println(obj) // Minecraft
 
         CoroutineScope(Dispatchers.Default).launch {
-            LOGGER.log(Level.INFO, "Before delay")
+//            LOGGER.log(Level.INFO, "Before delay")
             delay(5.seconds)
-            LOGGER.log(Level.INFO, "After 5 seconds")
+//            LOGGER.log(Level.INFO, "After 5 seconds")
         }
 
         // Register ourselves for server and other game events we are interested in.

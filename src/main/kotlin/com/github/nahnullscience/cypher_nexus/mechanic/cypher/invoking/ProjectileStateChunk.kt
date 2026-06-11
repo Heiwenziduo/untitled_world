@@ -12,6 +12,7 @@ import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
+import java.util.EnumMap
 
 class ProjectileStateChunk private constructor (
     private var charge: Int,
@@ -25,7 +26,7 @@ class ProjectileStateChunk private constructor (
     }
 
     override var enabledFlags: Int = 0
-    val computedOperationMap = HashMap<CypherAttribute, HashMap<CypherAttributeOperation, Double>>()
+    val computedOperationMap = HashMap<CypherAttribute, EnumMap<CypherAttributeOperation, Double>>()
 
     private val hooks = HookContainer()
     private val modifiers = mutableListOf<ModifierNode>()
@@ -57,7 +58,7 @@ class ProjectileStateChunk private constructor (
                 hooks)
 
             val newPosPair = hooks.cumulateHooks(CypherBehaviorHooks.INVOKE_REDIRECT_POS_SERVER, posDire)
-            { h, l, pair -> h.redirectPosDireServer(level as ServerLevel, directInvoker, proj, l, pair, i) }
+            { h, l, pair -> h.redirectPosDireServer(level, directInvoker, proj, l, pair, i) }
 
             proj.setDirection(newPosPair)
             level.addFreshEntity(proj)

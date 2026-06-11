@@ -5,6 +5,7 @@ import com.mojang.serialization.DataResult
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import java.util.Locale.getDefault
+import kotlin.math.min
 
 
 enum class CypherAttributeOperation {
@@ -59,7 +60,11 @@ enum class CypherAttributeOperation {
         override fun formatString() = "="
     },
 
-
+    CAP_AT {
+        override val defaultValue = Double.MAX_VALUE
+        override fun cumulate(last: Double, new: Double): Double = min(last, new)
+        override fun formatString() = "<"
+    }
 
 
     ;
@@ -68,7 +73,6 @@ enum class CypherAttributeOperation {
     abstract fun cumulate(last: Double, new: Double) : Double
     abstract fun formatString() : String
     open fun format(value: Double) : MutableComponent = Component.literal("${formatString()}$value")
-
     override fun toString() = super.toString().lowercase(getDefault())
 
     companion object {
@@ -80,6 +84,7 @@ enum class CypherAttributeOperation {
                 "multiply_base" -> MULTIPLY_BASE
                 "multiply_total" -> MULTIPLY_TOTAL
                 "set_all" -> SET_ALL
+                "cap_at" -> SET_ALL
                 else -> throw IllegalArgumentException("$string is not a valid operator, valid operators are: ${entries.toList().map{ operation -> "$operation" }}")
             }
         }

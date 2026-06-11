@@ -10,8 +10,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAt
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.ChatFormatting
@@ -20,6 +18,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerPlayer
+import java.util.EnumMap
 
 /**
  *
@@ -40,7 +39,7 @@ sealed class AbstractCypher: IRegisterable {
 
     /** auto-detect hooks */
     val implementedHooks: List<HookModule<*>> by lazy {
-        if (this is AbstractNonProjectileCypher) {
+        if (this is AbstractProjectileCypher) {
             CypherNexus.LOGGER.warn("Don't register hooks on [{}], instead implement them on related entity directly.", this)
             return@lazy emptyList()
         }
@@ -102,7 +101,7 @@ sealed class AbstractCypher: IRegisterable {
         state: InvokingHelper.InvokingStateBundle,
         relativeIndex: Int
     ) {
-        CypherNexus.LOGGER.debug("[{}] is invoked and modifies the state", this)
+        CypherNexus.debugCypher { "[$this] is invoked and modifies the state" }
 
         modifyStateChunk(helper, data, chunk)
         var forwardState = chunk
@@ -134,7 +133,7 @@ sealed class AbstractCypher: IRegisterable {
         for (i in 0 until draw) {
             var cy = helper.drawNext()
             if (cy == null) {
-                CypherNexus.LOGGER.debug("[{}] want a wrap", this)
+                CypherNexus.debugCypher { "[$this] want a wrap" }
                 val wrap = helper.wrap()
                 if (!wrap) break // nothing to wrap, break
                 cy = helper.drawNext()
@@ -147,17 +146,17 @@ sealed class AbstractCypher: IRegisterable {
         if (chunk == helper.rootChunk) data.delay += delay
         data.recharge += recharge
 
-        attributes().stateChunk.forEach { (attribute, stateMap) ->
+        attributes().stateChunk.forEach { (attribute, cyMap) ->
             var targetChunk = chunk
             if (RECOIL.`is`(attribute.resource)) targetChunk = helper.rootChunk
 
-            val stateMap = targetChunk.computedOperationMap.getOrPut(attribute) { HashMap() }
+            val chunkMap = targetChunk.computedOperationMap.getOrPut(attribute) { EnumMap(CypherAttributeOperation::class.java) }
             // prune: if set, skip
-            if (stateMap[CypherAttributeOperation.SET_ALL] != null && stateMap[CypherAttributeOperation.SET_ALL] == null) return@forEach
+            if (chunkMap[CypherAttributeOperation.SET_ALL] != null && cyMap[CypherAttributeOperation.SET_ALL] == null) return@forEach
 
-            stateMap.forEach { (operator, value) ->
+            cyMap.forEach { (operator, value) ->
                 if (operator != CypherAttributeOperation.BASE) {
-                    stateMap.compute(operator) { op, v -> operator.cumulate(v?: operator.defaultValue, value) }
+                    chunkMap.compute(operator) { op, v -> operator.cumulate(v?: operator.defaultValue, value) }
                 }
             }
         }
@@ -235,15 +234,15 @@ sealed class AbstractCypher: IRegisterable {
             if (attribute.hide) return@registry
             val opMap = attributes().stateChunk.getOrElse(attribute) { return@registry }
             var values: MutableComponent? = null
-            CypherAttributeOperation.entries.forEach op@ { op ->
-                val v = opMap.getOrElse(op) { return@op }
+            CypherAttributeOperation.entries.forEach enum@ { op ->
+                val v = opMap.getOrElse(op) { return@enum }
                 if (values == null) values = op.format(v)
                 else values.append("; ").append(op.format(v))
             }
             val comp = Component.literal("  ")
                 .append(attribute.translation())
                 .append(Component.literal(": "))
-                .append(values?: Component.literal("ERROR").withStyle(ChatFormatting.YELLOW))
+                .append(values ?: Component.literal("ERROR").withStyle(ChatFormatting.YELLOW))
             components.add(comp)
         }
 

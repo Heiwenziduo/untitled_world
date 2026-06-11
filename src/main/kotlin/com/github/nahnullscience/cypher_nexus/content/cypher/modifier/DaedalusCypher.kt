@@ -23,6 +23,8 @@ object DaedalusCypher : ModifierCypher(), ServerInvokeRedirectPosHook {
         return super.defaultAttributes()
             .manaDrain(40f)
             .stateChunkAttr(CypherAttributes.SPEED, CypherAttributeOperation.MULTIPLY_TOTAL, 1.25)
+            .stateChunkAttr(CypherAttributes.RECOIL, CypherAttributeOperation.MULTIPLY_TOTAL, 0.0)
+            .stateChunkAttr(CypherAttributes.SPREAD, CypherAttributeOperation.ADD, 20.0)
     }
 
     override fun redirectPosDireServer(

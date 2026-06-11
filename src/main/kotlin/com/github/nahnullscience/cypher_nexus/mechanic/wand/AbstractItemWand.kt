@@ -46,15 +46,14 @@ abstract class AbstractItemWand(
         return InteractionResult.FAIL
     }
 
-    override fun releaseUsing(stack: ItemStack, level: Level, invoker: LivingEntity, remainingUseDuration: Int) : Boolean {
+    override fun onStopUsing(stack: ItemStack, invoker: LivingEntity, remainingUseDuration: Int) {
         // println("releaseUsing $level") // call on both sides
-        // NOTE if using is stopped by changing the stack (drop, switch, etc.), this function will not be called
-        if (invoker !is ServerPlayer) return false
-        val wandData = getWandData(stack, invoker) ?: return false
+        if (invoker !is ServerPlayer) return
+        val wandData = getWandData(stack, invoker) ?: return
 
-        val instance = invoker.getData(WAND_DATA_MAP).getOrPutInstance(wandData, this, level)
+        val instance = invoker.getData(WAND_DATA_MAP).getOrPutInstance(wandData, this, invoker.level())
         val useTime = getUseDuration(stack, invoker) - remainingUseDuration
-        if (level.gameTime - useTime >= instance.lastInvokeTime) return false // stop sync if no conduction performed
+        if (invoker.level().gameTime - useTime >= instance.lastInvokeTime) return  // stop sync if no conduction performed
 
         // FIXME this causes client delay / recharge bar flash, try sync somewhere else
         val helperBundle = instance.toHelperDataBundle()
@@ -68,7 +67,6 @@ abstract class AbstractItemWand(
                 helperBundle.deck
             )
         )
-        return true
     }
 
 

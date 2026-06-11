@@ -6,13 +6,12 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation.Companion.CODEC_OPERATION
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.mojang.serialization.Codec
-import com.mojang.serialization.codecs.RecordCodecBuilder
-import io.netty.buffer.ByteBuf
+import com.mojang.serialization.DataResult
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
+import java.util.*
 
 object CNCodecs {
 
@@ -34,8 +33,17 @@ object CNCodecs {
 
     val CYPHER_ATTRIBUTE: Codec<CypherAttribute> = CypherAttributes.REGISTRY.byNameCodec()
     /** represents a map that key is string-fied attribute-operator, and value is a double */
-    val CYPHER_OPERATION_MAP: Codec<Map<CypherAttributeOperation, Double>> =
-        Codec.unboundedMap(CODEC_OPERATION, Codec.DOUBLE)
+    val CYPHER_OPERATION_MAP: Codec<EnumMap<CypherAttributeOperation, Double>> =
+        Codec.unboundedMap(CODEC_OPERATION, Codec.DOUBLE).comapFlatMap(
+            { map ->
+                try {
+                    return@comapFlatMap DataResult.success(EnumMap(map))
+                } catch (e: IllegalArgumentException) {
+                    return@comapFlatMap DataResult.error { "$map is not a valid operator-map" }
+                }
+            },
+            { enumMap -> enumMap }
+        )
 
 //    val HOOK_CONTAINER: Codec<HookContainer> = Codec.recursive(HookContainer::class.simpleName) {
 //        recursedCodec -> RecordCodecBuilder.create()

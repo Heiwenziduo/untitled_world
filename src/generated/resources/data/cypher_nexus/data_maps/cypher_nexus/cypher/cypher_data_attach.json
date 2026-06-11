@@ -142,8 +142,14 @@
       "projectile": {},
       "recharge": 0,
       "stateChunk": {
+        "cypher_nexus:recoil": {
+          "multiply_total": 0.0
+        },
         "cypher_nexus:speed": {
           "multiply_total": 1.25
+        },
+        "cypher_nexus:spread": {
+          "add": 20.0
         }
       }
     },
