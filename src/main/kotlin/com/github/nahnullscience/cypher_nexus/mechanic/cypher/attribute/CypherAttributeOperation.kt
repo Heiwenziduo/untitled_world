@@ -19,13 +19,12 @@ enum class CypherAttributeOperation {
         }
         override fun formatString() = ""
     },
-    /**
-     * // TODO
-     *  */
-    SET_SELF {
-        override fun cumulate(last: Double, new: Double): Double = new
-        override fun formatString() = "="
-    },
+//    /**
+//     * specify self-set inside each projectile-entities */
+//    SET_SELF {
+//        override fun cumulate(last: Double, new: Double): Double = new
+//        override fun formatString() = "="
+//    },
 
     /** 1.0 -> add 1.0 */
     ADD {
@@ -76,7 +75,7 @@ enum class CypherAttributeOperation {
         fun string2operator(string: String) : CypherAttributeOperation {
             return when(string) {
                 "base" -> BASE
-                "set_self" -> SET_SELF
+//                "set_self" -> SET_SELF
                 "add" -> ADD
                 "multiply_base" -> MULTIPLY_BASE
                 "multiply_total" -> MULTIPLY_TOTAL

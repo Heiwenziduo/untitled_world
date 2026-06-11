@@ -49,7 +49,7 @@ open class CypherAttribute(
 
     class Builder(val resource: Identifier) {
         private var defaultValue: Double = 0.0
-        private var min: Double = -Double.MAX_VALUE
+        private var min: Double = 0.0
         private var max: Double = Double.MAX_VALUE
         private var sync: Boolean = true
         private var applyOn: AttributeApply = AttributeApply.PROJECTILE

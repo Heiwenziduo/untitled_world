@@ -20,8 +20,6 @@ object SpawnEggCypher : ProjectileCypher() {
     override val resource = CypherNexus.modResource("spawn_egg")
     override val projectileType = ModEntities.CYPHER_SPAWN_EGG
 
-//    val egg = ItemStack(Items.EGG)
-
     override fun defaultAttributes(): CypherDataMap.Builder {
         return super.defaultAttributes()
             .manaDrain(20f)
@@ -31,13 +29,6 @@ object SpawnEggCypher : ProjectileCypher() {
             .projectileAttr(CypherAttributes.EXISTING, 300.0)
             .projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
     }
-
-//    override fun visualEffectOnHit(level: Level, projectile: AbstractCypherProjectile) {
-//        val pos = projectile.position()
-//        for (i in 0..7) {
-//            level.addParticle(ItemParticleOption(ParticleTypes.ITEM, egg), pos.x, pos.y, pos.z, 0.0, 0.0, 0.0)
-//        }
-//    }
 
     override fun addToStateChunk(chunk: ProjectileStateChunk): ProjectileStateChunk {
         val subState = ProjectileStateChunk()

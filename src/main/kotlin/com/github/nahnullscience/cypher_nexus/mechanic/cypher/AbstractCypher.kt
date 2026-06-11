@@ -38,12 +38,15 @@ sealed class AbstractCypher: IRegisterable {
     /** use #addFlag during init */
     val flag: Int get() = _flag
 
-    /** auto detect hooks */
-    val implementedHooks: List<HookModule<*>> by lazy { // lazy init and cache result, cool
+    /** auto-detect hooks */
+    val implementedHooks: List<HookModule<*>> by lazy {
+        if (this is AbstractNonProjectileCypher) {
+            CypherNexus.LOGGER.warn("Don't register hooks on [{}], instead implement them on related entity directly.", this)
+            return@lazy emptyList()
+        }
         val hookModules = CypherBehaviorHooks.REGISTRY
         hookModules.filter { it.hook.isInstance(this) }
     }
-
     open val isRecursive: Boolean = false
     fun isEmpty() = this is EmptyCypher
     fun isNotEmpty() = !isEmpty()
@@ -144,16 +147,16 @@ sealed class AbstractCypher: IRegisterable {
         if (chunk == helper.rootChunk) data.delay += delay
         data.recharge += recharge
 
-        attributes().stateChunk.forEach { (attribute, cyMap) ->
+        attributes().stateChunk.forEach { (attribute, stateMap) ->
             var targetChunk = chunk
             if (RECOIL.`is`(attribute.resource)) targetChunk = helper.rootChunk
 
             val stateMap = targetChunk.computedOperationMap.getOrPut(attribute) { HashMap() }
             // prune: if set, skip
-            if (stateMap[CypherAttributeOperation.SET_ALL] != null && cyMap[CypherAttributeOperation.SET_ALL] == null) return@forEach
+            if (stateMap[CypherAttributeOperation.SET_ALL] != null && stateMap[CypherAttributeOperation.SET_ALL] == null) return@forEach
 
-            cyMap.forEach { (operator, value) ->
-                if (operator != CypherAttributeOperation.BASE && operator != CypherAttributeOperation.SET_SELF) {
+            stateMap.forEach { (operator, value) ->
+                if (operator != CypherAttributeOperation.BASE) {
                     stateMap.compute(operator) { op, v -> operator.cumulate(v?: operator.defaultValue, value) }
                 }
             }

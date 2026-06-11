@@ -8,7 +8,8 @@ import kotlin.collections.iterator
 import kotlin.jvm.optionals.getOrNull
 
 class HookContainer (
-    /** the "prototype", use to isolate projectile specific hooks (child) from StateBlock hooks (parent),
+    /**
+     * the "prototype", use to isolate projectile specific hooks (child) from StateBlock hooks (parent),
      * while iteration, search this(child) first, then parents
      *  */
     val parent: Optional<HookContainer> = Optional.empty()

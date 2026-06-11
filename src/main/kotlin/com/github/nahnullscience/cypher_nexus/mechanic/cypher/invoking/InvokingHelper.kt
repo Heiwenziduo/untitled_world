@@ -78,8 +78,8 @@ class InvokingHelper (
     }
 
     // =================================================================================
-    /** peek the next cypher in the deck, null if empty
-     *  @param next the next x-th cypher */
+//    /** peek the next cypher in the deck, null if empty
+//     *  @param next the next x-th cypher */
 //    fun peekNext(next: Int = 0): AbstractCypher? {
 //        var peekIndex = data.deck.countTrailingZeroBits()
 //        var stepIndex = peekIndex

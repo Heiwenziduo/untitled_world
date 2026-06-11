@@ -11,27 +11,4 @@ object ExplosionCypher : AbstractStaticSummonerCypher() {
     override val projectileType = ModEntities.CYPHER_EXPLOSION
 
     override fun defaultAttributes() = super.defaultAttributes().manaDrain(80f).delay(13).recharge(8)
-    override fun beforeDiscardBoth(
-        level: Level,
-        projectile: AbstractCypherProjectile,
-        strength: Int,
-        reason: AbstractCypherProjectile.DiscardReason
-    ) {
-        if (!level.isClientSide) {
-            val pos = projectile.position()
-            // check  net.minecraft.world.level.ExplosionDamageCalculator  &&  Explosion.BlockInteraction
-            level.explode(
-                projectile,
-                Explosion.getDefaultDamageSource(level, projectile),
-                null,
-                pos.x,
-                pos.y,
-                pos.z,
-                4.0f,
-                false,
-                Level.ExplosionInteraction.TNT
-            )
-        }
-    }
-
 }

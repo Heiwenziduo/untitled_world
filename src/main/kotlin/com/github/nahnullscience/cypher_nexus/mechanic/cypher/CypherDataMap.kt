@@ -17,7 +17,7 @@ data class CypherDataMap(
     val recharge: Int,
     val flags: Int,
 
-    val projectile: Map<CypherAttribute, Map<CypherAttributeOperation, Double>>,
+    val projectile: Map<CypherAttribute, Double>,
     val stateChunk: Map<CypherAttribute, Map<CypherAttributeOperation, Double>>,
 ) {
     companion object {
@@ -27,7 +27,7 @@ data class CypherDataMap(
             Codec.INT.fieldOf("delay").orElse(0).forGetter(CypherDataMap::delay),
             Codec.INT.fieldOf("recharge").orElse(0).forGetter(CypherDataMap::recharge),
             Codec.INT.fieldOf("flags").orElse(0).forGetter(CypherDataMap::flags),
-            Codec.unboundedMap(CYPHER_ATTRIBUTE, CYPHER_OPERATION_MAP)
+            Codec.unboundedMap(CYPHER_ATTRIBUTE, Codec.DOUBLE)
                     .fieldOf("projectile").orElse(HashMap()).forGetter(CypherDataMap::projectile),
             Codec.unboundedMap(CYPHER_ATTRIBUTE, CYPHER_OPERATION_MAP)
                     .fieldOf("stateChunk").orElse(HashMap()).forGetter(CypherDataMap::stateChunk),
@@ -38,13 +38,13 @@ data class CypherDataMap(
         fun builder() = Builder()
     }
 
-    open class Builder() {
+    open class Builder {
         private var manaDrain: Float = 0f
         private var draw: Int? = null
         private var delay: Int? = null
         private var recharge: Int? = null
         private var flags: Int = 0
-        private val projectile: HashMap<CypherAttribute, HashMap<CypherAttributeOperation, Double>> = HashMap()
+        private val projectile: HashMap<CypherAttribute, Double> = HashMap()
         private val stateChunk: HashMap<CypherAttribute, HashMap<CypherAttributeOperation, Double>> = HashMap()
 
         open fun manaDrain(float: Float): Builder = run { manaDrain = float; this@Builder }
@@ -56,8 +56,7 @@ data class CypherDataMap(
         // it seems datagen has a special lifecycle that can unpacks a holder directly (?)
         open fun projectileAttr(holder: Holder<CypherAttribute>, value: Double) = projectileAttr(holder.value(), value)
         open fun projectileAttr(attr: CypherAttribute, value: Double): Builder {
-            val opMap = projectile.getOrPut(attr) { HashMap() }
-            opMap[CypherAttributeOperation.BASE] = value
+            projectile[attr] = value
             return this
         }
 

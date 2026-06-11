@@ -32,22 +32,22 @@ object CypherAttributes {
     // ================================ invoking
     /** degree */
     val SPREAD = registerAttribute("spread")
-    { builder -> builder.min(0.0).max(720.0).applyOn(AttributeApply.INVOKING) }
+    { builder -> builder.max(720.0).applyOn(AttributeApply.INVOKING) }
     val RECOIL = registerAttribute("recoil")
-    { builder -> builder.min(0.0).max(1000.0).applyOn(AttributeApply.INVOKING).hide() }
+    { builder -> builder.max(1000.0).applyOn(AttributeApply.INVOKING).hide() }
     // ================================ projectile
     val DAMAGE = registerAttribute("damage")
-    { builder -> builder.min(0.0).notSync() }
+    { builder -> builder.min(-Double.MAX_VALUE).notSync() }
     /** 1.00 <-> 100% */
     val CRIT_CHANCE = registerAttribute("crit_chance")
-    { builder -> builder.min(0.0).notSync() }
+    { builder -> builder.notSync() }
     val KNOCKBACK = registerAttribute("knockback")
-    { builder -> builder.min(0.0).max(1000.0).notSync().hide() }
+    { builder -> builder.max(1000.0).notSync().hide() }
     val FORTUNE_LEVEL = registerAttribute("fortune")
     { builder -> builder.min(-1.0).max(100.0).notSync().hide() }
     /** initial speed, in unit block per tick, will show block/sec to player */
     val SPEED = registerAttribute("speed")
-    { builder -> builder.min(0.0).max(16.0) }
+    { builder -> builder.max(16.0) }
     /** tick */
     val EXISTING = registerAttribute("existing")
     { builder -> builder.default(200.0) }
@@ -55,11 +55,11 @@ object CypherAttributes {
     { builder -> builder.default(1.0).min(0.0625).max(16.0) }
     /** int, bounce times */
     val BOUNCE = registerAttribute("bounce")
-    { builder -> builder.min(0.0).max(100.0) }
+    { builder -> builder.max(100.0) }
     /** how much it falls each tick */
     val GRAVITY_FACTOR = registerAttribute("gravity_factor")
     { builder -> builder.min(-1.0).max(1.0).hide() }
     /** deltaMovement * (1 - Friction) each tick, 0.01 by default */
     val FRICTION_FACTOR = registerAttribute("friction_factor")
-    { builder -> builder.default(0.01).min(-9.0).max(1.0).hide() }
+    { builder -> builder.default(0.03).min(-9.0).max(1.0).hide() }
 }
