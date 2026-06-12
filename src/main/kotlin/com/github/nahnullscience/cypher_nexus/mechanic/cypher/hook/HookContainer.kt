@@ -18,6 +18,8 @@ class HookContainer (
         _map = map
     }
 
+    override fun toString() = _map.toString()
+
     /* @doc
      * LinkedHashMap maintains a doubly-linked list of its entries to preserve insertion order.
      * The least recently inserted entry (the eldest) is first, and the youngest entry is last.
@@ -25,15 +27,17 @@ class HookContainer (
      * */
     private var _map = HashMap<HookModule<*>, LinkedHashMap<AbstractCypher, Int>>()
 
-    fun add(cypher: AbstractCypher) {
+    fun add(cypher: AbstractCypher) = add(cypher, 1)
+    fun add(cypher: AbstractCypher, count: Int) {
         for (module in cypher.implementedHooks) {
-            add(module, cypher)
+            add(module, cypher, count)
         }
     }
-    fun add(module: HookModule<*>, cypher: AbstractCypher) {
+    fun add(module: HookModule<*>, cypher: AbstractCypher) = add(module, cypher, 1)
+    fun add(module: HookModule<*>, cypher: AbstractCypher, count: Int) {
         if (module.hook.isInstance(cypher)) {
             val cypherMap = _map.getOrPut(module) { LinkedHashMap() }
-            cypherMap[cypher] = cypherMap.getOrDefault(cypher, 0) + 1
+            cypherMap[cypher] = cypherMap.getOrDefault(cypher, 0) + count
         } else {
             // a cypher registered a HookModule it doesn't actually implement.
             CypherNexus.LOGGER.error("Cypher $cypher claimed to have module $module but doesn't implement it!")

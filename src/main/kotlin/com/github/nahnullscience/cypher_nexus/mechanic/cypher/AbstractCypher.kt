@@ -6,7 +6,7 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes.RECOIL
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
@@ -150,12 +150,12 @@ sealed class AbstractCypher: IRegisterable {
             var targetChunk = chunk
             if (RECOIL.`is`(attribute.resource)) targetChunk = helper.rootChunk
 
-            val chunkMap = targetChunk.computedOperationMap.getOrPut(attribute) { EnumMap(CypherAttributeOperation::class.java) }
+            val chunkMap = targetChunk.computedOperationMap.getOrPut(attribute) { EnumMap(AttributeOperator::class.java) }
             // prune: if set, skip
-            if (chunkMap[CypherAttributeOperation.SET_ALL] != null && cyMap[CypherAttributeOperation.SET_ALL] == null) return@forEach
+            if (chunkMap[AttributeOperator.SET_ALL] != null && cyMap[AttributeOperator.SET_ALL] == null) return@forEach
 
             cyMap.forEach { (operator, value) ->
-                if (operator != CypherAttributeOperation.BASE) {
+                if (operator != AttributeOperator.BASE) {
                     chunkMap.compute(operator) { op, v -> operator.cumulate(v?: operator.defaultValue, value) }
                 }
             }
@@ -165,6 +165,8 @@ sealed class AbstractCypher: IRegisterable {
             chunk.attachHooks(this)
             chunk.enableFlags(flag)
         }
+
+        chunk.record(this)
     }
 
 //    open fun discardFromDeck(helper: InvokingHelper,) {
@@ -234,7 +236,7 @@ sealed class AbstractCypher: IRegisterable {
             if (attribute.hide) return@registry
             val opMap = attributes().stateChunk.getOrElse(attribute) { return@registry }
             var values: MutableComponent? = null
-            CypherAttributeOperation.entries.forEach enum@ { op ->
+            AttributeOperator.entries.forEach enum@ { op ->
                 val v = opMap.getOrElse(op) { return@enum }
                 if (values == null) values = op.format(v)
                 else values.append("; ").append(op.format(v))

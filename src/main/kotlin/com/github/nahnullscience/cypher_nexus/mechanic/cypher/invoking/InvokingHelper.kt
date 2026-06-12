@@ -225,9 +225,11 @@ class InvokingHelper (
         var alreadyRefreshed: Boolean = false,
 
         var drawEnabled: Boolean = true,
-        var isCopiedCypher: Boolean = false,
+//        var isCopiedCypher: Boolean = false,
         var recursiveDepth: Int = 0,
+
         var divideByChainLength: Int = 0,
+        var divideByChainLengthMax: Int = 0,
     ) {
         // val map = ... // attach additional data if desire
     }

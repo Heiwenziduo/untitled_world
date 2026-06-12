@@ -112,24 +112,4 @@ abstract class AbstractItemWand(
         return PosDirePair(pos, dire)
     }
 
-
-    companion object {
-        // TODO check data authentic
-        fun editWand(stack: ItemStack, list: List<AbstractCypher>) {
-            println("editWand: $stack")
-            // TODO maybe we should use AbstractItemWand instead?
-            if (stack.item is IWandLike) {
-                stack.set(ModDataComponents.WAND_HIGH_PAYLOAD, WandDataHighPayload(ArrayOfCyphers(list)))
-            }
-        }
-//        fun resetIndex(stack: ItemStack) {
-//            println("resetIndex: $stack")
-//            if (stack.item is IWandLike) {
-//                val fre = stack.get(ModDataComponents.WAND_FREQUENT)
-//                if (fre != null) {
-//                    stack.set(ModDataComponents.WAND_FREQUENT, fre.fromStart())
-//                }
-//            }
-//        }
-    }
 }

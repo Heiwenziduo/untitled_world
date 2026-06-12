@@ -5,7 +5,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCyp
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeRedirectPosHook
 import com.github.nahnullscience.cypher_nexus.utility.RayCastUtility
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
@@ -22,21 +22,22 @@ object DaedalusCypher : ModifierCypher(), ServerInvokeRedirectPosHook {
     override fun defaultAttributes(): CypherDataMap.Builder {
         return super.defaultAttributes()
             .manaDrain(40f)
-            .stateChunkAttr(CypherAttributes.SPEED, CypherAttributeOperation.MULTIPLY_TOTAL, 1.25)
-            .stateChunkAttr(CypherAttributes.RECOIL, CypherAttributeOperation.MULTIPLY_TOTAL, 0.0)
-            .stateChunkAttr(CypherAttributes.SPREAD, CypherAttributeOperation.ADD, 20.0)
+            .stateChunkAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 1.25)
+            .stateChunkAttr(CypherAttributes.RECOIL, AttributeOperator.MULTIPLY_TOTAL, 0.0)
+            .stateChunkAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 20.0)
     }
 
     override fun redirectPosDireServer(
         level: ServerLevel,
         invoker: Entity?,
+        owner: Entity?,
         projectile: AbstractCypherProjectile,
         strength: Int,
         pair: PosDirePair,
         index: Int
     ): PosDirePair {
-        val height = -8.0 + 16.0 * strength
-        val length = 12.0 + 8.0 * strength
+        val height = (16.0 + 8.0 * strength).coerceAtMost(128.0)
+        val length = (16.0 + 8.0 * strength).coerceAtMost(128.0)
         val (start, direction) = pair
         if (invoker != null && direction != Vec3.ZERO) {
             val route = direction.normalize().scale(length)

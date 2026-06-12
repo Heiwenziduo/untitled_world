@@ -75,7 +75,7 @@ class WandInstance(
     fun recoilModule(invoker: Entity, recoil: Double, invokePosDire: PosDirePair) {
         // TODO recoil module
         // for now, push invoker for ease
-        println("do some recoil: $recoil   ${side()}")
+//        println("do some recoil: $recoil   ${side()}")
 
         // since it is the client side that is Player position authoritative
         // this logic should run on both side, client for smooth movement, server for verification

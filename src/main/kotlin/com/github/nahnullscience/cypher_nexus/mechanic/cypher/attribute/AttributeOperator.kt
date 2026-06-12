@@ -6,19 +6,20 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import java.util.Locale.getDefault
 import kotlin.math.min
+import kotlin.math.pow
 
 
-enum class CypherAttributeOperation {
+enum class AttributeOperator {
     /**
      * Base value of one cast, mostly on ProjectileCyphers,
      * without base value, the attribute will be ignored.
      * Can be set via special ModifierCyphers.
      * */
     BASE {
-        override fun cumulate(last: Double, new: Double): Double {
-            return new // we can assume if another BASE passed in, this only happens when another ConsumerCypher is called
-        }
-        override fun formatString() = ""
+        override val defaultValue = 0.0
+        override fun cumulate(last: Double, new: Double): Double = new // this should not happen
+        override fun cumulate(last: Double, new: Double, times: Int): Double = cumulate(last, new)
+        override fun formatSymbol() = ""
     },
 //    /**
 //     * specify self-set inside each projectile-entities */
@@ -29,18 +30,21 @@ enum class CypherAttributeOperation {
 
     /** 1.0 -> add 1.0 */
     ADD {
+        override val defaultValue = 0.0
         override fun cumulate(last: Double, new: Double): Double = last + new
-        override fun formatString() = "+"
+        override fun cumulate(last: Double, new: Double, times: Int): Double = last + new * times
+        override fun formatSymbol() = "+"
         override fun format(value: Double): MutableComponent {
             return if (value > 0) super.format(value) else Component.literal("$value")
         }
     },
     /** 0.33 -> plus 33% */
     MULTIPLY_BASE {
-        // override val defaultValue = 1.0
         // defaultValue may cumulate multiple times while map initialization(at AbsCypher & Helper)
+        override val defaultValue = 0.0
         override fun cumulate(last: Double, new: Double): Double = last + new
-        override fun formatString() = "+"
+        override fun cumulate(last: Double, new: Double, times: Int): Double = last + new * times
+        override fun formatSymbol() = "+"
         override fun format(value: Double): MutableComponent {
             return super.format(value * 100).append("%")
         }
@@ -49,34 +53,52 @@ enum class CypherAttributeOperation {
     MULTIPLY_TOTAL {
         override val defaultValue = 1.0
         override fun cumulate(last: Double, new: Double): Double = last * new
-        override fun formatString() = "x"
+        override fun cumulate(last: Double, new: Double, times: Int): Double = last * new.pow(times)
+        override fun formatSymbol() = "x"
     },
     /**
      * Force an attribute to become an invariable value,
      * will ignore other operations.
      * */
     SET_ALL {
+        override val defaultValue = 0.0
         override fun cumulate(last: Double, new: Double): Double = new
-        override fun formatString() = "="
+        override fun cumulate(last: Double, new: Double, times: Int): Double = new
+        override fun formatSymbol() = "="
     },
 
     CAP_AT {
         override val defaultValue = Double.MAX_VALUE
         override fun cumulate(last: Double, new: Double): Double = min(last, new)
-        override fun formatString() = "<"
+        override fun cumulate(last: Double, new: Double, times: Int): Double = min(last, new)
+        override fun formatSymbol() = "<"
     }
 
 
     ;
 //    abstract fun <T> apply(v1: T, v2: T) : T
-    open val defaultValue: Double = 0.0
+    abstract val defaultValue: Double
     abstract fun cumulate(last: Double, new: Double) : Double
-    abstract fun formatString() : String
-    open fun format(value: Double) : MutableComponent = Component.literal("${formatString()}$value")
+    abstract fun cumulate(last: Double, new: Double, times: Int) : Double
+    abstract fun formatSymbol() : String
+
+    open fun format(value: Double) : MutableComponent = Component.literal("${formatSymbol()}$value")
     override fun toString() = super.toString().lowercase(getDefault())
 
     companion object {
-        fun string2operator(string: String) : CypherAttributeOperation {
+        fun attributeCalculator(opMap: Map<AttributeOperator, Double>, base: Double) : Double {
+            val s = opMap[SET_ALL]
+            if (s != null) return s
+
+            val a = opMap.getOrDefault(ADD, ADD.defaultValue)
+            val m1 = opMap.getOrDefault(MULTIPLY_BASE, MULTIPLY_BASE.defaultValue)
+            val m2 = opMap.getOrDefault(MULTIPLY_TOTAL, MULTIPLY_TOTAL.defaultValue)
+            val cap = opMap.getOrDefault(CAP_AT, CAP_AT.defaultValue)
+            return ((base + a) * (m1 + 1) * m2).coerceAtMost(cap)
+        }
+
+
+        fun string2operator(string: String) : AttributeOperator {
             return when(string) {
                 "base" -> BASE
 //                "set_self" -> SET_SELF
@@ -92,7 +114,7 @@ enum class CypherAttributeOperation {
         // Given a string codec to convert to a integer
         // Not all strings can become integers (A is not fully equivalent to B)
         // All integers can become strings (B is fully equivalent to A)
-        val CODEC_OPERATION: Codec<CypherAttributeOperation> = Codec.STRING.comapFlatMap(
+        val CODEC_OPERATION: Codec<AttributeOperator> = Codec.STRING.comapFlatMap(
             { s ->
                 try {
                     return@comapFlatMap DataResult.success(string2operator(s))
@@ -100,7 +122,7 @@ enum class CypherAttributeOperation {
                     return@comapFlatMap DataResult.error { "$s is not a valid operator" }
                 }
             },
-            CypherAttributeOperation::toString
+            AttributeOperator::toString
         )
     }
 }

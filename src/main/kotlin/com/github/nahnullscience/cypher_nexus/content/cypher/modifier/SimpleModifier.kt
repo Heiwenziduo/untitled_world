@@ -4,7 +4,7 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import net.minecraft.core.Holder
 import java.util.EnumMap
@@ -21,7 +21,7 @@ class SimpleModifier(
 
     private var _color: Int = 0
     // register timing can't unpack holder, so use holder directly here
-    private val stateChunkHolder: HashMap<Holder<CypherAttribute>, EnumMap<CypherAttributeOperation, Double>> = HashMap()
+    private val stateChunkHolder: HashMap<Holder<CypherAttribute>, EnumMap<AttributeOperator, Double>> = HashMap()
 
     override fun manaDrain(float: Float) = run { super.manaDrain(float); this }
     override fun draw(int: Int) = run { super.draw(int); this }
@@ -35,17 +35,17 @@ class SimpleModifier(
 
     override fun stateChunkAttr(
         holder: Holder<CypherAttribute>,
-        operator: CypherAttributeOperation,
+        operator: AttributeOperator,
         value: Double
     ): SimpleModifier {
-        val opMap = stateChunkHolder.getOrPut(holder) { EnumMap(CypherAttributeOperation::class.java) }
+        val opMap = stateChunkHolder.getOrPut(holder) { EnumMap(AttributeOperator::class.java) }
         opMap[operator] = value
         return this
     }
 
     fun attribute(
         holder: Holder<CypherAttribute>,
-        operator: CypherAttributeOperation,
+        operator: AttributeOperator,
         value: Double
     ) = stateChunkAttr(holder, operator, value)
 

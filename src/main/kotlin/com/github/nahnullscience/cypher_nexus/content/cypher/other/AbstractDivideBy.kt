@@ -5,11 +5,12 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
+import kotlin.math.max
 
 abstract class AbstractDivideBy() : AbstractNonProjectileCypher() {
     override val category = CypherCategories.OTHER
@@ -34,6 +35,7 @@ abstract class AbstractDivideBy() : AbstractNonProjectileCypher() {
         CypherNexus.debugCypher { "[$this] will copy: [$target]" }
 
         val currentDepth = state.divideByChainLength++
+        state.divideByChainLengthMax = max(state.divideByChainLengthMax, currentDepth)
 
         val canGoDeeper =  state.divideByChainLength <= chainPositionLimit
 
@@ -49,7 +51,8 @@ abstract class AbstractDivideBy() : AbstractNonProjectileCypher() {
         // FIXME discard index is wrong
         // if this is the beginning of one chain, do discard based on chain length
         if (currentDepth == 0) {
-            CypherNexus.debugCypher { "divide by chain finish, discard next ${state.divideByChainLength + 1}" }
+            CypherNexus.debugCypher { "divide by chain finish, discard next ${state.divideByChainLengthMax + 1}" }
+            state.divideByChainLengthMax = 0
             for (i in 0 .. state.divideByChainLength) helper.deckNext2discard()
         }
         state.divideByChainLength = currentDepth
@@ -63,8 +66,8 @@ abstract class AbstractDivideBy() : AbstractNonProjectileCypher() {
             return super.defaultAttributes()
                 .manaDrain(70f)
                 .delay(3)
-                .stateChunkAttr(CypherAttributes.DAMAGE, CypherAttributeOperation.ADD, -2.0)
-                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, CypherAttributeOperation.MULTIPLY_BASE, -0.1)
+                .stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -2.0)
+                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.1)
         }
     }
 
@@ -76,8 +79,8 @@ abstract class AbstractDivideBy() : AbstractNonProjectileCypher() {
             return super.defaultAttributes()
                 .manaDrain(110f)
                 .delay(5)
-                .stateChunkAttr(CypherAttributes.DAMAGE, CypherAttributeOperation.ADD, -3.0)
-                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, CypherAttributeOperation.MULTIPLY_BASE, -0.15)
+                .stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -3.0)
+                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.15)
         }
     }
 
@@ -89,8 +92,8 @@ abstract class AbstractDivideBy() : AbstractNonProjectileCypher() {
             return super.defaultAttributes()
                 .manaDrain(150f)
                 .delay(7)
-                .stateChunkAttr(CypherAttributes.DAMAGE, CypherAttributeOperation.ADD, -4.0)
-                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, CypherAttributeOperation.MULTIPLY_BASE, -0.2)
+                .stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -4.0)
+                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.2)
         }
     }
 
@@ -102,8 +105,8 @@ abstract class AbstractDivideBy() : AbstractNonProjectileCypher() {
             return super.defaultAttributes()
                 .manaDrain(240f)
                 .delay(15)
-                .stateChunkAttr(CypherAttributes.DAMAGE, CypherAttributeOperation.ADD, -10.0)
-                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, CypherAttributeOperation.MULTIPLY_BASE, -0.5)
+                .stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -10.0)
+                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.5)
         }
     }
 }

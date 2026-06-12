@@ -11,7 +11,8 @@ import net.minecraft.world.entity.Entity
 interface ServerInvokeRedirectPosHook {
     /**
      * @param level Level
-     * @param invoker who invokes the cypher
+     * @param invoker who invokes the cypher, this may be another cypher (trigger)
+     * @param owner the entity that fires the cypher
      * @param strength how many times the cypher is invoked
      * @param pair cumulated position & direction, will be forward
      * @param index some mythic number
@@ -19,6 +20,7 @@ interface ServerInvokeRedirectPosHook {
     fun redirectPosDireServer(
         level: ServerLevel,
         invoker: Entity?,
+        owner: Entity?,
         projectile: AbstractCypherProjectile,
         strength: Int,
         pair: PosDirePair,

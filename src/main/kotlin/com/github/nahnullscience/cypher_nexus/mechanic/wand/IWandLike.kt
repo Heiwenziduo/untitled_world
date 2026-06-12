@@ -1,8 +1,12 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand
 
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
+import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
+import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
@@ -65,5 +69,13 @@ interface IWandLike {
 
     companion object {
         fun validItemWand(stack: ItemStack): Boolean = !stack.isEmpty && stack.item is IWandLike
+
+        fun editItemWand(stack: ItemStack, list: List<AbstractCypher>) {
+            println("editWand: $stack")
+            if (validItemWand(stack)) {
+                stack.set(ModDataComponents.WAND_HIGH_PAYLOAD, WandDataHighPayload(ArrayOfCyphers(list)))
+            }
+        }
+
     }
 }

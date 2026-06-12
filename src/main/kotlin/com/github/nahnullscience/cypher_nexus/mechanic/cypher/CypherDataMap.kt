@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.CYPHER_ATTRIBUTE
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.CYPHER_OPERATION_MAP
@@ -19,7 +19,7 @@ data class CypherDataMap(
     val flags: Int,
 
     val projectile: Map<CypherAttribute, Double>,
-    val stateChunk: Map<CypherAttribute, EnumMap<CypherAttributeOperation, Double>>,
+    val stateChunk: Map<CypherAttribute, EnumMap<AttributeOperator, Double>>,
 ) {
     companion object {
         val CODEC: Codec<CypherDataMap> = RecordCodecBuilder.create() { it.group(
@@ -46,7 +46,7 @@ data class CypherDataMap(
         private var recharge: Int? = null
         private var flags: Int = 0
         private val projectile: HashMap<CypherAttribute, Double> = HashMap()
-        private val stateChunk: HashMap<CypherAttribute, EnumMap<CypherAttributeOperation, Double>> = HashMap()
+        private val stateChunk: HashMap<CypherAttribute, EnumMap<AttributeOperator, Double>> = HashMap()
 
         open fun manaDrain(float: Float): Builder = run { manaDrain = float; this@Builder }
         open fun draw(int: Int): Builder = run { draw = int; this@Builder }
@@ -61,9 +61,9 @@ data class CypherDataMap(
             return this
         }
 
-        open fun stateChunkAttr(holder: Holder<CypherAttribute>, operator: CypherAttributeOperation, value: Double) = stateChunkAttr(holder.value(), operator, value)
-        open fun stateChunkAttr(attr: CypherAttribute, operator: CypherAttributeOperation, value: Double): Builder {
-            val opMap = stateChunk.getOrPut(attr) { EnumMap(CypherAttributeOperation::class.java) }
+        open fun stateChunkAttr(holder: Holder<CypherAttribute>, operator: AttributeOperator, value: Double) = stateChunkAttr(holder.value(), operator, value)
+        open fun stateChunkAttr(attr: CypherAttribute, operator: AttributeOperator, value: Double): Builder {
+            val opMap = stateChunk.getOrPut(attr) { EnumMap(AttributeOperator::class.java) }
             opMap[operator] = value
             return this
         }

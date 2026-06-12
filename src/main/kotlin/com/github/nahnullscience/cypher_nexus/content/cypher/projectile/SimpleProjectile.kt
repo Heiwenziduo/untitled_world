@@ -4,7 +4,7 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttributeOperation
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import net.minecraft.core.Holder
@@ -23,7 +23,7 @@ class SimpleProjectile(
     private var _color: Int = 0
 
     private val projectileAttrHolder: HashMap<Holder<CypherAttribute>, Double> = HashMap()
-    private val stateChunkHolder: HashMap<Holder<CypherAttribute>, EnumMap<CypherAttributeOperation, Double>> = HashMap()
+    private val stateChunkHolder: HashMap<Holder<CypherAttribute>, EnumMap<AttributeOperator, Double>> = HashMap()
 
     override fun manaDrain(float: Float) = run { super.manaDrain(float); this }
     override fun draw(int: Int) = run { super.draw(int); this }
@@ -36,8 +36,8 @@ class SimpleProjectile(
         projectileAttrHolder[holder] = value
         this@SimpleProjectile
     }
-    override fun stateChunkAttr(holder: Holder<CypherAttribute>, operator: CypherAttributeOperation, value: Double) = run {
-        val opMap = stateChunkHolder.getOrPut(holder) { EnumMap(CypherAttributeOperation::class.java) }
+    override fun stateChunkAttr(holder: Holder<CypherAttribute>, operator: AttributeOperator, value: Double) = run {
+        val opMap = stateChunkHolder.getOrPut(holder) { EnumMap(AttributeOperator::class.java) }
         opMap[operator] = value
         this@SimpleProjectile
     }

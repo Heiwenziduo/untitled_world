@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.content.entity.statics
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers.EXPLOSION
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractStaticSummoner
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level

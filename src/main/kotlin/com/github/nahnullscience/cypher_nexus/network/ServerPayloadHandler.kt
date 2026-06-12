@@ -2,7 +2,6 @@ package com.github.nahnullscience.cypher_nexus.network
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.AbstractItemWand
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.network.server.ServerboundEditWandCyphers
@@ -39,7 +38,8 @@ object ServerPayloadHandler {
             }
 
             if (!stack.isEmpty) {
-                AbstractItemWand.editWand(stack, data.cyphers)
+                // TODO check data authentic
+                IWandLike.editItemWand(stack, data.cyphers)
                 player.getData(WAND_DATA_MAP).updateWandStats(stack, stack.item as IWandLike, player.level())
             }
 

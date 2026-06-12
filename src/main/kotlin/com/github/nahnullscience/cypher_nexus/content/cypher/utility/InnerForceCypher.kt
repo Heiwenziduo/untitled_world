@@ -22,12 +22,13 @@ object InnerForceCypher : AbstractNonProjectileCypher(), ServerInvokeRedirectPos
     override fun redirectPosDireServer(
         level: ServerLevel,
         invoker: Entity?,
+        owner: Entity?,
         projectile: AbstractCypherProjectile,
         strength: Int,
         pair: PosDirePair,
         index: Int
     ): PosDirePair {
-        invoker?: return pair
-        return PosDirePair(invoker.eyePosition, invoker.eyePosition.vectorTo(pair.position))
+        owner?: return pair
+        return PosDirePair(owner.eyePosition, owner.eyePosition.vectorTo(pair.position))
     }
 }
