@@ -28,14 +28,12 @@ sealed class AbstractCypher: IRegisterable {
     val draw: Int get() = attributes().draw
     val delay: Int get() = attributes().delay
     val recharge: Int get() = attributes().recharge
+    val flags: Int get() = attributes().flags
 
     /** whether the cypher shows in the index(left side) */
     open val hide: Boolean = false
     /** override colors from category */
     open val color: Int = 0
-    private var _flag: Int = 0
-    /** use #addFlag during init */
-    val flag: Int get() = _flag
 
     /** auto-detect hooks */
     val implementedHooks: List<HookModule<*>> by lazy {
@@ -63,7 +61,7 @@ sealed class AbstractCypher: IRegisterable {
     abstract val category: Holder<CypherCategory>
 
 
-    // = attr & data attach ==============================================================================================
+    // attr & data attach ==============================================================================================
 
 //    fun holder(): Holder.Reference<AbstractCypher> = Cyphers.REGISTRY.getHolder(resource).getOrElse()
 //    { throw CypherNotFoundException("$resource not exist") }
@@ -163,7 +161,7 @@ sealed class AbstractCypher: IRegisterable {
         if (this is AbstractNonProjectileCypher) {
             // hooks on NonProjectile affect the Block, hooks on Projectile only affect itself
             chunk.attachHooks(this)
-            chunk.enableFlags(flag)
+            chunk.enableFlags(flags)
         }
 
         chunk.record(this)

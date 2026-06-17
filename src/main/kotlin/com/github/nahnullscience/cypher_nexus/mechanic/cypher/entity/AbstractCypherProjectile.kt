@@ -127,15 +127,9 @@ abstract class AbstractCypherProjectile(
         set(value) {
             _attributeMap[CypherAttributes.EXISTING.value()] = CypherAttributes.EXISTING.value().restrictRange(value.toDouble())
         }
-    var bounce: Int
-        get() = getAttrOrProjDefault(CypherAttributes.BOUNCE).toInt()
-        set(value) = Unit
-    var gravity: Float
-        get() = getAttrOrProjDefault(CypherAttributes.GRAVITY_FACTOR).toFloat()
-        set(value) = Unit
-    var speedFactor: Float
-        get() = 1f - getAttrOrProjDefault(CypherAttributes.FRICTION_FACTOR).toFloat()
-        set(value) = Unit
+    val bounce: Int get() = getAttrOrProjDefault(CypherAttributes.BOUNCE).toInt()
+    val gravity: Float get() = getAttrOrProjDefault(CypherAttributes.GRAVITY_FACTOR).toFloat()
+    val speedFactor: Float get() = 1f - getAttrOrProjDefault(CypherAttributes.FRICTION_FACTOR).toFloat()
 
 
 //    /** the direct entity create the projectile, invoker could be another projectile if trigger */
@@ -180,7 +174,7 @@ abstract class AbstractCypherProjectile(
     ) {
         if (isInitialized) CypherNexus.LOGGER.debug("{} is already initialized", this)
         setOwner(invoker)
-        enabledFlags = shotState.enabledFlags or cypher.flag
+        enabledFlags = shotState.enabledFlags or cypher.flags
         _payload = node.payload
         _trigger = node.trigger
 
@@ -195,7 +189,7 @@ abstract class AbstractCypherProjectile(
     private fun initFromMoCC(mocc: MapOfCypherCounts) {
         println("${level()} init from $mocc")
         val state = StateChunkPool.getOrCreateStateChunk(mocc)
-        enabledFlags = state.enabledFlags or cypher.flag
+        enabledFlags = state.enabledFlags or cypher.flags
         setHooks(state.hooks)
         initAttributes(state)
     }

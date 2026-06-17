@@ -8,7 +8,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAt
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlaggable
-import com.github.nahnullscience.cypher_nexus.utility.mod.CypherUtility
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.server.level.ServerLevel
@@ -102,7 +101,7 @@ class ProjectileStateChunk private constructor (
         _countMap.forEach { (cypher, i) ->
 
             if (cypher is AbstractNonProjectileCypher) {
-                enableFlags(cypher.flag)
+                enableFlags(cypher.flags)
                 hooks.add(cypher, i)
             }
 

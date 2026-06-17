@@ -553,7 +553,7 @@
       "recharge": -6,
       "stateChunk": {}
     },
-    "cypher_nexus:randomize": {
+    "cypher_nexus:randomize_shot": {
       "delay": -3,
       "draw": 1,
       "flags": 0,
@@ -707,11 +707,11 @@
         }
       }
     },
-    "cypher_nexus:turn_to_target": {
+    "cypher_nexus:turn_toward_target": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 40.0,
+      "manaDrain": 30.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {}

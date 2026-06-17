@@ -83,7 +83,7 @@ abstract class AbstractHoming(path: String, private val _manaDrain: Float): Modi
         }
     }
 
-    object TurnToTarget: AbstractHoming("turn_to_target", 40f) {
+    object TurnToTarget: AbstractHoming("turn_toward_target", 30f) {
         override fun tickBehaviorBoth(
             level: Level,
             projectile: AbstractCypherProjectile,

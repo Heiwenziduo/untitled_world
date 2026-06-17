@@ -198,8 +198,8 @@ object Cyphers {
     val REDUCE_SPREAD = registerCypher(
         SimpleModifier("reduce_spread", 1f)
             .attribute(CypherAttributes.SPREAD, AttributeOperator.ADD, -60.0))
-    val RANDOMIZE = registerCypher(
-        SimpleModifier("randomize", 3f)
+    val RANDOMIZE_SHOT = registerCypher(
+        SimpleModifier("randomize_shot", 3f)
             .delay(-3)
             .recharge(-5)
             .attribute(CypherAttributes.SPREAD, AttributeOperator.ADD, 720.0))
@@ -209,7 +209,6 @@ object Cyphers {
     val RECOIL_DAMPER = registerCypher(
         SimpleModifier("recoil_damper", 5f)
             .attribute(CypherAttributes.RECOIL, AttributeOperator.ADD, -20.0))
-
     val HOMING = registerCypher(AbstractHoming.Homing)
     val TURN_TO_TARGET = registerCypher(AbstractHoming.TurnToTarget)
     val BOOMERANG = registerCypher(BoomerangCypher)
