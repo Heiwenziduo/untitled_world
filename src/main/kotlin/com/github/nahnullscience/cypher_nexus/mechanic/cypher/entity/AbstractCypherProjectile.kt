@@ -8,7 +8,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.Attribut
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookSharingData
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.StateChunkPool
@@ -19,13 +19,14 @@ import com.github.nahnullscience.cypher_nexus.utility.i.IFlaggable
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.MOCC_STREAM
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.toSameDire
+import com.github.nahnullscience.cypher_nexus.utility.toVec3i
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 import net.minecraft.network.syncher.EntityDataAccessor
-import net.minecraft.network.syncher.EntityDataSerializers
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -33,6 +34,8 @@ import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.animal.Animal
+import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Explosion
@@ -53,7 +56,7 @@ abstract class AbstractCypherProjectile(
     companion object {
         const val CLIP_MARGIN = 0.2f
         const val CAPTURE_SIZE = 8.0
-        const val CAPTURE_SIZE_SQR = 64.0
+        const val CAPTURE_SIZE_SQR = CAPTURE_SIZE * CAPTURE_SIZE
 
         /** generate projectile with attributes initialized */
         fun <T : AbstractCypherProjectile> create(
@@ -77,34 +80,16 @@ abstract class AbstractCypherProjectile(
             throw IllegalStateException("Failed to create projectile [$entityType].")
             return proj
         }
-
-
-        val FLAG: EntityDataAccessor<Int> = SynchedEntityData.defineId(
-            AbstractCypherProjectile::class.java,
-            EntityDataSerializers.INT)
-        val BOUNCE: EntityDataAccessor<Int> = SynchedEntityData.defineId(
-            AbstractCypherProjectile::class.java,
-            EntityDataSerializers.INT)
-        val GRAVITY: EntityDataAccessor<Float> = SynchedEntityData.defineId(
-            AbstractCypherProjectile::class.java,
-            EntityDataSerializers.FLOAT)
-        val SPEED_FACTOR: EntityDataAccessor<Float> = SynchedEntityData.defineId(
-            AbstractCypherProjectile::class.java,
-            EntityDataSerializers.FLOAT)
     }
-    override fun defineSynchedData(builder: SynchedEntityData.Builder) {
-        builder.define(FLAG, 0)
-        builder.define(BOUNCE, 0)
-        builder.define(GRAVITY, 0f)
-        builder.define(SPEED_FACTOR, 0.99f)
-    }
+    override fun defineSynchedData(builder: SynchedEntityData.Builder) { }
     override fun onSyncedDataUpdated(key: EntityDataAccessor<*>) {
         super.onSyncedDataUpdated(key)
     }
+    override fun readAdditionalSaveData(input: ValueInput) = Unit
+    override fun addAdditionalSaveData(output: ValueOutput) = Unit
 
     override fun writeSpawnData(buffer: RegistryFriendlyByteBuf) {
         // send when entity added to level
-//        buffer.writeInt(bounce)
         buffer.writeBoolean(mocc != null) // write & read relay strictly on order, use a marker to tell client if a map follows
         if (mocc != null) {
             MOCC_STREAM.encode(buffer, mocc!!)
@@ -112,8 +97,6 @@ abstract class AbstractCypherProjectile(
     }
 
     override fun readSpawnData(buffer: RegistryFriendlyByteBuf) {
-//        println("bounce: " )
-//        buffer.readInt()
         if (buffer.readBoolean()) {
             val mocc = MOCC_STREAM.decode(buffer)
             initFromMoCC(mocc)
@@ -130,33 +113,29 @@ abstract class AbstractCypherProjectile(
         super.sendPairingData(serverPlayer, bundleBuilder)
     }
 
-    // ==================================================================================================================
-    // ==================================================================================================================
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     abstract val cypherHolder: Holder<out AbstractProjectileCypher>
     val cypher get() = cypherHolder.value()
-    private var _existing: Int = 1
-    var existing
-        get() = _existing
-        set(value) { _existing = value }
 
     /** a flag is basically a bundle of booleans */
-    override var enabledFlags: Int
-        get() = entityData.get(FLAG)
-        set(value) = entityData.set(FLAG, value)
+    override var enabledFlags: Int = 0
 
-//    var existing: Int
-//        get() = entityData.get(EXISTING)
-//        set(value) = entityData.set(EXISTING, value)
-
+    open var existing
+        get() = getAttrOrProjDefault(CypherAttributes.EXISTING).toInt()
+        set(value) {
+            _attributeMap[CypherAttributes.EXISTING.value()] = CypherAttributes.EXISTING.value().restrictRange(value.toDouble())
+        }
     var bounce: Int
-        get() = entityData.get(BOUNCE)
-        private set(value) = entityData.set(BOUNCE, value)
+        get() = getAttrOrProjDefault(CypherAttributes.BOUNCE).toInt()
+        set(value) = Unit
     var gravity: Float
-        get() = entityData.get(GRAVITY)
-        private set(value) = entityData.set(GRAVITY, value)
+        get() = getAttrOrProjDefault(CypherAttributes.GRAVITY_FACTOR).toFloat()
+        set(value) = Unit
     var speedFactor: Float
-        get() = entityData.get(SPEED_FACTOR)
-        private set(value) = entityData.set(SPEED_FACTOR, value)
+        get() = 1f - getAttrOrProjDefault(CypherAttributes.FRICTION_FACTOR).toFloat()
+        set(value) = Unit
 
 
 //    /** the direct entity create the projectile, invoker could be another projectile if trigger */
@@ -181,7 +160,7 @@ abstract class AbstractCypherProjectile(
 
     private var _hooks: HookContainer? = null
     val hooks: HookContainer? get() = _hooks
-    val hookData = HookSharingData()
+    val hooksSharedData = HooksSharedData()
     private var _trigger = TriggerType.NONE
     private var _payload: ProjectileStateChunk? = null
     val payload: ProjectileStateChunk? get() = _payload
@@ -216,6 +195,7 @@ abstract class AbstractCypherProjectile(
     private fun initFromMoCC(mocc: MapOfCypherCounts) {
         println("${level()} init from $mocc")
         val state = StateChunkPool.getOrCreateStateChunk(mocc)
+        enabledFlags = state.enabledFlags or cypher.flag
         setHooks(state.hooks)
         initAttributes(state)
     }
@@ -223,7 +203,8 @@ abstract class AbstractCypherProjectile(
     protected fun initAttributes(shootState: ProjectileStateChunk) {
         shootState.computedOperationMap.forEach { (attr, opMap) ->
             if (!attr.isProjectileAttribute) return@forEach
-            if (haveFlag(CypherFlags.CONSTANT_EXISTING) && CypherAttributes.EXISTING.`is`(attr.resource)) return@forEach
+//            if (haveFlag(CypherFlags.CONSTANT_EXISTING) && CypherAttributes.EXISTING.`is`(attr.resource)) return@forEach
+            // TODO prune cumulation, some of attributes will not be used, depends on cypher implementation
 
             _attributeMap.compute(attr) { a, v ->
                 val def = cypher.getAttrBaseOrDefault(attr)
@@ -231,17 +212,10 @@ abstract class AbstractCypherProjectile(
                 attr.restrictRange(final)
             }
         }
-
-        if (!level().isClientSide) {
-            _existing = getAttrOrProjDefault(CypherAttributes.EXISTING).toInt()
-            bounce = getAttrOrProjDefault(CypherAttributes.BOUNCE).toInt()
-            gravity = getAttrOrProjDefault(CypherAttributes.GRAVITY_FACTOR).toFloat()
-            speedFactor = 1f - getAttrOrProjDefault(CypherAttributes.FRICTION_FACTOR).toFloat()
-        }
     }
 
     protected fun setDirection(direction: Vec3? = null) {
-        moveDirection = direction?.normalize() ?: getOwner()?.lookAngle?.normalize() ?: moveDirection
+        moveDirection = direction?.normalize() ?: owner()?.lookAngle?.normalize() ?: moveDirection
         if (moveDirection != Vec3.ZERO){
             deltaMovement = moveDirection.scale(getAttrOrProjDefault(CypherAttributes.SPEED))
             // FIXME inertia behavior seems strange
@@ -262,7 +236,6 @@ abstract class AbstractCypherProjectile(
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // called on both server side and client side
     override fun tick() {
         captureSurrounds()
         if (firstTick) { // start from tickCount == 1
@@ -279,7 +252,6 @@ abstract class AbstractCypherProjectile(
 //        updateSwimming()
         super.tick() // TODO: prune default tick
 
-        // hookContainer.get(TICK_BEHAVIOR).forEach { h, i -> h.tickBehaviorBoth(level(), this, i) }
         _hooks?.playHooks(CypherBehaviorHooks.TICK_BEHAVIOR_BOTH)
         { h, i -> h.tickBehaviorBoth(level(), this, i) }
 
@@ -287,18 +259,24 @@ abstract class AbstractCypherProjectile(
         onTickAfterBoth()
 
         if (tickCount == 20) trigger(TriggerType.TIMER_20)
-        if (_existing < 0 || _existing == tickCount) {
+        if (existing < 0 || existing == tickCount) {
             // here's a trick, if player make existing-time exactly equal to 0, projectile will last till the game quit
             discardCypher(DiscardReason.EXPIRE)
         }
     }
 
-
-    protected open fun modifierTick() {}
     /**
      * check hit-result and set delta-movement here
      * */
     protected open fun projectileTick() {
+        updateRotation()
+
+        applySpeedChange()
+        applyGravity()
+
+        _hooks?.playHooks(CypherBehaviorHooks.FINALIZE_TICK_MOVEMENT_BOTH)
+        { h, i -> h.finalizeTickMovementBoth(level(), this, i) }
+
         /*
          * deltaMovement: the movement for the "next tick", client smooth animation relay on this
          * // an AABB check is used everyTick every vanilla projectile, sounds outrageous, but is ok in performance
@@ -306,7 +284,7 @@ abstract class AbstractCypherProjectile(
         val hitResult = RayCastUtility.getProjectileHitResult(position(), this, ::canHitEntity, deltaMovement, level(), CLIP_MARGIN)
         bouncePoints.clear()
         val (lastBouncePoint, lastDeltaMove) = bounceLoop(hitResult)
-        if (bounceTick) deltaMovement = VectorUtility.toSameDire(deltaMovement, lastDeltaMove)
+        if (bounceTick) deltaMovement = deltaMovement.toSameDire(lastDeltaMove)
 
 //        run collideCheck@ {
 //            val fluidCheck = ClipContext.Fluid.NONE // bounce when touching water surface?
@@ -314,11 +292,6 @@ abstract class AbstractCypherProjectile(
 //        }
 
         //checkInsideBlocks() // trigger #onInsideBlock
-
-        updateRotation()
-
-        applySpeedChange()
-        applyGravity()
 
         // #move do exactly the same with #setPos when dealing with "noPhysics"
         if (bounceTick) setPos(lastBouncePoint.add(lastDeltaMove))
@@ -338,10 +311,10 @@ abstract class AbstractCypherProjectile(
                 val entities = level().getEntities(this, boundingBox.inflate(CAPTURE_SIZE))
                 { entity -> entity !is AbstractCypherProjectile }
 
-                println("capture $entities")
+//                println("capture $entities")
                 for (entity in entities) {
                     onCaptureSurrounding(entity)
-                    // TODO need optimization, for this is O(m * n)
+                    // TODO try further optimization, for this is O(m * n)
                     _hooks?.playHooks(CypherBehaviorHooks.ENTITY_SEARCH_BOTH)
                     { h, i -> h.entitySearchBoth(level(), this, i, entity) }
                 }
@@ -350,8 +323,6 @@ abstract class AbstractCypherProjectile(
     }
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -381,7 +352,7 @@ abstract class AbstractCypherProjectile(
             val targetBox = when(hitResultStep) {
                 is EntityHitResult -> hitResultStep.entity.boundingBox.inflate(CLIP_MARGIN.toDouble())
                 is BlockHitResult -> AABB(hitResultStep.blockPos)
-                else -> AABB(BlockPos(VectorUtility.toVec3i(hitResultStep.location)))
+                else -> AABB(BlockPos(hitResultStep.location.toVec3i()))
             }
             val hitPoint = targetBox.clip(startPosStep, startPosStep.add(deltaMoveStep)).getOrNull()
 
@@ -442,10 +413,10 @@ abstract class AbstractCypherProjectile(
     override fun onHitEntity(result: EntityHitResult) {
         super.onHitEntity(result)
         val entity = result.entity
-        if (notHaveFlag(CypherFlags.NO_DAMAGE)) {
+        if (notHaveFlag(CypherFlags.SKIP_DAMAGE_CHECK)) {
             val damage = getAttrOrProjDefault(CypherAttributes.DAMAGE)
             if (level() is ServerLevel)
-            entity.hurtServer(level() as ServerLevel, damageSources().thrown(this, getOwner()), damage.toFloat())
+            entity.hurtServer(level() as ServerLevel, damageSources().thrown(this, owner()), damage.toFloat())
         }
     }
     override fun onHitBlock(result: BlockHitResult) {
@@ -457,14 +428,18 @@ abstract class AbstractCypherProjectile(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /** ProjectileStateBlock#release */
-    private fun releasePayload(posDire: PosDirePair) = _payload?.release(level(), this, getOwner(), posDire)
+    private fun releasePayload(posDire: PosDirePair) = _payload?.release(level(), this, owner(), posDire)
     fun trigger(type: TriggerType) {
         // TODO
         if (type == _trigger) releasePayload(PosDirePair(position(), deltaMovement.reverse()))
     }
 
     open fun canHomeTarget(target: Entity): Boolean {
-        return !target.isInvisible && target.isAlive && target != owner()
+        return target !is Animal
+                && target !is ItemEntity
+                && !target.isInvisible
+                && target.isAlive
+                && target != owner()
     }
     // personal hooks
     protected open fun onBeforeDiscardBoth(reason: DiscardReason) = Unit
@@ -492,6 +467,19 @@ abstract class AbstractCypherProjectile(
     override fun shouldRenderAtSqrDistance(distance: Double): Boolean = distance < 4096
 
     override fun displayFireAnimation() = haveFlag(CypherFlags.WITH_FIRE)
+
+    override fun isClientAuthoritative(): Boolean {
+        // make boomerang client-track smooth
+        return super.isClientAuthoritative() ||
+                (haveFlag(CypherFlags.MOTION_FOLLOWS_OWNER) && owner()?.isClientAuthoritative == true) ||
+                hooksSharedData.homingTarget?.isClientAuthoritative == true
+    }
+    override fun isLocalClientAuthoritative(): Boolean {
+        // make boomerang client-track smooth
+        return super.isLocalClientAuthoritative() ||
+                (haveFlag(CypherFlags.MOTION_FOLLOWS_OWNER) && owner()?.isLocalClientAuthoritative == true) ||
+                hooksSharedData.homingTarget?.isLocalClientAuthoritative == true
+    }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -536,8 +524,6 @@ abstract class AbstractCypherProjectile(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // miscellaneous
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    override fun readAdditionalSaveData(input: ValueInput) = Unit
-    override fun addAdditionalSaveData(output: ValueOutput) = Unit
     override fun getPickResult(): ItemStack? = null // null by default, this is the creative mod middle button pick result
     override fun isPickable() = false // false by default, entirely disable the picking activity
     /**
@@ -557,6 +543,14 @@ abstract class AbstractCypherProjectile(
     override fun hurtServer(level: ServerLevel, source: DamageSource, damage: Float) = false
     override fun hurtClient(source: DamageSource) = false
     override fun ignoreExplosion(explosion: Explosion) = true // this prevents projectile getting kinetic energy from explosion
+    override fun push(entity: Entity) = Unit
+    override fun push(impulse: Vec3) = push(impulse.x, impulse.y, impulse.z)
+    override fun push(xa: Double, ya: Double, za: Double) {
+        if (xa.isFinite() && ya.isFinite() && za.isFinite()) {
+            deltaMovement = deltaMovement.add(xa, ya, za)
+        }
+    }
+    fun pushThenSync(impulse: Vec3) = run { push(impulse); needsSync = true }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private fun debugMsg() {
@@ -571,6 +565,5 @@ abstract class AbstractCypherProjectile(
     }
 
     override fun hashCode() = super.hashCode()
-    override fun equals(other: Any?) = if (other is Entity) other.id == this.id else false
-
+    override fun equals(other: Any?) = if (other is Entity) other.id == this.id else false // a kotlin nullable reload
 }

@@ -44,7 +44,7 @@ class ProjectileStateChunk private constructor (
     private val projectiles = mutableListOf<ProjectileNode>()
 
     fun release(level: Level, directInvoker: Entity?, owner: Entity?, posDire: PosDirePair) {
-        println(_countMap)
+        println("mocc: $_countMap")
         // do recoil only on root
         if (directInvoker != null && directInvoker == owner && helper != null) {
             val recoilMap = computedOperationMap[CypherAttributes.RECOIL.value()]

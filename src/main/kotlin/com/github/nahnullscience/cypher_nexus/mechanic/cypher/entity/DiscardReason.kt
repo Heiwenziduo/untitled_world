@@ -12,6 +12,8 @@ enum class DiscardReason {
     HIT_BLOCK,
     /**  */
     TRANSFORMED,
+    /**  */
+    CONSUMED,
 
     /** by some special reason */
     ERASE,

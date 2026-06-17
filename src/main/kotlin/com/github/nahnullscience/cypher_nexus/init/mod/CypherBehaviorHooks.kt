@@ -6,6 +6,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule.Ho
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeRedirectPosHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothBeforeDiscardHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothEntitySearchHook
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothFinalizeTickMovementHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothFirstTickHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.ServerHitEntityHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothTickBehaviorHook
@@ -49,5 +50,6 @@ object CypherBehaviorHooks {
     val BEFORE_DISCARD_BOTH = registerHook(BothBeforeDiscardHook.MODULE)
     val FIRST_TICK_BOTH = registerHook(BothFirstTickHook.MODULE)
     val TICK_BEHAVIOR_BOTH = registerHook(BothTickBehaviorHook.MODULE)
+    val FINALIZE_TICK_MOVEMENT_BOTH = registerHook(BothFinalizeTickMovementHook.MODULE)
     val ENTITY_SEARCH_BOTH = registerHook(BothEntitySearchHook.MODULE)
 }

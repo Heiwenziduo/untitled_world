@@ -1,9 +1,10 @@
 package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.AbstractHoming
+import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.BoomerangCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.DaedalusCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.FieryCypher
-import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.HomingCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.SimpleModifier
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.*
@@ -75,30 +76,40 @@ object Cyphers {
             .manaDrain(10f)
             .delay(2)
             .projectileAttr(CypherAttributes.DAMAGE, 3.0)
-            .projectileAttr(CypherAttributes.SPEED, 1.1)
+            .projectileAttr(CypherAttributes.SPEED, 1.3)
             .projectileAttr(CypherAttributes.EXISTING, 300.0)
             .projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.01)
     )
     val SNOWBALL = registerCypher(
         SimpleProjectile("snowball", ModEntities.CYPHER_SNOWBALL)
             .manaDrain(3f)
-            .projectileAttr(CypherAttributes.SPEED, 1.0)
+            .projectileAttr(CypherAttributes.SPEED, 1.2)
             .projectileAttr(CypherAttributes.EXISTING, 300.0)
             .projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
     )
     val ENDER_TELEPORTATION = registerCypher(
         SimpleProjectile("ender_teleportation", ModEntities.CYPHER_ENDER_TELEPORTATION)
             .manaDrain(20f)
-            .flags(CypherFlags.NO_DAMAGE)
-            .projectileAttr(CypherAttributes.SPEED, 1.3)
+            .flags(CypherFlags.SKIP_DAMAGE_CHECK)
+            .projectileAttr(CypherAttributes.SPEED, 1.6)
             .projectileAttr(CypherAttributes.EXISTING, 15.0)
+            .projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.0)
     )
     val ENDER_RECALL = registerCypher(
         SimpleProjectile("ender_recall", ModEntities.CYPHER_ENDER_RECALL)
             .manaDrain(25f)
-            .flags(CypherFlags.NO_DAMAGE)
-            .projectileAttr(CypherAttributes.SPEED, 1.3)
+            .flags(CypherFlags.SKIP_DAMAGE_CHECK)
+            .projectileAttr(CypherAttributes.SPEED, 1.6)
             .projectileAttr(CypherAttributes.EXISTING, 15.0)
+            .projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.0)
+    )
+    val BUBBLE_COLUMN = registerCypher(
+        SimpleProjectile("bubble_column", ModEntities.CYPHER_BUBBLE_COLUMN)
+            .manaDrain(15f)
+            .recharge(2)
+            .projectileAttr(CypherAttributes.DAMAGE, 1.0)
+            .projectileAttr(CypherAttributes.SPEED, 1.3)
+            .projectileAttr(CypherAttributes.EXISTING, 120.0)
     )
     val LLAMA_SPIT = registerCypher(
         SimpleProjectile("llama_spit", ModEntities.CYPHER_LLAMA_SPIT)
@@ -106,7 +117,7 @@ object Cyphers {
             .recharge(2)
             .stateChunkAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.05)
             .projectileAttr(CypherAttributes.DAMAGE, 1.0)
-            .projectileAttr(CypherAttributes.SPEED, 1.2)
+            .projectileAttr(CypherAttributes.SPEED, 1.3)
             .projectileAttr(CypherAttributes.EXISTING, 120.0)
             .projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.06)
     )
@@ -144,11 +155,11 @@ object Cyphers {
     val ACCELERATING = registerCypher(
         SimpleModifier("accelerating", 5f)
             .attribute(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 0.375)
-            .attribute(CypherAttributes.FRICTION_FACTOR, AttributeOperator.MULTIPLY_BASE, -2.0))
+            .attribute(CypherAttributes.FRICTION_FACTOR, AttributeOperator.ADD, -0.06))
     val DECELERATION = registerCypher(
         SimpleModifier("decelerating", 5f)
             .attribute(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 1.625)
-            .attribute(CypherAttributes.FRICTION_FACTOR, AttributeOperator.MULTIPLY_BASE, 1.0))
+            .attribute(CypherAttributes.FRICTION_FACTOR, AttributeOperator.ADD, 0.03))
     val FIERY = registerCypher(FieryCypher)
 
     val ANTIGRAVITY = registerCypher(
@@ -166,7 +177,7 @@ object Cyphers {
             .recharge(-6))
     val PEACEFUL = registerCypher(
         SimpleModifier("peaceful", 5f)
-            .flags(CypherFlags.NO_DAMAGE))
+            .flags(CypherFlags.SKIP_DAMAGE_CHECK))
     val BOUNCY = registerCypher(
         SimpleModifier("bouncy", 5f)
             .attribute(CypherAttributes.BOUNCE, AttributeOperator.ADD, 10.0))
@@ -199,7 +210,9 @@ object Cyphers {
         SimpleModifier("recoil_damper", 5f)
             .attribute(CypherAttributes.RECOIL, AttributeOperator.ADD, -20.0))
 
-    val HOMING = registerCypher(HomingCypher)
+    val HOMING = registerCypher(AbstractHoming.Homing)
+    val TURN_TO_TARGET = registerCypher(AbstractHoming.TurnToTarget)
+    val BOOMERANG = registerCypher(BoomerangCypher)
     val PIERCE_ENTITY = registerCypher(
         SimpleModifier("pierce_entity", 110f)
             .flags(CypherFlags.HURT_OWNER, CypherFlags.PIERCE_ENTITY)

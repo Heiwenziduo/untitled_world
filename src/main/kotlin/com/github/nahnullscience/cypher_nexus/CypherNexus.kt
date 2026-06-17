@@ -122,6 +122,6 @@ object CypherNexus {
 
     @SubscribeEvent
     private fun onServerStarting(event: ServerStartingEvent) {
-        // LOGGER.info("HELLO from server starting")
+        // on dedicated server
     }
 }

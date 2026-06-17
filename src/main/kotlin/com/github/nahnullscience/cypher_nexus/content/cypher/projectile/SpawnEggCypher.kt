@@ -25,7 +25,7 @@ object SpawnEggCypher : ProjectileCypher() {
             .manaDrain(20f)
             .draw(1)
             .flags(CypherFlags.STICKY)
-            .projectileAttr(CypherAttributes.SPEED, 0.8)
+            .projectileAttr(CypherAttributes.SPEED, 1.0)
             .projectileAttr(CypherAttributes.EXISTING, 300.0)
             .projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
     }

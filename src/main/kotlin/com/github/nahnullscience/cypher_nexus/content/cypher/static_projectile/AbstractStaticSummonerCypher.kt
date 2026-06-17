@@ -12,8 +12,6 @@ abstract class AbstractStaticSummonerCypher : StaticProjectileCypher() {
     override fun defaultAttributes(): CypherDataMap.Builder {
         return super.defaultAttributes()
             .flags(CypherFlags.PIERCE_ENTITY)
-            .flags(CypherFlags.CONSTANT_EXISTING)
-            .projectileAttr(CypherAttributes.EXISTING, 2.0)
     }
 
     companion object {

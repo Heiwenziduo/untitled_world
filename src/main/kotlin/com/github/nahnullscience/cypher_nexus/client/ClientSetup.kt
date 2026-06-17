@@ -5,6 +5,7 @@ import com.github.nahnullscience.cypher_nexus.client.gui.WandDataOverlay
 import com.github.nahnullscience.cypher_nexus.client.renderer.ArrowCypherRenderer
 import com.github.nahnullscience.cypher_nexus.client.renderer.LlamaSpitCypherRenderer
 import com.github.nahnullscience.cypher_nexus.client.renderer.SimpleItemProjectileRenderer
+import com.github.nahnullscience.cypher_nexus.client.renderer.SimpleParticleProjectileRenderer
 import com.github.nahnullscience.cypher_nexus.client.renderer.SimpleSummonerRenderer
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
@@ -55,17 +56,19 @@ object ClientSetup {
         // projectile
         //////////////////////////////////////////////////////////////////////////////
         event.registerEntityRenderer(ModEntities.CYPHER_ARROW.get(), ::ArrowCypherRenderer)
-        event.registerProjectile(ModEntities.CYPHER_LLAMA_SPIT, ::LlamaSpitCypherRenderer)
+        event.registerEntityRenderer(ModEntities.CYPHER_LLAMA_SPIT, ::LlamaSpitCypherRenderer)
 
         event.registerItemProjectile(ModEntities.CYPHER_SNOWBALL)
         event.registerItemProjectile(ModEntities.CYPHER_ENDER_RECALL)
         event.registerItemProjectile(ModEntities.CYPHER_ENDER_TELEPORTATION)
         event.registerItemProjectile(ModEntities.CYPHER_SPAWN_EGG)
 
+        event.registerParticleProjectile(ModEntities.CYPHER_BUBBLE_COLUMN)
+
         //////////////////////////////////////////////////////////////////////////////
         // static
         //////////////////////////////////////////////////////////////////////////////
-        event.registerProjectile(ModEntities.CYPHER_EXPLOSION, ::SimpleSummonerRenderer)
+        event.registerEntityRenderer(ModEntities.CYPHER_EXPLOSION, ::SimpleSummonerRenderer)
     }
 
 //    @SubscribeEvent
@@ -88,7 +91,12 @@ private fun <CY> RegisterRenderers.registerItemProjectile (
 ) where CY : AbstractCypherProjectile, CY : ItemSupplier
         = registerEntityRenderer(cypherEntity.get()) { context -> SimpleItemProjectileRenderer(context) }
 
-private fun <T : AbstractCypherProjectile> RegisterRenderers.registerProjectile(
+private fun <CY> RegisterRenderers.registerParticleProjectile (
+    cypherEntity: Supplier<out EntityType<out CY>>,
+) where CY : AbstractCypherProjectile
+        = registerEntityRenderer(cypherEntity.get()) { context -> SimpleParticleProjectileRenderer(context) }
+
+private fun <T : AbstractCypherProjectile> RegisterRenderers.registerEntityRenderer(
     cypherEntity: Supplier<out EntityType<out T>>,
     factory: EntityRendererProvider<T>
 ) = registerEntityRenderer(cypherEntity.get(), factory)

@@ -8,5 +8,7 @@ abstract class AbstractStaticSummoner(
     level: Level
 ) : AbstractCypherProjectile(entityType, level) {
 
+    abstract override var existing: Int
+
     abstract override fun onBeforeDiscardBoth(reason: DiscardReason)
 }

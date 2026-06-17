@@ -44,22 +44,24 @@ abstract class AbstractAddTrigger(
             attachIndex++
             if (!cy0.isInvokable()) continue
 
-            cy0.modifyStateChunk(helper, data, chunk)
-            CypherNexus.debugCypher { "[$this] modify the state through [$cy0]" }
-
             if (cy0.triggerInterplay()) {
                 cy = cy0
                 break
             }
+
+            // interplay-able && non-projectile -> do not modify state
+            cy0.modifyStateChunk(helper, data, chunk)
+            CypherNexus.debugCypher { "[$this] modify the state through [$cy0]" }
         }
 
         if (cy.isNotEmpty()) {
             if (cy !is AbstractProjectileCypher) {
-                // to fit Noita mechanic, let's agree a NonProj cypher with #triggerCanAttach == ture will terminate add trigger-s
+                // to fit Noita mechanic, let's agree a NonProj cypher with #triggerCanAttach == true will terminate add trigger-s
                 // for example, refresher-ring
                 CypherNexus.debugCypher { "[$this] attach process terminate due to [$cy]" }
                 return
             }
+            cy.modifyStateChunk(helper, data, chunk)
 
             // discard if attach is found
             CypherNexus.debugCypher { "[$this] find trigger attachable [$cy]" }
@@ -72,7 +74,6 @@ abstract class AbstractAddTrigger(
                 val cy1 = helper.aoc[index1]
                 index1++
                 if (cy1 is AbstractProjectileCypher && cy1.triggerInterplay()) {
-//                if (cy1.triggerInterplay()) { // consider ignore whether projectile
                     find = true
                     break
                 }

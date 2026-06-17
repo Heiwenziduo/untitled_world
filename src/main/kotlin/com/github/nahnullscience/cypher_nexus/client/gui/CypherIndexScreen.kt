@@ -112,7 +112,7 @@ class CypherIndexScreen(
             renderWandData(guiGraphics, mouseX, mouseY)
         }
 
-//        draggedCypher?.let { cypher -> // it seems methods call order decides the layer order
+        // it seems methods call order decides the layer order
         if (HoverContext.isHolding) {
             HoverContext.hoverCypher?.let { cypher ->
                 // FIXME dragged item should be on top

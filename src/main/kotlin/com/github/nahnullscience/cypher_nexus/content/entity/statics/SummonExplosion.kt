@@ -14,6 +14,8 @@ class SummonExplosion (
 ) : AbstractStaticSummoner(entityType, level) {
     override val cypherHolder = EXPLOSION
 
+    override var existing: Int = 2
+
     override fun onBeforeDiscardBoth(reason: DiscardReason) {
         if (!level().isClientSide) {
             // check  net.minecraft.world.level.ExplosionDamageCalculator  &&  Explosion.BlockInteraction
