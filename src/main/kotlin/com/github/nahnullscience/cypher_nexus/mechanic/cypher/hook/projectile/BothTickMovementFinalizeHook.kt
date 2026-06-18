@@ -6,12 +6,12 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule.HookType.PROJECTILE
 import net.minecraft.world.level.Level
 
-interface BothFinalizeTickMovementHook {
+interface BothTickMovementFinalizeHook {
     fun finalizeTickMovementBoth(level: Level, projectile: AbstractCypherProjectile, strength: Int)
     companion object {
         val MODULE = HookModule(
             CypherNexus.modResource("finalize_tick_movement"),
-            BothFinalizeTickMovementHook::class,
+            BothTickMovementFinalizeHook::class,
             true,
             PROJECTILE,
             false

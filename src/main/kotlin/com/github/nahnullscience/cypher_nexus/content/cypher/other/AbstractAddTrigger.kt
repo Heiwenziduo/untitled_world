@@ -34,7 +34,7 @@ abstract class AbstractAddTrigger(
         recursionDepth: Int,
         isCopy: Boolean
     ) {
-        CypherNexus.debugCypher { "[$this] is invoked" }
+        CypherNexus.debugCypher { "[$this $relativeIndex] is invoked" }
         val startIndex = helper.peekNextIndex(relativeIndex + 1)
         if (startIndex == -1) return // this means AddTrigger is the last one in deck
 

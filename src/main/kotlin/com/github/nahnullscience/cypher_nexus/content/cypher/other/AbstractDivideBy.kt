@@ -28,7 +28,7 @@ abstract class AbstractDivideBy : AbstractNonProjectileCypher() {
         recursionDepth: Int,
         isCopy: Boolean
     ) {
-        CypherNexus.debugCypher { "[$this] is invoked and modifies the state" }
+        CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
         modifyStateChunk(helper, data, chunk)
 
         val targetIndex = helper.peekNextIndex(relativeIndex + 1)

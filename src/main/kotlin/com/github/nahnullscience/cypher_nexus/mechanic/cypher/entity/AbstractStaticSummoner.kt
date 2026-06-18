@@ -10,5 +10,10 @@ abstract class AbstractStaticSummoner(
 
     abstract override var existing: Int
 
-    abstract override fun onBeforeDiscardBoth(reason: DiscardReason)
+    override fun onBeforeDiscardBoth(reason: DiscardReason) {
+        summon()
+        super.onBeforeDiscardBoth(reason)
+    }
+
+    abstract fun summon()
 }

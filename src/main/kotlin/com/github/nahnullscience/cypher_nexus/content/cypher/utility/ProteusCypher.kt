@@ -29,7 +29,7 @@ object ProteusCypher : AbstractNonProjectileCypher() {
         recursionDepth: Int,
         isCopy: Boolean
     ) {
-        CypherNexus.debugCypher { "[$this] is invoked and modifies the state" }
+        CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
         modifyStateChunk(helper, data, chunk)
 
         if (state.drawEnabled)
@@ -42,11 +42,13 @@ object ProteusCypher : AbstractNonProjectileCypher() {
                 cy = helper.drawNext()
             }
             if (cy != null) {
-                CypherNexus.debugCypher { "[$this] will copy $cy" }
                 val index = helper.relativeIndex
                 cy.invokeInHand(helper, chunk, data, state)
                 if (cy is ProteusCypher) data.manaCurrent += 100f // award some mana if finds self
-                else cy.invoke(helper, chunk, data, state, index, recursionDepth, true)
+                else {
+                    CypherNexus.debugCypher { "[$this] will copy $cy" }
+                    cy.invoke(helper, chunk, data, state, index, recursionDepth, true)
+                }
             }
         }
     }

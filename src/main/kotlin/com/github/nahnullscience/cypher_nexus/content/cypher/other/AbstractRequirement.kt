@@ -36,7 +36,7 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
             recursionDepth: Int,
             isCopy: Boolean
         ) {
-            CypherNexus.debugCypher { "[$this] is invoked and modifies the state" }
+            CypherNexus.debugCypher { "[$this $relativeIndex] is invoked" }
             val startIndex = helper.peekNextIndex(relativeIndex + 1)
             if (startIndex == -1) return handleDraws(helper, chunk, data, state)
 

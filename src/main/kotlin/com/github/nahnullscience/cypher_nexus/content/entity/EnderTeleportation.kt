@@ -29,7 +29,8 @@ open class EnderTeleportation(
 
     override fun onBeforeDiscardBoth(reason: DiscardReason) {
         if (!level().isClientSide) {
-            getOwner()?.teleportTo(x, y, z)
+            owner()?.teleportTo(x, y, z)
         }
+        super.onBeforeDiscardBoth(reason)
     }
 }

@@ -14,6 +14,8 @@ enum class DiscardReason {
     TRANSFORMED,
     /**  */
     CONSUMED,
+    /**  */
+    LOW_SPEED,
 
     /** by some special reason */
     ERASE,

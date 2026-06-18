@@ -109,7 +109,7 @@ sealed class AbstractCypher: IRegisterable {
         isCopy: Boolean,
     ) {
         if (!canRecursionContinue(recursionDepth)) return
-        CypherNexus.debugCypher { "[$this] is invoked and modifies the state" }
+        CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
         modifyStateChunk(helper, data, chunk)
 
         var forwardState = chunk

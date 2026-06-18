@@ -17,16 +17,15 @@ class EnderRecall(
     override val cypherHolder = ENDER_RECALL
     override fun getItem() = ItemStack(Items.ENDER_PEARL)
 
-    override fun onTickBeforeBoth() {
+    override fun onFirstTickBoth() {
         if (level() is ServerLevel) {
-            if (firstTick) {
-                val teleport = createRaw(CYPHER_ENDER_TELEPORTATION.get(), level() as ServerLevel)
-                teleport.owner = getOwner()
-                teleport.setPos(position())
-                teleport.existing = 100
-                level().addFreshEntity(teleport)
-            }
+            val teleport = createRaw(CYPHER_ENDER_TELEPORTATION.get(), level() as ServerLevel)
+            teleport.owner = getOwner()
+            teleport.setPos(position())
+            teleport.existing = 100
+            level().addFreshEntity(teleport)
         }
+        super.onFirstTickBoth()
     }
 
 }

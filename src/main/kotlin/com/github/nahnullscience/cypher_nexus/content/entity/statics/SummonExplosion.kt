@@ -16,7 +16,7 @@ class SummonExplosion (
 
     override var existing: Int = 2
 
-    override fun onBeforeDiscardBoth(reason: DiscardReason) {
+    override fun summon() {
         if (!level().isClientSide) {
             // check  net.minecraft.world.level.ExplosionDamageCalculator  &&  Explosion.BlockInteraction
             level().explode(
@@ -32,5 +32,4 @@ class SummonExplosion (
             )
         }
     }
-
 }
