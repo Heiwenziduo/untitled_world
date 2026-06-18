@@ -30,7 +30,9 @@ abstract class AbstractAddTrigger(
         chunk: ProjectileStateChunk,
         data: HelperDataBundle,
         state: InvokingStateBundle,
-        relativeIndex: Int
+        relativeIndex: Int,
+        recursionDepth: Int,
+        isCopy: Boolean
     ) {
         CypherNexus.debugCypher { "[$this] is invoked" }
         val startIndex = helper.peekNextIndex(relativeIndex + 1)

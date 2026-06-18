@@ -16,7 +16,7 @@ object BoomerangCypher: ModifierCypher(), BothTickBehaviorHook {
     override fun defaultAttributes(): CypherDataMap.Builder {
         return super.defaultAttributes()
             .manaDrain(0f)
-            .flags(CypherFlags.HURT_OWNER, CypherFlags.MOTION_FOLLOWS_OWNER)
+            .flags(CypherFlags.MOTION_FOLLOWS_OWNER)
     }
 
     override fun tickBehaviorBoth(

@@ -10,6 +10,8 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.Attribut
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.ChatFormatting
@@ -24,6 +26,10 @@ import java.util.EnumMap
  *
  * */
 sealed class AbstractCypher: IRegisterable {
+    companion object {
+        const val RECURSION_LIMIT = 2
+    }
+
     val manaDrain: Float get() = attributes().manaDrain
     val draw: Int get() = attributes().draw
     val delay: Int get() = attributes().delay
@@ -44,6 +50,7 @@ sealed class AbstractCypher: IRegisterable {
         val hookModules = CypherBehaviorHooks.REGISTRY
         hookModules.filter { it.hook.isInstance(this) }
     }
+    /** if a cypher may call itself, set this to true to avoid infinite loop */
     open val isRecursive: Boolean = false
     fun isEmpty() = this is EmptyCypher
     fun isNotEmpty() = !isEmpty()
@@ -79,10 +86,10 @@ sealed class AbstractCypher: IRegisterable {
     fun invokeInHand(
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
-        data: InvokingHelper.HelperDataBundle,
-        state: InvokingHelper.InvokingStateBundle,
+        data: HelperDataBundle,
+        state: InvokingStateBundle,
     ) {
-        invoke(helper, chunk, data, state, 63 - data.hand.countLeadingZeroBits())
+        invoke(helper, chunk, data, state, helper.relativeIndex, 0, false)
 
         if (helper.invoker is ServerPlayer) {
             // TODO award stats
@@ -90,18 +97,21 @@ sealed class AbstractCypher: IRegisterable {
     }
 
     /** call super# for basic behaviors
-     * @param relativeIndex represent current cypher's Index in the AoC */
-    // the depth-first tree
+     * @param relativeIndex represent current invoking cypher's Index in the AoC */
+    // build the depth-first tree
     open fun invoke(
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
-        data: InvokingHelper.HelperDataBundle,
-        state: InvokingHelper.InvokingStateBundle,
-        relativeIndex: Int
+        data: HelperDataBundle,
+        state: InvokingStateBundle,
+        relativeIndex: Int,
+        recursionDepth: Int,
+        isCopy: Boolean,
     ) {
+        if (!canRecursionContinue(recursionDepth)) return
         CypherNexus.debugCypher { "[$this] is invoked and modifies the state" }
-
         modifyStateChunk(helper, data, chunk)
+
         var forwardState = chunk
         if (this is AbstractProjectileCypher) {
             forwardState = addToStateChunk(chunk)
@@ -110,24 +120,32 @@ sealed class AbstractCypher: IRegisterable {
         handleDraws(helper, forwardState, data, state)
     }
 
-    protected open fun canDraw(
-        helper: InvokingHelper,
-        chunk: ProjectileStateChunk,
-        data: InvokingHelper.HelperDataBundle,
-        state: InvokingHelper.InvokingStateBundle,
-    ): Boolean {
-        if (!state.drawEnabled) return false
-        if (isRecursive && state.recursiveDepth >= 2) return false
+    protected fun canRecursionContinue(recursionDepth: Int,): Boolean {
+        if (isRecursive) {
+            if (recursionDepth > RECURSION_LIMIT) {
+                CypherNexus.debugCypher { "[$this] is stopped due to recursion limit" }
+                return false
+            }
+        }
         return true
     }
+
+//    protected open fun canDraw(
+//        helper: InvokingHelper,
+//        chunk: ProjectileStateChunk,
+//        data: HelperDataBundle,
+//        state: InvokingStateBundle,
+//    ): Boolean {
+//        return state.drawEnabled
+//    }
 
     protected fun handleDraws(
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
-        data: InvokingHelper.HelperDataBundle,
-        state: InvokingHelper.InvokingStateBundle,
+        data: HelperDataBundle,
+        state: InvokingStateBundle,
     ) {
-        if (canDraw(helper, chunk, data, state))
+        if (state.drawEnabled)
         for (i in 0 until draw) {
             var cy = helper.drawNext()
             if (cy == null) {
@@ -140,7 +158,7 @@ sealed class AbstractCypher: IRegisterable {
         }
     }
 
-    open fun modifyStateChunk(helper: InvokingHelper, data: InvokingHelper.HelperDataBundle, chunk: ProjectileStateChunk) {
+    open fun modifyStateChunk(helper: InvokingHelper, data: HelperDataBundle, chunk: ProjectileStateChunk) {
         if (chunk == helper.rootChunk) data.delay += delay
         data.recharge += recharge
 

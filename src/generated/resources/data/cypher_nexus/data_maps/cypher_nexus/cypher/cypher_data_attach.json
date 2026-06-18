@@ -98,7 +98,7 @@
     "cypher_nexus:boomerang": {
       "delay": 0,
       "draw": 1,
-      "flags": 129,
+      "flags": 128,
       "manaDrain": 0.0,
       "projectile": {},
       "recharge": 0,
@@ -155,6 +155,15 @@
           "add": -38.0
         }
       }
+    },
+    "cypher_nexus:cypher_duplication": {
+      "delay": 7,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 300.0,
+      "projectile": {},
+      "recharge": 7,
+      "stateChunk": {}
     },
     "cypher_nexus:daedalus": {
       "delay": 0,
@@ -344,12 +353,12 @@
       "stateChunk": {}
     },
     "cypher_nexus:fortune": {
-      "delay": 0,
+      "delay": 16,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 150.0,
+      "manaDrain": 180.0,
       "projectile": {},
-      "recharge": 0,
+      "recharge": 10,
       "stateChunk": {
         "cypher_nexus:fortune": {
           "add": 1.0
@@ -521,6 +530,15 @@
           "add": 1.0
         }
       }
+    },
+    "cypher_nexus:proteus": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 10.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {}
     },
     "cypher_nexus:quadruple_invoking": {
       "delay": 0,

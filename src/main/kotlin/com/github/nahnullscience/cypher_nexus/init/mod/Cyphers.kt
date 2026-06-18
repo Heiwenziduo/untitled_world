@@ -10,6 +10,7 @@ import com.github.nahnullscience.cypher_nexus.content.cypher.other.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.static_projectile.ExplosionCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.InnerForceCypher
+import com.github.nahnullscience.cypher_nexus.content.cypher.utility.ProteusCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.RefresherRingCypher
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
@@ -223,7 +224,9 @@ object Cyphers {
             .recharge(-4)
             .attribute(CypherAttributes.EXISTING, AttributeOperator.SET_ALL, 1.0))
     val FORTUNE = registerCypher(
-        SimpleModifier("fortune", 150f)
+        SimpleModifier("fortune", 180f)
+            .delay(16)
+            .recharge(10)
             .attribute(CypherAttributes.FORTUNE_LEVEL, AttributeOperator.ADD, 1.0))
 
     const val COLOR_MULTI_INVOKE = 0xFF4EF3D3.toInt()
@@ -274,6 +277,7 @@ object Cyphers {
 
     val INNER_FORCE = registerCypher(InnerForceCypher)
     val REFRESHER_RING = registerCypher(RefresherRingCypher)
+    val PROTEUS = registerCypher(ProteusCypher)
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // other
@@ -304,4 +308,6 @@ object Cyphers {
     val D3 = registerCypher(AbstractDivideBy.D3)
     val D4 = registerCypher(AbstractDivideBy.D4)
     val D10 = registerCypher(AbstractDivideBy.D10)
+
+    val CYPHER_DUPLICATION = registerCypher(CypherDuplicationCypher)
 }

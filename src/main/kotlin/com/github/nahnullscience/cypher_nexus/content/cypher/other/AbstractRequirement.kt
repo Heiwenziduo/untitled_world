@@ -32,7 +32,9 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
             chunk: ProjectileStateChunk,
             data: HelperDataBundle,
             state: InvokingStateBundle,
-            relativeIndex: Int
+            relativeIndex: Int,
+            recursionDepth: Int,
+            isCopy: Boolean
         ) {
             CypherNexus.debugCypher { "[$this] is invoked and modifies the state" }
             val startIndex = helper.peekNextIndex(relativeIndex + 1)

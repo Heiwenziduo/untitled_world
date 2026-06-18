@@ -12,9 +12,8 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingH
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import kotlin.math.max
 
-abstract class AbstractDivideBy() : AbstractNonProjectileCypher() {
-    override val category = CypherCategories.OTHER
-    override val isRecursive = false
+abstract class AbstractDivideBy : AbstractNonProjectileCypher() {
+    final override val category = CypherCategories.OTHER
     override fun defaultAttributes() = super.defaultAttributes().draw(0)
 
     abstract val divideBy: Int
@@ -25,9 +24,12 @@ abstract class AbstractDivideBy() : AbstractNonProjectileCypher() {
         chunk: ProjectileStateChunk,
         data: HelperDataBundle,
         state: InvokingStateBundle,
-        relativeIndex: Int
+        relativeIndex: Int,
+        recursionDepth: Int,
+        isCopy: Boolean
     ) {
-        super.invoke(helper, chunk, data, state, relativeIndex)
+        CypherNexus.debugCypher { "[$this] is invoked and modifies the state" }
+        modifyStateChunk(helper, data, chunk)
 
         val targetIndex = helper.peekNextIndex(relativeIndex + 1)
         val target = helper.peekNext(relativeIndex + 1) ?: return // step++ avoid infinite loop
@@ -41,19 +43,19 @@ abstract class AbstractDivideBy() : AbstractNonProjectileCypher() {
 
         // first copy with draw-disabled, others with draw-enabled // every Dx exceed its position limit will turn to "D1"
         state.drawEnabled = false
-        target.invoke(helper, chunk, data, state, targetIndex)
+        target.invoke(helper, chunk, data, state, targetIndex, recursionDepth, true)
         state.drawEnabled = true
         if (canGoDeeper) {
             for (i in 0 until divideBy - 1) {
-                target.invoke(helper, chunk, data, state, targetIndex)
+                target.invoke(helper, chunk, data, state, targetIndex, recursionDepth, true)
             }
         }
-        // FIXME discard index is wrong
+
         // if this is the beginning of one chain, do discard based on chain length
         if (currentDepth == 0) {
             CypherNexus.debugCypher { "divide by chain finish, discard next ${state.divideByChainLengthMax + 1}" }
+            for (i in 0 .. state.divideByChainLengthMax) helper.deckNext2discard()
             state.divideByChainLengthMax = 0
-            for (i in 0 .. state.divideByChainLength) helper.deckNext2discard()
         }
         state.divideByChainLength = currentDepth
     }

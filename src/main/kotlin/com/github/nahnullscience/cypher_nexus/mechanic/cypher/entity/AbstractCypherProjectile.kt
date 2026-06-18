@@ -127,10 +127,10 @@ abstract class AbstractCypherProjectile(
         set(value) {
             _attributeMap[CypherAttributes.EXISTING.value()] = CypherAttributes.EXISTING.value().restrictRange(value.toDouble())
         }
+    val speed: Double get() = getAttrOrProjDefault(CypherAttributes.SPEED)
     val bounce: Int get() = getAttrOrProjDefault(CypherAttributes.BOUNCE).toInt()
     val gravity: Float get() = getAttrOrProjDefault(CypherAttributes.GRAVITY_FACTOR).toFloat()
     val speedFactor: Float get() = 1f - getAttrOrProjDefault(CypherAttributes.FRICTION_FACTOR).toFloat()
-
 
 //    /** the direct entity create the projectile, invoker could be another projectile if trigger */
 //    private var _invoker: Entity? = null
@@ -257,6 +257,9 @@ abstract class AbstractCypherProjectile(
             // here's a trick, if player make existing-time exactly equal to 0, projectile will last till the game quit
             discardCypher(DiscardReason.EXPIRE)
         }
+        if (speed > 0.02 && deltaMovement.lengthSqr() <= 0.0004) {
+            onLowSpeedBoth()
+        }
     }
 
     /**
@@ -307,7 +310,7 @@ abstract class AbstractCypherProjectile(
 
 //                println("capture $entities")
                 for (entity in entities) {
-                    onCaptureSurrounding(entity)
+                    onCaptureSurroundingBoth(entity)
                     // TODO try further optimization, for this is O(m * n)
                     _hooks?.playHooks(CypherBehaviorHooks.ENTITY_SEARCH_BOTH)
                     { h, i -> h.entitySearchBoth(level(), this, i, entity) }
@@ -442,7 +445,8 @@ abstract class AbstractCypherProjectile(
     protected open fun onTickBeforeBoth() = Unit
     protected open fun onTickAfterBoth() = Unit
     protected open fun needCaptureSurrounding() = false
-    protected open fun onCaptureSurrounding(entity: Entity) = Unit
+    protected open fun onCaptureSurroundingBoth(entity: Entity) = Unit
+    protected open fun onLowSpeedBoth() = Unit
     /** client only */
     protected open fun discardVisualEffect() = Unit
 

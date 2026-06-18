@@ -25,6 +25,8 @@ class InvokingHelper (
     val rootChunk = ProjectileStateChunk.root(this)
     val states = InvokingStateBundle()
     val isClientSide = level.isClientSide
+    /** the position of last-drawn cypher */
+    val relativeIndex: Int get() = 63 - data.hand.countLeadingZeroBits()
 
     init {
         // define the order of bits go from right to left, which is inverse compare to the order of the cypherArray
@@ -213,10 +215,10 @@ class InvokingHelper (
         var recharge: Int,
         var manaCurrent: Float,
         /** R -> L, invokable only */
+        var hand: Long = 0,
         var deck: Long = 0,
         var discard: Long = 0,
     ) {
-        var hand: Long = 0
     }
 
     /** for special data persist along the invoking */
@@ -225,8 +227,6 @@ class InvokingHelper (
         var alreadyRefreshed: Boolean = false,
 
         var drawEnabled: Boolean = true,
-//        var isCopiedCypher: Boolean = false,
-        var recursiveDepth: Int = 0,
 
         var divideByChainLength: Int = 0,
         var divideByChainLengthMax: Int = 0,

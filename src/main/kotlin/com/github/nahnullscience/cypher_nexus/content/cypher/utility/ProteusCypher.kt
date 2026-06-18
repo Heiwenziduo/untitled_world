@@ -9,17 +9,17 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingH
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 
-object RefresherRingCypher : AbstractNonProjectileCypher() {
-    override val resource = CypherNexus.modResource("refresher_ring")
+object ProteusCypher : AbstractNonProjectileCypher() {
+    override val resource = CypherNexus.modResource("proteus")
     override val category = CypherCategories.UTILITY
-    override val isRecursive = true
     override fun defaultAttributes(): CypherDataMap.Builder {
         return super.defaultAttributes()
-            .manaDrain(20f)
-            .recharge(-8)
+            .manaDrain(10f)
+            .draw(1)
     }
 
     override fun triggerInterplay() = true
+
     override fun invoke(
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
@@ -29,16 +29,25 @@ object RefresherRingCypher : AbstractNonProjectileCypher() {
         recursionDepth: Int,
         isCopy: Boolean
     ) {
-        if (!canRecursionContinue(recursionDepth)) return
-        super.invoke(helper, chunk, data, state, relativeIndex, recursionDepth, isCopy)
-        if (state.alreadyRefreshed) {
-            // terminate invoking process if meet again
-            // this only prevent drawing new cards, current invoking cypher will continue its function
-            helper.reload()
-            return
+        CypherNexus.debugCypher { "[$this] is invoked and modifies the state" }
+        modifyStateChunk(helper, data, chunk)
+
+        if (state.drawEnabled)
+        for (i in 0 until draw) {
+            var cy = helper.drawNext()
+            if (cy == null) {
+                CypherNexus.debugCypher { "[$this] want a wrap" }
+                val wrap = helper.wrap()
+                if (!wrap) break
+                cy = helper.drawNext()
+            }
+            if (cy != null) {
+                CypherNexus.debugCypher { "[$this] will copy $cy" }
+                val index = helper.relativeIndex
+                cy.invokeInHand(helper, chunk, data, state)
+                if (cy is ProteusCypher) data.manaCurrent += 100f // award some mana if finds self
+                else cy.invoke(helper, chunk, data, state, index, recursionDepth, true)
+            }
         }
-        state.alreadyRefreshed = true
-        helper.init()
-        data.recharge = 0
     }
 }
