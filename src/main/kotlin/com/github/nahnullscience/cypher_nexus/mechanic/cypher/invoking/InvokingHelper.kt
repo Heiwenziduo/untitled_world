@@ -215,12 +215,15 @@ class InvokingHelper (
     ) {
     }
 
-    /** for special data persist along the invoking */
+    /**
+     * for special data persist along the invoking
+     * */
     data class InvokingStateBundle (
         var wrapped: Boolean = false,
         var alreadyRefreshed: Boolean = false,
 
         var drawEnabled: Boolean = true,
+        var recursionDepth: Int = 0,
 
         var divideByChainLength: Int = 0,
         var divideByChainLengthMax: Int = 0,

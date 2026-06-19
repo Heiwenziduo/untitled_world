@@ -34,6 +34,7 @@ object EventsListener {
         val map = player.getData(WAND_DATA_MAP)
         val wands = CNEvents.gatherWandsTracking(player).wands()
         wands.forEach { wand ->
+//            (wand.item as IWandLike).itemWandInstance(player.level(), player, wand)?.tick(player)
             map.getOrPutInstance(
                 (wand.item as IWandLike).getWandData(wand, null) ?: return@forEach,
                 (wand.item as IWandLike),

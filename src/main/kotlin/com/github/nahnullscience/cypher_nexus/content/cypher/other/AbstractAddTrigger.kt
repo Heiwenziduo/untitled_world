@@ -31,7 +31,6 @@ abstract class AbstractAddTrigger(
         data: HelperDataBundle,
         state: InvokingStateBundle,
         relativeIndex: Int,
-        recursionDepth: Int,
         isCopy: Boolean
     ) {
         CypherNexus.debugCypher { "[$this $relativeIndex] is invoked" }

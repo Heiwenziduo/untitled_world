@@ -245,7 +245,7 @@ abstract class AbstractCypherProjectile(
         }
 
         if (deltaMovement.lengthSqr() <= LOW_SPEED_THRESHOLD_SQR) {
-            if (lowSpeedTickCount ++ > 60) onLowSpeedBoth()
+            onLowSpeedBoth(lowSpeedTickCount ++)
         } else lowSpeedTickCount = 0
     }
 
@@ -482,7 +482,8 @@ abstract class AbstractCypherProjectile(
     /**
      * remember call super to function state hooks []
      * */
-    protected open fun onLowSpeedBoth() {
+    protected open fun onLowSpeedBoth(count: Int) {
+        if (count < 60) return
         if (speed > LOW_SPEED_THRESHOLD) {
             discardCypher(DiscardReason.LOW_SPEED)
         }

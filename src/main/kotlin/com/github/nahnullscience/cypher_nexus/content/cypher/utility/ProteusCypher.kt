@@ -26,7 +26,6 @@ object ProteusCypher : AbstractNonProjectileCypher() {
         data: HelperDataBundle,
         state: InvokingStateBundle,
         relativeIndex: Int,
-        recursionDepth: Int,
         isCopy: Boolean
     ) {
         CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
@@ -47,7 +46,7 @@ object ProteusCypher : AbstractNonProjectileCypher() {
                 if (cy is ProteusCypher) data.manaCurrent += 100f // award some mana if finds self
                 else {
                     CypherNexus.debugCypher { "[$this] will copy $cy" }
-                    cy.invoke(helper, chunk, data, state, index, recursionDepth, true)
+                    cy.invoke(helper, chunk, data, state, index, true)
                 }
             }
         }

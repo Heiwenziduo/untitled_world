@@ -1,15 +1,16 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingState
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandDataBundle
+import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
+import net.neoforged.neoforge.network.PacketDistributor
 
 /**
  * hold variable wand data, and handle invoking modules
@@ -21,6 +22,7 @@ class ItemWandInstance(
     private var aoc: ArrayOfCyphers, // player may edit the wand after the instance has been created
     private val map: ItemWandInstanceMap
 ) {
+    val uuid = invariable.uuid
     val manaMax = invariable.chunkF.manaMax
     val manaRegen = invariable.chunkF.manaRegen
     private var _manaCurrent = 0f
@@ -133,7 +135,7 @@ class ItemWandInstance(
         discard = _discard
     )
 
-    fun updateHelperData(bundle: HelperDataBundle) {
+    fun updateFromHelperData(bundle: HelperDataBundle) {
         _manaCurrent        =   bundle.manaCurrent
         _delayCurrent       =   bundle.delay
         _rechargeCurrent    =   bundle.recharge
@@ -143,7 +145,24 @@ class ItemWandInstance(
         _discard            =   bundle.discard
     }
 
+    fun sendSyncStatePacket(player: ServerPlayer) {
+        if (isClient) {
+            CypherNexus.LOGGER.error("server method calls on client side: sendSyncStatePacket")
+            return
+        }
+        PacketDistributor.sendToPlayer(
+            player,
+            ClientboundSyncWandInstance(
+                uuid,
+                _manaCurrent,
+                _delayCurrent,
+                _rechargeCurrent,
+                _deck
+            )
+        )
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     fun side() = if (isClient) "client" else "server"
-    override fun toString() = "wand-instance: ${invariable.uuid}"
+    override fun toString() = "${side()} wand-instance: ${invariable.uuid}"
 }

@@ -26,11 +26,10 @@ object RefresherRingCypher : AbstractNonProjectileCypher() {
         data: HelperDataBundle,
         state: InvokingStateBundle,
         relativeIndex: Int,
-        recursionDepth: Int,
         isCopy: Boolean
     ) {
-        if (!canRecursionContinue(recursionDepth)) return
-        super.invoke(helper, chunk, data, state, relativeIndex, recursionDepth, isCopy)
+        if (!canRecursionContinue(state)) return
+        super.invoke(helper, chunk, data, state, relativeIndex, isCopy)
         if (state.alreadyRefreshed) {
             // terminate invoking process if meet again
             // this only prevent drawing new cards, current invoking cypher will continue its function

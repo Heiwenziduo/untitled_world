@@ -49,24 +49,13 @@ abstract class AbstractItemWand(
     override fun onStopUsing(stack: ItemStack, invoker: LivingEntity, remainingUseDuration: Int) {
         // println("releaseUsing $level") // call on both sides
         if (invoker !is ServerPlayer) return
-        val wandData = getWandData(stack) ?: return
+        val wandData = getWandData(stack)
 
         val instance = invoker.getData(WAND_DATA_MAP).getOrPutInstance(wandData, this, invoker.level())
         val useTime = getUseDuration(stack, invoker) - remainingUseDuration
         if (invoker.level().gameTime - useTime >= instance.lastInvokeTime) return  // stop sync if no conduction performed
 
-        // FIXME this causes client delay / recharge bar flash, try sync somewhere else
-        val helperBundle = instance.toHelperDataBundle()
-        PacketDistributor.sendToPlayer(
-            invoker,
-            ClientboundSyncWandInstance(
-                wandData.invariable.uuid,
-                helperBundle.manaCurrent,
-                helperBundle.delay,
-                helperBundle.recharge,
-                helperBundle.deck
-            )
-        )
+        instance.sendSyncStatePacket(invoker)
     }
 
 
@@ -148,7 +137,7 @@ abstract class AbstractItemWand(
         rootChunk: ProjectileStateChunk
     ): InvokingState {
         val instance = itemWandInstance(level, invoker, stack)
-        instance.updateHelperData(dataBundle)
+        instance.updateFromHelperData(dataBundle)
         instance.invokeFinish(level)
         return InvokingState.SUCCESS
     }

@@ -25,7 +25,6 @@ abstract class AbstractDivideBy : AbstractNonProjectileCypher() {
         data: HelperDataBundle,
         state: InvokingStateBundle,
         relativeIndex: Int,
-        recursionDepth: Int,
         isCopy: Boolean
     ) {
         CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
@@ -36,6 +35,8 @@ abstract class AbstractDivideBy : AbstractNonProjectileCypher() {
 
         CypherNexus.debugCypher { "[$this] will copy: [$target]" }
 
+        if (!target.canRecursionContinue(state)) return
+
         val currentDepth = state.divideByChainLength++
         state.divideByChainLengthMax = max(state.divideByChainLengthMax, currentDepth)
 
@@ -43,11 +44,11 @@ abstract class AbstractDivideBy : AbstractNonProjectileCypher() {
 
         // first copy with draw-disabled, others with draw-enabled // every Dx exceed its position limit will turn to "D1"
         state.drawEnabled = false
-        target.invoke(helper, chunk, data, state, targetIndex, recursionDepth, true)
+        target.invoke(helper, chunk, data, state, targetIndex, true)
         state.drawEnabled = true
         if (canGoDeeper) {
             for (i in 0 until divideBy - 1) {
-                target.invoke(helper, chunk, data, state, targetIndex, recursionDepth, true)
+                target.invoke(helper, chunk, data, state, targetIndex, true)
             }
         }
 

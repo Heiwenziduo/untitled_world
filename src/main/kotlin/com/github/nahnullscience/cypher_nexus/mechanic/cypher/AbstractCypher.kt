@@ -89,7 +89,8 @@ sealed class AbstractCypher: IRegisterable {
         data: HelperDataBundle,
         state: InvokingStateBundle,
     ) {
-        invoke(helper, chunk, data, state, helper.relativeIndex, 0, false)
+        state.recursionDepth = 0
+        invoke(helper, chunk, data, state, helper.relativeIndex, false)
 
         if (helper.invoker is ServerPlayer) {
             // TODO award stats
@@ -105,10 +106,9 @@ sealed class AbstractCypher: IRegisterable {
         data: HelperDataBundle,
         state: InvokingStateBundle,
         relativeIndex: Int,
-        recursionDepth: Int,
         isCopy: Boolean,
     ) {
-        if (!canRecursionContinue(recursionDepth)) return
+        if (!canRecursionContinue(state)) return
         CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
         modifyStateChunk(helper, data, chunk)
 
@@ -120,9 +120,9 @@ sealed class AbstractCypher: IRegisterable {
         handleDraws(helper, forwardState, data, state)
     }
 
-    protected fun canRecursionContinue(recursionDepth: Int,): Boolean {
+    fun canRecursionContinue(state: InvokingStateBundle): Boolean {
         if (isRecursive) {
-            if (recursionDepth > RECURSION_LIMIT) {
+            if (state.recursionDepth > RECURSION_LIMIT) {
                 CypherNexus.debugCypher { "[$this] is stopped due to recursion limit" }
                 return false
             }

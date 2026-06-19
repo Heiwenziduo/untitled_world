@@ -29,16 +29,15 @@ object CypherDuplicationCypher : AbstractNonProjectileCypher() {
         data: HelperDataBundle,
         state: InvokingStateBundle,
         relativeIndex: Int,
-        recursionDepth: Int,
         isCopy: Boolean
     ) {
-        if (!canRecursionContinue(recursionDepth)) return
+        if (!canRecursionContinue(state)) return
 
         CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
 
         modifyStateChunk(helper, data, chunk)
 
-        duplicate(helper, chunk, data, state, relativeIndex, recursionDepth)
+        duplicate(helper, chunk, data, state, relativeIndex)
 
         handleDraws(helper, chunk, data, state)
     }
@@ -50,7 +49,6 @@ object CypherDuplicationCypher : AbstractNonProjectileCypher() {
         data: HelperDataBundle,
         state: InvokingStateBundle,
         relativeIndex: Int,
-        recursionDepth: Int,
     ) {
         val hand = data.hand
         for (i in hand.countTrailingZeroBits() until relativeIndex) {
@@ -58,7 +56,9 @@ object CypherDuplicationCypher : AbstractNonProjectileCypher() {
             if (cy is CypherDuplicationCypher) continue
 
             CypherNexus.debugCypher { "[$this] copies $cy" }
-            cy.invoke(helper, chunk, data, state, i, recursionDepth + 1, true)
+            val depth = state.recursionDepth++
+            cy.invoke(helper, chunk, data, state, i, true)
+            state.recursionDepth = depth
         }
     }
 }
