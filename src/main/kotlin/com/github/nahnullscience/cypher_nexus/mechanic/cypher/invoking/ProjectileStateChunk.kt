@@ -50,7 +50,7 @@ class ProjectileStateChunk private constructor (
             if (recoilMap != null) {
                 var recoil = AttributeOperator.attributeCalculator(recoilMap, 0.0)
                 recoil = CypherAttributes.RECOIL.value().restrictRange(recoil)
-                helper.wandInstance()?.recoilModule(directInvoker, recoil, posDire)
+                helper.itemWand?.recoilModule(directInvoker, recoil, posDire)
             }
         }
 

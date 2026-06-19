@@ -2,6 +2,8 @@ package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingState
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandDataBundle
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
@@ -9,12 +11,15 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 
-/** hold variable wand data, and handle invoking modules */
-class WandInstance(
+/**
+ * hold variable wand data, and handle invoking modules
+ * */
+class ItemWandInstance(
     val invariable: WandDataInvariable,
     val isClient: Boolean,
     // TODO update client aoc when wand edit (item-component is auto synced, but the reference inside instance is not)
     private var aoc: ArrayOfCyphers, // player may edit the wand after the instance has been created
+    private val map: ItemWandInstanceMap
 ) {
     val manaMax = invariable.chunkF.manaMax
     val manaRegen = invariable.chunkF.manaRegen
@@ -31,6 +36,7 @@ class WandInstance(
     init {
         _manaCurrent = manaMax
     }
+
     val manaCurrent get(): Float = _manaCurrent
     val delay get(): Int = _delayCurrent
     val recharge get(): Int = _rechargeCurrent
@@ -40,6 +46,10 @@ class WandInstance(
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     fun tick(entity: Entity) {
+        if (_lastModifyTime == entity.level().gameTime) {
+            CypherNexus.warn { "wand [${invariable.uuid}] on [$entity] ticked multiple times" }
+            return
+        }
         _manaCurrent += manaRegen
         _manaCurrent = _manaCurrent.coerceAtMost(manaMax)
 
@@ -49,16 +59,18 @@ class WandInstance(
         _lastModifyTime = entity.level().gameTime // mark the last modify level tick for GC
     }
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    fun isBeginning() = _deck == 0L
+    fun canInvoke() = !(_delayCurrent > 0 || (_deck == 0L && _rechargeCurrent > 0))
+        .also { println("${side()} invoke check: delay=$_delayCurrent, recharge=$_rechargeCurrent") }
+
     fun invokeFinish(level: Level) {
         _lastInvokeTime = level.gameTime
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    fun canInvoke() = !(_delayCurrent > 0 || (_deck == 0L && _rechargeCurrent > 0))
-        .also { println("${side()} invoke check: delay=$_delayCurrent, recharge=$_rechargeCurrent") }
-    fun isBeginning() = _deck == 0L
-
     fun rightClickModule() {
 
     }
@@ -112,7 +124,7 @@ class WandInstance(
         _deck            = deck
     }
 
-    fun toHelperDataBundle() = InvokingHelper.HelperDataBundle(
+    fun toHelperDataBundle() = HelperDataBundle(
         draw = invariable.chunkI.draw,
         delay = invariable.chunkI.castDelay,
         recharge = if (isBeginning()) invariable.chunkI.rechargeTime else _rechargeCurrent,
@@ -121,7 +133,7 @@ class WandInstance(
         discard = _discard
     )
 
-    fun updateHelperData(bundle: InvokingHelper.HelperDataBundle) {
+    fun updateHelperData(bundle: HelperDataBundle) {
         _manaCurrent        =   bundle.manaCurrent
         _delayCurrent       =   bundle.delay
         _rechargeCurrent    =   bundle.recharge
@@ -132,6 +144,6 @@ class WandInstance(
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    private fun side() = if (isClient) "client" else "server"
+    fun side() = if (isClient) "client" else "server"
     override fun toString() = "wand-instance: ${invariable.uuid}"
 }

@@ -1,7 +1,8 @@
 package com.github.nahnullscience.cypher_nexus.init
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandInstanceMap
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataSyncHandler
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstanceMap
 import net.neoforged.neoforge.attachment.AttachmentType
 import net.neoforged.neoforge.registries.DeferredRegister
 import net.neoforged.neoforge.registries.NeoForgeRegistries
@@ -18,6 +19,6 @@ object ModDataAttachments {
         DEFERRED_REGISTER.register(MOD_BUS)
     }
 
-    val WAND_DATA_MAP: Supplier<AttachmentType<WandInstanceMap>> = DEFERRED_REGISTER.register("wand_instance_map")
-    { -> AttachmentType.builder { -> WandInstanceMap() }.build() }
+    val WAND_DATA_MAP: Supplier<AttachmentType<ItemWandInstanceMap>> = DEFERRED_REGISTER.register("wand_instance_map")
+    { -> AttachmentType.builder { -> ItemWandInstanceMap() }.sync(WandDataSyncHandler).build() }
 }

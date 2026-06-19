@@ -13,11 +13,11 @@ object CNEvents {
         return !event.isCanceled
     }
 
-    fun gatherWands(player: Player): PlayerGatherWandEvent.Ticking {
-        return NeoForge.EVENT_BUS.post(PlayerGatherWandEvent.Ticking(player))
+    fun gatherWandsTracking(player: Player): PlayerGatherWandEvent.Tracking {
+        return NeoForge.EVENT_BUS.post(PlayerGatherWandEvent.Tracking(player))
     }
 
-    fun gatherWandsRendering(player: Player): PlayerGatherWandEvent.Rendering {
-        return NeoForge.EVENT_BUS.post(PlayerGatherWandEvent.Rendering(player))
+    fun gatherWandsActive(player: Player): PlayerGatherWandEvent.Active {
+        return NeoForge.EVENT_BUS.post(PlayerGatherWandEvent.Active(player))
     }
 }

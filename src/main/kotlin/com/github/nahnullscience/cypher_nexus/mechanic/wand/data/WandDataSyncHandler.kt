@@ -6,25 +6,23 @@ import net.neoforged.neoforge.attachment.AttachmentSyncHandler
 import net.neoforged.neoforge.attachment.IAttachmentHolder
 
 // call AttachmentHolder#syncData(AttachmentType) to sync data manually
-// otherwise data will only sync when getData / setData / removeData is called
+// additionally data will also sync when #getData / #setData / #removeData is called
 // However both cases are not desired, since we wrapped instances into a map,
 // and there seems no way to avoid sync the entire map
-object WandDataSyncHandler : AttachmentSyncHandler<WandInstanceMap> {
+// so just disable default sync entirely
+/** default sync is disabled */
+object WandDataSyncHandler : AttachmentSyncHandler<ItemWandInstanceMap> {
     override fun write(
         buf: RegistryFriendlyByteBuf,
-        attachment: WandInstanceMap,
+        attachment: ItemWandInstanceMap,
         initialSync: Boolean
-    ) {
-    }
+    ) = Unit
 
     override fun read(
         holder: IAttachmentHolder,
         buf: RegistryFriendlyByteBuf,
-        previousValue: WandInstanceMap?
-    ): WandInstanceMap? {
-        TODO("Not yet implemented")
-    }
+        previousValue: ItemWandInstanceMap?
+    ): ItemWandInstanceMap? = null
 
-    // only update the player self-data
-    override fun sendToPlayer(holder: IAttachmentHolder, to: ServerPlayer) = holder == to
+    override fun sendToPlayer(holder: IAttachmentHolder, to: ServerPlayer) = false
 }

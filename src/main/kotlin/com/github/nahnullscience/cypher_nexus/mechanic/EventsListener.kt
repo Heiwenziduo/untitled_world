@@ -23,8 +23,7 @@ object EventsListener {
     private fun tickWandDataMap(tickEvent: EntityTickEvent.Post) {
         // fired on both sides
         if (tickEvent.entity.hasData(WAND_DATA_MAP)) {
-            val dataMap = tickEvent.entity.getData(WAND_DATA_MAP)
-            dataMap.tick(tickEvent.entity)
+            tickEvent.entity.getData(WAND_DATA_MAP).tick(tickEvent.entity)
         }
     }
 
@@ -33,20 +32,20 @@ object EventsListener {
     private fun wandInstanceUpdatePlayer(event: PlayerTickEvent.Post) {
         val player = event.entity
         val map = player.getData(WAND_DATA_MAP)
-        val wands = CNEvents.gatherWands(player).wands()
+        val wands = CNEvents.gatherWandsTracking(player).wands()
         wands.forEach { wand ->
             map.getOrPutInstance(
-                (wand.item as IWandLike).getWandData(wand, player) ?: return@forEach,
+                (wand.item as IWandLike).getWandData(wand, null) ?: return@forEach,
                 (wand.item as IWandLike),
                 player.level()
             ).tick(player)
         }
     }
 
-    // collect wands in hotbar & offhand
     @SubscribeEvent(priority = EventPriority.HIGH)
-    private fun gatherWandsTicking(event: PlayerGatherWandEvent.Ticking) {
+    private fun gatherWandsTicking(event: PlayerGatherWandEvent.Tracking) {
         val player = event.entity
+        // collect wands in hotbar & offhand
         for (i in 0 until 9) {
             val stack = player.inventory.getItem(i)
             if (IWandLike.validItemWand(stack)) event.addWand(stack)
@@ -56,7 +55,7 @@ object EventsListener {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    private fun gatherWandsRendering(event: PlayerGatherWandEvent.Rendering) {
+    private fun gatherWandsActive(event: PlayerGatherWandEvent.Active) {
         val player = event.entity
 //        val mainHand = player.inventory.selectedItem
 //        val offHand = player.inventory.getItem(SLOT_OFFHAND)
@@ -66,8 +65,12 @@ object EventsListener {
         if (IWandLike.validItemWand(offHand)) event.addWand(offHand)
     }
 
+
     private fun tackingCypherProjectiles(event: StartTracking) {
         // TODO consider availability
+        /**
+         * check [net.minecraft.server.level.ServerEntity.addPairing]
+         * */
     }
 
 //    @SubscribeEvent(priority = EventPriority.NORMAL)

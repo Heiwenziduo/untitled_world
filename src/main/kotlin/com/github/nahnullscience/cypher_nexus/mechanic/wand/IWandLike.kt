@@ -1,68 +1,89 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand
 
-import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingState
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
-import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
-import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
-import net.neoforged.neoforge.network.PacketDistributor
 
 /**
- * ---casting logics here---
- * Any Item/Entity implemented the interface here should be able to conduct the power of cyphers #tryConduct
+ * Any Item/Entity implemented the interface here should be able to conduct the power of cyphers through #tryConduct
  * */
 interface IWandLike {
-
-    /** itemStack Or entityInvoker */
-    fun getWandData(stack: ItemStack?, invoker: Entity?): WandDataBundle?
-
-    /** direction doesn't have to be normalized */
-    fun getInvokePosDire(level: Level, invoker: Entity, wandLength: Float): PosDirePair
 
     /** for item implementations to determine whether it can be modified in cypher-index */
     val isEditableWand: Boolean
 
 
     /**
+     * @param stack item wand if any
+     * @param entityWand entity invoker if any
+     * */
+    fun <EntityWand> getWandData(stack: ItemStack?, entityWand: EntityWand?): WandDataBundle?
+    where EntityWand : Entity, EntityWand: IWandLike
+
+
+    /**  */
+    fun checkInvokingPrerequisites(level: Level, invoker: Entity, stack: ItemStack?): Boolean
+
+
+    /**
+     * determine the initial position & direction of the projectile,
+     * will be further processed if hooks are present.
+     * direction doesn't have to be normalized
+     * */
+    fun getInvokePosDire(level: Level, invoker: Entity, wandLength: Float): PosDirePair
+
+
+    /**  */
+    fun getHelperDataBundle(level: Level, invoker: Entity, stack: ItemStack?): HelperDataBundle
+
+
+    /**  */
+    fun itemWandInstance(level: Level, invoker: Entity, stack: ItemStack?): ItemWandInstance?
+
+
+    /**
+     * resolve invoking feedback, for item-wands this is handled by [ItemWandInstance]
+     * */
+    fun afterInvoke(level: Level, invoker: Entity, stack: ItemStack?, dataBundle: HelperDataBundle, rootChunk: ProjectileStateChunk): InvokingState
+
+
+    /**
      * call on BOTH sides.
      * server side is responsible for projectile generation, authorise mana / deck / delay check.
      * client side is for user info overlay, and wand module functions.
-     * TODO let fake-player/machine can cast cyphers
      * */
-    fun tryConduct(level: Level, invoker: Entity, stack: ItemStack?): Boolean {
+    fun tryInvoke(level: Level, invoker: Entity, stack: ItemStack?): InvokingState {
 
-        val wandData = getWandData(stack, invoker) ?: return false
+        if (!checkInvokingPrerequisites(level, invoker, stack)) return InvokingState.LOADING
 
-        // data-attach (create if not present)
-        val instance = invoker.getData(WAND_DATA_MAP).getOrPutInstance(wandData, this, level)
+        val invoker0 = if (invoker is IWandLike) invoker else null
+        val wandData = getWandData(stack, invoker0) ?: return InvokingState.MISSING_DATA
 
-        if (!instance.canInvoke()) {
-//            println("casting rejected due to: $instance")
-            return false
-        }
+        val data = getHelperDataBundle(level, invoker, stack)
 
-        // TODO consider move these inside Instance logic
-        val helperBundle = instance.toHelperDataBundle()
+        // helper should decouple with wand-instance
         val helper = InvokingHelper(
             level,
             invoker,
             wandData.invariable,
             wandData.highPayload.cypherArray,
-            helperBundle,
+            data,
             getInvokePosDire(level, invoker, wandData.invariable.chunkF.wandLength),
+            itemWandInstance(level, invoker, stack)
         )
-        helper.start()
+        helper.process()
         helper.finalizeInvoking()
-        instance.updateHelperData(helperBundle) // retrieve data from helper and sync to instance of both sides
-
-        return true
+        return afterInvoke(level, invoker, stack, data, helper.rootChunk)
     }
 
 

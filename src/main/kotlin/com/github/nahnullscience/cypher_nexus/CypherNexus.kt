@@ -35,8 +35,12 @@ object CypherNexus {
     val LOGGER: Logger = LogManager.getLogger(MOD_ID)
     val LOGGER_CYPHER: Logger = LogManager.getLogger("${MOD_ID}_cyphers")
 
+    // TODO log management is required
     inline fun debugCypher(supplier: () -> String) {
 //        if (false)
+        LOGGER.debug(supplier.invoke())
+    }
+    inline fun debugWand(supplier: () -> String) {
         LOGGER.debug(supplier.invoke())
     }
     inline fun debug(supplier: () -> String) {

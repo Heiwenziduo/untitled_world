@@ -72,7 +72,7 @@ class CypherIndexScreen(
         // instance will be created each time player open the screen
         val localPlayer = Minecraft.getInstance().player
         if (localPlayer != null) {
-            wandList = CNEvents.gatherWands(localPlayer).wands()
+            wandList = CNEvents.gatherWandsTracking(localPlayer).wands()
             for (i in wandList.indices) {
                 if (localPlayer.mainHandItem == wandList[i]) wandListIndex = i
             }

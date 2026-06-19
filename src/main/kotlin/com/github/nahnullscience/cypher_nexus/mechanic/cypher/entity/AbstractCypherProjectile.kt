@@ -144,6 +144,7 @@ abstract class AbstractCypherProjectile(
     /** store bounce points triggered in one tick */
     protected val bouncePoints = mutableListOf<Vec3>()
     protected val bounceTick get() = bouncePoints.isNotEmpty()
+    private var lowSpeedTickCount = 0
 
     private var _hooks: HookContainer? = null
     val hooks: HookContainer? get() = _hooks
@@ -244,8 +245,8 @@ abstract class AbstractCypherProjectile(
         }
 
         if (deltaMovement.lengthSqr() <= LOW_SPEED_THRESHOLD_SQR) {
-            onLowSpeedBoth()
-        }
+            if (lowSpeedTickCount ++ > 60) onLowSpeedBoth()
+        } else lowSpeedTickCount = 0
     }
 
     /**
@@ -549,6 +550,7 @@ abstract class AbstractCypherProjectile(
                 onBeforeDiscardBoth(reason)
             }
         }
+        level().broadcastEntityEvent(this, 3)
         discard()
     }
 

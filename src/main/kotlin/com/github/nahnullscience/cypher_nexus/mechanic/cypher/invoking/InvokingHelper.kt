@@ -1,10 +1,9 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandInstance
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.world.entity.Entity
@@ -14,6 +13,7 @@ import kotlin.math.max
 /** cypher chain compiler */
 class InvokingHelper (
     val level: Level,
+    /** the caster */
     val invoker: Entity?,
 
     val wandStats: WandDataInvariable,
@@ -21,6 +21,7 @@ class InvokingHelper (
     val data: HelperDataBundle,
     /** direction doesn't have to be normalized */
     val invokePosDire: PosDirePair,
+    val itemWand: ItemWandInstance?,
 ) {
     val rootChunk = ProjectileStateChunk.root(this)
     val states = InvokingStateBundle()
@@ -36,17 +37,11 @@ class InvokingHelper (
         }
     }
 
-    fun wandInstance(): WandInstance? {
-        val has = invoker?.hasData(WAND_DATA_MAP)
-        if (has ?: return null)
-            return invoker
-            .getData(WAND_DATA_MAP)
-            .getOrPutInstance(wandStats, aoc, null, level)
-        return null
-    }
-
     // =================================================================================
-    fun start() {
+    /**
+     * AST: produce the invoking stateChunk through given [ArrayOfCyphers]
+     * */
+    fun process() {
         // level.profiler.push("invoking-start") // F3 + L to record time cost
         CypherNexus.debugCypher { "invoking start, prepare cyphers" }
 
@@ -66,10 +61,9 @@ class InvokingHelper (
     }
     fun finalizeInvoking() {
         rootChunk.release(level, invoker, invoker, invokePosDire)
-        wandInstance()?.invokeFinish(level)
     }
 
-    fun step(): Boolean {
+    private fun step(): Boolean {
         val cy = drawNext()
         if (cy != null) {
             cy.invokeInHand(this, rootChunk, data, states)

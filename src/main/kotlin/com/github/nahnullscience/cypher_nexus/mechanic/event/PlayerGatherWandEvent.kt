@@ -4,6 +4,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.event.entity.player.PlayerEvent
 
+/** fired on both sides */
 sealed class PlayerGatherWandEvent(
     val player: Player,
 ) : PlayerEvent(player) {
@@ -15,8 +16,12 @@ sealed class PlayerGatherWandEvent(
         wands.add(wand)
     }
 
-    /** on both sides */
-    class Ticking(player: Player) : PlayerGatherWandEvent(player)
-    /** only client side */
-    class Rendering(player: Player) : PlayerGatherWandEvent(player)
+    /**
+     * fired on both sides, collect wands that can be ticked
+     * */
+    class Tracking(player: Player) : PlayerGatherWandEvent(player)
+    /**
+     * fired on both sides, currently only main-hand and off-hand wands, will be rendered as overlay
+     * */
+    class Active(player: Player) : PlayerGatherWandEvent(player)
 }

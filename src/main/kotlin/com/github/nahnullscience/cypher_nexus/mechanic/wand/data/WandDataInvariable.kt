@@ -1,5 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
 
+import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.mojang.serialization.Codec
@@ -24,7 +25,7 @@ data class WandDataInvariable(
     data class WandDataChunkI(val draw: Int, val castDelay: Int, val rechargeTime: Int,)
     data class WandDataChunkL(val alwaysInvoke: List<AbstractCypher>)
 
-    class Builder() {
+    class Builder {
         var manaMax: Float = 100f
         var manaRegen: Float = 1f
         var wandLength: Float = 1f
@@ -122,7 +123,7 @@ data class WandDataInvariable(
             }
 
         val TEST_GOOD_WAND = WandDataInvariable(
-            uuid = "mythical",
+            uuid   = "mythical",
             chunkF = WandDataChunkF(3000f, 30f, 1.6f, 7f),
             chunkI = WandDataChunkI(1, 6, 10),
         )
@@ -134,6 +135,11 @@ data class WandDataInvariable(
 //            WandDataChunkU(UUID.randomUUID().toString())
 //        )
 
-
+        const val DATA_FAIL_UUID = "fall_back"
+        val FALL_BACK = WandDataInvariable(
+            uuid   = DATA_FAIL_UUID,
+            chunkF = WandDataChunkF(-Float.MAX_VALUE, 0f, 0f, 0f),
+            chunkI = WandDataChunkI(0, 0, 0),
+        )
     }
 }
