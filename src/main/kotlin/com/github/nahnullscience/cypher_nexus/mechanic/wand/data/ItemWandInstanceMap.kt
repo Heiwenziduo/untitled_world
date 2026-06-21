@@ -16,35 +16,34 @@ class ItemWandInstanceMap {
     }
 
     private val _map = HashMap<String, ItemWandInstance>()
+    operator fun get(uuid: String): ItemWandInstance? = _map[uuid]
 
 
-    /** do some garbage collection and free memory */
+    /**
+     * do some garbage collection and free memory
+     * */
     fun tick(entity: Entity) {
         if (entity.tickCount % RESET_TICK_COUNT != 0) return
         CypherNexus.debugWand { "${side(entity.level())} side wand data map GC: $entity" }
+
         _map.entries.removeIf { (uu, instance) ->
             (entity.level().gameTime - instance.lastModifyTime >= RESET_TICK_COUNT)
                 .also { if (it) CypherNexus.LOGGER.debug("remove {}", instance) }
         }
     }
 
-    operator fun get(uuid: String): ItemWandInstance? = _map[uuid]
 
-    fun getOrPutInstance(invariable: WandDataInvariable, cypherArray: ArrayOfCyphers, wand: IWandLike?, level: Level): ItemWandInstance {
+    fun getOrPutInstance(invariable: WandDataInvariable, aoc: ArrayOfCyphers, wand: IWandLike, level: Level): ItemWandInstance {
         val uuid = invariable.uuid
-        if (_map[uuid] == null) {
-            CypherNexus.debugWand { "wand-like [$wand] just created a ${side(level)} sided instance: [$uuid]" }
-        }
         return _map.getOrPut(uuid)
-        { ItemWandInstance(invariable, level.isClientSide, cypherArray, this) }
+        {
+            ItemWandInstance(invariable, level.isClientSide, aoc, this, wand)
+            .also { CypherNexus.debugWand { "wand-like [$wand] just created a ${side(level)} sided instance: [$uuid]" } }
+        }
     }
-    fun getOrPutInstance(bundle: WandDataBundle, wand: IWandLike?, level: Level) =
-        getOrPutInstance(bundle.invariable, bundle.highPayload.cypherArray, wand, level)
-//    fun getOrPutInstance(stack: ItemStack, wand: IWandLike, level: Level): WandInstance? {
-//        val invariable = stack.get(ModDataComponents.WAND_INVARIABLE) ?: return null
-//        val highPayload = stack.get(ModDataComponents.WAND_HIGH_PAYLOAD) ?: return null
-//        return getOrPutInstance(WandDataBundle(invariable, highPayload), wand, level)
-//    }
+    fun getOrPutInstance(bundle: WandDataBundle, wand: IWandLike, level: Level) =
+        getOrPutInstance(bundle.invariable, bundle.highPayload.aoc, wand, level)
+
 
 
     /** main scene is to edit cyphers */
@@ -52,7 +51,7 @@ class ItemWandInstanceMap {
         if (level.isClientSide) return@run
         getOrPutInstance(bundle, wand, level).updateWandStatsServer(bundle)
     }
-    fun updateWandStats(stack: ItemStack,  wand: IWandLike, level: Level) {
+    fun updateWandStats(stack: ItemStack, wand: IWandLike, level: Level) {
         val invariable = stack.get(ModDataComponents.WAND_INVARIABLE) ?: return
         val highPayload = stack.get(ModDataComponents.WAND_HIGH_PAYLOAD) ?: return
         return updateWandStats(WandDataBundle(invariable, highPayload), wand, level)

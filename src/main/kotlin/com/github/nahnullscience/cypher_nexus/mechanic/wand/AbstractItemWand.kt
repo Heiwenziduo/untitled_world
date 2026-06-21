@@ -7,7 +7,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingS
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.event.CNEvents
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
-import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -21,7 +20,6 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.ItemUseAnimation
 import net.minecraft.world.level.Level
-import net.neoforged.neoforge.network.PacketDistributor
 
 /**
  * item wand, its duty is as follows:

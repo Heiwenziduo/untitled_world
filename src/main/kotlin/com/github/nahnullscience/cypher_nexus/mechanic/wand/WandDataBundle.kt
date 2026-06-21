@@ -10,6 +10,6 @@ data class WandDataBundle(val invariable: WandDataInvariable, val highPayload: W
         fun missingData(msg: () -> String) = WandDataBundle(
             WandDataInvariable.FALL_BACK,
             WandDataHighPayload(ArrayOfCyphers(1))
-            ) .also { CypherNexus.debugWand(msg) }
+            ) .also { CypherNexus.debugWand(supplier = msg) }
     }
 }

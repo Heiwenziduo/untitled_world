@@ -2,9 +2,11 @@ package com.github.nahnullscience.cypher_nexus.network
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.client.network.ClientPayloadHandler
+import com.github.nahnullscience.cypher_nexus.network.client.ClientboundEditWandCyphersConfirm
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundOpenIndexScreen
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
 import com.github.nahnullscience.cypher_nexus.network.server.ServerboundEditWandCyphers
+import com.github.nahnullscience.cypher_nexus.network.server.ServerboundPerformWandModule
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
@@ -32,21 +34,33 @@ object InitNetwork {
 //        )
 
         registrar.playToClient(
-            ClientboundOpenIndexScreen.Companion.TYPE,
-            ClientboundOpenIndexScreen.Companion.STREAM,
+            ClientboundOpenIndexScreen.TYPE,
+            ClientboundOpenIndexScreen.STREAM,
             ClientPayloadHandler::openIndexScreen
         )
 
         registrar.playToClient(
-            ClientboundSyncWandInstance.Companion.TYPE,
-            ClientboundSyncWandInstance.Companion.STREAM,
+            ClientboundSyncWandInstance.TYPE,
+            ClientboundSyncWandInstance.STREAM,
             ClientPayloadHandler::syncWandInstance
         )
 
+        registrar.playToClient(
+            ClientboundEditWandCyphersConfirm.TYPE,
+            ClientboundEditWandCyphersConfirm.STREAM,
+            ClientPayloadHandler::editWandCyphersConfirm
+        )
+
         registrar.playToServer(
-            ServerboundEditWandCyphers.Companion.TYPE,
-            ServerboundEditWandCyphers.Companion.STREAM,
+            ServerboundEditWandCyphers.TYPE,
+            ServerboundEditWandCyphers.STREAM,
             ServerPayloadHandler::editWandCyphers
+        )
+
+        registrar.playToServer(
+            ServerboundPerformWandModule.TYPE,
+            ServerboundPerformWandModule.STREAM,
+            ServerPayloadHandler::performWandModule
         )
     }
 }

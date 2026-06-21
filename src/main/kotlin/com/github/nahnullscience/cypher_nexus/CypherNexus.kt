@@ -17,6 +17,7 @@ import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.common.Mod
 import net.neoforged.neoforge.event.server.ServerStartingEvent
 import net.neoforged.neoforge.registries.NewRegistryEvent
+import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
 import kotlin.time.Duration.Companion.seconds
@@ -33,15 +34,17 @@ object CypherNexus {
     const val MOD_ID: String = "cypher_nexus"
 
     val LOGGER: Logger = LogManager.getLogger(MOD_ID)
-    val LOGGER_CYPHER: Logger = LogManager.getLogger("${MOD_ID}_cyphers")
+//    val LOGGER_CYPHER: Logger = LogManager.getLogger("${MOD_ID}_cyphers")
 
     // TODO log management is required
-    inline fun debugCypher(supplier: () -> String) {
-//        if (false)
-        LOGGER.debug(supplier.invoke())
+    inline fun debugCypher(level: Level = Level.DEBUG, supplier: () -> String) {
+        LOGGER.log(level, supplier.invoke())
     }
-    inline fun debugWand(supplier: () -> String) {
-        LOGGER.debug(supplier.invoke())
+    inline fun debugWand(level: Level = Level.DEBUG, supplier: () -> String) {
+        LOGGER.log(level, supplier.invoke())
+    }
+    inline fun debugNetwork(level: Level = Level.DEBUG, supplier: () -> String) {
+        LOGGER.log(level, supplier.invoke())
     }
     inline fun debug(supplier: () -> String) {
         LOGGER.debug(supplier.invoke())

@@ -2,7 +2,10 @@ package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandDataBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.IWandModule
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModuleCategory
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
@@ -11,6 +14,8 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.network.PacketDistributor
+import java.util.EnumMap
+import kotlin.math.abs
 
 /**
  * hold variable wand data, and handle invoking modules
@@ -18,10 +23,14 @@ import net.neoforged.neoforge.network.PacketDistributor
 class ItemWandInstance(
     val invariable: WandDataInvariable,
     val isClient: Boolean,
-    // TODO update client aoc when wand edit (item-component is auto synced, but the reference inside instance is not)
     private var aoc: ArrayOfCyphers, // player may edit the wand after the instance has been created
-    private val map: ItemWandInstanceMap
+    private val map: ItemWandInstanceMap,
+    private val wand: IWandLike
 ) {
+    companion object {
+        const val DATA_TOLERANCE_TICK = 2
+    }
+
     val uuid = invariable.uuid
     val manaMax = invariable.chunkF.manaMax
     val manaRegen = invariable.chunkF.manaRegen
@@ -35,8 +44,11 @@ class ItemWandInstance(
     private var _lastModifyTime = 0L
     private var _lastInvokeTime = 0L
 
+    private val modules = EnumMap<ModuleCategory, IWandModule>(ModuleCategory::class.java)
+
     init {
         _manaCurrent = manaMax
+        computeModules()
     }
 
     val manaCurrent get(): Float = _manaCurrent
@@ -46,14 +58,19 @@ class ItemWandInstance(
     val lastModifyTime get(): Long = _lastModifyTime
     val lastInvokeTime get(): Long = _lastInvokeTime
 
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     fun tick(entity: Entity) {
         if (_lastModifyTime == entity.level().gameTime) {
-            CypherNexus.warn { "wand [${invariable.uuid}] on [$entity] ticked multiple times" }
+            CypherNexus.warn { "$this on [$entity] ticked multiple times" }
+            // FIXME unknown bug that client instance occasionally tick twice
             return
         }
-        _manaCurrent += manaRegen
-        _manaCurrent = _manaCurrent.coerceAtMost(manaMax)
+
+        if (_manaCurrent < manaMax) {
+            _manaCurrent += manaRegen
+            _manaCurrent = _manaCurrent.coerceAtMost(manaMax)
+        }
 
         if (_delayCurrent > 0) _delayCurrent--
         if (_deck == 0L && _rechargeCurrent > 0) _rechargeCurrent--
@@ -73,11 +90,22 @@ class ItemWandInstance(
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fun rightClickModule() {
 
+    fun module(category: ModuleCategory) = modules[category]
+
+    private fun computeModules() {
+        aoc.modulesSequence().forEach { moduleCypher ->
+            println("compute module: $moduleCypher")
+            moduleCypher.apply(modules)
+        }
+        CypherNexus.debugWand { "$this computed modules, current module: $modules" }
     }
 
     fun leftClickModule() {
+
+    }
+
+    fun rightClickModule() {
 
     }
 
@@ -113,17 +141,32 @@ class ItemWandInstance(
         _deck = 0
         _discard = 0
         _rechargeCurrent = 0
-        aoc = bundle.highPayload.cypherArray
+        updateAoc(bundle.highPayload.aoc)
     }
 
-    fun syncDataClient(mana: Float, delay: Int, recharge: Int, deck: Long) {
+    fun updateAoc(aoc: ArrayOfCyphers) {
+        // can be called on both sides
+        CypherNexus.debugWand { "$this just updated cyphers: $aoc" }
+        this.aoc = aoc
+        computeModules()
+    }
+
+    /**
+     * sync mana / delay / recharge state after invoking
+     * */
+    fun syncInvokingDataClient(mana: Float, delay: Int, recharge: Int, deck: Long) {
         if (!isClient) CypherNexus.LOGGER.error("client method calls on server side: syncDataClient")
-        _manaCurrent     = mana
-        _delayCurrent    = delay
-        _rechargeCurrent = recharge
-        _delay0          = delay
-        _recharge0       = recharge
-        _deck            = deck
+
+        // give a 2 ticks tolerance to prevent bar-flash
+        var badNetwork = false
+        if (abs(_manaCurrent - mana) > DATA_TOLERANCE_TICK * manaRegen) _manaCurrent = mana .also { badNetwork = true }
+        if (abs(_delayCurrent - delay) > DATA_TOLERANCE_TICK) _delayCurrent = delay .also { badNetwork = true }
+        if (abs(_rechargeCurrent - recharge) > DATA_TOLERANCE_TICK) _rechargeCurrent = recharge .also { badNetwork = true }
+
+        _deck = deck
+        if (badNetwork) {
+
+        }
     }
 
     fun toHelperDataBundle() = HelperDataBundle(
@@ -164,5 +207,5 @@ class ItemWandInstance(
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     fun side() = if (isClient) "client" else "server"
-    override fun toString() = "${side()} wand-instance: ${invariable.uuid}"
+    override fun toString() = "${side()} wand-instance: [$uuid]"
 }

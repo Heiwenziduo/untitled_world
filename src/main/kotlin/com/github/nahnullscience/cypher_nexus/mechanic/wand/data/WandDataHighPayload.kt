@@ -10,7 +10,7 @@ import net.minecraft.network.codec.StreamCodec
 /**
  * holds the cypher list
  * */
-data class WandDataHighPayload(val cypherArray: ArrayOfCyphers) {
+data class WandDataHighPayload(val aoc: ArrayOfCyphers) {
     companion object {
         fun of(capacity: Int) = WandDataHighPayload(ArrayOfCyphers(capacity))
 
@@ -45,14 +45,14 @@ data class WandDataHighPayload(val cypherArray: ArrayOfCyphers) {
             instance.group(
                 CNCodecs.AOC_CODEC
                     .fieldOf("cypherArray")
-                    .forGetter(WandDataHighPayload::cypherArray)
+                    .forGetter(WandDataHighPayload::aoc)
             ).apply(instance, ::WandDataHighPayload)
         }
 
         val HIGH_PAYLOAD_DATA_STREAM: StreamCodec<RegistryFriendlyByteBuf, WandDataHighPayload> =
             CNCodecs.AOC_STREAM.map(
                 ::WandDataHighPayload,
-                WandDataHighPayload::cypherArray
+                WandDataHighPayload::aoc
             )
     }
 }

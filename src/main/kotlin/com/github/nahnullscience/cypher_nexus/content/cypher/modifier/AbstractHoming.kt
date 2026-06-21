@@ -77,7 +77,7 @@ abstract class AbstractHoming(path: String, private val _manaDrain: Float): Modi
                     val dir = projectile.position().vectorTo(target.eyePosition)
                     val dis =  min(dir.length(), strength * HOMING_STRENGTH)
                     val speed = dir.normalize().scale(dis)
-                    projectile.push(speed)
+                    projectile.addSpeed(speed)
                 }
             }
         }

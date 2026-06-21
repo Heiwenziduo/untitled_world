@@ -92,9 +92,9 @@ data class WandDataInvariable(
             ByteBufCodecs.FLOAT, WandDataChunkF::spread,
             ::WandDataChunkF)
         val CHUNK1_STREAM: StreamCodec<ByteBuf, WandDataChunkI> = StreamCodec.composite(
-            ByteBufCodecs.INT, WandDataChunkI::draw,
-            ByteBufCodecs.INT, WandDataChunkI::castDelay,
-            ByteBufCodecs.INT, WandDataChunkI::rechargeTime,
+            ByteBufCodecs.VAR_INT, WandDataChunkI::draw,
+            ByteBufCodecs.VAR_INT, WandDataChunkI::castDelay,
+            ByteBufCodecs.VAR_INT, WandDataChunkI::rechargeTime,
             ::WandDataChunkI)
         val CHUNK2_STREAM: StreamCodec<RegistryFriendlyByteBuf, WandDataChunkL> =
             ByteBufCodecs.registry(Cyphers.RESOURCE_KEY).apply(ByteBufCodecs.list())

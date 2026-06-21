@@ -8,6 +8,8 @@ open class MapOfCypherCounts(private val map: HashMap<AbstractCypher, Int>) : Mu
 
     companion object {
         fun of() = MapOfCypherCounts(HashMap())
+
+        val EMPTY = MapOfCypherCounts(HashMap())
     }
 
     override fun get(key: AbstractCypher): Int {

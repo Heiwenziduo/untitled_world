@@ -29,7 +29,7 @@ object BoomerangCypher: ModifierCypher(), BothTickBehaviorHook {
             val dir = projectile.position().vectorTo(target.eyePosition)
             val dis =  min(dir.length(), strength * BOOMERANG_STRENGTH)
             val speed = dir.normalize().scale(dis)
-            projectile.push(speed)
+            projectile.addSpeed(speed)
         }
     }
 }

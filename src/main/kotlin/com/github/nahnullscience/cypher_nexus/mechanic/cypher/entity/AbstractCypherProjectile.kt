@@ -30,12 +30,15 @@ import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.animal.Animal
 import net.minecraft.world.entity.item.ItemEntity
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Explosion
@@ -291,7 +294,7 @@ abstract class AbstractCypherProjectile(
                 i++
             }
             // if someone need a refresh-search
-            if (i < modules.size || needCaptureSurrounding()) {
+            if (i < modules.size || alwaysCaptureSurrounding()) {
                 val entities = level().getEntities(this, boundingBox.inflate(CAPTURE_SIZE))
                 { entity -> entity !is AbstractCypherProjectile }
 
@@ -447,7 +450,6 @@ abstract class AbstractCypherProjectile(
         _hooks?.playHooks(CypherBehaviorHooks.FIRST_TICK_BOTH)
         { h, i -> h.firstTickBoth(level(), this, i) }
     }
-
     /**
      * remember call super to function state hooks [CypherBehaviorHooks.TICK_BEHAVIOR_BOTH]
      * change speed / attributes (here) -> finalize movement -> bounce & hit check
@@ -464,13 +466,15 @@ abstract class AbstractCypherProjectile(
         _hooks?.playHooks(CypherBehaviorHooks.TICK_MOVEMENT_FINALIZE_BOTH)
         { h, i -> h.finalizeTickMovementBoth(level(), this, i) }
     }
-    /** remember call super to function state hooks [CypherBehaviorHooks.ON_BOUNCE_BOTH] */
+    /**
+     * remember call super to function state hooks [CypherBehaviorHooks.ON_BOUNCE_BOTH]
+     * */
     protected open fun onBounceBoth() {
         _hooks?.playHooks(CypherBehaviorHooks.ON_BOUNCE_BOTH)
         { h, i -> h.onBounceBoth(level(), this, i, bounceCount) }
     }
     /**  */
-    protected open fun needCaptureSurrounding() = false
+    protected open fun alwaysCaptureSurrounding() = false
     /**
      * remember call super to function state hooks [CypherBehaviorHooks.ENTITY_SEARCH_BOTH]
      * */
@@ -539,6 +543,7 @@ abstract class AbstractCypherProjectile(
         if (f != 1f) deltaMovement = deltaMovement.scale(f.toDouble())
     }
     open fun underwaterSpeedFactor() = 0.8f
+    fun addSpeed(impulse: Vec3) = addDeltaMovement(impulse)
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -565,6 +570,7 @@ abstract class AbstractCypherProjectile(
      * the #deltaMovement initialization will be done automatically, call #shoot is not necessary
      * */
     override fun shoot(x: Double, y: Double, z: Double, velocity: Float, inaccuracy: Float) = Unit // do nothing, don't call
+    override fun push(entity: Entity) = Unit
     override fun handlePortal() {
         // TODO
         super.handlePortal()
@@ -577,14 +583,9 @@ abstract class AbstractCypherProjectile(
     override fun hurtServer(level: ServerLevel, source: DamageSource, damage: Float) = false
     override fun hurtClient(source: DamageSource) = false
     override fun ignoreExplosion(explosion: Explosion) = true // this prevents projectile getting kinetic energy from explosion
-    override fun push(entity: Entity) = Unit
-    override fun push(impulse: Vec3) = push(impulse.x, impulse.y, impulse.z)
-    override fun push(xa: Double, ya: Double, za: Double) {
-        if (xa.isFinite() && ya.isFinite() && za.isFinite()) {
-            deltaMovement = deltaMovement.add(xa, ya, za)
-        }
-    }
-    fun pushThenSync(impulse: Vec3) = run { push(impulse); needsSync = true }
+    override fun isAttackable(): Boolean = false
+    override fun skipAttackInteraction(source: Entity): Boolean = true
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private fun debugMsg() {

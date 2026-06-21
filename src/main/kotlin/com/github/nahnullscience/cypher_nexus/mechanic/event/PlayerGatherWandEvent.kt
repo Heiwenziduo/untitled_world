@@ -21,7 +21,8 @@ sealed class PlayerGatherWandEvent(
      * */
     class Tracking(player: Player) : PlayerGatherWandEvent(player)
     /**
-     * fired on both sides, currently only main-hand and off-hand wands, will be rendered as overlay
+     * fired on both sides, should be a subset of tracking wands.
+     * currently only contains main-hand and off-hand wands, will be rendered as overlay
      * */
     class Active(player: Player) : PlayerGatherWandEvent(player)
 }

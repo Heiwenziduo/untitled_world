@@ -66,8 +66,8 @@ interface IWandLike {
 
         if (!checkInvokingPrerequisites(level, invoker, stack)) return InvokingState.LOADING
 
-        val invoker0 = if (invoker is IWandLike) invoker else null
-        val wandData = getWandData(stack, invoker0) ?: return InvokingState.MISSING_DATA
+        val entityWand = if (invoker is IWandLike) invoker else null
+        val wandData = getWandData(stack, entityWand) ?: return InvokingState.MISSING_DATA
 
         val data = getHelperDataBundle(level, invoker, stack)
 
@@ -75,8 +75,7 @@ interface IWandLike {
         val helper = InvokingHelper(
             level,
             invoker,
-            wandData.invariable,
-            wandData.highPayload.cypherArray,
+            wandData.highPayload.aoc,
             data,
             getInvokePosDire(level, invoker, wandData.invariable.chunkF.wandLength),
             itemWandInstance(level, invoker, stack)

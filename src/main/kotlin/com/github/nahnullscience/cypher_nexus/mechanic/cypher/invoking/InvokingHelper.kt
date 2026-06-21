@@ -10,16 +10,19 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import kotlin.math.max
 
-/** cypher chain compiler */
+/**
+ * cypher chain compiler
+ * @param invoker the owner of resultant projectiles
+ * @param invokePosDire location information of resultant projectiles, direction doesn't have to be normalized
+ * @param itemWand [ItemWandInstance], null if invoke from an EntityWand
+ * */
 class InvokingHelper (
     val level: Level,
-    /** the caster */
     val invoker: Entity?,
 
-    val wandStats: WandDataInvariable,
+//    val invariable: WandDataInvariable,
     val aoc: ArrayOfCyphers,
     val data: HelperDataBundle,
-    /** direction doesn't have to be normalized */
     val invokePosDire: PosDirePair,
     val itemWand: ItemWandInstance?,
 ) {

@@ -2,11 +2,11 @@ package com.github.nahnullscience.cypher_nexus.client
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.client.gui.WandDataOverlay
-import com.github.nahnullscience.cypher_nexus.client.renderer.ArrowCypherRenderer
-import com.github.nahnullscience.cypher_nexus.client.renderer.LlamaSpitCypherRenderer
-import com.github.nahnullscience.cypher_nexus.client.renderer.SimpleItemProjectileRenderer
-import com.github.nahnullscience.cypher_nexus.client.renderer.SimpleParticleProjectileRenderer
-import com.github.nahnullscience.cypher_nexus.client.renderer.SimpleSummonerRenderer
+import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.ArrowCypherRenderer
+import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.LlamaSpitCypherRenderer
+import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.SimpleItemProjectileRenderer
+import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.SimpleParticleProjectileRenderer
+import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.SimpleSummonerRenderer
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
 import net.minecraft.client.renderer.entity.EntityRendererProvider

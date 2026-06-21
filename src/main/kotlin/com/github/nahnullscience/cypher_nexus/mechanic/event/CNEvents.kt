@@ -7,7 +7,9 @@ import net.minecraft.world.level.Level
 import net.neoforged.neoforge.common.NeoForge
 
 object CNEvents {
-    /** false if the event is canceled */
+    /**
+     * @return false if the event is canceled
+     * */
     fun canConductWand(player: Player, wand: ItemStack, hand: InteractionHand, level: Level): Boolean {
         val event = NeoForge.EVENT_BUS.post(PlayerConductsWandEvent(player, wand, hand, level))
         return !event.isCanceled

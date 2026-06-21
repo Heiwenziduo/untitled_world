@@ -27,7 +27,10 @@ object EventsListener {
         }
     }
 
-    // tick player activated wands and perform basic logic, like generating mana
+    /**
+     * tick player tracking wands and perform basic logic, like generating mana.
+     * other mobs counterpart are handled through [net.minecraft.world.item.Item.inventoryTick]
+     * */
     @SubscribeEvent(priority = EventPriority.NORMAL)
     private fun wandInstanceUpdatePlayer(event: PlayerTickEvent.Post) {
         val player = event.entity
@@ -46,6 +49,7 @@ object EventsListener {
     @SubscribeEvent(priority = EventPriority.HIGH)
     private fun gatherWandsTicking(event: PlayerGatherWandEvent.Tracking) {
         val player = event.entity
+
         // collect wands in hotbar & offhand
         for (i in 0 until 9) {
             val stack = player.inventory.getItem(i)

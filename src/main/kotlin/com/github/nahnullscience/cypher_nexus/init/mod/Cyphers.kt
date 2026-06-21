@@ -6,6 +6,7 @@ import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.BoomerangC
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.DaedalusCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.FieryCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.SimpleModifier
+import com.github.nahnullscience.cypher_nexus.content.cypher.module.PrimaryInvokingCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.static_projectile.ExplosionCypher
@@ -133,7 +134,7 @@ object Cyphers {
     // modifier
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     val POWER = registerCypher(
-        SimpleModifier("power", 5f)
+        SimpleModifier("power", 10f)
             .delay(1)
             .attribute(CypherAttributes.DAMAGE, AttributeOperator.ADD, 1.0)
             .attribute(CypherAttributes.RECOIL, AttributeOperator.ADD, 1.0))
@@ -143,16 +144,19 @@ object Cyphers {
             .attribute(CypherAttributes.DAMAGE, AttributeOperator.ADD, 3.0)
             .attribute(CypherAttributes.RECOIL, AttributeOperator.ADD, 2.0)
             .flags(CypherFlags.HURT_OWNER))
-    val HEAVILY_STRONG = registerCypher(
-        SimpleModifier("heavily_strong", 30f)
+    val HEAVY_SHOT = registerCypher(
+        SimpleModifier("heavy_shot", 30f)
             .delay(4)
             .attribute(CypherAttributes.DAMAGE, AttributeOperator.ADD, 4.0)
             .attribute(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 0.75)
             .attribute(CypherAttributes.RECOIL, AttributeOperator.ADD, 4.0)
-            .attribute(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.01))
+            .attribute(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 1.0))
+    val CRIT_STRIKE = registerCypher(
+        SimpleModifier("critical_strike", 10f)
+            .attribute(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.25))
     val BRISK = registerCypher(
         SimpleModifier("brisk", 5f)
-            .attribute(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 2.0))
+            .attribute(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 2.5))
     val ACCELERATING = registerCypher(
         SimpleModifier("accelerating", 5f)
             .attribute(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 0.375)
@@ -182,11 +186,11 @@ object Cyphers {
     val BOUNCY = registerCypher(
         SimpleModifier("bouncy", 5f)
             .attribute(CypherAttributes.BOUNCE, AttributeOperator.ADD, 10.0))
-    val NO_MORE_BOUNCE = registerCypher(
-        SimpleModifier("no_more_bounce", 0f)
+    val REMOVE_BOUNCE = registerCypher(
+        SimpleModifier("remove_bounce", 0f)
             .attribute(CypherAttributes.BOUNCE, AttributeOperator.SET_ALL, 0.0))
-    val NO_MORE_DAMAGE = registerCypher(
-        SimpleModifier("no_more_damage", 0f)
+    val REMOVE_DAMAGE = registerCypher(
+        SimpleModifier("remove_damage", 0f)
             .attribute(CypherAttributes.DAMAGE, AttributeOperator.SET_ALL, 0.0))
     val EXTEND_EXISTING = registerCypher(
         SimpleModifier("extend_existing", 40f)
@@ -210,6 +214,9 @@ object Cyphers {
     val RECOIL_DAMPER = registerCypher(
         SimpleModifier("recoil_damper", 5f)
             .attribute(CypherAttributes.RECOIL, AttributeOperator.ADD, -20.0))
+    val KNOCKBACK = registerCypher(
+        SimpleModifier("knockback", 5f)
+            .attribute(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 10.0))
     val HOMING = registerCypher(AbstractHoming.Homing)
     val TURN_TO_TARGET = registerCypher(AbstractHoming.TurnToTarget)
     val BOOMERANG = registerCypher(BoomerangCypher)
@@ -270,6 +277,7 @@ object Cyphers {
     // wand module
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    val PRIMARY_INVOKING = registerCypher(PrimaryInvokingCypher)
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // utility //////////////////////////////////////////////////////////////////////////////////////////////////////////

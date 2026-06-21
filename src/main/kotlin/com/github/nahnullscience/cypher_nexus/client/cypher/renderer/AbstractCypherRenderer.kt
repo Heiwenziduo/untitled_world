@@ -1,6 +1,6 @@
-package com.github.nahnullscience.cypher_nexus.client.renderer
+package com.github.nahnullscience.cypher_nexus.client.cypher.renderer
 
-import com.github.nahnullscience.cypher_nexus.client.cypher.CypherProjectileRenderState
+import com.github.nahnullscience.cypher_nexus.client.cypher.state.CypherProjectileRenderState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.SubmitNodeCollector

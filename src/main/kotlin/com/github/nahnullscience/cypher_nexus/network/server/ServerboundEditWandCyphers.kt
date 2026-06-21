@@ -2,6 +2,8 @@ package com.github.nahnullscience.cypher_nexus.network.server
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
+import com.github.nahnullscience.cypher_nexus.network.client.ClientboundEditWandCyphersConfirm
+import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
@@ -13,6 +15,8 @@ data class ServerboundEditWandCyphers(
     val cyphers : List<AbstractCypher> // TODO use AOC instead
 ) : CustomPacketPayload {
     override fun type() = TYPE
+
+    fun confirm() = ClientboundEditWandCyphersConfirm(uuid, ArrayOfCyphers(cyphers))
 
     companion object {
         val TYPE: CustomPacketPayload.Type<ServerboundEditWandCyphers> =

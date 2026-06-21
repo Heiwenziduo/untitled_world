@@ -3,12 +3,11 @@ package com.github.nahnullscience.cypher_nexus.client.network
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.client.gui.CypherIndexScreen
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
+import com.github.nahnullscience.cypher_nexus.network.client.ClientboundEditWandCyphersConfirm
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundOpenIndexScreen
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.mod.CypherUtility
 import net.minecraft.client.Minecraft
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.api.distmarker.OnlyIn
 import net.neoforged.neoforge.network.handling.IPayloadContext
 
 /*
@@ -38,13 +37,19 @@ object ClientPayloadHandler {
     }
 
     fun syncWandInstance(data: ClientboundSyncWandInstance, context: IPayloadContext) {
-        println("client receive package -> syncWandInstance: \n$data")
+        CypherNexus.debugNetwork { "client receive package -> syncWandInstance: \n$data" }
         val player = context.player()
-        player.getData(WAND_DATA_MAP)[data.uuid]?.syncDataClient(
+        player.getData(WAND_DATA_MAP)[data.uuid]?.syncInvokingDataClient(
             data.mana,
             data.delay,
             data.recharge,
             data.deck
         )
+    }
+
+    fun editWandCyphersConfirm(data: ClientboundEditWandCyphersConfirm, context: IPayloadContext) {
+        CypherNexus.debugNetwork { "client receive package -> editWandCyphersConfirm: \n$data" }
+        val player = context.player()
+        player.getData(WAND_DATA_MAP)[data.uuid]?.updateAoc(data.cyphers)
     }
 }
