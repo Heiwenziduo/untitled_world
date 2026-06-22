@@ -10,6 +10,10 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstanc
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
@@ -70,24 +74,37 @@ interface IWandLike {
         val wandData = getWandData(stack, entityWand) ?: return InvokingState.MISSING_DATA
 
         val data = getHelperDataBundle(level, invoker, stack)
+        val helper = InvokingHelper(invoker, wandData.highPayload.aoc, data)
 
-        // helper should decouple with wand-instance
-        val helper = InvokingHelper(
+
+//        scope.launch { // TODO if async #checkInvokingPrerequisites should handle "pending" state
+//            helper.process()
+//            helper.finalizeInvoking(
+//                level,
+//                getInvokePosDire(level, invoker, wandData.invariable.chunkF.wandLength),
+//                itemWandInstance(level, invoker, stack)
+//            )
+//            afterInvoke(level, invoker, stack, data, helper.rootChunk)
+//            return InvokingState.HANG
+//        }
+
+
+        helper.processSync()
+        helper.finalizeInvoking(
             level,
-            invoker,
-            wandData.highPayload.aoc,
-            data,
             getInvokePosDire(level, invoker, wandData.invariable.chunkF.wandLength),
             itemWandInstance(level, invoker, stack)
         )
-        helper.process()
-        helper.finalizeInvoking()
         return afterInvoke(level, invoker, stack, data, helper.rootChunk)
+
     }
 
 
 
     companion object {
+//        private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+        private val scope = CoroutineScope(Dispatchers.Default)
+
         fun validItemWand(stack: ItemStack): Boolean = !stack.isEmpty && stack.item is IWandLike
 
         fun editItemWand(stack: ItemStack, list: List<AbstractCypher>) {

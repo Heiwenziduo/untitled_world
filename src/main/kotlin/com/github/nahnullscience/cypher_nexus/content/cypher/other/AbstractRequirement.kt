@@ -43,16 +43,18 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
             var otherwise = -1
             var endpoint = -1
 
-            helper.deckEach(startIndex) { index, cypher ->
-                when (cypher) {
-                    is RequirementOtherwise -> otherwise = index
-                    is RequirementEndpoint -> {
-                        endpoint = index
-                        return@deckEach
-                    }
+            run {
+                helper.deckEach(startIndex) { index, cypher ->
+                    when (cypher) {
+                        is RequirementOtherwise -> otherwise = index
+                        is RequirementEndpoint -> {
+                            endpoint = index
+                            return@run
+                        }
 
-                    is RequirementIf -> return@deckEach
-                    else -> Unit
+                        is RequirementIf -> return@run
+                        else -> Unit
+                    }
                 }
             }
 

@@ -13,7 +13,6 @@ object CypherDuplicationCypher : AbstractNonProjectileCypher() {
     override val resource = CypherNexus.modResource("cypher_duplication")
     override val category = CypherCategories.OTHER
     override val isRecursive = true
-    override fun triggerInterplay() = false
 
     override fun defaultAttributes(): CypherDataMap.Builder {
         return super.defaultAttributes()

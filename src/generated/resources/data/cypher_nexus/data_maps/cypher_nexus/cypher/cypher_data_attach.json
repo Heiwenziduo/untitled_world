@@ -534,6 +534,15 @@
         }
       }
     },
+    "cypher_nexus:primary_invoking": {
+      "delay": 0,
+      "draw": 0,
+      "flags": 0,
+      "manaDrain": 0.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {}
+    },
     "cypher_nexus:proteus": {
       "delay": 0,
       "draw": 1,

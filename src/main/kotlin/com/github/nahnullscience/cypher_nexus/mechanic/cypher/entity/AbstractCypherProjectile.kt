@@ -409,7 +409,7 @@ abstract class AbstractCypherProjectile(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /** ProjectileStateBlock#release */
-    private fun releasePayload(posDire: PosDirePair) = _payload?.release(level(), this, owner(), posDire)
+    private fun releasePayload(posDire: PosDirePair) = _payload?.release(level(), this, owner(), posDire, null)
     fun trigger(type: TriggerType) {
         if (_trigger == TriggerType.NONE || type != _trigger) return
         val to = when(type) {

@@ -33,7 +33,7 @@ abstract class AbstractDivideBy : AbstractNonProjectileCypher() {
         val targetIndex = helper.peekNextIndex(relativeIndex + 1)
         val target = helper.peekNext(relativeIndex + 1) ?: return // step++ avoid infinite loop
 
-        CypherNexus.debugCypher { "[$this] will copy: [$target]" }
+        CypherNexus.debugCypher { "[$this $relativeIndex] will copy: [$target $targetIndex]" }
 
         if (!target.canRecursionContinue(state)) return
 

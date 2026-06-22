@@ -10,23 +10,18 @@ import net.minecraft.world.level.Level
 import kotlin.math.max
 
 /**
- * cypher chain compiler
- * @param invoker the owner of resultant projectiles
- * @param invokePosDire location information of resultant projectiles, direction doesn't have to be normalized
- * @param itemWand [ItemWandInstance], null if invoke from an EntityWand
+ * cypher chain compiler, mostly stateless
+ * @param invoker the source of given cyphers, usually also the owner of resultant projectiles.
+ * NOTE: do NOT modify invoker since compiler will run on threads
  * */
 class InvokingHelper (
-    val level: Level,
     val invoker: Entity?,
-
     val aoc: ArrayOfCyphers,
     val data: HelperDataBundle,
-    val invokePosDire: PosDirePair,
-    val itemWand: ItemWandInstance?,
 ) {
     val rootChunk = ProjectileStateChunk.root(this)
+    /** safe to modify */
     val states = InvokingStateBundle()
-    val isClientSide = level.isClientSide
     /** the position of last-drawn cypher */
     val relativeIndex: Int get() = 63 - data.hand.countLeadingZeroBits()
 
@@ -42,7 +37,12 @@ class InvokingHelper (
     /**
      * AST: produce the invoking stateChunk through given [ArrayOfCyphers]
      * */
-    fun process() {
+    suspend fun process() = processSync()
+
+    /**
+     * AST: produce the invoking stateChunk through given [ArrayOfCyphers]
+     * */
+    fun processSync() {
         // level.profiler.push("invoking-start") // F3 + L to record time cost
         CypherNexus.debugCypher { "invoking start, prepare cyphers" }
 
@@ -60,15 +60,21 @@ class InvokingHelper (
         CypherNexus.debugCypher { "invoking finish: $data" }
         // level.profiler.pop()
     }
-    fun finalizeInvoking() {
-        rootChunk.release(level, invoker, invoker, invokePosDire)
+
+    /**
+     *
+     * @param posDire location information of resultant projectiles, direction doesn't have to be normalized
+     * @param itemWand [ItemWandInstance], can be null if invoked from an EntityWand
+     * */
+    fun finalizeInvoking(level: Level, posDire: PosDirePair, itemWand: ItemWandInstance?) {
+        rootChunk.release(level, invoker, invoker, posDire, itemWand)
     }
 
     private fun step(): Boolean {
         val cy = drawNext()
         if (cy != null) {
             cy.invokeInHand(this, rootChunk, data, states)
-            data.draw --
+            data.draw--
             return true
         }
         return false
@@ -122,7 +128,7 @@ class InvokingHelper (
     /** result is non-empty */
     private fun draw(index: Int): AbstractCypher? {
         val cy = aoc[index]
-        CypherNexus.debugCypher { "draw [$cy], the ${index + 1}th cypher" }
+        CypherNexus.debugCypher { "draw [$cy $index]" }
         if (cy.isEmpty()) {
             // this should not happen
             CypherNexus.LOGGER.error("draw [empty]: $index in $aoc, this should not happen")
@@ -241,8 +247,7 @@ class InvokingHelper (
         data.deck = data.deck and (1L shl index).inv()
         data.discard = data.discard or (1L shl index)
 
-        val cy = aoc[index]
-        CypherNexus.debugCypher { "[$cy] discard from deck" }
+        CypherNexus.debugCypher { "[${aoc[index]} $index] discard from deck" }
     }
     /** discard next invokable */
     fun deckNext2discard(start: Int = 0) {
@@ -262,11 +267,7 @@ class InvokingHelper (
 
 //        CypherNexus.LOGGER.debugCypher("deck after bunch-discard: {}", data.deck.toString(2).padStart(aoc.capacity, '0'))
 
-//        for (i in toDiscard.countTrailingZeroBits() until 64 - toDiscard.countLeadingZeroBits()) {
-//            val cy = aoc[i]
-//            if (cy.isInvokable()) CypherNexus.debugCypher { "[$cy] batch-discard from deck" }
-//        }
-        CypherNexus.debugCypher {
+        if (toDiscard > 0) CypherNexus.debugCypher {
             val str = StringBuilder()
             aoc.invokableForEach(toDiscard) { index, cypher ->
                 str.append("\n[$cypher $index] batch-discard from deck")
@@ -285,15 +286,26 @@ class InvokingHelper (
 
 
     data class HelperDataBundle (
+        var manaCurrent: Float,
         var draw: Int,
         var delay: Int,
         var recharge: Int,
-        var manaCurrent: Float,
         /** R -> L, invokable only */
         var hand: Long = 0,
         var deck: Long = 0,
         var discard: Long = 0,
     ) {
+        override fun toString(): String {
+            return "HelperDataBundle(" +
+                    "manaCurrent=$manaCurrent, " +
+                    "draw=$draw, " +
+                    "delay=$delay, " +
+                    "recharge=$recharge, " +
+                    "hand=${hand.toString(2).padStart(8, '0')}, " +
+                    "deck=${deck.toString(2).padStart(8, '0')}, " +
+                    "discard=${discard.toString(2).padStart(8, '0')}, " +
+                    ")"
+        }
     }
 
     /**

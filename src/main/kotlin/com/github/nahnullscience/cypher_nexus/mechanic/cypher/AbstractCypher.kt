@@ -159,35 +159,33 @@ sealed class AbstractCypher: IRegisterable {
     }
 
     open fun modifyStateChunk(helper: InvokingHelper, data: HelperDataBundle, chunk: ProjectileStateChunk) {
-        if (chunk == helper.rootChunk) data.delay += delay
-        data.recharge += recharge
-
-        attributes().stateChunk.forEach { (attribute, cyMap) ->
-            var targetChunk = chunk
-            if (RECOIL.`is`(attribute.resource)) targetChunk = helper.rootChunk
-
-            val chunkMap = targetChunk.computedOperationMap.getOrPut(attribute) { EnumMap(AttributeOperator::class.java) }
-            // prune: if set, skip
-            if (chunkMap[AttributeOperator.SET_ALL] != null && cyMap[AttributeOperator.SET_ALL] == null) return@forEach
-
-            cyMap.forEach { (operator, value) ->
-                if (operator != AttributeOperator.BASE) {
-                    chunkMap.compute(operator) { op, v -> operator.cumulate(v?: operator.defaultValue, value) }
-                }
-            }
-        }
-        if (this is AbstractNonProjectileCypher) {
-            // hooks on NonProjectile affect the Block, hooks on Projectile only affect itself
-            chunk.attachHooks(this)
-            chunk.enableFlags(flags)
-        }
 
         chunk.record(this)
-    }
 
-//    open fun discardFromDeck(helper: InvokingHelper,) {
+        if (chunk.isRoot) data.delay += delay
+        data.recharge += recharge
 //
-//    }
+//        attributes().stateChunk.forEach { (attribute, cyMap) ->
+//            var targetChunk = chunk
+//            if (RECOIL.`is`(attribute.resource)) targetChunk = helper.rootChunk
+//
+//            val chunkMap = targetChunk.computedOperationMap.getOrPut(attribute) { EnumMap(AttributeOperator::class.java) }
+//            // prune: if set, skip
+//            if (chunkMap[AttributeOperator.SET_ALL] != null && cyMap[AttributeOperator.SET_ALL] == null) return@forEach
+//
+//            cyMap.forEach { (operator, value) ->
+//                if (operator != AttributeOperator.BASE) {
+//                    chunkMap.compute(operator) { op, v -> operator.cumulate(v?: operator.defaultValue, value) }
+//                }
+//            }
+//        }
+//        if (this is AbstractNonProjectileCypher) {
+//            // hooks on NonProjectile affect the Block, hooks on Projectile only affect itself
+//            chunk.attachHooks(this)
+//            chunk.enableFlags(flags)
+//        }
+
+    }
 
     // ============================================================================================================
 

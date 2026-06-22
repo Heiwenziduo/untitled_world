@@ -7,5 +7,9 @@ enum class InvokingState(
     MISSING_INSTANCE(false),
     LOADING(false),
 
+    /**
+     * waiting for threaded result
+     * */
+    HANG(true),
     SUCCESS(true),
 }

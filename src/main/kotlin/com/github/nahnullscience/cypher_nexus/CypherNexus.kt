@@ -38,7 +38,7 @@ object CypherNexus {
 
     // TODO log management is required
     inline fun debugCypher(level: Level = Level.DEBUG, supplier: () -> String) {
-        LOGGER.log(level, supplier.invoke())
+//        LOGGER.log(level, supplier.invoke())
     }
     inline fun debugWand(level: Level = Level.DEBUG, supplier: () -> String) {
         LOGGER.log(level, supplier.invoke())

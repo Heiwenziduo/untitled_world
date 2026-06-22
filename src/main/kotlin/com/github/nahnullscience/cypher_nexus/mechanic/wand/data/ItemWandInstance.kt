@@ -171,10 +171,10 @@ class ItemWandInstance(
     }
 
     fun toHelperDataBundle() = HelperDataBundle(
+        manaCurrent = _manaCurrent,
         draw = invariable.chunkI.draw,
         delay = invariable.chunkI.castDelay,
         recharge = if (isBeginning()) invariable.chunkI.rechargeTime else _rechargeCurrent,
-        manaCurrent = _manaCurrent,
         deck = _deck,
         discard = _discard
     )

@@ -19,4 +19,13 @@ open class MapOfCypherCounts(private val map: HashMap<AbstractCypher, Int>) : Mu
     fun innerMap() = map
 
     override fun toString() = map.toString()
+
+    /**
+     *
+     * */
+    fun count(cy: AbstractCypher, n: Int = 1): Int {
+        val v = map.getOrPut(cy) { 0 }
+        map[cy] = v + n
+        return v
+    }
 }

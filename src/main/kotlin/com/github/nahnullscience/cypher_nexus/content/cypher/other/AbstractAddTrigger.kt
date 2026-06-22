@@ -39,35 +39,41 @@ abstract class AbstractAddTrigger(
         // step 1, find attachment
         var attachIndex = startIndex
         var cy1: AbstractCypher? = null
-        helper.deckEach(startIndex) { index, cypher ->
-            if (cypher.triggerInterplay()) {
-                attachIndex = index
-                cy1 = cypher
-                return@deckEach
+        run {
+            helper.deckEach(startIndex) { index, cypher ->
+                if (cypher.triggerInterplay()) {
+                    attachIndex = index
+                    cy1 = cypher
+                    // return@deckEach just terminate current lambda, act as a "continue"
+                    // so wrapper this with a run block and return there
+                    return@run
+                }
+                cypher.modifyStateChunk(helper, data, chunk)
+                CypherNexus.debugCypher { "[$this] modify the state through [$cypher $index]" }
             }
-            cypher.modifyStateChunk(helper, data, chunk)
-            CypherNexus.debugCypher { "[$this] modify the state through [$cypher]" }
         }
 
         if (cy1 != null && cy1.isNotEmpty()) {
             if (cy1 !is AbstractProjectileCypher) {
                 // to fit Noita mechanic, let's agree a NonProj cypher with #triggerCanAttach == true will terminate add trigger-s
                 // for example, refresher-ring
-                CypherNexus.debugCypher { "[$this] attach process terminate due to [$cy1]" }
+                CypherNexus.debugCypher { "[$this] attach process terminate due to [$cy1 $attachIndex]" }
                 return
             }
             cy1.modifyStateChunk(helper, data, chunk)
 
             // discard if attach is found
-            CypherNexus.debugCypher { "[$this] find trigger attachable [$cy1]" }
-            helper.deck2discard(startIndex, attachIndex)
+            CypherNexus.debugCypher { "[$this] find trigger attachable [$cy1 $attachIndex]" }
+            helper.deck2discard(startIndex, attachIndex + 1)
 
             // step 2, find payload
             var cy2: AbstractCypher? = null
-            helper.deckEach(attachIndex + 1) { index, cypher ->
-                if (cypher.triggerInterplay()) {
-                    cy2 = cypher
-                    return@deckEach
+            run {
+                helper.deckEach(attachIndex + 1) { index, cypher ->
+                    if (cypher.triggerInterplay()) {
+                        cy2 = cypher
+                        return@run
+                    }
                 }
             }
 
