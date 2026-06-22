@@ -14,7 +14,10 @@ import kotlin.math.PI
 import kotlin.math.min
 
 /** these homing-s share the same "homing target" on HooksSharedData */
-abstract class AbstractHoming(path: String, private val _manaDrain: Float): ModifierCypher(), BothTickBehaviorHook, BothEntitySearchHook {
+abstract class AbstractHoming(
+    path: String,
+    private val _manaDrain: Float
+) : ModifierCypher(), BothTickBehaviorHook, BothEntitySearchHook {
 
     companion object {
         const val HOMING_STRENGTH = 0.1
@@ -54,15 +57,15 @@ abstract class AbstractHoming(path: String, private val _manaDrain: Float): Modi
         return !projectile.canHomeTarget(target)
     }
 
-    protected open fun authenticateTarget(projectile: AbstractCypherProjectile): Boolean {
-        // consider merge with AbstractCypherProjectile#canHomeTarget
-        val target = projectile.hooksSharedData.homingTarget ?: return false
-        if (projectile.distanceToSqr(target.eyePosition) > CAPTURE_SIZE_SQR * 2) {
-            projectile.hooksSharedData.homingTarget = null
-            return false
-        }
-        return true
-    }
+//    protected open fun authenticateTarget(projectile: AbstractCypherProjectile): Boolean {
+//        // consider merge with AbstractCypherProjectile#canHomeTarget
+//        val target = projectile.hooksSharedData.homingTarget ?: return false
+//        if (projectile.distanceToSqr(target.eyePosition) > CAPTURE_SIZE_SQR * 2) {
+//            projectile.hooksSharedData.homingTarget = null
+//            return false
+//        }
+//        return true
+//    }
 
 
     object Homing: AbstractHoming("homing", 60f) {
@@ -71,14 +74,12 @@ abstract class AbstractHoming(path: String, private val _manaDrain: Float): Modi
             projectile: AbstractCypherProjectile,
             strength: Int
         ) {
-            if (authenticateTarget(projectile)) {
-                val target = projectile.hooksSharedData.homingTarget!!
-                if (!target.boundingBox.contains(projectile.position())) {
-                    val dir = projectile.position().vectorTo(target.eyePosition)
-                    val dis =  min(dir.length(), strength * HOMING_STRENGTH)
-                    val speed = dir.normalize().scale(dis)
-                    projectile.addSpeed(speed)
-                }
+            val target = projectile.hooksSharedData.homingTarget ?: return
+            if (!target.boundingBox.contains(projectile.position())) {
+                val dir = projectile.position().vectorTo(target.eyePosition)
+                val dis =  min(dir.length(), strength * HOMING_STRENGTH)
+                val speed = dir.normalize().scale(dis)
+                projectile.addSpeed(speed)
             }
         }
     }
@@ -89,12 +90,10 @@ abstract class AbstractHoming(path: String, private val _manaDrain: Float): Modi
             projectile: AbstractCypherProjectile,
             strength: Int
         ) {
-            if (authenticateTarget(projectile)) {
-                val target = projectile.hooksSharedData.homingTarget!!
-                if (!target.boundingBox.contains(projectile.position())) {
-                    val dir = projectile.position().vectorTo(target.eyePosition)
-                    projectile.deltaMovement = projectile.deltaMovement.rotateTowards(dir, ROTATION_RADIUS * strength)
-                }
+            val target = projectile.hooksSharedData.homingTarget ?: return
+            if (!target.boundingBox.contains(projectile.position())) {
+                val dir = projectile.position().vectorTo(target.eyePosition)
+                projectile.deltaMovement = projectile.deltaMovement.rotateTowards(dir, ROTATION_RADIUS * strength)
             }
         }
     }

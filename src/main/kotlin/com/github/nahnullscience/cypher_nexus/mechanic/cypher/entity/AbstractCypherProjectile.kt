@@ -240,16 +240,13 @@ abstract class AbstractCypherProjectile(
 //        updateSwimming()
         super.tick() // TODO: prune default tick
 
+        hooksSharedData.tick(this)
         projectileTick()
 
-        if (existing < 0 || existing == tickCount) {
+        if (existing <= tickCount && existing != 0) {
             // here's a trick, if player make existing-time exactly equal to 0, projectile will last till the game quit
             discardCypher(DiscardReason.EXPIRE)
         }
-
-        if (deltaMovement.lengthSqr() <= LOW_SPEED_THRESHOLD_SQR) {
-            onLowSpeedBoth(lowSpeedTickCount ++)
-        } else lowSpeedTickCount = 0
     }
 
     /**
@@ -263,6 +260,10 @@ abstract class AbstractCypherProjectile(
         applyGravity()
 
         tickMovementFinalizeBoth()
+
+        if (deltaMovement.lengthSqr() <= LOW_SPEED_THRESHOLD_SQR) {
+            onLowSpeedBoth(lowSpeedTickCount ++)
+        } else lowSpeedTickCount = 0
 
         /*
          * deltaMovement: the movement for the "next tick", client smooth animation relay on this
@@ -487,7 +488,7 @@ abstract class AbstractCypherProjectile(
      * remember call super to function state hooks []
      * */
     protected open fun onLowSpeedBoth(count: Int) {
-        if (count < 60) return
+        if (count < 40) return
         if (speed > LOW_SPEED_THRESHOLD) {
             discardCypher(DiscardReason.LOW_SPEED)
         }

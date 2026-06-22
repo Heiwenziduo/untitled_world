@@ -41,7 +41,7 @@ object CypherCategories {
     val PROJECTILE = registerCategory(CypherCategory(PROJECTILE_RESOURCE, 0xFFBA1650.toInt()))
     val STATIC_PROJECTILE = registerCategory(CypherCategory(STATIC_PROJECTILE_RESOURCE, 0xFF228B22.toInt()))
     val MODIFIER = registerCategory(CypherCategory(MODIFIER_RESOURCE, 0xFF5F8CD6.toInt()))
-    val WAND_MODULE = registerCategory(CypherCategory(WAND_MODULE_RESOURCE, 0xFF056C5C.toInt()))
+    val WAND_MODULE = registerCategory(CypherCategory(WAND_MODULE_RESOURCE, 0xFF85858E.toInt()))
     val UTILITY = registerCategory(CypherCategory(UTILITY_RESOURCE, 0xFF8D25E1.toInt()))
-    val OTHER = registerCategory(CypherCategory(OTHER_RESOURCE, 0xFFF2EC8D.toInt()))
+    val OTHER = registerCategory(CypherCategory(OTHER_RESOURCE, 0xFFF9C66D.toInt()))
 }

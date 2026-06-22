@@ -2,6 +2,7 @@ package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.AbstractHoming
+import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.AbstractPathModifier
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.BoomerangCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.DaedalusCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.FieryCypher
@@ -236,7 +237,10 @@ object Cyphers {
             .recharge(10)
             .attribute(CypherAttributes.FORTUNE_LEVEL, AttributeOperator.ADD, 1.0))
 
-    const val COLOR_MULTI_INVOKE = 0xFF4EF3D3.toInt()
+    val HORIZONTAL_PATH = registerCypher(AbstractPathModifier.HorizontalPath)
+    val CARDINAL_PATH = registerCypher(AbstractPathModifier.CardinalPath)
+
+    const val COLOR_MULTI_INVOKE = 0xFFADEEC5.toInt()
     val DOUBLE_INVOKING = registerCypher(
         SimpleModifier("double_invoking", 1f)
             .draw(2)
