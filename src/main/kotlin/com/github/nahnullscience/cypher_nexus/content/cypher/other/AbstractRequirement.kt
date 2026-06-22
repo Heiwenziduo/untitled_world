@@ -42,17 +42,21 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
             val ok = requirement(helper, chunk, data, state)
             var otherwise = -1
             var endpoint = -1
-            for (i in startIndex until helper.aoc.invokableSize) {
-                val cy = helper.aoc[i]
-                if (cy is RequirementOtherwise) otherwise = i
-                if (cy is RequirementEndpoint) {
-                    endpoint = i
-                    break
+
+            helper.deckEach(startIndex) { index, cypher ->
+                when (cypher) {
+                    is RequirementOtherwise -> otherwise = index
+                    is RequirementEndpoint -> {
+                        endpoint = index
+                        return@deckEach
+                    }
+
+                    is RequirementIf -> return@deckEach
+                    else -> Unit
                 }
-                if (cy is RequirementIf) break
             }
 
-            CypherNexus.debugCypher { "[$this] requirement is ${if (ok) "" else "not "}met" }
+            CypherNexus.debugCypher { "[$this] condition is ${if (ok) "" else "not "}met" }
             if (ok) {
                 if (otherwise > 0) {
                     if (endpoint > 0) helper.deck2discard(otherwise, endpoint + 1)

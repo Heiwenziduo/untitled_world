@@ -2,7 +2,6 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
@@ -20,7 +19,6 @@ class InvokingHelper (
     val level: Level,
     val invoker: Entity?,
 
-//    val invariable: WandDataInvariable,
     val aoc: ArrayOfCyphers,
     val data: HelperDataBundle,
     val invokePosDire: PosDirePair,
@@ -94,17 +92,26 @@ class InvokingHelper (
 //        return aoc.getInvokableOrNull(peekIndex)
 //    }
 
-    /** @return next invokable index in Deck, -1 if non */
+    /**
+     * @return next invokable index in Deck, -1 if non
+     * */
     fun peekNextIndex(startFrom: Int = 0): Int {
         val start = max(startFrom, data.deck.countTrailingZeroBits())
         return aoc.nextInvokableIndex(start)
     }
+
+    /**
+     * @return next invokable Cypher in Deck, -1 if non
+     * */
     fun peekNext(startFrom: Int = 0): AbstractCypher? {
         val start = max(startFrom, data.deck.countTrailingZeroBits())
         return aoc.nextInvokable(start)
     }
 
-    /** non-empty-cypher, null if deck is empty */
+    /**
+     * draw first card in the deck, handle index automatically
+     * @return non-empty-cypher, or null if deck is empty
+     * */
     fun drawNext(): AbstractCypher? {
         // find the index of the first '1' (last '0', in fact) starting from the right.
         val drawIndex = data.deck.countTrailingZeroBits()
@@ -112,7 +119,7 @@ class InvokingHelper (
         return draw(drawIndex)
     }
 
-    /** non-empty */
+    /** result is non-empty */
     private fun draw(index: Int): AbstractCypher? {
         val cy = aoc[index]
         CypherNexus.debugCypher { "draw [$cy], the ${index + 1}th cypher" }
@@ -132,7 +139,9 @@ class InvokingHelper (
     }
 
     fun wrap() = run {
-        if (data.discard > 0) CypherNexus.debugCypher { "discard ${data.discard.toString(2).padStart(8, '0')} wrap back into deck" }
+        if (data.discard > 0) CypherNexus.debugCypher {
+            "discard ${data.discard.toString(2).padStart(aoc.capacity, '0')} wrap back into deck"
+        }
         else CypherNexus.debugCypher { "discard is empty, nothing to wrap" }
         states.wrapped = true
         discard2deck()
@@ -145,9 +154,71 @@ class InvokingHelper (
     }
 
     fun init() {
-        data.deck = aoc.bits() // really?
+        data.deck = aoc.bits()
         data.hand = 0
         data.discard = 0
+    }
+
+
+    /**
+     * pop every cypher in deck by order.
+     * */
+    fun deckSequence(startIndex: Int = 0): Sequence<AbstractCypher> {
+        return aoc.invokableSequence(data.deck and (-1L shl startIndex))
+    }
+
+
+    /**
+     * pop every cypher in deck by order.
+     * compare to sequence [deckSequence], this can naturally access the index of elements.
+     * However, since this is an inline function, too much usage may inflate package size.
+     * @param startIndex invokable check will start from this index, note this may not be the first element's index,
+     * if the given index is not present in the deck.
+     * should within a range of 0..63
+     * */
+    inline fun deckEach(startIndex: Int = 0, sideEffect: (index: Int, cypher: AbstractCypher) -> Unit) {
+        val merge = data.deck and (-1L shl startIndex) // for -1L is 111....111 64 1s in total
+        return aoc.invokableForEach(merge, sideEffect)
+    }
+
+
+    /**
+     * reverse ordered counterpart of [deckEach]
+     * */
+    inline fun deckEachReverse(startIndex: Int = 0, sideEffect: (index: Int, cypher: AbstractCypher) -> Unit) {
+        val merge = data.deck and (-1L shl startIndex) // guess this index should reverse as well, wait for it...
+        return aoc.invokableForEachReverse(merge, sideEffect)
+    }
+
+
+    /**
+     * pop every cypher in discard by order.
+     * */
+    fun discardSequence(startIndex: Int = 0): Sequence<AbstractCypher> {
+        return aoc.invokableSequence(data.discard and (-1L shl startIndex))
+    }
+
+
+    /**
+     * pop every cypher in discard by order.
+     * compare to sequence [discardSequence], this can naturally access the index of elements
+     * However, since this is an inline function, too much usage may inflate package size.
+     * @param startIndex invokable check will start from this index, note this may not be the first element's index,
+     * if the given index is not present in the discard.
+     * should within a range of 0..63
+     * */
+    inline fun discardEach(startIndex: Int = 0, sideEffect: (index: Int, cypher: AbstractCypher) -> Unit) {
+        val merge = data.discard and (-1L shl startIndex)
+        return aoc.invokableForEach(merge, sideEffect)
+    }
+
+
+    /**
+     * reverse ordered counterpart of [discardEach]
+     * */
+    inline fun discardEachReverse(startIndex: Int = 0, sideEffect: (index: Int, cypher: AbstractCypher) -> Unit) {
+        val merge = data.deck and (-1L shl startIndex)
+        return aoc.invokableForEachReverse(merge, sideEffect)
     }
 
     // ============== bit operations ===================================================
@@ -184,16 +255,23 @@ class InvokingHelper (
         val filter1 = ((1L shl until) - 1) and filter
         val toDiscard = data.deck and filter1
 
-//        CypherNexus.LOGGER.debugCypher("deck before bunch-discard: {}", data.deck.toString(2).padStart(20, '0'))
+//        CypherNexus.LOGGER.debugCypher("deck before bunch-discard: {}", data.deck.toString(2).padStart(aoc.capacity, '0'))
 
         data.deck = data.deck and toDiscard.inv()
         data.discard = data.discard or toDiscard
 
-//        CypherNexus.LOGGER.debugCypher("deck after bunch-discard: {}", data.deck.toString(2).padStart(20, '0'))
+//        CypherNexus.LOGGER.debugCypher("deck after bunch-discard: {}", data.deck.toString(2).padStart(aoc.capacity, '0'))
 
-        for (i in toDiscard.countTrailingZeroBits() until 64 - toDiscard.countLeadingZeroBits()) {
-            val cy = aoc[i]
-            if (cy.isInvokable()) CypherNexus.debugCypher { "[$cy] batch-discard from deck" }
+//        for (i in toDiscard.countTrailingZeroBits() until 64 - toDiscard.countLeadingZeroBits()) {
+//            val cy = aoc[i]
+//            if (cy.isInvokable()) CypherNexus.debugCypher { "[$cy] batch-discard from deck" }
+//        }
+        CypherNexus.debugCypher {
+            val str = StringBuilder()
+            aoc.invokableForEach(toDiscard) { index, cypher ->
+                str.append("\n[$cypher $index] batch-discard from deck")
+            }
+            str.toString()
         }
     }
     /** aka. wrap, return true if there is something to wrap */

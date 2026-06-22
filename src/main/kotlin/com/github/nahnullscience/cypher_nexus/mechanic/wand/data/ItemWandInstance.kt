@@ -94,7 +94,8 @@ class ItemWandInstance(
     fun module(category: ModuleCategory) = modules[category]
 
     private fun computeModules() {
-        aoc.modulesSequence().forEach { moduleCypher ->
+        modules.clear()
+        aoc.modulesSequenceReverse().forEach { moduleCypher ->
             println("compute module: $moduleCypher")
             moduleCypher.apply(modules)
         }

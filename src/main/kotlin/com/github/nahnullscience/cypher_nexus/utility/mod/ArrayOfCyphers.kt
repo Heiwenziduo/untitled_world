@@ -1,24 +1,61 @@
 package com.github.nahnullscience.cypher_nexus.utility.mod
 
+import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories.WAND_MODULE_RESOURCE
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.WandModuleCypher
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 
-
-private fun AbstractCypher.isModule(): Boolean = isNotEmpty() && category.`is`(WAND_MODULE_RESOURCE)
 
 /**
  * fixed length, cypher changeable, EmptyCypher autofill
  * */
 open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
     companion object {
+        private fun AbstractCypher.isModule(): Boolean = isNotEmpty() && category.`is`(WAND_MODULE_RESOURCE)
+
         /** O(n) */
         fun of(list: List<AbstractCypher?>) = ArrayOfCyphers(list)
 
         const val MAX_LENGTH = 64 // max length capped at a Long-bits count, guess this is quite enough
+
+        /**
+         * access an Array indices through 1-bits of a Long
+         * */
+        inline fun <T> Array<T>.bitForEach(bitsAccess: Long, action: (index: Int, element: T) -> Unit) {
+            if (size > 64) CypherNexus.warn { "${this.contentToString()} uses a bit access but its size exceeds 64!" }
+
+            var mask =
+                if (size < 64) bitsAccess and (-1L shl size).inv()
+                // for Kotlin use "size % 64" to wrap the distance,
+                // -1L shl 64 <=> -1L shl 0 which will result in 111...111 the 64 1s
+                // thus, x and -1L.inv() will wipe out all bits
+                else bitsAccess
+
+
+            while (mask != 0L) {
+                val index = mask.countTrailingZeroBits()
+                action(index, this[index])
+                mask = mask and (mask - 1)
+            }
+        }
+
+        /**
+         * access an Array indices through 1-bits of a Long, last element first
+         * */
+        inline fun <T> Array<T>.bitForEachReverse(bitsAccess: Long, action: (index: Int, element: T) -> Unit) {
+            if (size > 64) CypherNexus.warn { "${this.contentToString()} uses a bit access but its size exceeds 64!" }
+
+            var mask =
+                if (size < 64) bitsAccess and (-1L shl size).inv()
+                else bitsAccess
+
+            while (mask != 0L) {
+                val index = 63 - mask.countLeadingZeroBits()
+                action(index, this[index])
+                mask = mask xor (1L shl index)
+            }
+        }
     }
 
     /** O(n) */
@@ -40,11 +77,14 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
         require(capacity in 1..MAX_LENGTH)
     }
 
+    @PublishedApi
+    internal val cyphers: Array<AbstractCypher> = Array(capacity) { EmptyCypher }
     /** not empty and not "passive" */
-    protected var bitsInvokable: Long = 0
-    protected var bitsModule: Long = 0
-    protected val cyphers: Array<AbstractCypher> = Array(capacity) { EmptyCypher }
-    /** last Invokable index + 1 */
+    var bitsInvokable: Long = 0
+    private set
+    var bitsModule: Long = 0
+    private set
+    /** the last Invokable index + 1 */
     val invokableSize : Int get() = 64 - bitsInvokable.countLeadingZeroBits()
 
 
@@ -106,6 +146,7 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
         return bitsInvokable
     }
 
+
     /**
      * pop every Module Cyphers in order
      * */
@@ -115,12 +156,8 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
 
             while (mask != 0L) {
                 val index = mask.countTrailingZeroBits()
-
-                println(index)
-
                 if (index < capacity) {
                     val cy = this@ArrayOfCyphers[index]
-                    println(cy)
                     if (cy.isModule()) yield(cy as WandModuleCypher)
                 }
 
@@ -129,20 +166,90 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
         }
     }
 
-//    fun firstInvokable(): AbstractCypher? {
-//        val i = _bitInvokable.countTrailingZeroBits()
-//        if (i < capacity) {
-//            return _cyphers[i]
-//        }
-//        return null
-//    }
-//    fun lastInvokable(): AbstractCypher? {
-//        val i = 63 - _bitInvokable.countLeadingZeroBits()
-//        if (i in 0..<capacity) {
-//            return _cyphers[i]
-//        }
-//        return null
-//    }
+
+    /**
+     * pop every Module Cyphers in reverse order
+     * */
+    fun modulesSequenceReverse(): Sequence<WandModuleCypher> {
+        return sequence {
+            var mask = bitsModule
+            while (mask != 0L) {
+                val index = 63 - mask.countLeadingZeroBits()
+                val cy = this@ArrayOfCyphers[index]
+                if (cy.isModule()) yield(cy as WandModuleCypher)
+
+                mask = mask xor (1L shl index)
+            }
+        }
+    }
+
+
+    /**
+     * pop every invokable cyphers in order
+     * @param merge a mark uses And operator to filter the bits
+     *  */
+    fun invokableSequence(merge: Long): Sequence<AbstractCypher> {
+        return sequence {
+            var mask = bitsInvokable and merge
+            while (mask != 0L) {
+                val index = mask.countTrailingZeroBits()
+                if (index < capacity) {
+                    val cy = this@ArrayOfCyphers[index]
+                    if (cy.isInvokable()) yield(cy)
+                }
+
+                mask = mask and (mask - 1)
+            }
+        }
+    }
+
+
+    /**
+     * pop every invokable cyphers in reverse order
+     * @param merge a mark uses And operator to filter the bits
+     * */
+    fun invokableSequenceReverse(merge: Long): Sequence<AbstractCypher> {
+        return sequence {
+
+        }
+    }
+
+
+    /**
+     * do side effects on every invokable cypher in order.
+     * compare to sequence, this can naturally access the index of elements
+     * @param merge a mark uses And operator to filter the bits
+     *  */
+    inline fun invokableForEach(merge: Long, action: (index: Int, cypher: AbstractCypher) -> Unit) {
+        this.cyphers.bitForEach(bitsInvokable and merge, action)
+        return
+    }
+
+    /**
+     * do side effects on every invokable cypher in reverse order.
+     * compare to sequence, this can naturally access the index of elements
+     * @param merge a mark uses And operator to filter the bits
+     *  */
+    inline fun invokableForEachReverse(merge: Long, action: (index: Int, cypher: AbstractCypher) -> Unit) {
+        this.cyphers.bitForEachReverse(bitsInvokable and merge, action)
+        return
+    }
+
+
+    fun firstInvokable(): AbstractCypher? {
+        val i = bitsInvokable.countTrailingZeroBits()
+        if (i < capacity) {
+            return cyphers[i]
+        }
+        return null
+    }
+    fun lastInvokable(): AbstractCypher? {
+        val i = 63 - bitsInvokable.countLeadingZeroBits()
+        if (i in 0 until capacity) {
+            return cyphers[i]
+        }
+        return null
+    }
     fun nextInvokableIndex(startFrom: Int = 0): Int {
         val l = (bitsInvokable shr startFrom).countTrailingZeroBits()
         val t = startFrom + l

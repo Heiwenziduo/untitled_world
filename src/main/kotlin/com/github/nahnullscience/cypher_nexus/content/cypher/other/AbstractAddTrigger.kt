@@ -5,7 +5,6 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
@@ -37,56 +36,50 @@ abstract class AbstractAddTrigger(
         val startIndex = helper.peekNextIndex(relativeIndex + 1)
         if (startIndex == -1) return // this means AddTrigger is the last one in deck
 
+        // step 1, find attachment
         var attachIndex = startIndex
-        var cy: AbstractCypher = EmptyCypher
-        while (attachIndex < helper.aoc.invokableSize) {
-            // step 1, find target projectile cypher
-            val cy0 = helper.aoc[attachIndex]
-            attachIndex++
-            if (!cy0.isInvokable()) continue
-
-            if (cy0.triggerInterplay()) {
-                cy = cy0
-                break
+        var cy1: AbstractCypher? = null
+        helper.deckEach(startIndex) { index, cypher ->
+            if (cypher.triggerInterplay()) {
+                attachIndex = index
+                cy1 = cypher
+                return@deckEach
             }
-
-            // interplay-able && non-projectile -> do not modify state
-            cy0.modifyStateChunk(helper, data, chunk)
-            CypherNexus.debugCypher { "[$this] modify the state through [$cy0]" }
+            cypher.modifyStateChunk(helper, data, chunk)
+            CypherNexus.debugCypher { "[$this] modify the state through [$cypher]" }
         }
 
-        if (cy.isNotEmpty()) {
-            if (cy !is AbstractProjectileCypher) {
+        if (cy1 != null && cy1.isNotEmpty()) {
+            if (cy1 !is AbstractProjectileCypher) {
                 // to fit Noita mechanic, let's agree a NonProj cypher with #triggerCanAttach == true will terminate add trigger-s
                 // for example, refresher-ring
-                CypherNexus.debugCypher { "[$this] attach process terminate due to [$cy]" }
+                CypherNexus.debugCypher { "[$this] attach process terminate due to [$cy1]" }
                 return
             }
-            cy.modifyStateChunk(helper, data, chunk)
+            cy1.modifyStateChunk(helper, data, chunk)
 
             // discard if attach is found
-            CypherNexus.debugCypher { "[$this] find trigger attachable [$cy]" }
+            CypherNexus.debugCypher { "[$this] find trigger attachable [$cy1]" }
             helper.deck2discard(startIndex, attachIndex)
 
             // step 2, find payload
-            var index1 = attachIndex
-            var find = false
-            while (index1 < helper.aoc.invokableSize) {
-                val cy1 = helper.aoc[index1]
-                index1++
-                if (cy1 is AbstractProjectileCypher && cy1.triggerInterplay()) {
-                    find = true
-                    break
+            var cy2: AbstractCypher? = null
+            helper.deckEach(attachIndex + 1) { index, cypher ->
+                if (cypher.triggerInterplay()) {
+                    cy2 = cypher
+                    return@deckEach
                 }
             }
-            if (find) {
-                CypherNexus.debugCypher { "invoke [$cy] with payload" }
+
+            // the cypher activates the payload process doesn't have to be the payload
+            if (cy2 != null) {
+                CypherNexus.debugCypher { "invoke [$cy1] with payload due to [$cy2]" }
                 val subChunk = ProjectileStateChunk(Int.MAX_VALUE)
-                chunk.addProjectile(ProjectileNode(cy, subChunk, triggerType))
+                chunk.addProjectile(ProjectileNode(cy1, subChunk, triggerType))
                 val payload = helper.drawNext()
                 payload?.invokeInHand(helper, subChunk, data, state)
             } else {
-                chunk.addProjectile(ProjectileNode(cy, null))
+                chunk.addProjectile(ProjectileNode(cy1, null))
             }
         }
     }
