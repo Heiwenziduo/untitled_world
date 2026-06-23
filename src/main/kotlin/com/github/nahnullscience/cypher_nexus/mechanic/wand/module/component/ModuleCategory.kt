@@ -1,9 +1,10 @@
-package com.github.nahnullscience.cypher_nexus.mechanic.wand.module
+package com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component
 
 import io.netty.buffer.ByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.util.ByIdMap
+import net.minecraft.util.ByIdMap.OutOfBoundsStrategy
 import java.util.function.IntFunction
 
 enum class ModuleCategory {
@@ -28,7 +29,7 @@ enum class ModuleCategory {
             ByIdMap.continuous(
                 ModuleCategory::ordinal,
                 entries.toTypedArray(),
-                ByIdMap.OutOfBoundsStrategy.ZERO
+                OutOfBoundsStrategy.ZERO
             )
         val STREAM_CODEC: StreamCodec<ByteBuf, ModuleCategory> = ByteBufCodecs.idMapper(BY_ID, ModuleCategory::ordinal)
     }

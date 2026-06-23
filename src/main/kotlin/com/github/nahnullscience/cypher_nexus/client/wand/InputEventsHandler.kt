@@ -2,7 +2,6 @@ package com.github.nahnullscience.cypher_nexus.client.wand
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModuleCategory
 import com.github.nahnullscience.cypher_nexus.network.server.ServerboundPerformWandModule
 import net.minecraft.client.Minecraft
 import net.minecraft.world.InteractionHand
@@ -28,7 +27,7 @@ object InputEventsHandler {
             val wand = player.getItemInHand(InteractionHand.MAIN_HAND)
             if (wand.isEmpty || wand.item !is IWandLike) return
             val instance = (wand.item as IWandLike).itemWandInstance(player.level(), player, wand) ?: return
-            val module = instance.module(ModuleCategory.PRIMARY) ?: return
+            val module = instance.primaryModule() ?: return
 
             if (module.takeoverInput) {
                 event.setCanceled(true)
@@ -41,7 +40,7 @@ object InputEventsHandler {
                     player.inventory.selectedSlot
                 )
             )
-            module.perform(player.level(), player, wand, instance, wand.item as IWandLike)
+            module.perform(player.level(), player, wand)
         } else if (event.isUseItem) {
 
         }

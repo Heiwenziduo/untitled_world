@@ -5,7 +5,6 @@ import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
-import com.github.nahnullscience.cypher_nexus.mechanic.event.CNEvents
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.server.level.ServerLevel
@@ -22,9 +21,10 @@ import net.minecraft.world.item.ItemUseAnimation
 import net.minecraft.world.level.Level
 
 /**
- * item wand, its duty is as follows:
- * 1. hold wand data (data-component on stack)
- * 2. perform animation
+ * item wand, its main duty is as follows:
+ * 1. hold wand data through DataComponent
+ * 2. point to the [ItemWandInstance] represent this wand
+ * 3. perform animation (TODO)
  * */
 abstract class AbstractItemWand(
     properties: Properties = Properties()
@@ -33,48 +33,43 @@ abstract class AbstractItemWand(
 ), IWandLike  {
     abstract override val isEditableWand: Boolean
 
-    override fun getUseAnimation(stack: ItemStack) = ItemUseAnimation.SPYGLASS
-    override fun use(level: Level, player: Player, usedHand: InteractionHand): InteractionResult {
-        val stack = player.getItemInHand(usedHand)
-        val f = CNEvents.canConductWand(player, stack, usedHand, level)
-        if (f) {
-            player.startUsingItem(usedHand)
-            return InteractionResult.CONSUME
+    override fun use(level: Level, player: Player, hand: InteractionHand): InteractionResult {
+        val stack = player.getItemInHand(hand)
+        val instance = itemWandInstance(level, player, stack)
+
+        return instance.secondaryModule()?.onInteract(player, instance, hand) ?: run {
+            player.startUsingItem(hand)
+            InteractionResult.PASS
         }
-        return InteractionResult.FAIL
+    }
+
+    override fun getUseAnimation(stack: ItemStack) = ItemUseAnimation.EAT
+    override fun getUseDuration(stack: ItemStack, entity: LivingEntity) = 72000
+    override fun onUseTick(level: Level, invoker: LivingEntity, stack: ItemStack, remainTicks: Int) {
+        // #getUseDuration() - used ticks, resets to full if reach 0
+        // will call on both sides
+
+        val instance = itemWandInstance(level, invoker, stack)
+        instance.doSecondaryTick(level, invoker, stack, remainTicks)
     }
 
     override fun onStopUsing(stack: ItemStack, invoker: LivingEntity, remainingUseDuration: Int) {
-        // println("releaseUsing $level") // call on both sides
-        if (invoker !is ServerPlayer) return
-        val wandData = getWandData(stack)
-
-        val instance = invoker.getData(WAND_DATA_MAP).getOrPutInstance(wandData, this, invoker.level())
-        val useTime = getUseDuration(stack, invoker) - remainingUseDuration
-        if (invoker.level().gameTime - useTime >= instance.lastInvokeTime) return  // stop sync if no conduction performed
-
-        instance.sendSyncStatePacket(invoker)
+        // call on both sides
+        if (invoker is ServerPlayer) {
+            val instance = itemWandInstance(invoker.level(), invoker, stack)
+            val useTime = getUseDuration(stack, invoker) - remainingUseDuration
+            if (invoker.level().gameTime - useTime >= instance.lastInvokeTime) return  // stop sync if no conduction performed
+            instance.sendSyncStatePacket(invoker)
+        }
     }
-
-
-    override fun getUseDuration(stack: ItemStack, entity: LivingEntity) = 72000
-    override fun onUseTick(level: Level, invoker: LivingEntity, stack: ItemStack, remainingUseDuration: Int) {
-        //println(remainingUseDuration) // #getUseDuration() - used ticks, resets to full if reach 0
-
-        // will call on both sides
-        tryInvoke(level, invoker, stack)
-    }
-
 
     override fun inventoryTick(stack: ItemStack, level: ServerLevel, entity: Entity, slot: EquipmentSlot?) {
         // call through (living#aistep)EntityEquipment#tick / (player#aistep)Inventory#tick -> stack#tick -> item#tick
         // inventory 0-35, does not contain equipment-slots, so everything tick once per tick
 
-        if (entity is Player) return // tick player hotbar through events, since that runs on both sides
+        // tick player hotbar through events, since that runs on both sides
+        if (entity is Player) return
         if (slot == EquipmentSlot.MAINHAND || slot == EquipmentSlot.OFFHAND) {
-//            val dataInstance = entity.getData(WAND_DATA_MAP)
-//                .getOrPutInstance(getWandData(stack, entity) ?: return, this, level)
-//            dataInstance.tick(entity)
             itemWandInstance(level, entity, stack).tick(entity)
         }
     }

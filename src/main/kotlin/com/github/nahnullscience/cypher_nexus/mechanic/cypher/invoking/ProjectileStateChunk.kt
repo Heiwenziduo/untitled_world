@@ -53,12 +53,23 @@ class ProjectileStateChunk private constructor (
 
         println("${level.isClientSide} client mocc: $_countMap")
         // do recoil only on root
-        if (directInvoker != null && directInvoker == owner && isRoot) {
+//        if (directInvoker != null && directInvoker == owner && isRoot) {
+//            val recoilMap = computedOperationMap[CypherAttributes.RECOIL.value()]
+//            if (recoilMap != null) {
+//                var recoil = AttributeOperator.attributeCalculator(recoilMap, 0.0)
+//                recoil = CypherAttributes.RECOIL.value().restrictRange(recoil)
+//                itemWand?.recoilModule(directInvoker, recoil, posDire)
+//            }
+//        }
+
+        run {
+            itemWand ?: return@run
+            directInvoker ?: return@run
             val recoilMap = computedOperationMap[CypherAttributes.RECOIL.value()]
             if (recoilMap != null) {
                 var recoil = AttributeOperator.attributeCalculator(recoilMap, 0.0)
                 recoil = CypherAttributes.RECOIL.value().restrictRange(recoil)
-                itemWand?.recoilModule(directInvoker, recoil, posDire)
+                itemWand.doRecoil(directInvoker, recoil, posDire)
             }
         }
 

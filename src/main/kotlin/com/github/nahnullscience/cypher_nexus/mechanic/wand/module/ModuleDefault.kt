@@ -1,0 +1,33 @@
+package com.github.nahnullscience.cypher_nexus.mechanic.wand.module
+
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
+import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
+
+/**
+ * stateless default behavior
+ * */
+object ModuleDefault {
+    /**
+     * push Entity backward
+     * */
+    fun recoil(
+        invoker: Entity,
+        recoil: Double,
+        invokePosDire: PosDirePair
+    ) {
+        // since it is the client side that is Player position authoritative
+        // this logic should run on both side, client for smooth movement, server for verification
+        val dire = if (invokePosDire.direction != Vec3.ZERO) invokePosDire.direction
+        else invoker.eyePosition.vectorTo(invokePosDire.position)
+        val recoil0 = recoil / 20
+        invoker.push(dire.normalize().scale(recoil0).reverse())
+    }
+
+    fun secondary(level: Level, invoker: Entity, stack: ItemStack, wand: IWandLike) {
+        wand.tryInvoke(level, invoker, stack)
+    }
+}

@@ -21,28 +21,10 @@ object ServerPayloadHandler {
         context.enqueueWork {
             val player = context.player()
             var stack: ItemStack = ItemStack.EMPTY
-//            run findWand@ {
-//                for (i in 0..8) {
-//                    val stack0 = player.inventory.getItem(i)
-//                    if (!stack0.isEmpty && stack0.item is IWandLike) {
-//                        val uuidW = stack0.get(ModDataComponents.WAND_INVARIABLE)?.uuid
-//                        if (uuidW == data.uuid) {
-//                            stack = stack0
-//                            return@findWand
-//                        }
-//                    }
-//                }
-//                val stack1 = player.getItemBySlot(EquipmentSlot.OFFHAND)
-//                if (!stack1.isEmpty && stack1.item is IWandLike && stack1.get(ModDataComponents.WAND_INVARIABLE)?.uuid == data.uuid) {
-//                    stack = stack1
-//                    return@findWand
-//                }
-//            }
 
             val w = CNEvents.gatherWandsTracking(player).wands().filter { stack ->
                     val i = stack.get(ModDataComponents.WAND_INVARIABLE)
-                    i != null && i.uuid == data.uuid
-                }
+                    i != null && i.uuid == data.uuid }
 
             if (w.size > 1) CypherNexus.debugWand(Level.ERROR) { "duplicate uuid [${data.uuid}] $w" }
             stack = w.first()
@@ -63,15 +45,14 @@ object ServerPayloadHandler {
 
     fun performWandModule(data: ServerboundPerformWandModule, context: IPayloadContext) {
         CypherNexus.debugNetwork { "server receive package -> performWandModule: \n$data" }
+
         context.enqueueWork {
             val player = context.player()
             val instance = player.getData(WAND_DATA_MAP)[data.uuid]!!
             val stack = player.inventory.getItem(data.wandSlot)
 
             if (!stack.isEmpty && stack.item is IWandLike) {
-                instance.module(data.module)
-                    ?. perform(player.level(), player, stack, instance, stack.item as IWandLike)
-                    ?: CypherNexus.debugNetwork(Level.ERROR) { "module ${data.module} is missing on $instance" }
+                instance.performModule(data.module, player.level(), player, stack)
             } else {
                 CypherNexus.debugNetwork(Level.ERROR) { "didn't find wand in slot ${data.wandSlot}" }
             }

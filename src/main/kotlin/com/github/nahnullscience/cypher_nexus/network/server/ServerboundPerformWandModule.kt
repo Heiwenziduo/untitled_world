@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.network.server
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModuleCategory
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.ModuleCategory
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec

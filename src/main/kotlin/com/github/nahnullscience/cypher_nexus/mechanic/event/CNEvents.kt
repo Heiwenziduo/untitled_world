@@ -10,6 +10,7 @@ object CNEvents {
     /**
      * @return false if the event is canceled
      * */
+    // TODO
     fun canConductWand(player: Player, wand: ItemStack, hand: InteractionHand, level: Level): Boolean {
         val event = NeoForge.EVENT_BUS.post(PlayerConductsWandEvent(player, wand, hand, level))
         return !event.isCanceled

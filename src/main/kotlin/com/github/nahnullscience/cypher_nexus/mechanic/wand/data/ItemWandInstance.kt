@@ -4,17 +4,21 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.IWandModule
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModuleCategory
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.AbstractPrimaryModule
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.AbstractSecondaryModule
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModuleDefault
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.AbstractRecoilModule
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.MapOfModules
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.ModuleCategory
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
-import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.network.PacketDistributor
-import java.util.EnumMap
+import org.apache.logging.log4j.Level.ERROR
 import kotlin.math.abs
 
 /**
@@ -25,7 +29,7 @@ class ItemWandInstance(
     val isClient: Boolean,
     private var aoc: ArrayOfCyphers, // player may edit the wand after the instance has been created
     private val map: ItemWandInstanceMap,
-    private val wand: IWandLike
+    val wand: IWandLike
 ) {
     companion object {
         const val DATA_TOLERANCE_TICK = 2
@@ -44,7 +48,7 @@ class ItemWandInstance(
     private var _lastModifyTime = 0L
     private var _lastInvokeTime = 0L
 
-    private val modules = EnumMap<ModuleCategory, IWandModule>(ModuleCategory::class.java)
+    private val modules = MapOfModules(this)
 
     init {
         _manaCurrent = manaMax
@@ -91,41 +95,36 @@ class ItemWandInstance(
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    fun module(category: ModuleCategory) = modules[category]
+    fun primaryModule() = modules[ModuleCategory.PRIMARY] as AbstractPrimaryModule?
+    fun secondaryModule() = modules[ModuleCategory.SECONDARY] as AbstractSecondaryModule?
+    fun recoilModule() = modules[ModuleCategory.RECOIL] as AbstractRecoilModule?
 
     private fun computeModules() {
         modules.clear()
         aoc.modulesSequenceReverse().forEach { moduleCypher ->
-            println("compute module: $moduleCypher")
-            moduleCypher.apply(modules)
+            moduleCypher.apply(this, modules)
         }
-        CypherNexus.debugWand { "$this computed modules, current module: $modules" }
+        modules.finalizeInit()
     }
 
-    fun leftClickModule() {
+    fun performModule(category: ModuleCategory, level: Level, invoker: Entity, stack: ItemStack) {
 
+        // tmp
+        if (category == ModuleCategory.PRIMARY) {
+            primaryModule()?.perform(level, invoker, stack)
+        }
     }
 
-    fun rightClickModule() {
-
+    fun doSecondaryTick(level: Level, invoker: Entity, stack: ItemStack, remainTicks: Int) {
+        if (stack.item is IWandLike) {
+            secondaryModule()?.perform(level, invoker, stack)
+                ?: ModuleDefault.secondary(level, invoker, stack, stack.item as IWandLike)
+        } else CypherNexus.debugWand(ERROR) { "doSecondaryTick: $stack is not a valid wand" }
     }
 
-    fun middleClickModule() {
-
-    }
-
-    /** should call on both sides */
-    fun recoilModule(invoker: Entity, recoil: Double, invokePosDire: PosDirePair) {
-        // TODO recoil module
-        // for now, push invoker for ease
-//        println("do some recoil: $recoil   ${side()}")
-
-        // since it is the client side that is Player position authoritative
-        // this logic should run on both side, client for smooth movement, server for verification
-        val dire = if (invokePosDire.direction != Vec3.ZERO) invokePosDire.direction
-        else invoker.eyePosition.vectorTo(invokePosDire.position)
-        val recoil0 = recoil / 20
-        invoker.push(dire.normalize().scale(recoil0).reverse())
+    fun doRecoil(invoker: Entity, recoil: Double, invokePosDire: PosDirePair) {
+        recoilModule()?.recoil(invoker, recoil, invokePosDire)
+            ?: ModuleDefault.recoil(invoker, recoil, invokePosDire)
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
