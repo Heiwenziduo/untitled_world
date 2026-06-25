@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.content.block
 
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundOpenIndexScreen
-import com.github.nahnullscience.cypher_nexus.utility.mod.CypherData
+import com.github.nahnullscience.cypher_nexus.utility.mod.CNData
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.InteractionResult
@@ -32,7 +32,7 @@ class CypherIndexBlock(property: BlockBehaviour.Properties): Block(property) {
 //        }
         if (!level.isClientSide) {
                 PacketDistributor.sendToPlayer(player as ServerPlayer, ClientboundOpenIndexScreen(
-                CypherData.cyphersUnhide, CypherData.cyphersPlayerUnlocked(player))
+                CNData.cyphersUnhide, CNData.cyphersPlayerUnlocked(player))
             )
         }
         return InteractionResult.SUCCESS

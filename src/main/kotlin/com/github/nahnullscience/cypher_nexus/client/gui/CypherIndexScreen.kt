@@ -3,7 +3,7 @@ package com.github.nahnullscience.cypher_nexus.client.gui
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
-import com.github.nahnullscience.cypher_nexus.mechanic.event.CNEvents
+import com.github.nahnullscience.cypher_nexus.mechanic.event.CNCommonEvents
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
 import com.github.nahnullscience.cypher_nexus.network.server.ServerboundEditWandCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
@@ -72,7 +72,7 @@ class CypherIndexScreen(
         // instance will be created each time player open the screen
         val localPlayer = Minecraft.getInstance().player
         if (localPlayer != null) {
-            wandList = CNEvents.gatherWandsTracking(localPlayer).wands()
+            wandList = CNCommonEvents.livingGatherWandsTracking(localPlayer).wands()
             for (i in wandList.indices) {
                 if (localPlayer.mainHandItem == wandList[i]) wandListIndex = i
             }

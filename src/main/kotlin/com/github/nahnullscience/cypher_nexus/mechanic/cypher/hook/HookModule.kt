@@ -4,9 +4,9 @@ import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.resources.Identifier
 import kotlin.reflect.KClass
 
-class HookModule <out HOOK : Any> (
+class HookModule <out Hook : Any> (
     override val resource: Identifier,
-    val hook: KClass<out HOOK>,
+    val hook: KClass<out Hook>,
     val sync: Boolean,
     val type: HookType,
     val unique: Boolean = false,

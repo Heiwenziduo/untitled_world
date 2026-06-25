@@ -7,13 +7,12 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingH
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
@@ -44,7 +43,7 @@ interface IWandLike {
      * will be further processed if hooks are present.
      * direction doesn't have to be normalized
      * */
-    fun getInvokePosDire(level: Level, invoker: Entity, wandLength: Float): PosDirePair
+    fun getInvokePosDire(level: Level, invoker: Entity, stack: ItemStack?): PosDirePair
 
 
     /**  */
@@ -81,7 +80,7 @@ interface IWandLike {
 //            helper.process()
 //            helper.finalizeInvoking(
 //                level,
-//                getInvokePosDire(level, invoker, wandData.invariable.chunkF.wandLength),
+//                getInvokePosDire(level, invoker),
 //                itemWandInstance(level, invoker, stack)
 //            )
 //            afterInvoke(level, invoker, stack, data, helper.rootChunk)
@@ -92,7 +91,7 @@ interface IWandLike {
         helper.processSync()
         helper.finalizeInvoking(
             level,
-            getInvokePosDire(level, invoker, wandData.invariable.chunkF.wandLength),
+            getInvokePosDire(level, invoker, stack),
             itemWandInstance(level, invoker, stack)
         )
         return afterInvoke(level, invoker, stack, data, helper.rootChunk)
@@ -105,11 +104,14 @@ interface IWandLike {
 //        private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
         private val scope = CoroutineScope(Dispatchers.Default)
 
-        fun validItemWand(stack: ItemStack): Boolean = !stack.isEmpty && stack.item is IWandLike
+        /**
+         * @return whether the item behind the stack is a decent [IWandLike]
+         * */
+        fun validateItemWand(stack: ItemStack): Boolean = !stack.isEmpty && stack.item is IWandLike
 
         fun editItemWand(stack: ItemStack, list: List<AbstractCypher>) {
             println("editWand: $stack")
-            if (validItemWand(stack)) {
+            if (validateItemWand(stack)) {
                 stack.set(ModDataComponents.WAND_HIGH_PAYLOAD, WandDataHighPayload(ArrayOfCyphers(list)))
             }
         }

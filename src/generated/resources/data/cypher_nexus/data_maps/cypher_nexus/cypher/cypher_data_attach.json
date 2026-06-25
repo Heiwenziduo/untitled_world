@@ -99,7 +99,7 @@
       "delay": 0,
       "draw": 1,
       "flags": 128,
-      "manaDrain": 0.0,
+      "manaDrain": 10.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {}
@@ -142,6 +142,19 @@
       },
       "recharge": 2,
       "stateChunk": {}
+    },
+    "cypher_nexus:cardinal_path": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 0.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
+        "cypher_nexus:damage": {
+          "add": 0.5
+        }
+      }
     },
     "cypher_nexus:critical_strike": {
       "delay": 0,
@@ -424,6 +437,19 @@
       "projectile": {},
       "recharge": 0,
       "stateChunk": {}
+    },
+    "cypher_nexus:horizontal_path": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 0.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
+        "cypher_nexus:damage": {
+          "add": 0.5
+        }
+      }
     },
     "cypher_nexus:inner_force": {
       "delay": 0,

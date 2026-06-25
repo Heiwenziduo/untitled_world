@@ -2,10 +2,12 @@ package com.github.nahnullscience.cypher_nexus.mechanic.wand
 
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
+import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.SECONDARY
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataBundle
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
@@ -37,29 +39,30 @@ abstract class AbstractItemWand(
         val stack = player.getItemInHand(hand)
         val instance = itemWandInstance(level, player, stack)
 
-        return instance.secondaryModule()?.onInteract(player, instance, hand) ?: run {
+        return instance.module(SECONDARY)?.onInteract(player, instance, hand) ?: run {
+            // if not startUsingItem, further functions like onStopUsing will not perform
             player.startUsingItem(hand)
             InteractionResult.PASS
         }
     }
 
     override fun getUseAnimation(stack: ItemStack) = ItemUseAnimation.EAT
-    override fun getUseDuration(stack: ItemStack, entity: LivingEntity) = 72000
-    override fun onUseTick(level: Level, invoker: LivingEntity, stack: ItemStack, remainTicks: Int) {
+    override fun getUseDuration(stack: ItemStack, entity: LivingEntity) = 114_514
+    override fun onUseTick(level: Level, user: LivingEntity, stack: ItemStack, remainTicks: Int) {
         // #getUseDuration() - used ticks, resets to full if reach 0
         // will call on both sides
 
-        val instance = itemWandInstance(level, invoker, stack)
-        instance.doSecondaryTick(level, invoker, stack, remainTicks)
+        val instance = itemWandInstance(level, user, stack)
+        instance.doSecondaryTick(level, user, stack, remainTicks)
     }
 
-    override fun onStopUsing(stack: ItemStack, invoker: LivingEntity, remainingUseDuration: Int) {
+    override fun onStopUsing(stack: ItemStack, user: LivingEntity, remainTicks: Int) {
         // call on both sides
-        if (invoker is ServerPlayer) {
-            val instance = itemWandInstance(invoker.level(), invoker, stack)
-            val useTime = getUseDuration(stack, invoker) - remainingUseDuration
-            if (invoker.level().gameTime - useTime >= instance.lastInvokeTime) return  // stop sync if no conduction performed
-            instance.sendSyncStatePacket(invoker)
+        if (user is ServerPlayer) {
+            val instance = itemWandInstance(user.level(), user, stack)
+            val useTime = getUseDuration(stack, user) - remainTicks
+            if (user.level().gameTime - useTime >= instance.lastInvokeTime) return  // stop sync if no conduction performed
+            instance.sendSyncStatePacket(user)
         }
     }
 
@@ -104,9 +107,12 @@ abstract class AbstractItemWand(
     }
 
     // for an Item Wand, pos and dire just use the living's view vector
-    override fun getInvokePosDire(level: Level, invoker: Entity, wandLength: Float): PosDirePair {
+    override fun getInvokePosDire(level: Level, invoker: Entity, stack: ItemStack?): PosDirePair {
+        val tip = run {
+            getWandData(stack ?: return@run 0.8).invariable.chunkF.wandLength.toDouble()
+        }
         val dire = invoker.lookAngle
-        val pos = invoker.eyePosition.add(dire.scale(wandLength.toDouble()))
+        val pos = invoker.eyePosition.add(dire.scale(tip))
         return PosDirePair(pos, dire)
     }
 

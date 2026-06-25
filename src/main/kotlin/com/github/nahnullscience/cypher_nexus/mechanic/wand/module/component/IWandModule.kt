@@ -4,15 +4,16 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstanc
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
+import java.util.function.Supplier
 
 interface IWandModule {
     /**
-     *
+     * registered wand module type
      * */
-    val category: ModuleCategory
+    val typeHolder: Supplier<out WandModuleType<*>>
 
     /**
-     *
+     * instance reference
      * */
     val instance: ItemWandInstance
 }

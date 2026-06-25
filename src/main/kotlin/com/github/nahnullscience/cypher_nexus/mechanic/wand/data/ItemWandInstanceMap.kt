@@ -3,7 +3,6 @@ package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandDataBundle
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
@@ -28,7 +27,7 @@ class ItemWandInstanceMap {
 
         _map.entries.removeIf { (uu, instance) ->
             (entity.level().gameTime - instance.lastModifyTime >= RESET_TICK_COUNT)
-                .also { if (it) CypherNexus.LOGGER.debug("remove {}", instance) }
+                .also { if (it) CypherNexus.debugWand { "remove $instance" } }
         }
     }
 

@@ -3,7 +3,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule.HookType.PROJECTILE
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule.HookType
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
@@ -32,7 +32,7 @@ interface ServerInvokeRedirectPosHook {
             CypherNexus.modResource("invoke_redirect_pos"),
             ServerInvokeRedirectPosHook::class,
             false,
-            PROJECTILE,
+            HookType.INVOKING,
             false
         )
     }

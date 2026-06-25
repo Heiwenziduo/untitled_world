@@ -1,8 +1,6 @@
-package com.github.nahnullscience.cypher_nexus.mechanic.wand
+package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 
 data class WandDataBundle(val invariable: WandDataInvariable, val highPayload: WandDataHighPayload) {

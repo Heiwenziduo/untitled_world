@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.client.gui
 
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
-import com.github.nahnullscience.cypher_nexus.mechanic.event.CNEvents
+import com.github.nahnullscience.cypher_nexus.mechanic.event.CNCommonEvents
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import net.minecraft.client.DeltaTracker
@@ -26,7 +26,7 @@ object WandDataOverlay : GuiLayer {
 
 
         // in the future maybe we can show multiple wands data, combine #gatherWand Event
-        CNEvents.gatherWandsActive(player).wands().withIndex().forEach { (i, stack) ->
+        CNCommonEvents.livingGatherWandsActive(player).wands().withIndex().forEach { (i, stack) ->
             val wand = stack.item
             if (stack.isEmpty || wand !is IWandLike) return@forEach
             val wandData = wand.getWandData(stack, null) ?: return@forEach
