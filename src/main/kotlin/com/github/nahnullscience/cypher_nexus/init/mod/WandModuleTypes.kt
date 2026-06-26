@@ -7,6 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.AbstractRecoi
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.AbstractSecondaryModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.AbstractSpecialModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.IWandModule
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.InputModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.WandModuleType
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceKey
@@ -59,7 +60,7 @@ object WandModuleTypes {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
     // TODO should be a better way to handle this
-    val inputModules = mutableSetOf<Supplier<out WandModuleType<*>>>()
+    val inputModules = mutableSetOf<Supplier<out WandModuleType<InputModule>>>()
     init {
         inputModules.add(PRIMARY)
         inputModules.add(SECONDARY)

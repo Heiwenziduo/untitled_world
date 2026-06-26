@@ -5,7 +5,8 @@ import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.RECOIL
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.SECONDARY
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModuleDefault
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModuleDefaultRecoil
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModuleDefaultSecondary
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.IWandModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.MapOfModules
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.WandModuleType
@@ -103,38 +104,9 @@ class ItemWandInstance(
         aoc.modulesSequenceReverse().forEach { moduleCypher ->
             moduleCypher.apply(this, modules)
         }
+        modules.getOrPut(RECOIL) { ModuleDefaultRecoil(this) }
+        modules.getOrPut(SECONDARY) { ModuleDefaultSecondary(this) }
         modules.finalizeInit()
-    }
-
-    fun handleGeneralInputModule(type: WandModuleType<*>, level: Level, invoker: Entity, stack: ItemStack) {
-//        val p = CNEvents.performWandModuleStart(type, level, invoker, this)
-//        if (p) {
-//            when (type.resource) {
-//                WandModuleTypes.PRIMARY_RESOURCE -> {
-//                    val mod = (modules[type] ?: return) as AbstractPrimaryModule
-//                    mod.perform(level, invoker, stack)
-//                }
-//                WandModuleTypes.SECONDARY_RESOURCE -> {
-//                    // handled in item#use
-//                }
-//                WandModuleTypes.SPECIAL_RESOURCE -> {
-//                    val mod = (modules[type] ?: return) as AbstractSpecialModule
-//
-//                }
-//            }
-//        }
-    }
-
-    fun doSecondaryTick(level: Level, invoker: Entity, stack: ItemStack, remainTicks: Int) {
-        if (stack.item is IWandLike) {
-            modules[SECONDARY]?.perform(level, invoker, stack)
-                ?: ModuleDefault.secondary(level, invoker, stack, stack.item as IWandLike)
-        } else CypherNexus.debugWand(ERROR) { "doSecondaryTick: $stack is not a valid wand" }
-    }
-
-    fun doRecoil(invoker: Entity, recoil: Double, invokePosDire: PosDirePair) {
-        modules[RECOIL]?.recoil(invoker, recoil, invokePosDire)
-            ?: ModuleDefault.recoil(invoker, recoil, invokePosDire)
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

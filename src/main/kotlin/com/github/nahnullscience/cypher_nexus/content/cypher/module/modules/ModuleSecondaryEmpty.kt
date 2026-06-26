@@ -1,10 +1,10 @@
-package com.github.nahnullscience.cypher_nexus.mechanic.wand.module
+package com.github.nahnullscience.cypher_nexus.content.cypher.module.modules
 
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.AbstractSecondaryModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.IEmptyModule
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
@@ -20,13 +20,10 @@ class ModuleSecondaryEmpty(
     override val isHoldingInput = false
     override val maxHoldingTick = 0
 
-    override fun perform(level: Level, invoker: Entity, stack: ItemStack) {
-        // do nothing
-    }
-
-    override fun onInteract(
-        player: Player,
-        instance: ItemWandInstance,
+    override fun onVanillaUseStart(
+        level: Level,
+        user: Player,
+        stack: ItemStack,
         hand: InteractionHand
     ): InteractionResult {
         return InteractionResult.PASS

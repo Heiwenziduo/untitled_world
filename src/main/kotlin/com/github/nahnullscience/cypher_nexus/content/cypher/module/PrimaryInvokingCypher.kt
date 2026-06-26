@@ -4,8 +4,8 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.WandModuleCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModulePrimaryInvoking
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModuleSecondaryEmpty
+import com.github.nahnullscience.cypher_nexus.content.cypher.module.modules.ModulePrimaryInvoking
+import com.github.nahnullscience.cypher_nexus.content.cypher.module.modules.ModuleSecondaryEmpty
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.MapOfModules
 
 object PrimaryInvokingCypher : WandModuleCypher() {

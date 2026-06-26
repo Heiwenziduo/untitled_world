@@ -5,6 +5,7 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.IRecursiveCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
@@ -12,12 +13,16 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingH
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 import kotlin.math.max
 
-abstract class AbstractDivideBy : AbstractNonProjectileCypher() {
-    final override val category = CypherCategories.OTHER
-    override fun defaultAttributes() = super.defaultAttributes().draw(0)
+abstract class AbstractDivideBy(
+    path: String,
+    val divideBy: Int,
+    val chainPositionLimit: Int
+) : AbstractNonProjectileCypher(), IRecursiveCypher {
 
-    abstract val divideBy: Int
-    abstract val chainPositionLimit: Int
+    final override val resource = CypherNexus.modResource(path)
+    final override val category = CypherCategories.OTHER
+    override val isRecursive = false
+    override fun defaultAttributes() = super.defaultAttributes().draw(0)
 
     override fun invoke(
         helper: InvokingHelper,
@@ -33,10 +38,6 @@ abstract class AbstractDivideBy : AbstractNonProjectileCypher() {
         val targetIndex = helper.peekNextIndex(relativeIndex + 1)
         val target = helper.peekNext(relativeIndex + 1) ?: return // step++ avoid infinite loop
 
-        CypherNexus.debugCypher { "[$this $relativeIndex] will copy: [$target $targetIndex]" }
-
-        if (!target.canRecursionContinue(state)) return
-
         val currentDepth = state.divideByChainLength++
         state.divideByChainLengthMax = max(state.divideByChainLengthMax, currentDepth)
 
@@ -44,11 +45,11 @@ abstract class AbstractDivideBy : AbstractNonProjectileCypher() {
 
         // first copy with draw-disabled, others with draw-enabled // every Dx exceed its position limit will turn to "D1"
         state.drawEnabled = false
-        target.invoke(helper, chunk, data, state, targetIndex, true)
+        copyCypher(target, helper, chunk, data, state, targetIndex)
         state.drawEnabled = true
         if (canGoDeeper) {
             for (i in 0 until divideBy - 1) {
-                target.invoke(helper, chunk, data, state, targetIndex, true)
+                copyCypher(target, helper, chunk, data, state, targetIndex)
             }
         }
 
@@ -61,36 +62,27 @@ abstract class AbstractDivideBy : AbstractNonProjectileCypher() {
         state.divideByChainLength = currentDepth
     }
 
-    object D2 : AbstractDivideBy() {
-        override val resource = CypherNexus.modResource("divide_by_2")
-        override val divideBy = 2
-        override val chainPositionLimit = 4
+    object D2 : AbstractDivideBy("divide_by_2", 2, 4) {
         override fun defaultAttributes(): CypherDataMap.Builder {
             return super.defaultAttributes()
-                .manaDrain(70f)
+                .manaDrain(40f)
                 .delay(3)
                 .stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -2.0)
                 .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.1)
         }
     }
 
-    object D3 : AbstractDivideBy() {
-        override val resource = CypherNexus.modResource("divide_by_3")
-        override val divideBy = 3
-        override val chainPositionLimit = 3
+    object D3 : AbstractDivideBy("divide_by_3", 3, 3) {
         override fun defaultAttributes(): CypherDataMap.Builder {
             return super.defaultAttributes()
-                .manaDrain(110f)
+                .manaDrain(90f)
                 .delay(5)
                 .stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -3.0)
                 .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.15)
         }
     }
 
-    object D4 : AbstractDivideBy() {
-        override val resource = CypherNexus.modResource("divide_by_4")
-        override val divideBy = 4
-        override val chainPositionLimit = 3
+    object D4 : AbstractDivideBy("divide_by_4", 4, 3) {
         override fun defaultAttributes(): CypherDataMap.Builder {
             return super.defaultAttributes()
                 .manaDrain(150f)
@@ -100,13 +92,10 @@ abstract class AbstractDivideBy : AbstractNonProjectileCypher() {
         }
     }
 
-    object D10 : AbstractDivideBy() {
-        override val resource = CypherNexus.modResource("divide_by_10")
-        override val divideBy = 10
-        override val chainPositionLimit = 2
+    object D10 : AbstractDivideBy("divide_by_10", 10, 2) {
         override fun defaultAttributes(): CypherDataMap.Builder {
             return super.defaultAttributes()
-                .manaDrain(240f)
+                .manaDrain(220f)
                 .delay(15)
                 .stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -10.0)
                 .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.5)

@@ -1,6 +1,5 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.entity
 
-import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_MODULE_STATE_TRACKER
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.id
@@ -10,7 +9,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.IEm
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.WandModuleType
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.LivingEntity
-import net.neoforged.fml.common.EventBusSubscriber
 import java.util.function.Supplier
 
 /**

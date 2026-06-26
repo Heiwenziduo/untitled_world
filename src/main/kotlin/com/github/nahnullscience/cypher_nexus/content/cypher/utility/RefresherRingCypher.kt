@@ -4,15 +4,17 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.IRecursiveCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 
-object RefresherRingCypher : AbstractNonProjectileCypher() {
+object RefresherRingCypher : AbstractNonProjectileCypher(), IRecursiveCypher {
     override val resource = CypherNexus.modResource("refresher_ring")
     override val category = CypherCategories.UTILITY
     override val isRecursive = true
+
     override fun defaultAttributes(): CypherDataMap.Builder {
         return super.defaultAttributes()
             .manaDrain(20f)
@@ -28,14 +30,16 @@ object RefresherRingCypher : AbstractNonProjectileCypher() {
         relativeIndex: Int,
         isCopy: Boolean
     ) {
-        if (!canRecursionContinue(state)) return
-        super.invoke(helper, chunk, data, state, relativeIndex, isCopy)
+        CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
+        modifyStateChunk(helper, data, chunk)
+
         if (state.alreadyRefreshed) {
             // terminate invoking process if meet again
             // this only prevent drawing new cards, current invoking cypher will continue its function
             helper.reload()
             return
         }
+
         state.alreadyRefreshed = true
         helper.init()
         data.recharge = 0

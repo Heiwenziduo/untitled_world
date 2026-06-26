@@ -2,6 +2,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
+import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.RECOIL
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
@@ -53,24 +54,15 @@ class ProjectileStateChunk private constructor (
 
         println("${level.isClientSide} client mocc: $_countMap")
         // do recoil only on root
-//        if (directInvoker != null && directInvoker == owner && isRoot) {
-//            val recoilMap = computedOperationMap[CypherAttributes.RECOIL.value()]
-//            if (recoilMap != null) {
-//                var recoil = AttributeOperator.attributeCalculator(recoilMap, 0.0)
-//                recoil = CypherAttributes.RECOIL.value().restrictRange(recoil)
-//                itemWand?.recoilModule(directInvoker, recoil, posDire)
-//            }
-//        }
-
         run {
             itemWand ?: return@run
             directInvoker ?: return@run
-            val recoilMap = computedOperationMap[CypherAttributes.RECOIL.value()]
-            if (recoilMap != null) {
-                var recoil = AttributeOperator.attributeCalculator(recoilMap, 0.0)
-                recoil = CypherAttributes.RECOIL.value().restrictRange(recoil)
-                itemWand.doRecoil(directInvoker, recoil, posDire)
-            }
+            val recoilMap = computedOperationMap[CypherAttributes.RECOIL.value()] ?: return@run
+            val recoilModule = itemWand.module(RECOIL) ?: return@run
+
+            var recoil = AttributeOperator.attributeCalculator(recoilMap, 0.0)
+            recoil = CypherAttributes.RECOIL.value().restrictRange(recoil)
+            recoilModule.recoil(directInvoker, recoil, posDire)
         }
 
         // handle entities only on server

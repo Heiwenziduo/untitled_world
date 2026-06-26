@@ -1,12 +1,13 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component
 
+import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_MODULE_STATE_TRACKER
 import com.github.nahnullscience.cypher_nexus.mechanic.event.LivingGatherWandsEvent
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 
-interface InputModule {
+interface InputModule : IWandModule {
     /**
      * whether the original vanilla event should be canceled, if canceled, further process from other source will not perform
      * */
@@ -34,24 +35,24 @@ interface InputModule {
         get() = !isHoldingInput
 
     /**
-     *
+     * call both sides
      * */
     fun onHoldingTick(level: Level, invoker: LivingEntity, stack: ItemStack?, tickCount: Int) {
 
     }
 
     /**
-     *
+     * call both sides
      * */
     fun onHoldingStart(level: Level, invoker: LivingEntity, stack: ItemStack?) {
-
+        invoker.getData(WAND_MODULE_STATE_TRACKER).printCurrentPerforming()
     }
 
     /**
-     *
+     * call both sides
      * */
     fun onHoldingStop(level: Level, invoker: LivingEntity, stack: ItemStack?, tickCount: Int) {
-
+        invoker.getData(WAND_MODULE_STATE_TRACKER).printCurrentPerforming()
     }
 
     /**

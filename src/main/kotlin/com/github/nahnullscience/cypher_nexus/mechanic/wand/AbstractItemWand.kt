@@ -39,31 +39,25 @@ abstract class AbstractItemWand(
         val stack = player.getItemInHand(hand)
         val instance = itemWandInstance(level, player, stack)
 
-        return instance.module(SECONDARY)?.onInteract(player, instance, hand) ?: run {
-            // if not startUsingItem, further functions like onStopUsing will not perform
-            player.startUsingItem(hand)
-            InteractionResult.PASS
-        }
+        val module = instance.module(SECONDARY) ?: return InteractionResult.PASS
+        // if not startUsingItem, further functions like onUseTick / onStopUsing will not perform
+        // player.startUsingItem(hand)
+        return module.onVanillaUseStart(player.level(), player, stack, hand)
     }
 
     override fun getUseAnimation(stack: ItemStack) = ItemUseAnimation.EAT
     override fun getUseDuration(stack: ItemStack, entity: LivingEntity) = 114_514
-    override fun onUseTick(level: Level, user: LivingEntity, stack: ItemStack, remainTicks: Int) {
-        // #getUseDuration() - used ticks, resets to full if reach 0
-        // will call on both sides
 
+    override fun onUseTick(level: Level, user: LivingEntity, stack: ItemStack, remainTicks: Int) {
+        // call on both sides
         val instance = itemWandInstance(level, user, stack)
-        instance.doSecondaryTick(level, user, stack, remainTicks)
+        instance.module(SECONDARY)?.onVanillaUseTick(level, user, stack, remainTicks) // #getUseDuration - used ticks, resets to full if reach 0
     }
 
     override fun onStopUsing(stack: ItemStack, user: LivingEntity, remainTicks: Int) {
         // call on both sides
-        if (user is ServerPlayer) {
-            val instance = itemWandInstance(user.level(), user, stack)
-            val useTime = getUseDuration(stack, user) - remainTicks
-            if (user.level().gameTime - useTime >= instance.lastInvokeTime) return  // stop sync if no conduction performed
-            instance.sendSyncStatePacket(user)
-        }
+        val instance = itemWandInstance(user.level(), user, stack)
+        instance.module(SECONDARY)?.onVanillaStopUse(stack, user, remainTicks)
     }
 
     override fun inventoryTick(stack: ItemStack, level: ServerLevel, entity: Entity, slot: EquipmentSlot?) {

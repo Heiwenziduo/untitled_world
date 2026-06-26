@@ -153,12 +153,18 @@ class InvokingHelper (
         discard2deck()
     }
 
+    /**
+     * put all decks / hands into discard
+     * */
     fun reload() {
         data.deck = 0
         data.hand = 0
         data.discard = 0
     }
 
+    /**
+     * put all hands / discards into deck
+     * */
     fun init() {
         data.deck = aoc.bits()
         data.hand = 0

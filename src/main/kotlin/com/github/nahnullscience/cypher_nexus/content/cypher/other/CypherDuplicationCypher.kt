@@ -4,12 +4,13 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.IRecursiveCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 
-object CypherDuplicationCypher : AbstractNonProjectileCypher() {
+object CypherDuplicationCypher : AbstractNonProjectileCypher(), IRecursiveCypher {
     override val resource = CypherNexus.modResource("cypher_duplication")
     override val category = CypherCategories.OTHER
     override val isRecursive = true
@@ -30,8 +31,6 @@ object CypherDuplicationCypher : AbstractNonProjectileCypher() {
         relativeIndex: Int,
         isCopy: Boolean
     ) {
-        if (!canRecursionContinue(state)) return
-
         CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
 
         modifyStateChunk(helper, data, chunk)
@@ -49,15 +48,10 @@ object CypherDuplicationCypher : AbstractNonProjectileCypher() {
         state: InvokingStateBundle,
         relativeIndex: Int,
     ) {
-        val hand = data.hand
-        for (i in hand.countTrailingZeroBits() until relativeIndex) {
-            val cy = helper.aoc.getInvokableOrNull(i) ?: continue
-            if (cy is CypherDuplicationCypher) continue
-
-            CypherNexus.debugCypher { "[$this] copies $cy" }
-            val depth = state.recursionDepth++
-            cy.invoke(helper, chunk, data, state, i, true)
-            state.recursionDepth = depth
+        val remember = data.hand
+        helper.aoc.invokableForEach(remember) { index, cypher ->
+            if (cypher is CypherDuplicationCypher) return@invokableForEach
+            copyCypher(cypher, helper, chunk, data, state, index)
         }
     }
 }

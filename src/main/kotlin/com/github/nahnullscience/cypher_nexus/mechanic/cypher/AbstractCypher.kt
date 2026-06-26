@@ -3,7 +3,6 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataMaps.CYPHER_DATA_ATTACH
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
-import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes.RECOIL
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
@@ -20,15 +19,12 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.Identifier
 import net.minecraft.server.level.ServerPlayer
-import java.util.EnumMap
 
 /**
  *
  * */
 sealed class AbstractCypher: IRegisterable {
-    companion object {
-        const val RECURSION_LIMIT = 2
-    }
+    abstract val category: Holder<CypherCategory>
 
     val manaDrain: Float get() = attributes().manaDrain
     val draw: Int get() = attributes().draw
@@ -50,8 +46,8 @@ sealed class AbstractCypher: IRegisterable {
         val hookModules = CypherBehaviorHooks.REGISTRY
         hookModules.filter { it.hook.isInstance(this) }
     }
-    /** if a cypher may call itself, set this to true to avoid infinite loop */
-    open val isRecursive: Boolean = false
+//    /** if a cypher may call itself, set this to true to avoid infinite loop */
+//    open val isRecursive: Boolean = false
     fun isEmpty() = this is EmptyCypher
     fun isNotEmpty() = !isEmpty()
     /** use for AddTrigger series */
@@ -64,8 +60,6 @@ sealed class AbstractCypher: IRegisterable {
     open fun triggerInterplay() = false
     open fun isInvokable() = true
 
-
-    abstract val category: Holder<CypherCategory>
 
 
     // attr & data attach ==============================================================================================
@@ -108,7 +102,6 @@ sealed class AbstractCypher: IRegisterable {
         relativeIndex: Int,
         isCopy: Boolean,
     ) {
-        if (!canRecursionContinue(state)) return
         CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
         modifyStateChunk(helper, data, chunk)
 
@@ -120,24 +113,6 @@ sealed class AbstractCypher: IRegisterable {
         handleDraws(helper, forwardState, data, state)
     }
 
-    fun canRecursionContinue(state: InvokingStateBundle): Boolean {
-        if (isRecursive) {
-            if (state.recursionDepth > RECURSION_LIMIT) {
-                CypherNexus.debugCypher { "[$this] is stopped due to recursion limit" }
-                return false
-            }
-        }
-        return true
-    }
-
-//    protected open fun canDraw(
-//        helper: InvokingHelper,
-//        chunk: ProjectileStateChunk,
-//        data: HelperDataBundle,
-//        state: InvokingStateBundle,
-//    ): Boolean {
-//        return state.drawEnabled
-//    }
 
     protected fun handleDraws(
         helper: InvokingHelper,
@@ -164,27 +139,6 @@ sealed class AbstractCypher: IRegisterable {
 
         if (chunk.isRoot) data.delay += delay
         data.recharge += recharge
-//
-//        attributes().stateChunk.forEach { (attribute, cyMap) ->
-//            var targetChunk = chunk
-//            if (RECOIL.`is`(attribute.resource)) targetChunk = helper.rootChunk
-//
-//            val chunkMap = targetChunk.computedOperationMap.getOrPut(attribute) { EnumMap(AttributeOperator::class.java) }
-//            // prune: if set, skip
-//            if (chunkMap[AttributeOperator.SET_ALL] != null && cyMap[AttributeOperator.SET_ALL] == null) return@forEach
-//
-//            cyMap.forEach { (operator, value) ->
-//                if (operator != AttributeOperator.BASE) {
-//                    chunkMap.compute(operator) { op, v -> operator.cumulate(v?: operator.defaultValue, value) }
-//                }
-//            }
-//        }
-//        if (this is AbstractNonProjectileCypher) {
-//            // hooks on NonProjectile affect the Block, hooks on Projectile only affect itself
-//            chunk.attachHooks(this)
-//            chunk.enableFlags(flags)
-//        }
-
     }
 
     // ============================================================================================================

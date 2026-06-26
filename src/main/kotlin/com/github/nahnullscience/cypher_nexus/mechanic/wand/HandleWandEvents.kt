@@ -3,18 +3,13 @@ package com.github.nahnullscience.cypher_nexus.mechanic.wand
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes
-import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.id
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.inputModules
 import com.github.nahnullscience.cypher_nexus.mechanic.entity.WandModuleStateTracker.Companion.getModulePerformingHand
 import com.github.nahnullscience.cypher_nexus.mechanic.entity.WandModuleStateTracker.Companion.isPerformingModule
 import com.github.nahnullscience.cypher_nexus.mechanic.event.CNCommonEvents
-import com.github.nahnullscience.cypher_nexus.mechanic.event.LivingGatherWandsEvent
 import com.github.nahnullscience.cypher_nexus.mechanic.event.WandModulePerformStateChangeEvent
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.InputModule
-import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.player.Inventory
-import net.minecraft.world.entity.player.Player
 import net.neoforged.bus.api.EventPriority
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
@@ -38,7 +33,7 @@ object HandleWandEvents {
         CNCommonEvents.livingGatherWandsActive(living).wandsSequence().forEach { stack ->
             val instance = (stack.item as IWandLike).itemWandInstance(living.level(), living, stack)!!
             inputs.removeIf { type ->
-                val module = instance.module(type) as? InputModule ?: return@removeIf false
+                val module = instance.module(type) ?: return@removeIf false
                 module.onHoldingTick(living.level(), living, stack, 0)
                 module.consumeInput
             }
@@ -102,7 +97,7 @@ object HandleWandEvents {
                 ?: return
             val stack = living.getItemInHand(hand)
             val instance = (stack.item as IWandLike).itemWandInstance(living.level(), living, stack)!!
-            // TODO using tick
+            // TODO using tick counts
             (instance.module(type) as InputModule).onHoldingStop(living.level(), living, stack, 0)
         }
 
@@ -150,38 +145,6 @@ object HandleWandEvents {
                 (wand.item as IWandLike),
                 player.level()
             ).tick(player)
-        }
-    }
-
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    private fun gatherWandsTicking(event: LivingGatherWandsEvent.Tracking) {
-        if (event.entity !is Player) {
-            val living = event.entity
-            InteractionHand.entries.forEach { hand ->
-                val stack = living.getItemInHand(hand)
-                if (IWandLike.validateItemWand(stack)) event.addWand(stack)
-            }
-            return
-        }
-
-        val player = event.entity as Player
-        // collect wands in hotbar & offhand
-        for (i in 0 until 9) {
-            val stack = player.inventory.getItem(i)
-            if (IWandLike.validateItemWand(stack)) event.addWand(stack)
-        }
-        val offHand = player.inventory.getItem(Inventory.SLOT_OFFHAND)
-        if (IWandLike.validateItemWand(offHand)) event.addWand(offHand)
-    }
-
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    private fun gatherWandsActive(event: LivingGatherWandsEvent.Active) {
-        val living = event.entity
-        InteractionHand.entries.forEach { hand ->
-            val stack = living.getItemInHand(hand)
-            if (IWandLike.validateItemWand(stack)) event.addWand(stack)
         }
     }
 

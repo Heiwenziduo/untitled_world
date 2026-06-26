@@ -1,20 +1,15 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand.module
 
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.item.ItemStack
-import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 
-/**
- * stateless default behavior
- * */
-object ModuleDefault {
-    /**
-     * push Entity backward
-     * */
-    fun recoil(
+class ModuleDefaultRecoil(
+    override val instance: ItemWandInstance
+) : AbstractRecoilModule() {
+
+    override fun recoil(
         invoker: Entity,
         recoil: Double,
         invokePosDire: PosDirePair
@@ -25,9 +20,5 @@ object ModuleDefault {
         else invoker.eyePosition.vectorTo(invokePosDire.position)
         val recoil0 = recoil / 20
         invoker.push(dire.normalize().scale(recoil0).reverse())
-    }
-
-    fun secondary(level: Level, invoker: Entity, stack: ItemStack, wand: IWandLike) {
-        wand.tryInvoke(level, invoker, stack)
     }
 }

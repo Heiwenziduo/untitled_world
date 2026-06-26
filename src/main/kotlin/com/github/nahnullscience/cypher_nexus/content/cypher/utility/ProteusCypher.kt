@@ -4,14 +4,16 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.IRecursiveCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
 
-object ProteusCypher : AbstractNonProjectileCypher() {
+object ProteusCypher : AbstractNonProjectileCypher(), IRecursiveCypher {
     override val resource = CypherNexus.modResource("proteus")
     override val category = CypherCategories.UTILITY
+    override val isRecursive = false
     override fun defaultAttributes(): CypherDataMap.Builder {
         return super.defaultAttributes()
             .manaDrain(10f)
@@ -45,8 +47,7 @@ object ProteusCypher : AbstractNonProjectileCypher() {
                 cy.invokeInHand(helper, chunk, data, state)
                 if (cy is ProteusCypher) data.manaCurrent += 100f // award some mana if finds self
                 else {
-                    CypherNexus.debugCypher { "[$this] will copy $cy" }
-                    cy.invoke(helper, chunk, data, state, index, true)
+                    copyCypher(cy, helper, chunk, data, state, index)
                 }
             }
         }

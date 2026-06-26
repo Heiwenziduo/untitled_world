@@ -1,10 +1,9 @@
-package com.github.nahnullscience.cypher_nexus.mechanic.wand.module
+package com.github.nahnullscience.cypher_nexus.content.cypher.module.modules
 
-import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_MODULE_STATE_TRACKER
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
-import net.minecraft.world.InteractionHand
-import net.minecraft.world.entity.Entity
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.AbstractPrimaryModule
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.ModuleSharedLogic
+import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
@@ -20,16 +19,19 @@ class ModulePrimaryInvoking(
     override val maxHoldingTick = 72_000
 
     override fun onHoldingStart(level: Level, invoker: LivingEntity, stack: ItemStack?) {
-        invoker.getData(WAND_MODULE_STATE_TRACKER).printCurrentPerforming()
+        super.onHoldingStart(level, invoker, stack)
     }
 
     override fun onHoldingTick(level: Level, invoker: LivingEntity, stack: ItemStack?, tickCount: Int) {
-        println("${level.isClientSide} side onHoldingTick: $invoker")
-        val wand = stack?.item as? IWandLike ?: return
-        wand.tryInvoke(level, invoker, stack)
+//        println("${level.isClientSide} side onHoldingTick: $invoker")
+        ModuleSharedLogic.invoking(level, invoker, stack)
     }
 
     override fun onHoldingStop(level: Level, invoker: LivingEntity, stack: ItemStack?, tickCount: Int) {
-        invoker.getData(WAND_MODULE_STATE_TRACKER).printCurrentPerforming()
+        super.onHoldingStop(level, invoker, stack, tickCount)
+
+        if (invoker is ServerPlayer) {
+            instance.sendSyncStatePacket(invoker)
+        }
     }
 }

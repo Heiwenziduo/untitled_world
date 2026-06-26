@@ -26,7 +26,7 @@ object CNData {
         _enabledList.filter { !it.hide }
     }
 
-//    private val _allInputModules: List<WandModuleType<*>> by lazy {
+//    private val _allInputModules: List<WandModuleType<InputModule>> by lazy {
 //        val list = WandModuleTypes.REGISTRY.toList().filter { it }
 //    }
 

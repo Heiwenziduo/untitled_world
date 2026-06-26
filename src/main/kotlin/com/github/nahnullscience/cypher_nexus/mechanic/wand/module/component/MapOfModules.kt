@@ -9,7 +9,7 @@ class MapOfModules(
     val instance: ItemWandInstance
 ) {
     @PublishedApi
-    internal val modules = IdentityHashMap<WandModuleType<*>, IWandModule>(16)
+    internal val modules = IdentityHashMap<WandModuleType<*>, IWandModule>(32)
     @PublishedApi
     internal var init = false
 
