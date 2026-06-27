@@ -35,6 +35,7 @@ abstract class AbstractDivideBy(
         CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
         modifyStateChunk(helper, data, chunk)
 
+        // TODO targetIndex should be handled specially to achieve consistence with Noita (especially with Greek letters)
         val targetIndex = helper.peekNextIndex(relativeIndex + 1)
         val target = helper.peekNext(relativeIndex + 1) ?: return // step++ avoid infinite loop
 
@@ -44,9 +45,10 @@ abstract class AbstractDivideBy(
         val canGoDeeper =  state.divideByChainLength <= chainPositionLimit
 
         // first copy with draw-disabled, others with draw-enabled // every Dx exceed its position limit will turn to "D1"
-        state.drawEnabled = false
+        state.disableDraw()
         copyCypher(target, helper, chunk, data, state, targetIndex)
-        state.drawEnabled = true
+        state.enableDraw()
+
         if (canGoDeeper) {
             for (i in 0 until divideBy - 1) {
                 copyCypher(target, helper, chunk, data, state, targetIndex)

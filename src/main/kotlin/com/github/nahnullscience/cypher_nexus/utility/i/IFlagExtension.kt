@@ -1,7 +1,13 @@
 package com.github.nahnullscience.cypher_nexus.utility.i
 
-/** utilities to store, use, computed bit-integers */
-interface IFlaggable {
+/**
+ * utilities to store, use, computed bit-integers
+ * */
+interface IFlagExtension {
+
+    /**
+     * a flag is basically a bundle of booleans
+     * */
     var enabledFlags: Int
 //    var disabledFlags: Int
 

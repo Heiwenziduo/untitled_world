@@ -37,6 +37,8 @@ sealed class AbstractCypher: IRegisterable {
     /** override colors from category */
     open val color: Int = 0
 
+    open val isInvokable: Boolean = true
+
     /** auto-detect hooks */
     val implementedHooks: List<HookModule<*>> by lazy {
         if (this is AbstractProjectileCypher) {
@@ -58,8 +60,6 @@ sealed class AbstractCypher: IRegisterable {
     // NonProjectileCypher with #triggerInterplay == true,          will terminate the searching process & cancel the discarding after, for example, blood-magic
     // NonProjectileCypher with #triggerInterplay == false (default), simply modify the state-chunk
     open fun triggerInterplay() = false
-    open fun isInvokable() = true
-
 
 
     // attr & data attach ==============================================================================================
@@ -84,7 +84,7 @@ sealed class AbstractCypher: IRegisterable {
         state: InvokingStateBundle,
     ) {
         state.recursionDepth = 0
-        invoke(helper, chunk, data, state, helper.relativeIndex, false)
+        invoke(helper, chunk, data, state, helper.lastDrawIndex, false)
 
         if (helper.invoker is ServerPlayer) {
             // TODO award stats
@@ -92,8 +92,9 @@ sealed class AbstractCypher: IRegisterable {
     }
 
     /** call super# for basic behaviors
-     * @param relativeIndex represent current invoking cypher's Index in the AoC */
-    // build the depth-first tree
+     * @param relativeIndex where the cypher should function at.
+     * if the cypher comes from a draw, this should be the index of the cypher in [com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers]
+     * */
     open fun invoke(
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
@@ -114,6 +115,9 @@ sealed class AbstractCypher: IRegisterable {
     }
 
 
+    /**
+     * if drawEnabled, draw [draw] times, then invoke drawn cyphers one by one
+     * */
     protected fun handleDraws(
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
@@ -121,7 +125,20 @@ sealed class AbstractCypher: IRegisterable {
         state: InvokingStateBundle,
     ) {
         if (state.drawEnabled)
-        for (i in 0 until draw) {
+        drawXForEach(helper, draw) { index, cypher ->
+            cypher.invokeInHand(helper, chunk, data, state)
+        }
+    }
+
+    /**
+     * bare draw logic, should prefer [handleDraws] in most case
+     * */
+    protected inline fun drawXForEach(
+        helper: InvokingHelper,
+        X: Int,
+        consumer: (index: Int, cypher: AbstractCypher) -> Unit
+    ) {
+        for (i in 0 until X) {
             var cy = helper.drawNext()
             if (cy == null) {
                 CypherNexus.debugCypher { "[$this] want a wrap" }
@@ -129,7 +146,10 @@ sealed class AbstractCypher: IRegisterable {
                 if (!wrap) break // nothing to wrap, break
                 cy = helper.drawNext()
             }
-            cy?.invokeInHand(helper, chunk, data, state)
+
+            if (cy != null) {
+                consumer(helper.lastDrawIndex, cy)
+            }
         }
     }
 

@@ -8,7 +8,8 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.WandModuleCypher
 
 
 /**
- * fixed length, cypher changeable, EmptyCypher autofill
+ * a helper Array that provides a series of utils to manipulate cyphers.
+ * fixed length, cypher changeable, EmptyCypher autofill, quick lookup, and bits operation-friendly
  * */
 open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
     companion object {
@@ -17,7 +18,7 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
         /** O(n) */
         fun of(list: List<AbstractCypher?>) = ArrayOfCyphers(list)
 
-        const val MAX_LENGTH = 64 // max length capped at a Long-bits count, guess this is quite enough
+        const val MAX_LENGTH = Long.SIZE_BITS // max length capped at a Long-bits count (64), guess this is quite enough
 
         /**
          * access an Array indices through 1-bits of a Long
@@ -64,7 +65,7 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
             if (cypher == null) return@forEach
             cyphers[i] = cypher
 
-            if (cypher.isInvokable()) {
+            if (cypher.isInvokable) {
                 bitsInvokable = bitsInvokable or (1L shl i)
             } else if (cypher.isModule()) {
                 bitsModule = bitsModule or (1L shl i)
@@ -102,7 +103,7 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
         val cypher = cypher0 ?: EmptyCypher
         cyphers[index] = cypher
 
-        if (cypher.isInvokable()) bitsInvokable = bitsInvokable or (1L shl index)
+        if (cypher.isInvokable) bitsInvokable = bitsInvokable or (1L shl index)
         if (cypher.isModule()) bitsModule = bitsModule or (1L shl index)
         if (cypher.isEmpty()) {
             bitsInvokable = bitsInvokable and (1L shl index).inv()
@@ -117,7 +118,7 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
     fun copy(): ArrayOfCyphers = ArrayOfCyphers(cyphers.toList())
     fun isEmpty() = (bitsInvokable or bitsModule) == 0L
     fun isNotEmpty() = !isEmpty()
-    fun isInvokable() = bitsInvokable > 0
+    fun isInvokable() = bitsInvokable != 0L
 
     /** find the first Empty then replace that with given cypher
      * @return the replaced index, -1 if no empty */
@@ -195,7 +196,7 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
                 val index = mask.countTrailingZeroBits()
                 if (index < capacity) {
                     val cy = this@ArrayOfCyphers[index]
-                    if (cy.isInvokable()) yield(cy)
+                    if (cy.isInvokable) yield(cy)
                 }
 
                 mask = mask and (mask - 1)
@@ -218,9 +219,9 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
     /**
      * do side effects on every invokable cypher in order.
      * compare to sequence, this can naturally access the index of elements
-     * @param merge a mark uses And operator to filter the bits
+     * @param merge a mark uses And operator to filter the bits, leave it empty and will go through all
      *  */
-    inline fun invokableForEach(merge: Long, action: (index: Int, cypher: AbstractCypher) -> Unit) {
+    inline fun invokableForEach(merge: Long = -1L, action: (index: Int, cypher: AbstractCypher) -> Unit) {
         this.cyphers.bitForEach(bitsInvokable and merge, action)
         return
     }
@@ -228,9 +229,9 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
     /**
      * do side effects on every invokable cypher in reverse order.
      * compare to sequence, this can naturally access the index of elements
-     * @param merge a mark uses And operator to filter the bits
+     * @param merge a mark uses And operator to filter the bits, leave it empty and will go through all
      *  */
-    inline fun invokableForEachReverse(merge: Long, action: (index: Int, cypher: AbstractCypher) -> Unit) {
+    inline fun invokableForEachReverse(merge: Long = -1L, action: (index: Int, cypher: AbstractCypher) -> Unit) {
         this.cyphers.bitForEachReverse(bitsInvokable and merge, action)
         return
     }

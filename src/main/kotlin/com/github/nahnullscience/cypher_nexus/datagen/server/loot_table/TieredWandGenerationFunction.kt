@@ -6,7 +6,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
-import com.github.nahnullscience.cypher_nexus.utility.i.IFlaggable
+import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.mojang.serialization.Codec
 import com.mojang.serialization.MapCodec
@@ -103,7 +103,7 @@ class TieredWandGenerationFunction(
         override val value: Int,
 
         val rate: Float,
-    ): IFlaggable.IFlagEnum {
+    ): IFlagExtension.IFlagEnum {
 //        NO_PREFERENCE(0),
         MANA_MAX(1, 9f),
         MANA_REGEN(2, 1f),

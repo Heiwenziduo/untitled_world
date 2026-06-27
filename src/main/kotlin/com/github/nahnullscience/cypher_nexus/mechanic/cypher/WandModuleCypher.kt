@@ -6,7 +6,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.Map
 
 abstract class WandModuleCypher : AbstractNonProjectileCypher() {
     final override val category = CypherCategories.WAND_MODULE
-    final override fun isInvokable() = false
+    final override val isInvokable = false
     final override fun triggerInterplay() = false
 
     abstract fun apply(instance: ItemWandInstance, modules: MapOfModules)

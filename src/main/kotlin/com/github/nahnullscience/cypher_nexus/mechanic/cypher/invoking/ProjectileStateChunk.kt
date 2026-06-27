@@ -9,7 +9,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.Attribut
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
-import com.github.nahnullscience.cypher_nexus.utility.i.IFlaggable
+import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.server.level.ServerLevel
@@ -21,7 +21,7 @@ class ProjectileStateChunk private constructor (
     private var charge: Int,
     /** only root has access to the helper */
     private val helper: InvokingHelper?
-) : IFlaggable {
+) : IFlagExtension {
     companion object {
         fun root(helper: InvokingHelper) = ProjectileStateChunk(1, helper)
     }
@@ -140,7 +140,7 @@ class ProjectileStateChunk private constructor (
                 cyMap.forEach { (operator, value) ->
                     if (operator != AttributeOperator.BASE) {
                         chunkMap.compute(operator) { op, v ->
-                            operator.cumulate(v?: operator.defaultValue, value, counts)
+                            operator.cumulate(v ?: operator.defaultValue, value, counts)
                         }
                     }
                 }

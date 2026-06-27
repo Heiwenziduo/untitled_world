@@ -37,14 +37,14 @@ object CypherAttributes {
     { builder -> builder.max(1000.0).applyOn(AttributeApply.INVOKING).hide() }
     // ================================ projectile
     val DAMAGE = registerAttribute("damage")
-    { builder -> builder.min(-Double.MAX_VALUE).notSync() }
+    { builder -> builder.min(-Double.MAX_VALUE).noSync() }
     /** 1.00 <-> 100% */
     val CRIT_CHANCE = registerAttribute("crit_chance")
-    { builder -> builder.notSync() }
+    { builder -> builder.noSync() }
     val KNOCKBACK = registerAttribute("knockback")
-    { builder -> builder.max(1000.0).notSync().hide() }
+    { builder -> builder.max(1000.0).noSync().hide() }
     val FORTUNE_LEVEL = registerAttribute("fortune")
-    { builder -> builder.min(-1.0).max(100.0).notSync().hide() }
+    { builder -> builder.min(-1.0).max(100.0).noSync().hide() }
     /** initial speed, in unit block per tick, will show block/sec to player */
     val SPEED = registerAttribute("speed")
     { builder -> builder.max(16.0) }

@@ -15,7 +15,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.StateChun
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.RayCastUtility
 import com.github.nahnullscience.cypher_nexus.utility.VectorUtility
-import com.github.nahnullscience.cypher_nexus.utility.i.IFlaggable
+import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.MOCC_STREAM
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
@@ -30,15 +30,12 @@ import net.minecraft.network.syncher.EntityDataAccessor
 import net.minecraft.network.syncher.SynchedEntityData
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
-import net.minecraft.world.InteractionHand
-import net.minecraft.world.InteractionResult
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.animal.Animal
 import net.minecraft.world.entity.item.ItemEntity
-import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Explosion
@@ -55,7 +52,7 @@ abstract class AbstractCypherProjectile(
     entityType: EntityType<out AbstractCypherProjectile>,
     level: Level
 ) : Projectile(entityType, level), IEntityWithComplexSpawn,
-    IFlaggable {
+    IFlagExtension {
     companion object {
         const val CLIP_MARGIN = 0.2f
         const val CAPTURE_SIZE = 8.0
@@ -107,7 +104,7 @@ abstract class AbstractCypherProjectile(
             initFromMoCC(mocc)
         } else mocc = null
 
-        println("${level().isClientSide} client side hooks: $_hooks")
+//        println("${level().isClientSide} client side hooks: $_hooks")
     }
 
     override fun onAddedToLevel() {
@@ -124,8 +121,7 @@ abstract class AbstractCypherProjectile(
     abstract val cypherHolder: Holder<out AbstractProjectileCypher>
     val cypher get() = cypherHolder.value()
 
-    /** a flag is basically a bundle of booleans */
-    override var enabledFlags: Int = 0
+    override var enabledFlags = 0
 
     open var existing
         get() = getAttrOrProjDefault(CypherAttributes.EXISTING).toInt()
@@ -330,7 +326,7 @@ abstract class AbstractCypherProjectile(
 
             // FIXME image a situation that one proj with bounce can pierce block but can not pierce entity, it should bounce back when an entity stand behind a wall
             onHit(hitResultStep) // or hitTargetOrDeflectSelf(hitResult)
-            val canPierce = hitResultStep is BlockHitResult && haveFlag(CypherFlags.PIERCE_BLOCK)
+            val canPierce = hitResultStep is BlockHitResult && haveFlag(CypherFlags.IGNORE_BLOCK)
                     || hitResultStep is EntityHitResult && haveFlag(CypherFlags.PIERCE_ENTITY)
             if (!canBounce || canPierce) break
 
@@ -372,7 +368,6 @@ abstract class AbstractCypherProjectile(
         if (!target.canBeHitByProjectile()) {
             return false // vanilla logic, for item-entities
         }
-        // if (haveFlag(CypherFlags.NO_DAMAGE)) return false
         if (owner() == target && notHaveFlag(CypherFlags.HURT_OWNER)) return false
         // maybe hook
         return true
@@ -384,7 +379,7 @@ abstract class AbstractCypherProjectile(
         trigger(TriggerType.COLLISION)
 
         val canPierce =
-            result is BlockHitResult && haveFlag(CypherFlags.PIERCE_BLOCK) ||
+            result is BlockHitResult && haveFlag(CypherFlags.IGNORE_BLOCK) ||
             result is EntityHitResult && haveFlag(CypherFlags.PIERCE_ENTITY)
         if (!canPierce && !canBounce) {
             level().broadcastEntityEvent(this, 3) // combine with #handleEntityEvent
@@ -394,11 +389,11 @@ abstract class AbstractCypherProjectile(
     }
     override fun onHitEntity(result: EntityHitResult) {
         super.onHitEntity(result)
-        val entity = result.entity
+        val target = result.entity
         if (notHaveFlag(CypherFlags.SKIP_DAMAGE_CHECK)) {
             val damage = getAttrOrProjDefault(CypherAttributes.DAMAGE)
             if (level() is ServerLevel)
-            entity.hurtServer(level() as ServerLevel, damageSources().thrown(this, owner()), damage.toFloat())
+            target.hurtServer(level() as ServerLevel, damageSources().thrown(this, owner()), damage.toFloat())
         }
     }
     override fun onHitBlock(result: BlockHitResult) {

@@ -134,6 +134,7 @@ class ItemWandInstance(
     }
 
     /**
+     * when receive package from [sendSyncStatePacket],
      * sync mana / delay / recharge state after invoking
      * */
     fun syncInvokingDataClient(mana: Float, delay: Int, recharge: Int, deck: Long) {
@@ -161,6 +162,7 @@ class ItemWandInstance(
     )
 
     fun updateFromHelperData(bundle: HelperDataBundle) {
+        bundle.coerceData()
         _manaCurrent        =   bundle.manaCurrent
         _delayCurrent       =   bundle.delay
         _rechargeCurrent    =   bundle.recharge

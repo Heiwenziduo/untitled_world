@@ -22,6 +22,9 @@ object ProteusCypher : AbstractNonProjectileCypher(), IRecursiveCypher {
 
     override fun triggerInterplay() = true
 
+    /**
+     * draw [draw] times, then copy drawn cyphers one time
+     * */
     override fun invoke(
         helper: InvokingHelper,
         chunk: ProjectileStateChunk,
@@ -34,22 +37,10 @@ object ProteusCypher : AbstractNonProjectileCypher(), IRecursiveCypher {
         modifyStateChunk(helper, data, chunk)
 
         if (state.drawEnabled)
-        for (i in 0 until draw) {
-            var cy = helper.drawNext()
-            if (cy == null) {
-                CypherNexus.debugCypher { "[$this] want a wrap" }
-                val wrap = helper.wrap()
-                if (!wrap) break
-                cy = helper.drawNext()
+            drawXForEach(helper, draw) { index, cypher ->
+                cypher.invokeInHand(helper, chunk, data, state)
+                if (cypher is ProteusCypher) data.manaCurrent += 100f
+                else copyCypher(cypher, helper, chunk, data, state, index)
             }
-            if (cy != null) {
-                val index = helper.relativeIndex
-                cy.invokeInHand(helper, chunk, data, state)
-                if (cy is ProteusCypher) data.manaCurrent += 100f // award some mana if finds self
-                else {
-                    copyCypher(cy, helper, chunk, data, state, index)
-                }
-            }
-        }
     }
 }

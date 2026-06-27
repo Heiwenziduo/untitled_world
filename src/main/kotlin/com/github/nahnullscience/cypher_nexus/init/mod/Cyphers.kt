@@ -294,6 +294,7 @@ object Cyphers {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // other
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     val ADD_TRIGGER = registerCypher(object : AbstractAddTrigger(10f) {
         override val triggerType = TriggerType.COLLISION
         override val resource = CypherNexus.modResource("add_trigger")
@@ -310,16 +311,23 @@ object Cyphers {
 //        override val triggerType = TriggerType.RED_STONE
 //        override val resource = CypherNexus.modResource("add_trigger_red_stone")
 //    })
-    val REQUIREMENT_HP = registerCypher(RequirementLowHP)
-    val REQUIREMENT_NOT_PLAYER = registerCypher(RequirementNotPlayer)
-    val REQUIREMENT_ODD_HAND = registerCypher(RequirementOddHand)
-    val REQUIREMENT_OTHERWISE = registerCypher(AbstractRequirement.RequirementOtherwise)
-    val REQUIREMENT_ENDPOINT = registerCypher(AbstractRequirement.RequirementEndpoint)
 
     val D2 = registerCypher(AbstractDivideBy.D2)
     val D3 = registerCypher(AbstractDivideBy.D3)
     val D4 = registerCypher(AbstractDivideBy.D4)
     val D10 = registerCypher(AbstractDivideBy.D10)
 
+    val ALPHA = registerCypher(AbstractGreekLetter.Alpha)
+    val GAMMA = registerCypher(AbstractGreekLetter.Gamma)
+    val OMEGA = registerCypher(AbstractGreekLetter.Omega)
+    val TAU = registerCypher(AbstractGreekLetter.Tau)
+
+    val REQUIREMENT_HP = registerCypher(RequirementLowHP)
+    val REQUIREMENT_NOT_PLAYER = registerCypher(RequirementNotPlayer)
+    val REQUIREMENT_ODD_HAND = registerCypher(RequirementOddHand)
+    val REQUIREMENT_OTHERWISE = registerCypher(AbstractRequirement.RequirementOtherwise)
+    val REQUIREMENT_ENDPOINT = registerCypher(AbstractRequirement.RequirementEndpoint)
+
     val CYPHER_DUPLICATION = registerCypher(CypherDuplicationCypher)
+
 }

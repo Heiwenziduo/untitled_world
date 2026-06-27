@@ -53,7 +53,7 @@ abstract class AbstractAddTrigger(
             }
         }
 
-        if (cy1 != null && cy1.isNotEmpty()) {
+        if (cy1 != null && cy1.isInvokable) {
             if (cy1 !is AbstractProjectileCypher) {
                 // to fit Noita mechanic, let's agree a NonProj cypher with #triggerCanAttach == true will terminate add trigger-s
                 // for example, refresher-ring

@@ -52,6 +52,15 @@
       "recharge": 0,
       "stateChunk": {}
     },
+    "cypher_nexus:alpha": {
+      "delay": 5,
+      "draw": 0,
+      "flags": 0,
+      "manaDrain": 20.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {}
+    },
     "cypher_nexus:antigravity": {
       "delay": 0,
       "draw": 1,
@@ -98,7 +107,7 @@
     "cypher_nexus:boomerang": {
       "delay": 0,
       "draw": 1,
-      "flags": 128,
+      "flags": 256,
       "manaDrain": 10.0,
       "projectile": {},
       "recharge": 0,
@@ -233,7 +242,7 @@
       "delay": 15,
       "draw": 0,
       "flags": 0,
-      "manaDrain": 240.0,
+      "manaDrain": 220.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {
@@ -249,7 +258,7 @@
       "delay": 3,
       "draw": 0,
       "flags": 0,
-      "manaDrain": 70.0,
+      "manaDrain": 40.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {
@@ -265,7 +274,7 @@
       "delay": 5,
       "draw": 0,
       "flags": 0,
-      "manaDrain": 110.0,
+      "manaDrain": 90.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {
@@ -394,6 +403,15 @@
         }
       }
     },
+    "cypher_nexus:gamma": {
+      "delay": 5,
+      "draw": 0,
+      "flags": 0,
+      "manaDrain": 20.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {}
+    },
     "cypher_nexus:gravity": {
       "delay": 0,
       "draw": 1,
@@ -518,6 +536,15 @@
       "draw": 8,
       "flags": 0,
       "manaDrain": 50.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {}
+    },
+    "cypher_nexus:omega": {
+      "delay": 15,
+      "draw": 0,
+      "flags": 0,
+      "manaDrain": 300.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {}
@@ -757,13 +784,22 @@
     "cypher_nexus:spawn_egg": {
       "delay": 0,
       "draw": 1,
-      "flags": 32,
+      "flags": 128,
       "manaDrain": 20.0,
       "projectile": {
         "cypher_nexus:existing": 300.0,
         "cypher_nexus:gravity_factor": 0.03,
         "cypher_nexus:speed": 1.0
       },
+      "recharge": 0,
+      "stateChunk": {}
+    },
+    "cypher_nexus:tau": {
+      "delay": 10,
+      "draw": 0,
+      "flags": 0,
+      "manaDrain": 80.0,
+      "projectile": {},
       "recharge": 0,
       "stateChunk": {}
     },

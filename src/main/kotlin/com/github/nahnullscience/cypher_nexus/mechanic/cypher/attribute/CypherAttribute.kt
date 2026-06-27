@@ -6,8 +6,6 @@ import net.minecraft.core.Holder
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.Identifier
-import kotlin.math.max
-import kotlin.math.min
 
 /**
  * a bit like vanilla LivingEntity's Attribute system
@@ -22,13 +20,10 @@ open class CypherAttribute(
     /** whether the attr will show on tooltips */
     val hide: Boolean = false,
 ): IRegisterable {
-    val isProjectileAttribute: Boolean get() = applyOn == AttributeApply.PROJECTILE
+
+    val isProjectileAttribute = applyOn == AttributeApply.PROJECTILE
 
     fun restrictRange(v: Double) = v.coerceIn(min, max)
-
-//    override fun hashCode(): Int {
-//        return super.hashCode()
-//    }
 
     // ==========================================================================================================
     fun holder(): Holder<CypherAttribute> {
@@ -61,7 +56,7 @@ open class CypherAttribute(
         fun default(value: Double): Builder = run { defaultValue = value; this }
         fun min(value: Double): Builder = run { min = value ; this }
         fun max(value: Double): Builder = run { max = value ; this }
-        fun notSync(): Builder = run { sync = false ; this }
+        fun noSync(): Builder = run { sync = false ; this }
         fun applyOn(value: AttributeApply): Builder = run { applyOn = value ; this }
         fun hide(): Builder = run { hide = true ; this }
     }

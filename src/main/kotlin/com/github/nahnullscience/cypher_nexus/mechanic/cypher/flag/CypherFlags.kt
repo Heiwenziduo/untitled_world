@@ -1,6 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag
 
-import com.github.nahnullscience.cypher_nexus.utility.i.IFlaggable
+import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 
 /**
  * Kotlin provides a few operators for bits operation
@@ -21,29 +21,71 @@ import com.github.nahnullscience.cypher_nexus.utility.i.IFlaggable
  * */
 
 /** a flag is basically a bundle of booleans, all flag-bits are 0 by default */
-enum class CypherFlags(override val value: Int): IFlaggable.IFlagEnum {
-    /**  */
-    HURT_OWNER(1),
-    // TODO deal pierce & bounce logic
-    PIERCE_ENTITY(2),
-    PIERCE_BLOCK(4),
-    /** skip dealing damage process totally */
-    SKIP_DAMAGE_CHECK(8),
-    /** #displayFireAnimation */
-    WITH_FIRE(16),
-    /** stick on touching surface */
-    STICKY(32), // TODO
-    /** make projectile always use its base existing, not affect by modifiers */
-//    CONSTANT_EXISTING(64),
+enum class CypherFlags : IFlagExtension.IFlagEnum {
 
-    /** self-explanatory */
-    MOTION_FOLLOWS_OWNER(128),
+    /**
+     * let the projectile able to hurt the invoker self
+     * */
+    HURT_OWNER,
+
+    /**
+     *
+     * */
+    // TODO deal pierce & bounce logic
+    PIERCE_ENTITY,
+
+    /**
+     *
+     * */
+    IGNORE_BLOCK,
+
+    /**
+     * skip dealing damage process totally
+     * */
+    SKIP_DAMAGE_CHECK,
+
+    /**
+     * mark the projectile fire-related
+     * */
+    // TODO
+    WITH_FIRE,
+
+    /**
+     * mark the projectile electric-related
+     * */
+    // TODO
+    WITH_ELECTRICITY,
+
+    /**
+     * mark the projectile ender-related
+     * */
+    // TODO
+    WITH_ENDER_POWER,
+
+    /**
+     *
+     * */
+    // TODO
+    PHYSICS,
+
+    /**
+     * let the projectile movement client-authoritative, if the owner is client-authoritative
+     * */
+    MOTION_FOLLOWS_OWNER,
+
+    /**
+     * let the projectile explode when disappear
+     * */
+    // TODO
+    EXPLOSIVE,
 
 
     ;
+    override val value: Int = 1 shl ordinal
     init {
-        require(value != 0)
-        require(value == 1 || value % 2 == 0)
+//        require(value != 0)
+//        require(value == 1 || value % 2 == 0)
+        require(value < Int.MAX_VALUE)
     }
 
     companion object {

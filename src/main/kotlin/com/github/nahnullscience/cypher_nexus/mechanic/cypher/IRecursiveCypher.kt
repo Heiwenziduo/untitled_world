@@ -15,11 +15,9 @@ interface IRecursiveCypher {
 
         fun AbstractCypher.canRecursionContinue(state: InvokingStateBundle): Boolean {
             if (this !is IRecursiveCypher) return true
-            if (isRecursive) {
-                if (state.recursionDepth > RECURSION_LIMIT) {
-                    CypherNexus.debugCypher { "[$this] has reached the recursion depth limit and stops function." }
-                    return false
-                }
+            if (this.isRecursive && state.recursionDepth >= RECURSION_LIMIT) {
+                CypherNexus.debugCypher { "[$this] has reached the recursion depth limit and stops function." }
+                return false
             }
             return true
         }

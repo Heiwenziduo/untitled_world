@@ -17,7 +17,7 @@ object EmptyCypher: AbstractCypher() {
     override val hide = true
     override val category = CypherCategories.OTHER
     override val resource = CypherNexus.modResource("empty_cypher")
-    override fun isInvokable() = false
+    override val isInvokable = false
     override fun triggerInterplay() = false
 
 }

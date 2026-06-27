@@ -22,8 +22,11 @@ class InvokingHelper (
     val rootChunk = ProjectileStateChunk.root(this)
     /** safe to modify */
     val states = InvokingStateBundle()
-    /** the position of last-drawn cypher */
-    val relativeIndex: Int get() = 63 - data.hand.countLeadingZeroBits()
+    /**
+     * the position of last-drawn cypher
+     * */
+    var lastDrawIndex: Int = 0
+        private set
 
     init {
         // define the order of bits go from right to left, which is inverse compare to the order of the cypherArray
@@ -40,6 +43,7 @@ class InvokingHelper (
     suspend fun process() = processSync()
 
     /**
+     * build the depth-first tree
      * AST: produce the invoking stateChunk through given [ArrayOfCyphers]
      * */
     fun processSync() {
@@ -81,22 +85,31 @@ class InvokingHelper (
     }
 
     // =================================================================================
-//    /** peek the next cypher in the deck, null if empty
-//     *  @param next the next x-th cypher */
-//    fun peekNext(next: Int = 0): AbstractCypher? {
-//        var peekIndex = data.deck.countTrailingZeroBits()
-//        var stepIndex = peekIndex
-//        var tmpDeck = data.deck shr (stepIndex + 1)
-//
-//        for (i in 0 until next) {
-//            stepIndex = tmpDeck.countTrailingZeroBits()
-//            peekIndex += ++stepIndex // step
-//            tmpDeck = tmpDeck shr stepIndex
-//            if (peekIndex >= aoc.invokableSize) return null
-//        }
-//
-//        return aoc.getInvokableOrNull(peekIndex)
-//    }
+
+    /**
+     * check if the given index is in Hand
+     * */
+    fun isIndexInHand(index: Int): Boolean {
+        if (index >= ArrayOfCyphers.MAX_LENGTH) return false
+        return data.hand and (1L shl index) != 0L
+    }
+
+    /**
+     * check if the given index is in Deck
+     * */
+    fun isIndexInDeck(index: Int): Boolean {
+        if (index >= ArrayOfCyphers.MAX_LENGTH) return false
+        return data.deck and (1L shl index) != 0L
+    }
+
+    /**
+     * check if the given index is in Discard
+     * */
+    fun isIndexInDiscard(index: Int): Boolean {
+        if (index >= ArrayOfCyphers.MAX_LENGTH) return false
+        return data.discard and (1L shl index) != 0L
+    }
+
 
     /**
      * @return next invokable index in Deck, -1 if non
@@ -107,7 +120,7 @@ class InvokingHelper (
     }
 
     /**
-     * @return next invokable Cypher in Deck, -1 if non
+     * @return next invokable Cypher in Deck, null if non
      * */
     fun peekNext(startFrom: Int = 0): AbstractCypher? {
         val start = max(startFrom, data.deck.countTrailingZeroBits())
@@ -115,8 +128,8 @@ class InvokingHelper (
     }
 
     /**
-     * draw first card in the deck, handle index automatically
-     * @return non-empty-cypher, or null if deck is empty
+     * draw first card in the Deck, and put it into Hand, handles mana automatically
+     * @return non-empty-cypher, or null if there's nothing to draw (deck is empty / mana not enough)
      * */
     fun drawNext(): AbstractCypher? {
         // find the index of the first '1' (last '0', in fact) starting from the right.
@@ -128,19 +141,21 @@ class InvokingHelper (
     /** result is non-empty */
     private fun draw(index: Int): AbstractCypher? {
         val cy = aoc[index]
-        CypherNexus.debugCypher { "draw [$cy $index]" }
         if (cy.isEmpty()) {
-            // this should not happen
-            CypherNexus.LOGGER.error("draw [empty]: $index in $aoc, this should not happen")
+            CypherNexus.LOGGER.error("draw [Empty $index] in $aoc, this should not happen")
             return null
         }
+
+        CypherNexus.debugCypher { "draw [$cy $index]" }
+
         if (data.manaCurrent < cy.manaDrain) {
             CypherNexus.debugCypher { "mana not enough, [$cy] discards directly" }
             deck2discard(index)
             return drawNext()
         }
+        else data.manaCurrent -= cy.manaDrain
+
         deck2hand(index)
-        data.manaCurrent -= cy.manaDrain
         return cy
     }
 
@@ -240,6 +255,7 @@ class InvokingHelper (
         if (cy != null) {
             data.deck = data.deck and (1L shl index).inv()
             data.hand = data.hand or (1L shl index)
+            lastDrawIndex = index
         }
         return cy
     }
@@ -301,6 +317,11 @@ class InvokingHelper (
         var deck: Long = 0,
         var discard: Long = 0,
     ) {
+        fun coerceData() {
+            manaCurrent = manaCurrent.coerceAtLeast(0f)
+            delay = delay.coerceIn(0, 1200)
+            recharge = recharge.coerceIn(0, 1200)
+        }
         override fun toString(): String {
             return "HelperDataBundle(" +
                     "manaCurrent=$manaCurrent, " +
@@ -328,5 +349,8 @@ class InvokingHelper (
         var divideByChainLengthMax: Int = 0,
     ) {
         // val map = ... // attach additional data if desire
+
+        fun disableDraw() = run { drawEnabled = false }
+        fun enableDraw() = run { drawEnabled = true }
     }
 }
