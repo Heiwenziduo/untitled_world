@@ -8,6 +8,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCyp
 import net.minecraft.core.Holder
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
+import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 import java.util.function.Supplier
@@ -24,7 +25,7 @@ object ModEntities {
         factory: EntityType.EntityFactory<T>,
         category: MobCategory = MobCategory.MISC,
         updateInterval: Int = 10
-    ): Supplier<EntityType<T>> {
+    ): DeferredHolder<EntityType<*>, EntityType<T>> {
         return DEFERRED_REGISTER.registerEntityType(name, factory, category) { builder ->
             builder.sized(0.125f, 0.125f)
             // Prevents the entity from being saved to disk.
@@ -39,16 +40,9 @@ object ModEntities {
         }
     }
 
-//    fun <T : AbstractCypherProjectile> register(
-//        cypher: Holder<out AbstractProjectileCypher>,
-//        factory: EntityType.EntityFactory<T>,
-//        category: MobCategory = MobCategory.MISC,
-//        updateInterval: Int = 10
-//    ): Supplier<EntityType<T>> {
-//        val key = cypher.key?.identifier()?.path ?: throw IllegalArgumentException("$cypher resource key is null")
-//        return register("cypher_$key", factory, category, updateInterval)
-//    }
 
+    // projectile ////////////////////////////////////////////////////////////////////////////////////////
+    // using "cypher_" prefix is a convention
     val CYPHER_ARROW = register("cypher_arrow", ::Arrow)
     val CYPHER_SNOWBALL = register("cypher_snowball", ::Snowball)
     val CYPHER_ENDER_TELEPORTATION = register("cypher_ender_teleportation", ::EnderTeleportation)
@@ -57,6 +51,7 @@ object ModEntities {
     val CYPHER_BUBBLE_COLUMN = register("cypher_bubble_column", ::BubbleColumn)
     val CYPHER_LLAMA_SPIT = register("cypher_llama_spit", ::LlamaSpit)
 
+    // static-projectile //////////////////////////////////////////////////////////////////////////////////
     val CYPHER_EXPLOSION = register("cypher_explosion", ::SummonExplosion)
 }
 

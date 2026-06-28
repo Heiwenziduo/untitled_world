@@ -88,7 +88,7 @@ class ItemWandInstance(
 
     fun isBeginning() = _deck == 0L
     fun canInvoke() = !(_delayCurrent > 0 || (_deck == 0L && _rechargeCurrent > 0))
-        .also { println("${side()} invoke check: delay=$_delayCurrent, recharge=$_rechargeCurrent") }
+//        .also { println("${side()} invoke check: delay=$_delayCurrent, recharge=$_rechargeCurrent") }
 
     fun invokeFinish(level: Level) {
         _lastInvokeTime = level.gameTime

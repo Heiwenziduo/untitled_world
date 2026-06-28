@@ -12,6 +12,9 @@ import net.minecraft.world.entity.EntityType
 import java.util.EnumMap
 import java.util.function.Supplier
 
+/**
+ * the idea is, put entity-specific logics inside those Entity[AbstractCypherProjectile] classes, and leave the cypher simple
+ * */
 class SimpleProjectile(
     val path: String,
     val type: Supplier<out EntityType<out AbstractCypherProjectile>>

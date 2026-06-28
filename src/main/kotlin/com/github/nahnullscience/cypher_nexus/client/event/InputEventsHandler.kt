@@ -43,9 +43,14 @@ object InputEventsHandler {
     fun moduleKeysTracking(event: ClientTickEvent.Pre) {
         val mc = Minecraft.getInstance()
         if (mc.player != null &&
-            mc.level != null &&
-            mc.screen == null &&
-            mc.overlay == null) {
+            mc.level != null) {
+
+            // if in screen, stop input-modules
+            if (mc.screen != null || mc.overlay != null) {
+                ClientWandModuleStateManager.endAllInputModule()
+                return
+            }
+
             // in the game, and not opening a screen
             val player = mc.player!!
 

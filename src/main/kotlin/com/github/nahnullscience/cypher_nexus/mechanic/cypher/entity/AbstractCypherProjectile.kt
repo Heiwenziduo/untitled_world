@@ -234,7 +234,7 @@ abstract class AbstractCypherProjectile(
 //        updateInWaterStateAndDoFluidPushing()
 //        updateFluidOnEyes()
 //        updateSwimming()
-        super.tick() // TODO: prune default tick
+        super.tick() // maybe prune default tick?
 
         hooksSharedData.tick(this)
         projectileTick()
@@ -248,11 +248,11 @@ abstract class AbstractCypherProjectile(
     /**
      * check hit-result and set delta-movement here
      * */
-    protected open fun projectileTick() {
+    protected fun projectileTick() {
         tickBehaviorChangeBoth()
 
         updateRotation()
-        applySpeedChange()
+        applyFriction()
         applyGravity()
 
         tickMovementFinalizeBoth()
@@ -263,17 +263,12 @@ abstract class AbstractCypherProjectile(
 
         /*
          * deltaMovement: the movement for the "next tick", client smooth animation relay on this
-         * // an AABB check is used everyTick every vanilla projectile, sounds outrageous, but is ok in performance
+         * an AABB check is used everyTick every vanilla projectile, sounds outrageous, but is ok in performance
          * */
         val hitResult = RayCastUtility.getProjectileHitResult(position(), this, ::canHitEntity, deltaMovement, level(), CLIP_MARGIN)
         bouncePoints.clear()
         val (lastBouncePoint, lastDeltaMove) = bounceLoop(hitResult)
         if (bounceTick) deltaMovement = deltaMovement.toSameDire(lastDeltaMove)
-
-//        run collideCheck@ {
-//            val fluidCheck = ClipContext.Fluid.NONE // bounce when touching water surface?
-//            val blockHit = level().clip(ClipContext(position(), deltaMovement, ClipContext.Block.COLLIDER, fluidCheck, this))
-//        }
 
         //checkInsideBlocks() // trigger #onInsideBlock
 
@@ -531,10 +526,10 @@ abstract class AbstractCypherProjectile(
     /** computedOperationMap > projectileCypher-base > attr#default */
     fun getAttrOrProjDefault(holer: Holder<CypherAttribute>): Double = getAttrOrProjDefault(holer.value())
 
-    protected final override fun applyGravity() {
+    protected override fun applyGravity() {
         if (gravity != 0f) deltaMovement = deltaMovement.add(0.0, -(gravity).toDouble(), 0.0)
     }
-    protected fun applySpeedChange() {
+    protected open fun applyFriction() {
         val f: Float = if (isInWater) underwaterSpeedFactor() * speedFactor else speedFactor
         if (f != 1f) deltaMovement = deltaMovement.scale(f.toDouble())
     }
@@ -561,6 +556,7 @@ abstract class AbstractCypherProjectile(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     override fun getPickResult(): ItemStack? = null // null by default, this is the creative mod middle button pick result
     override fun isPickable() = false // false by default, entirely disable the picking activity
+    override fun canSpawnSprintParticle() = false
     /**
      * since the projectile can't exist without a related cypher,
      * the #deltaMovement initialization will be done automatically, call #shoot is not necessary

@@ -75,7 +75,7 @@
       }
     },
     "cypher_nexus:arrow": {
-      "delay": 2,
+      "delay": 3,
       "draw": 0,
       "flags": 0,
       "manaDrain": 10.0,
@@ -86,13 +86,17 @@
         "cypher_nexus:speed": 1.3
       },
       "recharge": 0,
-      "stateChunk": {}
+      "stateChunk": {
+        "cypher_nexus:spread": {
+          "add": -10.0
+        }
+      }
     },
     "cypher_nexus:bloodlust": {
       "delay": 3,
       "draw": 1,
       "flags": 1,
-      "manaDrain": 20.0,
+      "manaDrain": 5.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {
@@ -140,17 +144,21 @@
       }
     },
     "cypher_nexus:bubble_column": {
-      "delay": 0,
+      "delay": 1,
       "draw": 0,
       "flags": 0,
       "manaDrain": 15.0,
       "projectile": {
-        "cypher_nexus:damage": 1.0,
+        "cypher_nexus:damage": 2.0,
         "cypher_nexus:existing": 120.0,
         "cypher_nexus:speed": 1.3
       },
-      "recharge": 2,
-      "stateChunk": {}
+      "recharge": 0,
+      "stateChunk": {
+        "cypher_nexus:spread": {
+          "add": 23.0
+        }
+      }
     },
     "cypher_nexus:cardinal_path": {
       "delay": 0,

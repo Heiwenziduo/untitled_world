@@ -40,4 +40,9 @@ object ClientWandModuleStateManager {
             // continue
         }
     }
+
+    fun endAllInputModule() {
+        val player = mc.player ?: return
+
+    }
 }

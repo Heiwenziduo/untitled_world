@@ -55,7 +55,7 @@ object ClientSetup {
         //////////////////////////////////////////////////////////////////////////////
         // projectile
         //////////////////////////////////////////////////////////////////////////////
-        event.registerEntityRenderer(ModEntities.CYPHER_ARROW.get(), ::ArrowCypherRenderer)
+        event.registerEntityRenderer(ModEntities.CYPHER_ARROW, ::ArrowCypherRenderer)
         event.registerEntityRenderer(ModEntities.CYPHER_LLAMA_SPIT, ::LlamaSpitCypherRenderer)
 
         event.registerItemProjectile(ModEntities.CYPHER_SNOWBALL)
