@@ -15,7 +15,6 @@ class SimpleItemProjectileRenderer <CY> (
     context: EntityRendererProvider.Context,
 ) : AbstractCypherRenderer<CY, ItemProjectileRenderState>(context) where CY : AbstractCypherProjectile, CY : ItemSupplier {
     private val itemModelResolver: ItemModelResolver = context.itemModelResolver
-//    val stack = ItemStack(item)
     val scale = 0.5f
 
     init {

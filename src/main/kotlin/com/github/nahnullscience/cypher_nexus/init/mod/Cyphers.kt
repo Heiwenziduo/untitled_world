@@ -97,6 +97,7 @@ object Cyphers {
         projectileAttr(CypherAttributes.SPEED, 1.3)
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.01)
+        projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.01)
     }
     val SNOWBALL = registerSimple(ModEntities.CYPHER_SNOWBALL) {
         manaDrain(3f)

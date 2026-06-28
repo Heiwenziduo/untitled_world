@@ -14,6 +14,9 @@ class Arrow(
 ) : AbstractCypherProjectile(entityType, level) {
     override val cypherHolder = ARROW
 
+    var shakeTime: Float = 0f
+        private set
+
     override fun discardVisualEffect() {
         for (i in 0..7) {
             level().addParticle(ItemParticleOption(ParticleTypes.ITEM, Items.ARROW), x, y, z, 0.0, 0.0, 0.0)

@@ -24,8 +24,6 @@ import java.util.function.Supplier
 
 @EventBusSubscriber(modid = CypherNexus.MOD_ID, value = [Dist.CLIENT])
 object ClientSetup {
-    // TODO: separate logical and physical clients?
-
     /**
      * This is used for initializing client specific things such as renderers and keymaps.
      * Fired on the mod specific event bus.
@@ -35,6 +33,8 @@ object ClientSetup {
      */
     @SubscribeEvent
     private fun onClientStarting(event: FMLClientSetupEvent) {
+        // Q: should we separate logical and physical clients?
+
 //        CypherNexus.LOGGER.info("HELLO FROM CLIENT SETUP")
 //        CypherNexus.LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().user.name)
 

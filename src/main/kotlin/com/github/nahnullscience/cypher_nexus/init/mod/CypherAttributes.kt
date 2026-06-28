@@ -59,7 +59,7 @@ object CypherAttributes {
     /** how much it falls each tick, 0.0 by default */
     val GRAVITY_FACTOR = registerAttribute("gravity_factor")
     { builder -> builder.min(-1.0).max(1.0).hide() }
-    /** deltaMovement * (1 - Friction) each tick, 0.01 by default */
+    /** deltaMovement * (1 - Friction) each tick, 0.03 by default */
     val FRICTION_FACTOR = registerAttribute("friction_factor")
     { builder -> builder.default(0.03).min(-9.0).max(1.0).hide() }
 }
