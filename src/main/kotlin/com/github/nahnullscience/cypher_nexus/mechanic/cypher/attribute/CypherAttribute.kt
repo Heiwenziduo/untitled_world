@@ -21,7 +21,7 @@ open class CypherAttribute(
     val hide: Boolean = false,
 ): IRegisterable {
 
-    val isProjectileAttribute = applyOn == AttributeApply.PROJECTILE
+    val isEntityAttribute = applyOn == AttributeApply.ENTITY
 
     fun restrictRange(v: Double) = v.coerceIn(min, max)
 
@@ -42,7 +42,7 @@ open class CypherAttribute(
     enum class AttributeApply {
         /** Invoking attributes will not cumulate on projectile-entity */
         INVOKING,
-        PROJECTILE
+        ENTITY
     }
 
     class Builder(val resource: Identifier) {
@@ -50,7 +50,7 @@ open class CypherAttribute(
         private var min: Double = 0.0
         private var max: Double = Double.MAX_VALUE
         private var sync: Boolean = true
-        private var applyOn: AttributeApply = AttributeApply.PROJECTILE
+        private var applyOn: AttributeApply = AttributeApply.ENTITY
         private var hide: Boolean = false
         fun build() = CypherAttribute(resource, defaultValue, min, max, sync, applyOn, hide)
         fun default(value: Double): Builder = run { defaultValue = value; this }

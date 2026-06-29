@@ -3,16 +3,20 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
+/**
+ * base class for cyphers those who functions as a summoner,
+ * fixed existing, generally immobile and invisible, and will summon something in the end
+ * */
 abstract class AbstractStaticSummoner(
-    entityType: EntityType<out AbstractCypherProjectile>,
+    entityType: EntityType<out DedicatedCypherProjectile>,
     level: Level
-) : AbstractCypherProjectile(entityType, level) {
+) : DedicatedCypherProjectile(entityType, level) {
 
-    abstract override var existing: Int
+    override var existing: Int = 2
 
-    override fun onBeforeDiscardBoth(reason: DiscardReason) {
+    override fun beforeDiscardBoth(reason: DiscardReason) {
         summon()
-        super.onBeforeDiscardBoth(reason)
+        super.beforeDiscardBoth(reason)
     }
 
     abstract fun summon()

@@ -1,10 +1,14 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute
 
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import java.util.Locale.getDefault
+import kotlin.collections.component1
+import kotlin.collections.component2
 import kotlin.math.min
 import kotlin.math.pow
 
@@ -86,6 +90,7 @@ enum class AttributeOperator {
     override fun toString() = super.toString().lowercase(getDefault())
 
     companion object {
+
         fun attributeCalculator(opMap: Map<AttributeOperator, Double>, base: Double) : Double {
             val s = opMap[SET_ALL]
             if (s != null) return s
@@ -95,6 +100,24 @@ enum class AttributeOperator {
             val m2 = opMap.getOrDefault(MULTIPLY_TOTAL, MULTIPLY_TOTAL.defaultValue)
             val cap = opMap.getOrDefault(CAP_AT, CAP_AT.defaultValue)
             return ((base + a) * (m1 + 1) * m2).coerceAtMost(cap)
+        }
+
+        typealias AttributeMap = MutableMap<CypherAttribute, Double>
+        /**
+         * cumulate attributes from a state to a single cypher-entity
+         * */
+        fun AttributeMap.initAttributes(state: ShotStateChunk, cypher: AbstractProjectileCypher<*>) {
+            state.computedOperationMap.forEach { (attr, opMap) ->
+                if (!attr.isEntityAttribute) return@forEach
+//            if (haveFlag(CypherFlags.CONSTANT_EXISTING) && CypherAttributes.EXISTING.`is`(attr.resource)) return@forEach
+                // TODO prune cumulation, some of attributes will not be used, depends on cypher implementation
+
+                this.compute(attr) { a, v ->
+                    val def = cypher.getAttrBaseOrDefault(attr)
+                    val final = AttributeOperator.attributeCalculator(opMap, def)
+                    attr.restrictRange(final)
+                }
+            }
         }
 
 

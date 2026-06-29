@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.client.cypher.renderer
 
 import com.github.nahnullscience.cypher_nexus.client.cypher.state.ItemProjectileRenderState
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.entity.EntityRendererProvider
@@ -13,7 +13,7 @@ import net.minecraft.world.item.ItemDisplayContext
 
 class SimpleItemProjectileRenderer <CY> (
     context: EntityRendererProvider.Context,
-) : AbstractCypherRenderer<CY, ItemProjectileRenderState>(context) where CY : AbstractCypherProjectile, CY : ItemSupplier {
+) : AbstractCypherRenderer<CY, ItemProjectileRenderState>(context) where CY : DedicatedCypherProjectile, CY : ItemSupplier {
     private val itemModelResolver: ItemModelResolver = context.itemModelResolver
     val scale = 0.5f
 

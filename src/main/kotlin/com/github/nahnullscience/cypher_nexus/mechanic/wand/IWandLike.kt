@@ -5,7 +5,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingState
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
@@ -57,7 +57,7 @@ interface IWandLike {
     /**
      * resolve invoking feedback, for item-wands this is handled by [ItemWandInstance]
      * */
-    fun afterInvoke(level: Level, invoker: Entity, stack: ItemStack?, dataBundle: HelperDataBundle, rootChunk: ProjectileStateChunk): InvokingState
+    fun afterInvoke(level: Level, invoker: Entity, stack: ItemStack?, dataBundle: HelperDataBundle, rootChunk: ShotStateChunk): InvokingState
 
 
     /**

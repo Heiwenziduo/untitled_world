@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.content.entity
 
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers.SPAWN_EGG
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
 import net.minecraft.core.particles.ItemParticleOption
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.EntityType
@@ -11,9 +11,9 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 
 class SpawnEgg(
-    entityType: EntityType<out AbstractCypherProjectile>,
+    entityType: EntityType<out DedicatedCypherProjectile>,
     level: Level
-) : AbstractCypherProjectile(entityType, level), ItemSupplier {
+) : DedicatedCypherProjectile(entityType, level), ItemSupplier {
     override val cypherHolder = SPAWN_EGG
     override fun getItem() = ItemStack(Items.EGG)
 

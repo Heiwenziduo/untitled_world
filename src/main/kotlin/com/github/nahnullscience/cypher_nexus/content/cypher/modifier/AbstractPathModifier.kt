@@ -5,9 +5,11 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothTickMovementFinalizeHook
 import net.minecraft.core.Direction
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 
 abstract class AbstractPathModifier(
@@ -24,21 +26,23 @@ abstract class AbstractPathModifier(
     }
 
     object HorizontalPath : AbstractPathModifier("horizontal_path", 0f, 0.5) {
-        override fun finalizeTickMovementBoth(
+
+        override fun <CY> finalizeTickMovementBoth(
             level: Level,
-            projectile: AbstractCypherProjectile,
+            projectile: CY,
             strength: Int
-        ) {
+        ) where CY : Entity, CY : ICypherEntity {
             projectile.deltaMovement = projectile.deltaMovement.horizontal()
         }
     }
 
     object CardinalPath : AbstractPathModifier("cardinal_path", 0f, 0.5) {
-        override fun finalizeTickMovementBoth(
+
+        override fun <CY> finalizeTickMovementBoth(
             level: Level,
-            projectile: AbstractCypherProjectile,
+            projectile: CY,
             strength: Int
-        ) {
+        ) where CY : Entity, CY : ICypherEntity {
             val t = Direction.getApproximateNearest(projectile.deltaMovement)
             projectile.deltaMovement = projectile.deltaMovement.projectedOn(t.unitVec3)
             projectile.hooksSharedData.pathDirection = t

@@ -9,7 +9,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingH
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 
 abstract class AbstractAddTrigger(
@@ -20,13 +20,13 @@ abstract class AbstractAddTrigger(
     override fun modifyStateChunk(
         helper: InvokingHelper,
         data: InvokingHelper.HelperDataBundle,
-        chunk: ProjectileStateChunk
+        chunk: ShotStateChunk
     ) = Unit
     override fun defaultAttributes() = super.defaultAttributes().manaDrain(_manaDrain).draw(0)
 
     override fun invoke(
         helper: InvokingHelper,
-        chunk: ProjectileStateChunk,
+        chunk: ShotStateChunk,
         data: HelperDataBundle,
         state: InvokingStateBundle,
         relativeIndex: Int,
@@ -54,7 +54,7 @@ abstract class AbstractAddTrigger(
         }
 
         if (cy1 != null && cy1.isInvokable) {
-            if (cy1 !is AbstractProjectileCypher) {
+            if (cy1 !is AbstractProjectileCypher<*>) {
                 // to fit Noita mechanic, let's agree a NonProj cypher with #triggerCanAttach == true will terminate add trigger-s
                 // for example, refresher-ring
                 CypherNexus.debugCypher { "[$this] attach process terminate due to [$cy1 $attachIndex]" }
@@ -80,7 +80,7 @@ abstract class AbstractAddTrigger(
             // the cypher activates the payload process doesn't have to be the payload
             if (cy2 != null) {
                 CypherNexus.debugCypher { "invoke [$cy1] with payload due to [$cy2]" }
-                val subChunk = ProjectileStateChunk(Int.MAX_VALUE)
+                val subChunk = ShotStateChunk(Int.MAX_VALUE)
                 chunk.addProjectile(ProjectileNode(cy1, subChunk, triggerType))
                 val payload = helper.drawNext()
                 payload?.invokeInHand(helper, subChunk, data, state)

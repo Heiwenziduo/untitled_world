@@ -17,13 +17,13 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import java.util.*
 
-class ProjectileStateChunk private constructor (
+class ShotStateChunk private constructor (
     private var charge: Int,
     /** only root has access to the helper */
     private val helper: InvokingHelper?
 ) : IFlagExtension {
     companion object {
-        fun root(helper: InvokingHelper) = ProjectileStateChunk(1, helper)
+        fun root(helper: InvokingHelper) = ShotStateChunk(1, helper)
     }
     /** normal chunk can only release once */
     constructor(charge: Int = 1): this(charge, null)
@@ -82,22 +82,22 @@ class ProjectileStateChunk private constructor (
             val newPosPair = hooks.cumulateHooks(CypherBehaviorHooks.INVOKE_REDIRECT_POS_SERVER, posDire)
             { h, l, pair -> h.redirectPosDireServer(level, directInvoker, owner, proj, l, pair, i) }
 
-            proj.setDirection(newPosPair)
+            proj.initDirection(newPosPair)
             level.addFreshEntity(proj)
         }
     }
 
-    fun addProjectile(node: ProjectileNode): ProjectileStateChunk {
+    fun addProjectile(node: ProjectileNode): ShotStateChunk {
         projectiles.add(node)
         return this
     }
 
-    fun attachHooks(cypher: AbstractNonProjectileCypher): ProjectileStateChunk {
+    fun attachHooks(cypher: AbstractNonProjectileCypher): ShotStateChunk {
         hooks.add(cypher)
         return this
     }
 
-    fun enableFlags(flag: Int): ProjectileStateChunk {
+    fun enableFlags(flag: Int): ShotStateChunk {
         enableFlag(flag)
         return this
     }
@@ -107,7 +107,7 @@ class ProjectileStateChunk private constructor (
         return _countMap.count(cy)
     }
 
-    fun compute(): ProjectileStateChunk {
+    fun compute(): ShotStateChunk {
         if (!dirty) return this
 
         _countMap.forEach { (cypher, counts) ->

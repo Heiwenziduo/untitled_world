@@ -5,6 +5,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import kotlin.math.max
@@ -19,7 +20,7 @@ class InvokingHelper (
     val aoc: ArrayOfCyphers,
     val data: HelperDataBundle,
 ) {
-    val rootChunk = ProjectileStateChunk.root(this)
+    val rootChunk = ShotStateChunk.root(this)
     /** safe to modify */
     val states = InvokingStateBundle()
     /**
@@ -47,7 +48,7 @@ class InvokingHelper (
      * AST: produce the invoking stateChunk through given [ArrayOfCyphers]
      * */
     fun processSync() {
-        // level.profiler.push("invoking-start") // F3 + L to record time cost
+        Profiler.get().push("cypherArrayParsing") // F3 + L to record time cost
         CypherNexus.debugCypher { "invoking start, prepare cyphers" }
 
         while (data.draw >= 1) {
@@ -62,7 +63,7 @@ class InvokingHelper (
             reload()
         }
         CypherNexus.debugCypher { "invoking finish: $data" }
-        // level.profiler.pop()
+        Profiler.get().pop()
     }
 
     /**

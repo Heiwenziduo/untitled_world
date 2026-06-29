@@ -8,7 +8,7 @@ import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.SimpleItemP
 import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.SimpleParticleProjectileRenderer
 import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.SimpleSummonerRenderer
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.projectile.ItemSupplier
@@ -69,6 +69,7 @@ object ClientSetup {
         // static
         //////////////////////////////////////////////////////////////////////////////
         event.registerEntityRenderer(ModEntities.CYPHER_EXPLOSION, ::SimpleSummonerRenderer)
+        event.registerEntityRenderer(ModEntities.CYPHER_LIGHTING, ::SimpleSummonerRenderer)
     }
 
 //    @SubscribeEvent
@@ -88,15 +89,15 @@ object ClientSetup {
 
 private fun <CY> RegisterRenderers.registerItemProjectile (
     cypherEntity: Supplier<out EntityType<out CY>>,
-) where CY : AbstractCypherProjectile, CY : ItemSupplier
+) where CY : DedicatedCypherProjectile, CY : ItemSupplier
         = registerEntityRenderer(cypherEntity.get()) { context -> SimpleItemProjectileRenderer(context) }
 
 private fun <CY> RegisterRenderers.registerParticleProjectile (
     cypherEntity: Supplier<out EntityType<out CY>>,
-) where CY : AbstractCypherProjectile
+) where CY : DedicatedCypherProjectile
         = registerEntityRenderer(cypherEntity.get()) { context -> SimpleParticleProjectileRenderer(context) }
 
-private fun <T : AbstractCypherProjectile> RegisterRenderers.registerEntityRenderer(
+private fun <T : DedicatedCypherProjectile> RegisterRenderers.registerEntityRenderer(
     cypherEntity: Supplier<out EntityType<out T>>,
     factory: EntityRendererProvider<T>
 ) = registerEntityRenderer(cypherEntity.get(), factory)

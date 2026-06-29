@@ -1,10 +1,10 @@
 package com.github.nahnullscience.cypher_nexus.client.cypher.renderer
 
 import com.github.nahnullscience.cypher_nexus.client.cypher.state.ParticleProjectileRenderState
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 
-class SimpleParticleProjectileRenderer  <CY : AbstractCypherProjectile> (
+class SimpleParticleProjectileRenderer  <CY : DedicatedCypherProjectile> (
     context: EntityRendererProvider.Context
 ) : AbstractCypherRenderer<CY, ParticleProjectileRenderState>(context) {
 

@@ -11,7 +11,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.ChatFormatting
 import net.minecraft.core.Holder
@@ -41,7 +41,7 @@ sealed class AbstractCypher: IRegisterable {
 
     /** auto-detect hooks */
     val implementedHooks: List<HookModule<*>> by lazy {
-        if (this is AbstractProjectileCypher) {
+        if (this is AbstractProjectileCypher<*>) {
             CypherNexus.LOGGER.warn("Don't register hooks on [{}], instead implement them on related entity directly.", this)
             return@lazy emptyList()
         }
@@ -79,7 +79,7 @@ sealed class AbstractCypher: IRegisterable {
     /** when invoke from helper#draw */
     fun invokeInHand(
         helper: InvokingHelper,
-        chunk: ProjectileStateChunk,
+        chunk: ShotStateChunk,
         data: HelperDataBundle,
         state: InvokingStateBundle,
     ) {
@@ -97,7 +97,7 @@ sealed class AbstractCypher: IRegisterable {
      * */
     open fun invoke(
         helper: InvokingHelper,
-        chunk: ProjectileStateChunk,
+        chunk: ShotStateChunk,
         data: HelperDataBundle,
         state: InvokingStateBundle,
         relativeIndex: Int,
@@ -107,7 +107,7 @@ sealed class AbstractCypher: IRegisterable {
         modifyStateChunk(helper, data, chunk)
 
         var forwardState = chunk
-        if (this is AbstractProjectileCypher) {
+        if (this is AbstractProjectileCypher<*>) {
             forwardState = addToStateChunk(chunk)
         }
 
@@ -120,7 +120,7 @@ sealed class AbstractCypher: IRegisterable {
      * */
     protected fun handleDraws(
         helper: InvokingHelper,
-        chunk: ProjectileStateChunk,
+        chunk: ShotStateChunk,
         data: HelperDataBundle,
         state: InvokingStateBundle,
     ) {
@@ -153,7 +153,7 @@ sealed class AbstractCypher: IRegisterable {
         }
     }
 
-    open fun modifyStateChunk(helper: InvokingHelper, data: HelperDataBundle, chunk: ProjectileStateChunk) {
+    open fun modifyStateChunk(helper: InvokingHelper, data: HelperDataBundle, chunk: ShotStateChunk) {
 
         chunk.record(this)
 

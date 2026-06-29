@@ -4,11 +4,11 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
+import net.minecraft.world.phys.HitResult
 
-interface BothTickBehaviorHook {
-    /** call on both side, before projectile-tick (which perform bounce or hit logic) */
-    fun <CY> tickBehaviorBoth(level: Level, projectile: CY, strength: Int) where CY : Entity, CY : ICypherEntity
+interface BothHitEntityHook {
+    fun <CY> onHitBoth(level: Level, projectile: CY, strength: Int, result: HitResult) where CY : Entity, CY : ICypherEntity
     companion object {
-        val HOOK = HookModule.HookBuilder("tick_behavior", BothTickBehaviorHook::class)
+        val HOOK = HookModule.HookBuilder("hit_entity", BothHitEntityHook::class)
     }
 }

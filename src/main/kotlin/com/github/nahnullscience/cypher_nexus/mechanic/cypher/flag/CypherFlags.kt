@@ -31,13 +31,17 @@ enum class CypherFlags : IFlagExtension.IFlagEnum {
     /**
      *
      * */
-    // TODO deal pierce & bounce logic
     PIERCE_ENTITY,
 
     /**
      *
      * */
     IGNORE_BLOCK,
+
+    /**
+     * ignore all collision, disable physics even with flag [PHYSICS] present
+     * */
+    PENETRATE_WORLD,
 
     /**
      * skip dealing damage process totally
@@ -96,5 +100,7 @@ enum class CypherFlags : IFlagExtension.IFlagEnum {
             }
             println("]")
         }
+
+        fun fromFlags(vararg flags: CypherFlags): Int = flags.sumOf { it.value }
     }
 }

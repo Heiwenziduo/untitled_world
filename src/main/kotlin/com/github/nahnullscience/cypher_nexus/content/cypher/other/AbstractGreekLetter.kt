@@ -8,7 +8,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.IRecursiveCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import org.apache.logging.log4j.Level
 
 /**
@@ -25,7 +25,7 @@ abstract class AbstractGreekLetter(
 
     override fun invoke(
         helper: InvokingHelper,
-        chunk: ProjectileStateChunk,
+        chunk: ShotStateChunk,
         data: HelperDataBundle,
         state: InvokingStateBundle,
         relativeIndex: Int,
@@ -41,7 +41,7 @@ abstract class AbstractGreekLetter(
         override fun defaultAttributes() = super.defaultAttributes().delay(5)
         override fun invoke(
             helper: InvokingHelper,
-            chunk: ProjectileStateChunk,
+            chunk: ShotStateChunk,
             data: HelperDataBundle,
             state: InvokingStateBundle,
             relativeIndex: Int,
@@ -78,7 +78,7 @@ abstract class AbstractGreekLetter(
         override fun defaultAttributes() = super.defaultAttributes().delay(5)
         override fun invoke(
             helper: InvokingHelper,
-            chunk: ProjectileStateChunk,
+            chunk: ShotStateChunk,
             data: HelperDataBundle,
             state: InvokingStateBundle,
             relativeIndex: Int,
@@ -113,7 +113,7 @@ abstract class AbstractGreekLetter(
         override fun defaultAttributes() = super.defaultAttributes().delay(15)
         override fun invoke(
             helper: InvokingHelper,
-            chunk: ProjectileStateChunk,
+            chunk: ShotStateChunk,
             data: HelperDataBundle,
             state: InvokingStateBundle,
             relativeIndex: Int,
@@ -142,7 +142,7 @@ abstract class AbstractGreekLetter(
         override fun defaultAttributes() = super.defaultAttributes().delay(10)
         override fun invoke(
             helper: InvokingHelper,
-            chunk: ProjectileStateChunk,
+            chunk: ShotStateChunk,
             data: HelperDataBundle,
             state: InvokingStateBundle,
             relativeIndex: Int,

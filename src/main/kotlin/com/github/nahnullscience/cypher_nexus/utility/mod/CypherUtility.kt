@@ -7,7 +7,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.LivingEntity
-import kotlin.collections.forEach
 
 object CypherUtility {
 

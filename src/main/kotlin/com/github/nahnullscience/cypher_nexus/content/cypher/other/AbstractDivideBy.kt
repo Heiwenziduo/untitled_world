@@ -10,7 +10,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.Attribut
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import kotlin.math.max
 
 abstract class AbstractDivideBy(
@@ -26,7 +26,7 @@ abstract class AbstractDivideBy(
 
     override fun invoke(
         helper: InvokingHelper,
-        chunk: ProjectileStateChunk,
+        chunk: ShotStateChunk,
         data: HelperDataBundle,
         state: InvokingStateBundle,
         relativeIndex: Int,

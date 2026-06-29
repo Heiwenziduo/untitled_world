@@ -6,7 +6,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProject
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 
 /** invoke the next a few cyphers only when the requirements are met */
 sealed class AbstractRequirement : AbstractNonProjectileCypher() {
@@ -14,7 +14,7 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
     override fun modifyStateChunk(
         helper: InvokingHelper,
         data: InvokingHelper.HelperDataBundle,
-        chunk: ProjectileStateChunk
+        chunk: ShotStateChunk
     ) = Unit
     override fun defaultAttributes() = super.defaultAttributes().manaDrain(0f).draw(1)
 
@@ -22,14 +22,14 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
         /** true if conditions are met */
         abstract fun requirement(
             helper: InvokingHelper,
-            chunk: ProjectileStateChunk,
+            chunk: ShotStateChunk,
             data: InvokingHelper.HelperDataBundle,
             state: InvokingHelper.InvokingStateBundle,
         ) : Boolean
 
         override fun invoke(
             helper: InvokingHelper,
-            chunk: ProjectileStateChunk,
+            chunk: ShotStateChunk,
             data: HelperDataBundle,
             state: InvokingStateBundle,
             relativeIndex: Int,

@@ -1,22 +1,14 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile
 
-import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule.HookType.PROJECTILE
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 
 interface BothEntitySearchHook {
-    fun entitySearchBoth(level: Level, projectile: AbstractCypherProjectile, strength: Int, target: Entity)
-    fun needSearch(level: Level, projectile: AbstractCypherProjectile): Boolean
+    fun <CY> entitySearchBoth(level: Level, projectile: CY, strength: Int, target: Entity) where CY : Entity, CY : ICypherEntity
+    fun <CY> needSearch(level: Level, projectile: CY): Boolean where CY : Entity, CY : ICypherEntity
     companion object {
-        val MODULE = HookModule(
-            CypherNexus.modResource("entity_search"),
-            BothEntitySearchHook::class,
-            true,
-            PROJECTILE,
-            false
-        )
+        val HOOK = HookModule.HookBuilder("entity_search", BothEntitySearchHook::class)
     }
 }

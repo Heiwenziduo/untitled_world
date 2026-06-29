@@ -4,7 +4,7 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 
 /**
  * mark a cypher that has the ability to copy others or itself
@@ -35,7 +35,7 @@ interface IRecursiveCypher {
     fun copyCypher(
         target: AbstractCypher,
         helper: InvokingHelper,
-        chunk: ProjectileStateChunk,
+        chunk: ShotStateChunk,
         data: HelperDataBundle,
         state: InvokingStateBundle,
         targetIndex: Int,

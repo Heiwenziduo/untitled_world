@@ -2,16 +2,14 @@ package com.github.nahnullscience.cypher_nexus.init
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.entity.*
-import com.github.nahnullscience.cypher_nexus.content.entity.statics.SummonExplosion
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
-import net.minecraft.core.Holder
+import com.github.nahnullscience.cypher_nexus.content.entity.statics.SummonedExplosion
+import com.github.nahnullscience.cypher_nexus.content.entity.statics.SummonedLightning
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
-import java.util.function.Supplier
 
 object ModEntities {
     val DEFERRED_REGISTER: DeferredRegister.Entities = DeferredRegister.createEntities(CypherNexus.MOD_ID)
@@ -20,7 +18,7 @@ object ModEntities {
         DEFERRED_REGISTER.register(MOD_BUS)
     }
 
-    fun <T : AbstractCypherProjectile> register(
+    fun <T : DedicatedCypherProjectile> register(
         name: String,
         factory: EntityType.EntityFactory<T>,
         category: MobCategory = MobCategory.MISC,
@@ -52,6 +50,7 @@ object ModEntities {
     val CYPHER_LLAMA_SPIT = register("cypher_llama_spit", ::LlamaSpit)
 
     // static-projectile //////////////////////////////////////////////////////////////////////////////////
-    val CYPHER_EXPLOSION = register("cypher_explosion", ::SummonExplosion)
+    val CYPHER_EXPLOSION = register("cypher_explosion", ::SummonedExplosion)
+    val CYPHER_LIGHTING = register("cypher_lighting", ::SummonedLightning)
 }
 

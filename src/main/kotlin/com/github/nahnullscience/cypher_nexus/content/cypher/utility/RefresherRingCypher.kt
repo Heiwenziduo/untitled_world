@@ -8,7 +8,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.IRecursiveCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 
 object RefresherRingCypher : AbstractNonProjectileCypher(), IRecursiveCypher {
     override val resource = CypherNexus.modResource("refresher_ring")
@@ -24,7 +24,7 @@ object RefresherRingCypher : AbstractNonProjectileCypher(), IRecursiveCypher {
     override fun triggerInterplay() = true
     override fun invoke(
         helper: InvokingHelper,
-        chunk: ProjectileStateChunk,
+        chunk: ShotStateChunk,
         data: HelperDataBundle,
         state: InvokingStateBundle,
         relativeIndex: Int,

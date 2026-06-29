@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.content.entity
 
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers.ENDER_TELEPORTATION
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.server.level.ServerLevel
@@ -16,9 +16,9 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.portal.TeleportTransition
 
 open class EnderTeleportation(
-    entityType: EntityType<out AbstractCypherProjectile>,
+    entityType: EntityType<out DedicatedCypherProjectile>,
     level: Level
-) : AbstractCypherProjectile(entityType, level), ItemSupplier {
+) : DedicatedCypherProjectile(entityType, level), ItemSupplier {
     companion object {
         // teleportation utils
 
@@ -49,7 +49,7 @@ open class EnderTeleportation(
         }
     }
 
-    override fun onBeforeDiscardBoth(reason: DiscardReason) {
+    override fun beforeDiscardBoth(reason: DiscardReason) {
         if (!level().isClientSide && owner() != null) {
             // compare to #teleportTo on Entity, this can handle dimension
             // owner()?.teleportTo(x, y, z)
@@ -70,6 +70,6 @@ open class EnderTeleportation(
         }
 
 
-        super.onBeforeDiscardBoth(reason)
+        super.beforeDiscardBoth(reason)
     }
 }

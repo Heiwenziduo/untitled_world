@@ -2,14 +2,15 @@ package com.github.nahnullscience.cypher_nexus.utility.mod
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 
+/**
+ * serve as a token to rebuild the ProjectileStateChunk (payload info not included)
+ * */
 //open class MapOfCypherCounts : Reference2IntOpenHashMap<AbstractCypher>() {
 open class MapOfCypherCounts(private val map: HashMap<AbstractCypher, Int>) : MutableMap<AbstractCypher, Int> by map {
     constructor(anyMap: Map<AbstractCypher, Int>) : this(HashMap<AbstractCypher, Int>(anyMap))
 
     companion object {
         fun of() = MapOfCypherCounts(HashMap())
-
-        val EMPTY = MapOfCypherCounts(HashMap())
     }
 
     override fun get(key: AbstractCypher): Int {

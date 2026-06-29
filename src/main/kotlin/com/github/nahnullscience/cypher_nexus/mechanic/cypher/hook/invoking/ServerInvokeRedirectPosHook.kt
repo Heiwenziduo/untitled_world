@@ -1,9 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking
 
-import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule.HookType
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
@@ -17,23 +15,17 @@ interface ServerInvokeRedirectPosHook {
      * @param pair cumulated position & direction, will be forward
      * @param index some mythic number
      * */
-    fun redirectPosDireServer(
+    fun <CY> redirectPosDireServer(
         level: ServerLevel,
         invoker: Entity?,
         owner: Entity?,
-        projectile: AbstractCypherProjectile,
+        cypherEntity: CY,
         strength: Int,
         pair: PosDirePair,
         index: Int
-    ): PosDirePair
+    ): PosDirePair where CY : Entity, CY : ICypherEntity
 
     companion object {
-        val MODULE = HookModule(
-            CypherNexus.modResource("invoke_redirect_pos"),
-            ServerInvokeRedirectPosHook::class,
-            false,
-            HookType.INVOKING,
-            false
-        )
+        val HOOK = HookModule.HookBuilder("invoke_redirect_pos", ServerInvokeRedirectPosHook::class).invoking()
     }
 }

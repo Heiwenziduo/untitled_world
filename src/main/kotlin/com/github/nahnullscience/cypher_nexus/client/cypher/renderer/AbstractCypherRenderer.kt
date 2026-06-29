@@ -1,16 +1,17 @@
 package com.github.nahnullscience.cypher_nexus.client.cypher.renderer
 
 import com.github.nahnullscience.cypher_nexus.client.cypher.state.ICypherEntityRenderState
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractCypherProjectile
-import com.mojang.blaze3d.vertex.PoseStack
-import net.minecraft.client.renderer.SubmitNodeCollector
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.entity.state.EntityRenderState
-import net.minecraft.client.renderer.state.level.CameraRenderState
 
-abstract class AbstractCypherRenderer <CY : AbstractCypherProjectile, State> (
+abstract class AbstractCypherRenderer <CY : DedicatedCypherProjectile, State> (
     context: EntityRendererProvider.Context
 ) : EntityRenderer<CY, State>(context) where State : EntityRenderState, State : ICypherEntityRenderState {
 
+    override fun extractRenderState(entity: CY, state: State, partialTicks: Float) {
+        super.extractRenderState(entity, state, partialTicks)
+//        state.radius =
+    }
 }
