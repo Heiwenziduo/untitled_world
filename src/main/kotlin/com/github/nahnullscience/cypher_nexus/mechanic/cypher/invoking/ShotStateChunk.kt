@@ -34,7 +34,7 @@ class ShotStateChunk private constructor (
 
     private var _countMap = MapOfCypherCounts.of()
     private var dirty = true
-    val cyphers get() = _countMap
+    val ccMap get() = _countMap
     val isRoot: Boolean by lazy { helper != null && helper.rootChunk == this }
 
     override var enabledFlags: Int = 0

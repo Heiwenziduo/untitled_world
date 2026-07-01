@@ -15,6 +15,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.StateChunkPool
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
@@ -42,7 +43,7 @@ import kotlin.jvm.optionals.getOrNull
 import kotlin.math.pow
 
 
-open class CypherEntityDelegation <CY> : ICypherEntity where CY : Entity, CY : ICypherEntity {
+open class CypherEntityBasics <CY> : ICypherEntity where CY : Entity, CY : ICypherEntity {
     companion object {
         /**
          *
@@ -66,8 +67,10 @@ open class CypherEntityDelegation <CY> : ICypherEntity where CY : Entity, CY : I
     /** no flag by default */
     override var enabledFlags = CypherFlags.fromFlags()
 
-//    private var _ccMap: MapOfCypherCounts? = null
-//    override val ccMap: MapOfCypherCounts? get() = _ccMap
+    private var _ccMap: MapOfCypherCounts? = null
+    override var ccMap: MapOfCypherCounts?
+        get() = _ccMap
+        set(value) = run { _ccMap = value }
     private var _attributeMap: AttributeMap = HashMap<CypherAttribute, Double>()
     override val attributeMap: Map<CypherAttribute, Double> get() = _attributeMap
 
@@ -107,32 +110,45 @@ open class CypherEntityDelegation <CY> : ICypherEntity where CY : Entity, CY : I
     override fun getOwner(): Entity? = owner
     override fun setOwner(owner: Entity?) = let { this.owner = owner }
 
-    override fun initCypher(state: ShotStateChunk) {
+    override fun initCypher(cypher: AbstractProjectileCypher<*>, state: ShotStateChunk, node: ProjectileNode?) {
         if (isInit) return
-        // TODO serverside attach trigger / payload
         _attributeMap.initAttributes(state, cypher)
         enabledFlags = state.enabledFlags or cypher.flags
         _hooks = state.hooks
+        _ccMap = state.ccMap
+        if (node != null) {
+            _trigger = node.trigger
+            _payload = node.payload
+        }
 
         isInit = true
     }
-    override fun initCypher(map: MapOfCypherCounts?) {
+    override fun initCypher(cypher: AbstractProjectileCypher<*>, map: MapOfCypherCounts?) {
         if (map == null) return
         val state = StateChunkPool.getOrCreateStateChunk(map)
-        initCypher(state)
+        initCypher(cypher, state, null)
     }
+    @Suppress("UNCHECKED_CAST")
     override fun <E> initEntity (cy: E) where E : Entity, E : ICypherEntity {
         _cyEntity = cy as CY
+        initDirection()
     }
 
-    override fun initDirection(direction: Vec3?) {
-        // TODO, problem is this timing entity has not been added to level
+    override val positionInitial: Vec3 get() = initPosition ?: Vec3.ZERO
+    override val directionInitial: Vec3 get() = initDirection ?: Vec3.ZERO
+    private var initPosition: Vec3? = null // due to CyEntity init timing, store direction data and init lazily
+    private var initDirection: Vec3? = null
+    override fun initDirection(direction: Vec3?) = run { initDirection = direction }
+    override fun initDirection(pair: PosDirePair) = run { initDirection = pair.direction; initPosition = pair.position }
+    private fun initDirection() {
+        initDirection = initDirection?.normalize() ?: cyEntity.owner?.lookAngle?.normalize()
+        if (directionInitial != Vec3.ZERO){
+            cyEntity.deltaMovement = directionInitial.scale(getAttrOrProjDefault(CypherAttributes.SPEED))
+            // FIXME inertia behavior seems strange
+        } else {
+            cyEntity.deltaMovement = Vec3.ZERO
+        }
     }
-
-    override fun initDirection(pair: PosDirePair) {
-
-    }
-
 
     protected open fun captureSurroundings() {
         if (cyEntity.firstTick || cyEntity.tickCount and 3 == 3) { // trigger on 1, 3 and then every 4 tick
@@ -232,7 +248,7 @@ open class CypherEntityDelegation <CY> : ICypherEntity where CY : Entity, CY : I
         lowSpeedBoth(count)
     }
 
-    private fun releasePayload(posDire: PosDirePair) = _payload?.release(level, cyEntity, owner, posDire, null)
+    private fun releasePayload(posDire: PosDirePair) = _payload?.release(level, cyEntity, cyEntity.owner, posDire, null)
     override fun trigger(type: TriggerType) {
         if (_trigger == TriggerType.NONE || type != _trigger) return
         val to = when(type) {
@@ -389,7 +405,7 @@ open class CypherEntityDelegation <CY> : ICypherEntity where CY : Entity, CY : I
                     onBounceBoth(bouncePoint)
                     bouncePoints.add(bouncePoint)
 
-                    stepPosition = bouncePoint
+                    stepPosition = bouncePoint.add(bounceDirection.unitVec3.scale(0.01))
                     stepMovement = stepDestination0.subtract(destination).flipByDirection(bounceDirection, bounceSpeedPenalty())
                 }
             }
@@ -460,9 +476,14 @@ open class CypherEntityDelegation <CY> : ICypherEntity where CY : Entity, CY : I
     }
 
     override fun whenHit(result: HitResult) {
+        onHitBoth(result)
         if (level.isClientSide) return
         trigger(TriggerType.COLLISION)
 
         // TODO
+    }
+
+    override fun canHomeTarget(target: Entity): Boolean {
+        return super.canHomeTarget(target) && target != cyEntity.owner
     }
 }

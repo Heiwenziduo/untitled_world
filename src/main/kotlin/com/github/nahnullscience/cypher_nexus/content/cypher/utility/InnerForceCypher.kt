@@ -1,11 +1,10 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.utility
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherBeforeInit
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeRedirectPosHook
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.server.level.ServerLevel
@@ -20,15 +19,15 @@ object InnerForceCypher : AbstractNonProjectileCypher(), ServerInvokeRedirectPos
             .draw(1)
     }
 
-    override fun <CY> redirectPosDireServer(
+    override fun <CypherBeforeInit> redirectPosDireServer(
         level: ServerLevel,
         invoker: Entity?,
         owner: Entity?,
-        cypherEntity: CY,
+        cypherEntity: CypherBeforeInit,
         strength: Int,
         pair: PosDirePair,
         index: Int
-    ): PosDirePair where CY : Entity, CY : ICypherEntity {
+    ): PosDirePair where CypherBeforeInit : Entity, CypherBeforeInit : ICypherBeforeInit {
         owner?: return pair
         return PosDirePair(owner.eyePosition, owner.eyePosition.vectorTo(pair.position))
     }

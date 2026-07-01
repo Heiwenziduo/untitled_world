@@ -3,16 +3,14 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.CypherEntityDelegation
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.CypherEntityBasics
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.MOCC_STREAM
-import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.core.Holder
 import net.minecraft.network.RegistryFriendlyByteBuf
@@ -40,24 +38,22 @@ abstract class DedicatedCypherProjectile(
     entityType: EntityType<out DedicatedCypherProjectile>,
     level: Level
 ) : Projectile(entityType, level), IEntityWithComplexSpawn,
-    IFlagExtension, ICypherEntity by CypherEntityDelegation<DedicatedCypherProjectile>() {
+    IFlagExtension, ICypherEntity by CypherEntityBasics<DedicatedCypherProjectile>() {
     companion object {
         /** generate projectile with attributes initialized */
         fun <CY> create(
+            cypher: AbstractProjectileCypher<*>,
             entityType: EntityType<CY>,
             level: ServerLevel,
             invoker: Entity?,
             direction: Vec3? = null,
             shotState: ShotStateChunk,
             node: ProjectileNode,
-            stateHooks: HookContainer?
         ) : CY where CY : Entity, CY : ICypherEntity {
             val proj = entityType.create(level, EntitySpawnReason.SPAWN_ITEM_USE) ?:
             throw IllegalStateException("Failed to create projectile [$entityType].")
             proj.setOwner(invoker)
-            proj.initCypher(shotState)
-            // TODO ccmap, direction, trigger, payload
-//            proj._ccMap = shotState.cyphers
+            proj.initCypher(cypher, shotState, node)
             proj.initDirection(direction)
             return proj
         }
@@ -78,24 +74,22 @@ abstract class DedicatedCypherProjectile(
 
     override fun writeSpawnData(buffer: RegistryFriendlyByteBuf) {
         // send when entity added to level
-        buffer.writeBoolean(_ccMap != null) // write & read relay strictly on order, use a marker to tell client if a map follows
-        if (_ccMap != null) {
-            MOCC_STREAM.encode(buffer, _ccMap!!)
+        buffer.writeBoolean(ccMap != null) // write & read relay strictly on order, use a marker to tell client if a map follows
+        if (ccMap != null) {
+            MOCC_STREAM.encode(buffer, ccMap!!)
         }
     }
 
     override fun readSpawnData(buffer: RegistryFriendlyByteBuf) {
+        // only on client
         if (buffer.readBoolean()) {
             val ccMap = MOCC_STREAM.decode(buffer)
-            initCypher(ccMap)
-        } else _ccMap = null
-
-//        println("${level().isClientSide} client side hooks: $_hooks")
+            initCypher(cypher, ccMap)
+        } else ccMap = null
     }
 
     override fun onAddedToLevel() {
         super.onAddedToLevel()
-        initEntity(this)
     }
 
     override fun sendPairingData(serverPlayer: ServerPlayer, bundleBuilder: Consumer<CustomPacketPayload>) {
@@ -106,31 +100,10 @@ abstract class DedicatedCypherProjectile(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     abstract override val cypherHolder: Holder<out AbstractProjectileCypher<out DedicatedCypherProjectile>>
-    private var _ccMap: MapOfCypherCounts? = null
-
-    var moveDirection: Vec3 = Vec3.ZERO
-        private set
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // initialization
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    protected fun setDirection(direction: Vec3? = null) {
-        moveDirection = direction?.normalize() ?: owner()?.lookAngle?.normalize() ?: moveDirection
-        if (moveDirection != Vec3.ZERO){
-            deltaMovement = moveDirection.scale(getAttrOrProjDefault(CypherAttributes.SPEED))
-            // FIXME inertia behavior seems strange
-        } else {
-            deltaMovement = Vec3.ZERO
-        }
-    }
-    fun setDirection(pair: PosDirePair) {
-        setPos(pair.position)
-        setDirection(pair.direction)
-    }
-
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,6 +111,7 @@ abstract class DedicatedCypherProjectile(
     override fun tick() {
         // FIXME entity desync "positon-flash" almost always happen at around first time they sync
         // FIXME aiming deviation at high speed
+        if (firstTick) debugMsg()
         doTick()
         super.tick() // maybe prune default tick?
     }

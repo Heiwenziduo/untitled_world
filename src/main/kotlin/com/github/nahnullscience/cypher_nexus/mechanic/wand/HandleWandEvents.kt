@@ -55,10 +55,15 @@ object HandleWandEvents {
             type.resource == WandModuleTypes.PRIMARY_RESOURCE ||
             type.resource == WandModuleTypes.SECONDARY_RESOURCE
         ) {
-            val hand = living.getModulePerformingHand(event.module)
-                .also { if (it == null) CypherNexus.debugWand(Level.ERROR) { "$type does not exist on $living both hands, this should not happen!" } }
-                ?: return
-            val stack = living.getItemInHand(hand)
+            // FIXME hand check fail occasionally, (when open a screen)
+            val hand = living.getModulePerformingHand(event.module).also {
+                if (it == null) {
+                    CypherNexus.debugWand(Level.ERROR)
+                    { "$type does not exist on $living both hands, this should not happen!" }
+                    return
+                }
+            }
+            val stack = living.getItemInHand(hand!!)
             val instance = (stack.item as IWandLike).itemWandInstance(living.level(), living, stack)!!
             (instance.module(type) as InputModule).onHoldingStart(living.level(), living, stack)
         }
@@ -92,10 +97,14 @@ object HandleWandEvents {
             type.resource == WandModuleTypes.PRIMARY_RESOURCE ||
             type.resource == WandModuleTypes.SECONDARY_RESOURCE
         ) {
-            val hand = living.getModulePerformingHand(event.module)
-                .also { if (it == null) CypherNexus.debugWand(Level.ERROR) { "$type does not exist on $living both hands, this should not happen!" } }
-                ?: return
-            val stack = living.getItemInHand(hand)
+            val hand = living.getModulePerformingHand(event.module).also {
+                if (it == null) {
+                    CypherNexus.debugWand(Level.ERROR)
+                    { "$type does not exist on $living both hands, this should not happen!" }
+                    return
+                }
+            }
+            val stack = living.getItemInHand(hand!!)
             val instance = (stack.item as IWandLike).itemWandInstance(living.level(), living, stack)!!
             // TODO using tick counts
             (instance.module(type) as InputModule).onHoldingStop(living.level(), living, stack, 0)

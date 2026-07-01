@@ -31,13 +31,13 @@ abstract class AbstractProjectileCypher <CY> : AbstractCypher() where CY : Entit
         stateHooks: HookContainer?
     ): CY {
         val proj = DedicatedCypherProjectile.create(
+            this,
             projectileType.get(),
             level,
             invoker,
             direction,
             shootState,
             node,
-            stateHooks
         )
         proj.setPos(startPos)
         return proj

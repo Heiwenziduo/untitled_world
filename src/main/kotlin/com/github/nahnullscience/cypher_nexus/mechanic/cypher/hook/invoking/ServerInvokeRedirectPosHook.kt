@@ -1,5 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking
 
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherBeforeInit
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
@@ -15,15 +16,15 @@ interface ServerInvokeRedirectPosHook {
      * @param pair cumulated position & direction, will be forward
      * @param index some mythic number
      * */
-    fun <CY> redirectPosDireServer(
+    fun <CypherBeforeInit> redirectPosDireServer(
         level: ServerLevel,
         invoker: Entity?,
         owner: Entity?,
-        cypherEntity: CY,
+        cypherEntity: CypherBeforeInit,
         strength: Int,
         pair: PosDirePair,
         index: Int
-    ): PosDirePair where CY : Entity, CY : ICypherEntity
+    ): PosDirePair where CypherBeforeInit : Entity, CypherBeforeInit : ICypherBeforeInit
 
     companion object {
         val HOOK = HookModule.HookBuilder("invoke_redirect_pos", ServerInvokeRedirectPosHook::class).invoking()

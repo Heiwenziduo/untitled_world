@@ -6,7 +6,7 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherBeforeInit
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeRedirectPosHook
 import com.github.nahnullscience.cypher_nexus.utility.RayCastUtility
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
@@ -29,15 +29,15 @@ object DaedalusCypher : ModifierCypher(), ServerInvokeRedirectPosHook {
             .stateChunkAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.03)
     }
 
-    override fun <CY> redirectPosDireServer(
+    override fun <CypherBeforeInit> redirectPosDireServer(
         level: ServerLevel,
         invoker: Entity?,
         owner: Entity?,
-        cypherEntity: CY,
+        cypherEntity: CypherBeforeInit,
         strength: Int,
         pair: PosDirePair,
         index: Int
-    ): PosDirePair where CY : Entity, CY : ICypherEntity {
+    ): PosDirePair where CypherBeforeInit : Entity, CypherBeforeInit : ICypherBeforeInit {
         val height = (16.0 + 8.0 * strength).coerceAtMost(128.0)
         val length = (16.0 + 8.0 * strength).coerceAtMost(128.0)
         val (start, direction) = pair

@@ -1,5 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation
 
+import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
@@ -7,6 +8,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReas
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
@@ -19,12 +21,17 @@ import net.minecraft.world.entity.animal.Animal
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
+import net.neoforged.bus.api.EventPriority
+import net.neoforged.bus.api.SubscribeEvent
+import net.neoforged.fml.common.EventBusSubscriber
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent
 
 /**
  * define data pieces that all cypher-entity would require.
  * those pieces then could be delivered through Delegation
  * */
-interface ICypherEntity : TraceableEntity, IFlagExtension {
+interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
+    @EventBusSubscriber(modid = CypherNexus.MOD_ID)
     companion object {
         const val CLIP_MARGIN = 0.2f
         const val CAPTURE_SIZE = 8.0
@@ -32,12 +39,24 @@ interface ICypherEntity : TraceableEntity, IFlagExtension {
         const val LOW_SPEED_THRESHOLD = 0.02
         const val LOW_SPEED_THRESHOLD_SQR = LOW_SPEED_THRESHOLD * LOW_SPEED_THRESHOLD
         const val HIT_BB_INFLATION = 0.25
+
+        @SubscribeEvent(priority = EventPriority.NORMAL)
+        private fun initCypherEntity(event: EntityJoinLevelEvent) {
+            val entity = event.entity
+            if (entity is ICypherEntity) {
+                entity.initEntity(entity)
+            }
+        }
     }
 
     val cypherHolder: Holder<out AbstractProjectileCypher<*>>
     val cypher get() = cypherHolder.value()
 
-//    val ccMap: MapOfCypherCounts?
+    /**
+     * [MapOfCypherCounts] serves as the token of [ShotStateChunk],
+     * this field initialized in server and will be shipped to client to sync shot-data
+     * */
+    override var ccMap: MapOfCypherCounts?
     val attributeMap: Map<CypherAttribute, Double>
 
     val hooks: HookContainer?
@@ -49,11 +68,11 @@ interface ICypherEntity : TraceableEntity, IFlagExtension {
     /**
      * initialize from [MapOfCypherCounts]
      * */
-    fun initCypher(map: MapOfCypherCounts?)
+    override fun initCypher(cypher: AbstractProjectileCypher<*>, map: MapOfCypherCounts?)
     /**
      * init from [ShotStateChunk]
      * */
-    fun initCypher(state: ShotStateChunk)
+    override fun initCypher(cypher: AbstractProjectileCypher<*>, state: ShotStateChunk, node: ProjectileNode?)
     /**
      *
      * */
@@ -61,14 +80,16 @@ interface ICypherEntity : TraceableEntity, IFlagExtension {
     /**
      *
      * */
-    fun initDirection(direction: Vec3? = null)
+    override fun initDirection(direction: Vec3?)
     /**
      *
      * */
-    fun initDirection(pair: PosDirePair)
+    override fun initDirection(pair: PosDirePair)
 
 
     // quick access for common attributes
+    val directionInitial: Vec3
+    val positionInitial: Vec3
     var existing: Int
     val speed: Double get() = getAttrOrProjDefault(CypherAttributes.SPEED)
     val bounce: Int get() = getAttrOrProjDefault(CypherAttributes.BOUNCE).toInt()
