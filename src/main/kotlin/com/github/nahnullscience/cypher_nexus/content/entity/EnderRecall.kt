@@ -21,7 +21,7 @@ class EnderRecall(
         if (level() is ServerLevel) {
             val teleport = createRaw(CYPHER_ENDER_TELEPORTATION.get(), level() as ServerLevel, owner())
             teleport.setPos(position())
-            teleport.existing = 100
+            teleport.setExisting(100)
             level().addFreshEntity(teleport)
         }
         super.firstTickBoth()

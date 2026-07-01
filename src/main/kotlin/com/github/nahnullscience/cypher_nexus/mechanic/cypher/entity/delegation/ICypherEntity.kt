@@ -1,7 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
@@ -11,14 +10,15 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedDa
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
+import com.github.nahnullscience.cypher_nexus.utility.EntityUtil.rotateTowardSpeed
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.core.Holder
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.TraceableEntity
 import net.minecraft.world.entity.animal.Animal
-import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.neoforged.bus.api.EventPriority
@@ -29,6 +29,9 @@ import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent
 /**
  * define data pieces that all cypher-entity would require.
  * those pieces then could be delivered through Delegation
+ *
+ * ONLY methods start with prefix "get" can be overridden in respective entity classes,
+ * overriding other method have no effect.
  * */
 interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
     @EventBusSubscriber(modid = CypherNexus.MOD_ID)
@@ -56,15 +59,7 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
      * [MapOfCypherCounts] serves as the token of [ShotStateChunk],
      * this field initialized in server and will be shipped to client to sync shot-data
      * */
-    override var ccMap: MapOfCypherCounts?
-    val attributeMap: Map<CypherAttribute, Double>
-
-    val hooks: HookContainer?
-    val hooksSharedData: HooksSharedData<*>
-
-    val trigger: TriggerType
-    val payload: ShotStateChunk?
-
+    override fun ccMap(): MapOfCypherCounts?
     /**
      * initialize from [MapOfCypherCounts]
      * */
@@ -86,56 +81,83 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
      * */
     override fun initDirection(pair: PosDirePair)
 
+    //    val attributeMap: Map<CypherAttribute, Double>
+    fun attributeMap(): Map<CypherAttribute, Double>
+
+//    val hooks: HookContainer?
+    fun hooks(): HookContainer?
+    val hooksSharedData: HooksSharedData<*>
+    fun hooksSharedData(): HooksSharedData<*>
+
+    fun triggerType(): TriggerType
+    fun payload(): ShotStateChunk?
+
+//    val trigger: TriggerType
+//    val payload: ShotStateChunk?
 
     // quick access for common attributes
-    val directionInitial: Vec3
-    val positionInitial: Vec3
-    var existing: Int
-    val speed: Double get() = getAttrOrProjDefault(CypherAttributes.SPEED)
-    val bounce: Int get() = getAttrOrProjDefault(CypherAttributes.BOUNCE).toInt()
-    val canBounce: Boolean
+//    val directionInitial: Vec3
+    fun getDirectionInitial(): Vec3
+//    val positionInitial: Vec3
+    fun getPositionInitial(): Vec3
+//    var existing: Int
+    fun getExisting(): Int
+    fun getSpeed(): Double
+    fun getBounce(): Int
+//    fun canBounce(): Boolean
+//    val speed: Double get() = getAttrOrProjDefault(CypherAttributes.SPEED)
+//    val bounce: Int get() = getAttrOrProjDefault(CypherAttributes.BOUNCE).toInt()
+    fun getGravityFactor(): Float
+    fun getSpeedFactor(): Float
+    /**
+     * used as a factor inside [rotateTowardSpeed],
+     * the higher the faster the entity will rotate, to face the direction the deltaMovement is pointed at
+     * */
+    fun getRotationSpeed(): Float
+    fun getEffectRadius(): Double
     /**
      * store bounce points triggered in one tick
      * */
     val bouncePoints: List<Vec3>
-    val bouncedThisTick: Boolean get() = bouncePoints.isNotEmpty()
-    val gravity: Float get() = getAttrOrProjDefault(CypherAttributes.GRAVITY_FACTOR).toFloat()
-    val speedFactor: Float get() = 1f - getAttrOrProjDefault(CypherAttributes.FRICTION_FACTOR).toFloat()
-    val rotationSpeed: Float
-    val effectRadius: Double get() = getAttrOrProjDefault(CypherAttributes.EFFECT_RADIUS)
+    val bouncedThisTick: Boolean
+    val canBounce: Boolean
+//    val gravity: Float get() = getAttrOrProjDefault(CypherAttributes.GRAVITY_FACTOR).toFloat()
+//    val speedFactor: Float get() = 1f - getAttrOrProjDefault(CypherAttributes.FRICTION_FACTOR).toFloat()
+//    val rotationSpeed: Float
+//    val effectRadius: Double get() = getAttrOrProjDefault(CypherAttributes.EFFECT_RADIUS)
+
 
     // attributes access functions
-    fun getAttribute(attr: CypherAttribute): Double? = attributeMap[attr]
-    fun getAttribute(holer: Holder<CypherAttribute>): Double? = getAttribute(holer.value())
-    /** get value through entity-specific map > cypher default > attribute default */
-    fun getAttrOrProjDefault(attr: CypherAttribute): Double = attributeMap[attr] ?: cypher.getAttrBaseOrDefault(attr)
-    /** get value through entity-specific map > cypher default > attribute default */
-    fun getAttrOrProjDefault(holer: Holder<CypherAttribute>): Double = getAttrOrProjDefault(holer.value())
+    fun attribute(attr: CypherAttribute): Double?
+    fun attribute(holer: Holder<CypherAttribute>): Double?
+    /**
+     * get value through entity-specific map > cypher default > attribute default
+     * */
+    fun attributeOrDefault(attr: CypherAttribute): Double
+    /**
+     * get value through entity-specific map > cypher default > attribute default
+     * */
+    fun attributeOrDefault(holer: Holder<CypherAttribute>): Double
 
     //
-    fun needCaptureSurrounding() = false
-    fun underwaterSpeedFactor() = 0.8f
-    fun inWallSpeedFactor() = 0.5f
-    fun bounceSpeedPenalty() = 0.9
+    fun needCaptureSurrounding(): Boolean
+    fun getUnderwaterSpeedFactor(): Float
+    fun getInWallSpeedFactor(): Float
+    fun getBounceSpeedPenalty(): Double
 
     fun trigger(type: TriggerType)
 
     fun discardCypher(reason: DiscardReason)
 
     // hooks // TODO extensive refactor
-    fun beforeDiscardBoth(reason: DiscardReason) {}
-    fun hitBoth(result: HitResult) {}
-    fun firstTickBoth() {}
-    fun tickBehaviorBoth() {}
-    fun tickFinalizeMovementBoth() {}
-    fun bounceBoth(bouncePoint: Vec3) {}
-    fun captureSurroundingBoth(captured: Entity) {}
-    fun lowSpeedBoth(count: Int) {
-        if (count < 40) return
-        if (speed > LOW_SPEED_THRESHOLD) {
-            discardCypher(DiscardReason.LOW_SPEED)
-        }
-    }
+    fun beforeDiscardBoth(reason: DiscardReason)
+    fun hitBoth(result: HitResult)
+    fun firstTickBoth()
+    fun tickBehaviorBoth()
+    fun tickFinalizeMovementBoth()
+    fun bounceBoth(bouncePoint: Vec3)
+    fun captureSurroundingBoth(captured: Entity)
+    fun lowSpeedBoth(count: Int)
 
     /**
      * should call inside Entity#tick, this handles all cypher-related logic
@@ -144,13 +166,7 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
     /**
      * use as general entity selector through [net.minecraft.world.level.Level.getEntities]
      * */
-    fun canHitTarget(target: Entity): Boolean {
-        if (!target.canBeHitByProjectile()) {
-            return false // vanilla logic, for item-entities
-        }
-        if (owner == target && notHaveFlag(CypherFlags.HURT_OWNER)) return false
-        return true
-    }
+    fun canHitTarget(target: Entity): Boolean
     /**
      * when the entity "hit" something,
      * both [net.minecraft.world.phys.EntityHitResult] and [net.minecraft.world.phys.BlockHitResult]
@@ -160,17 +176,11 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
     /**
      *
      * */
-    fun canHomeTarget(target: Entity): Boolean {
-        return target !is Animal
-                && target !is ItemEntity
-                && !target.isInvisible
-                && target.isAlive
-                && target != owner
-    }
+    fun canHomeTarget(target: Entity): Boolean
     /**
      *
      * */
-    fun whileHomeTarget(target: Entity) {}
+    fun whileHomeTarget(target: Entity)
 
     override fun getOwner(): Entity?
     fun setOwner(owner: Entity?)

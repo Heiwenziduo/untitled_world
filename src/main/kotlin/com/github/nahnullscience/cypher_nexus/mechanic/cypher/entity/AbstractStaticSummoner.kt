@@ -12,7 +12,7 @@ abstract class AbstractStaticSummoner(
     level: Level
 ) : DedicatedCypherProjectile(entityType, level) {
 
-    override var existing: Int = 2
+    override fun getExisting() = 2
 
     override fun beforeDiscardBoth(reason: DiscardReason) {
         summon()

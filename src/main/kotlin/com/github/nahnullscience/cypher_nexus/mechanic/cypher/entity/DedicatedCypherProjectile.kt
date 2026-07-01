@@ -11,7 +11,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.MOCC_STREAM
-import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.core.Holder
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
@@ -29,9 +28,11 @@ import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
-import net.minecraft.world.phys.*
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.EntityHitResult
+import net.minecraft.world.phys.HitResult
+import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn
-import java.util.*
 import java.util.function.Consumer
 
 abstract class DedicatedCypherProjectile(
@@ -74,9 +75,9 @@ abstract class DedicatedCypherProjectile(
 
     override fun writeSpawnData(buffer: RegistryFriendlyByteBuf) {
         // send when entity added to level
-        buffer.writeBoolean(ccMap != null) // write & read relay strictly on order, use a marker to tell client if a map follows
-        if (ccMap != null) {
-            MOCC_STREAM.encode(buffer, ccMap!!)
+        buffer.writeBoolean(ccMap() != null) // write & read relay strictly on order, use a marker to tell client if a map follows
+        if (ccMap() != null) {
+            MOCC_STREAM.encode(buffer, ccMap()!!)
         }
     }
 
@@ -85,7 +86,7 @@ abstract class DedicatedCypherProjectile(
         if (buffer.readBoolean()) {
             val ccMap = MOCC_STREAM.decode(buffer)
             initCypher(cypher, ccMap)
-        } else ccMap = null
+        }
     }
 
     override fun onAddedToLevel() {
@@ -100,6 +101,10 @@ abstract class DedicatedCypherProjectile(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     abstract override val cypherHolder: Holder<out AbstractProjectileCypher<out DedicatedCypherProjectile>>
+
+    private var _existing: Int? = null
+    override fun getExisting(): Int = _existing ?: attributeOrDefault(CypherAttributes.EXISTING).toInt()
+    fun setExisting(t: Int) = run { _existing = t }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // initialization
@@ -139,7 +144,7 @@ abstract class DedicatedCypherProjectile(
         super.onHitEntity(result)
         val target = result.entity
         if (notHaveFlag(CypherFlags.SKIP_DAMAGE_CHECK)) {
-            val damage = getAttrOrProjDefault(CypherAttributes.DAMAGE)
+            val damage = attributeOrDefault(CypherAttributes.DAMAGE)
             if (level() is ServerLevel)
                 target.hurtServer(level() as ServerLevel, damageSources().thrown(this, owner()), damage.toFloat())
         }
@@ -229,10 +234,10 @@ abstract class DedicatedCypherProjectile(
         CypherFlags.printFlag(enabledFlags)
 
         // modified AttrMap
-        attributeMap.forEach { (a, v) ->
+        attributeMap().forEach { (a, v) ->
             println("$a: $v")
         }
-        if (attributeMap.isEmpty()) println("projectile $cypher has no modified attributes")
+        if (attributeMap().isEmpty()) println("projectile $cypher has no modified attributes")
     }
 
     override fun hashCode() = super.hashCode()

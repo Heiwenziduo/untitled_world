@@ -45,7 +45,7 @@ object CypherNexus {
         LOGGER.log(level, supplier.invoke())
     }
     inline fun debugNetwork(level: Level = Level.DEBUG, supplier: () -> String) {
-        LOGGER.log(level, supplier.invoke())
+//        LOGGER.log(level, supplier.invoke())
     }
     inline fun debug(supplier: () -> String) {
         LOGGER.debug(supplier.invoke())

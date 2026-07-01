@@ -31,25 +31,37 @@ object ClientPayloadHandler {
         }.exceptionally {
             // Handle exception
             // context.disconnect(Component.translatable("my_mod.networking.failed", it.message)) // this kicks player out of the logical server
-            CypherNexus.LOGGER.warn(it.message)
+            CypherNexus.debugNetwork { it.message.toString() }
             return@exceptionally null
         }
     }
 
     fun syncWandInstance(data: ClientboundSyncWandInstance, context: IPayloadContext) {
         CypherNexus.debugNetwork { "client receive package -> syncWandInstance: \n$data" }
-        val player = context.player()
-        player.getData(WAND_DATA_MAP)[data.uuid]?.syncInvokingDataClient(
-            data.mana,
-            data.delay,
-            data.recharge,
-            data.deck
-        )
+
+        context.enqueueWork {
+            val player = context.player()
+            player.getData(WAND_DATA_MAP)[data.uuid]?.syncInvokingDataClient(
+                data.mana,
+                data.delay,
+                data.recharge,
+                data.deck
+            )
+        }.exceptionally {
+            CypherNexus.debugNetwork { it.message.toString() }
+            return@exceptionally null
+        }
     }
 
     fun editWandCyphersConfirm(data: ClientboundEditWandCyphersConfirm, context: IPayloadContext) {
         CypherNexus.debugNetwork { "client receive package -> editWandCyphersConfirm: \n$data" }
-        val player = context.player()
-        player.getData(WAND_DATA_MAP)[data.uuid]?.updateAoc(data.cyphers)
+
+        context.enqueueWork {
+            val player = context.player()
+            player.getData(WAND_DATA_MAP)[data.uuid]?.updateAoc(data.cyphers)
+        }.exceptionally {
+            CypherNexus.debugNetwork { it.message.toString() }
+            return@exceptionally null
+        }
     }
 }

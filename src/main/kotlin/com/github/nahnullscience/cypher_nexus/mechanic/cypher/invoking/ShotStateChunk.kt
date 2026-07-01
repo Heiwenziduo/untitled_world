@@ -50,6 +50,7 @@ class ShotStateChunk private constructor (
     private set
 
     fun release(level: Level, directInvoker: Entity?, owner: Entity?, posDire: PosDirePair, itemWand: ItemWandInstance?) {
+        if (charge-- <= 0) return
         if (dirty) compute()
 
         println("${level.isClientSide} client mocc: $_countMap")
@@ -67,7 +68,6 @@ class ShotStateChunk private constructor (
 
         // handle entities only on server
         if (level !is ServerLevel) return
-        if (charge-- <= 0) return
         for ((i, node) in projectiles.withIndex()) {
 
             val proj = node.instance.createProjectile(
