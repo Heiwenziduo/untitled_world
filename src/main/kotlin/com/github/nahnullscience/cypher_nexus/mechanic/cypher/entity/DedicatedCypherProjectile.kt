@@ -93,6 +93,11 @@ abstract class DedicatedCypherProjectile(
         super.onAddedToLevel()
     }
 
+    override fun onRemovedFromLevel() {
+//        println("$this about to remove")
+        super.onRemovedFromLevel()
+    }
+
     override fun sendPairingData(serverPlayer: ServerPlayer, bundleBuilder: Consumer<CustomPacketPayload>) {
         super.sendPairingData(serverPlayer, bundleBuilder)
     }
@@ -129,7 +134,7 @@ abstract class DedicatedCypherProjectile(
         super.onHit(result) // distribute hitResult
         hitBoth(result)
         if (level().isClientSide) return
-        trigger(TriggerType.COLLISION)
+//        trigger(TriggerType.COLLISION,,)
 
         val canPierce =
             result is BlockHitResult && haveFlag(CypherFlags.IGNORE_BLOCK) ||

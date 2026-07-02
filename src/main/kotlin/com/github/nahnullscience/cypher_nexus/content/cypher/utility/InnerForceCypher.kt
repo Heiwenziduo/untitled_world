@@ -28,7 +28,7 @@ object InnerForceCypher : AbstractNonProjectileCypher(), ServerInvokeRedirectPos
         pair: PosDirePair,
         index: Int
     ): PosDirePair where CypherBeforeInit : Entity, CypherBeforeInit : ICypherBeforeInit {
-        owner?: return pair
+        owner ?: return pair
         return PosDirePair(owner.eyePosition, owner.eyePosition.vectorTo(pair.position))
     }
 }

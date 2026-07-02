@@ -4,7 +4,6 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
@@ -16,9 +15,7 @@ import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.core.Holder
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.TraceableEntity
-import net.minecraft.world.entity.animal.Animal
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.neoforged.bus.api.EventPriority
@@ -145,7 +142,7 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
     fun getInWallSpeedFactor(): Float
     fun getBounceSpeedPenalty(): Double
 
-    fun trigger(type: TriggerType)
+    fun trigger(type: TriggerType, releaseTo: PosDirePair)
 
     fun discardCypher(reason: DiscardReason)
 

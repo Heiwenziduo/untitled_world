@@ -36,6 +36,8 @@ import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EntitySelector
+import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.animal.Animal
 import net.minecraft.world.level.ClipContext
@@ -63,9 +65,10 @@ open class CypherEntityBasics <CY> : ICypherEntity where CY : Entity, CY : ICyph
     }
 
     private var _cyEntity: CY? = null
-    val cyEntity: CY get() = _cyEntity ?:
+    protected val cyEntity: CY get() = _cyEntity ?:
     throw CypherEntityInitializationException("CypherEntityDelegation failed to initialize! make sure call #initEntity before it's adding to world!")
-    val level get() = cyEntity.level()
+    protected val level get() = cyEntity.level()
+    protected val random get() = cyEntity.random
     override val cypherHolder: Holder<out AbstractProjectileCypher<*>> get() = cyEntity.cypherHolder // FIXME this may lead to infinite loop
 
     /** no flag by default */
@@ -92,7 +95,7 @@ open class CypherEntityBasics <CY> : ICypherEntity where CY : Entity, CY : ICyph
     override fun getDirectionInitial(): Vec3 = _initDirection ?: Vec3.ZERO
     override fun getPositionInitial(): Vec3  = _initPosition ?: Vec3.ZERO
     override fun getExisting(): Int = attributeOrDefault(CypherAttributes.EXISTING).toInt()
-    override fun getSpeed(): Double = attributeOrDefault(CypherAttributes.EXISTING)
+    override fun getSpeed(): Double = attributeOrDefault(CypherAttributes.SPEED)
     override fun getBounce(): Int = attributeOrDefault(CypherAttributes.BOUNCE).toInt()
     override fun getGravityFactor(): Float = attributeOrDefault(CypherAttributes.GRAVITY_FACTOR).toFloat()
     override fun getSpeedFactor(): Float = 1f - attributeOrDefault(CypherAttributes.FRICTION_FACTOR).toFloat()
@@ -159,14 +162,15 @@ open class CypherEntityBasics <CY> : ICypherEntity where CY : Entity, CY : ICyph
 
 
     private fun initDirection() {
+        // TODO position setting needs to be polished
         if (level.isClientSide) return
-        _initDirection = _initDirection?.normalize() ?: cyEntity.owner?.lookAngle?.normalize()
+        _initDirection = _initDirection?.normalize() ?: cyEntity.owner?.headLookAngle?.normalize()
         if (cyEntity.getDirectionInitial() != Vec3.ZERO){
             cyEntity.deltaMovement = cyEntity.getDirectionInitial().scale(cyEntity.getSpeed())
-            // FIXME inertia behavior seems strange
         } else {
             cyEntity.deltaMovement = Vec3.ZERO
         }
+        _initPosition?.let { cyEntity.setPos(it) }
     }
 
     protected open fun captureSurroundings() {
@@ -271,20 +275,23 @@ open class CypherEntityBasics <CY> : ICypherEntity where CY : Entity, CY : ICyph
         cyEntity.lowSpeedBoth(count)
     }
 
-    private fun releasePayload(posDire: PosDirePair) = payload?.release(level, cyEntity, cyEntity.owner, posDire, null)
-    override fun trigger(type: TriggerType) {
-        if (trigger == TriggerType.NONE || type != trigger) return
-        val to = when(type) {
-            // TODO apply a random offset
-            TriggerType.COLLISION -> PosDirePair(cyEntity.position(), cyEntity.deltaMovement.reverse())
-            else -> PosDirePair(cyEntity.position(), cyEntity.deltaMovement)
-        }
-        releasePayload(to)
+    override fun trigger(type: TriggerType, releaseTo: PosDirePair) {
+        if (trigger == TriggerType.NONE || type != trigger || payload == null) return
+        payload!!.release(level, cyEntity, cyEntity.owner, releaseTo, null)
     }
+    protected fun trigger(type: TriggerType, releasePoint: Vec3) {
+        when (type) {
+            TriggerType.COLLISION ->
+                trigger(type, PosDirePair(releasePoint, cyEntity.deltaMovement.reverse()))
+            else ->
+                trigger(type, PosDirePair(releasePoint, cyEntity.deltaMovement))
+        }
+    }
+
 
     override fun discardCypher(reason: DiscardReason) {
         if (level.isClientSide) return
-        trigger(TriggerType.DEATH)
+        trigger(TriggerType.DEATH, cyEntity.position())
         when(reason){
             DiscardReason.ERASE -> {}
             else -> {
@@ -318,12 +325,23 @@ open class CypherEntityBasics <CY> : ICypherEntity where CY : Entity, CY : ICyph
 
     override fun doTick() {
         Profiler.get().push("cypherEntityTick")
+//        if (level.isClientSide && cyEntity.tickCount and 4 == 4) {
+//            println(cyEntity)
+//        }
+
 
         captureSurroundings()
         if (cyEntity.firstTick) {
             onFirstTickBoth()
         }
-        if (cyEntity.tickCount == 20) trigger(TriggerType.TIMER_20)
+        when (cyEntity.tickCount) {
+            5 -> trigger(TriggerType.TIMER_5, cyEntity.position())
+            10 -> trigger(TriggerType.TIMER_10, cyEntity.position())
+            20 -> trigger(TriggerType.TIMER_20, cyEntity.position())
+            40 -> trigger(TriggerType.TIMER_40, cyEntity.position())
+            70 -> trigger(TriggerType.TIMER_70, cyEntity.position())
+            200 -> trigger(TriggerType.TIMER_200, cyEntity.position())
+        }
 
         hooksSharedData.tick(cyEntity)
         if (moveAsProjectile) projectileTick()
@@ -405,7 +423,7 @@ open class CypherEntityBasics <CY> : ICypherEntity where CY : Entity, CY : ICyph
                     ) { target ->
                         val hitPoint = stepPosition.rayCast(destination, target.boundingBox, HIT_BB_INFLATION)
                         if (hitPoint != null) {
-                            whenHit(EntityHitResult(target, hitPoint))
+                            whenHitDelegate(EntityHitResult(target, hitPoint))
                         }
                     }
                 } else {
@@ -437,7 +455,7 @@ open class CypherEntityBasics <CY> : ICypherEntity where CY : Entity, CY : ICyph
                     }
 
                     if (hitEntityTmp != null) {
-                        whenHit(EntityHitResult(hitEntityTmp, destination))
+                        whenHitDelegate(EntityHitResult(hitEntityTmp, destination))
                         bouncePoint = destination
                     }
                 }
@@ -446,7 +464,7 @@ open class CypherEntityBasics <CY> : ICypherEntity where CY : Entity, CY : ICyph
             // bounce from the point
             if (bouncePoint != null) {
                 loopContinue = true
-                if (blockResult?.location == bouncePoint) whenHit(blockResult)
+                if (blockResult?.location == bouncePoint) whenHitDelegate(blockResult)
 
                 if (canBounce) {
                     bounceCount++
@@ -486,7 +504,6 @@ open class CypherEntityBasics <CY> : ICypherEntity where CY : Entity, CY : ICyph
             // EventHooks.onProjectileImpact(this, hitResultStep), maybe get a result from broadcast
 //            if (!level().isClientSide) println("loop$bounce: \n$hitResultStep\n$startPosStep\n$deltaMoveStep")
 
-            // FIXME image a situation that one proj with bounce can pierce block but can not pierce entity, it should bounce back when an entity stand behind a wall
 //            onHit(hitResultStep) // or hitTargetOrDeflectSelf(hitResult)
             val canPierce = hitResultStep is BlockHitResult && haveFlag(CypherFlags.IGNORE_BLOCK)
                     || hitResultStep is EntityHitResult && haveFlag(CypherFlags.PIERCE_ENTITY)
@@ -534,23 +551,34 @@ open class CypherEntityBasics <CY> : ICypherEntity where CY : Entity, CY : ICyph
         return true
     }
 
+    // in case subclasses want to override whenHit
+    protected fun whenHitDelegate(result: HitResult) = cyEntity.whenHit(result)
     override fun whenHit(result: HitResult) {
         onHitBoth(result)
-        if (level.isClientSide) return
-        trigger(TriggerType.COLLISION)
+        if (level.isClientSide || result.type == Type.MISS) return
+        trigger(TriggerType.COLLISION, result.location)
 
         // TODO
+        if (result is EntityHitResult && !canBounce && notHaveFlag(CypherFlags.PIERCE_ENTITY)) {
+            discardCypher(DiscardReason.HIT_ENTITY)
+        }
+        else if (result is BlockHitResult && !canBounce) {
+            discardCypher(DiscardReason.HIT_BLOCK)
+        }
     }
 
     override fun canHomeTarget(target: Entity): Boolean {
         return canHitTarget(target)
                 && target is LivingEntity
                 && target !is Animal
-//                && target !is ItemEntity
+                && target !is ICypherEntity
+                && EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(target)
                 && !target.isInvisible
+                && !target.isInvulnerable
                 && target.isAlive
                 && target != owner
                 && target != cyEntity.owner
+                && !target.`is`(EntityType.ARMOR_STAND)
     }
 
     override fun whileHomeTarget(target: Entity) {}

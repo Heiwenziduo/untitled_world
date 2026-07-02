@@ -104,8 +104,9 @@ abstract class AbstractItemWand(
         val tip = run {
             getWandData(stack ?: return@run 0.8).invariable.chunkF.wandLength.toDouble()
         }
-        val dire = invoker.lookAngle
-        val pos = invoker.eyePosition.add(dire.scale(tip))
+        val dire = invoker.headLookAngle
+        val scale = tip + invoker.knownMovement.dot(dire).coerceAtLeast(0.0) // solve inertia problem
+        val pos = invoker.eyePosition.add(dire.scale(scale))
         return PosDirePair(pos, dire)
     }
 

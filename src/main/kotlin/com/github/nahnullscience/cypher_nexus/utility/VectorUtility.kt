@@ -2,14 +2,13 @@ package com.github.nahnullscience.cypher_nexus.utility
 
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
+import net.minecraft.util.RandomSource
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.min
-import kotlin.math.sin
-import kotlin.math.sqrt
+import org.joml.Quaternionf
+import org.joml.Vector3f
+import kotlin.math.*
+
 
 object VectorUtility {
     fun getDireFromHit(hitPoint: Vec3?, aabb: AABB): Direction? {
@@ -42,6 +41,7 @@ fun Vec3.toSameDire(to: Vec3): Vec3 {
 
 /**
  * Rotates this vector towards the target vector's direction by at most [maxAngleRadians].
+ *
  * The original length of this vector is preserved.
  */
 fun Vec3.rotateTowards(target: Vec3, maxAngleRadians: Double): Vec3 {
@@ -75,5 +75,57 @@ fun Vec3.rotateTowards(target: Vec3, maxAngleRadians: Double): Vec3 {
         this.y * c + wY * scaleW,
         this.z * c + wZ * scaleW
     )
+}
+
+/**
+ * @return normalized vector randomly distributed within a shape of cone
+ * */
+fun Vec3.randomInCone(maxAngle: Double, random: RandomSource): Vec3 {
+    val vf = this.toVector3f().randomInCone(maxAngle, random)
+    return Vec3(vf.x.toDouble(), vf.y.toDouble(), vf.z.toDouble())
+}
+
+/**
+ * Generates a random vector within a cone around an initial arbitrary vector.
+ * No normalize needed for the initial vector
+ * @param maxAngle The maximum spread angle in Degree.
+ * @param random [RandomSource]
+ * @return A new normalized Vector3f pointing somewhere inside the cone.
+ */
+fun Vector3f.randomInCone(maxAngle: Double, random: RandomSource): Vector3f {
+    val r = Math.toRadians(maxAngle).coerceIn(0.0, PI) // the meaningful domain is [0, pi]
+
+
+    // 1. Calculate the local uniform random vector in a Z-up cone
+    val u1: Float = random.nextFloat()
+    val u2: Float = random.nextFloat()
+
+
+    // Use cosine distribution to avoid clumping at the center
+    val z = 1.0f - u2 * (1.0f - cos(r).toFloat())
+    val xyMag = sqrt((1.0f - z * z).toDouble()).toFloat()
+    val theta = 2.0f * Math.PI.toFloat() * u1
+
+    val x = xyMag * cos(theta.toDouble()).toFloat()
+    val y = xyMag * sin(theta.toDouble()).toFloat()
+
+    val localRandomDir = Vector3f(x, y, z)
+
+
+    // 2. Prepare the target rotation
+    val standardZ = Vector3f(0f, 0f, 1f)
+    val targetDir = Vector3f(this).normalize()
+
+
+    // 3. Overcome Gimbal Lock using JOML's Quaternionf.
+    // rotationTo() automatically calculates the single arbitrary axis and angle
+    // needed to rotate standardZ into targetDir, bypassing Euler angles completely!
+    val rotationQuat = Quaternionf().rotationTo(standardZ, targetDir)
+
+
+    // 4. Apply the Quaternion rotation to our local vector
+    localRandomDir.rotate(rotationQuat)
+
+    return localRandomDir
 }
 

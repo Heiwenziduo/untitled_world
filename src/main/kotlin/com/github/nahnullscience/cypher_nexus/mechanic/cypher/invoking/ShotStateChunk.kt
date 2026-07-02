@@ -12,10 +12,13 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstanc
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.randomInCone
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import java.util.*
+import kotlin.math.acos
 
 class ShotStateChunk private constructor (
     private var charge: Int,
@@ -51,25 +54,27 @@ class ShotStateChunk private constructor (
 
     fun release(level: Level, directInvoker: Entity?, owner: Entity?, posDire: PosDirePair, itemWand: ItemWandInstance?) {
         if (charge-- <= 0) return
+
+        Profiler.get().push("cypherEntityInitialization")
         if (dirty) compute()
 
         println("${level.isClientSide} client mocc: $_countMap")
         // do recoil only on root
-        run {
-            itemWand ?: return@run
-            directInvoker ?: return@run
-            val recoilMap = computedOperationMap[CypherAttributes.RECOIL.value()] ?: return@run
-            val recoilModule = itemWand.module(RECOIL) ?: return@run
+        run recoil@ {
+            itemWand ?: return@recoil
+            directInvoker ?: return@recoil
+            val recoilMap = computedOperationMap[CypherAttributes.RECOIL.value()] ?: return@recoil
+            val recoilModule = itemWand.module(RECOIL) ?: return@recoil
 
-            var recoil = AttributeOperator.attributeCalculator(recoilMap, 0.0)
+            var recoil = AttributeOperator.attributeCalculator(recoilMap, CypherAttributes.RECOIL.value().defaultValue)
             recoil = CypherAttributes.RECOIL.value().restrictRange(recoil)
             recoilModule.recoil(directInvoker, recoil, posDire)
         }
 
         // handle entities only on server
         if (level !is ServerLevel) return
-        for ((i, node) in projectiles.withIndex()) {
 
+        for ((i, node) in projectiles.withIndex()) {
             val proj = node.instance.createProjectile(
                 level,
                 owner,
@@ -77,12 +82,34 @@ class ShotStateChunk private constructor (
                 posDire.direction,
                 this,
                 node,
-                hooks)
+                hooks
+            )
 
-            val newPosPair = hooks.cumulateHooks(CypherBehaviorHooks.INVOKE_REDIRECT_POS_SERVER, posDire)
-            { h, l, pair -> h.redirectPosDireServer(level, directInvoker, owner, proj, l, pair, i) }
+            val newPosPair = hooks.cumulateHooks(
+                CypherBehaviorHooks.INVOKE_REDIRECT_POS_SERVER,
+                posDire
+            ) { h, l, pair ->
+                h.redirectPosDireServer(level, directInvoker, owner, proj, l, pair, i)
+            }
 
-            proj.initDirection(newPosPair)
+            var dire = newPosPair.direction
+            run spread@ {
+                val random = owner?.random ?: directInvoker?.random ?: return@spread
+                val spreadMap = computedOperationMap[CypherAttributes.SPREAD.value()] ?: return@spread
+
+                val spread = AttributeOperator.attributeCalculator(spreadMap, CypherAttributes.SPREAD.value().defaultValue)
+                    .let { CypherAttributes.SPREAD.value().restrictRange(it) }
+                if (spread > 0.01)
+                    dire = newPosPair.direction.randomInCone(spread / 2, random)
+//                        .also { println("dire: $dire -> $it, " +
+//                                "actual scatter: ${Math.toDegrees(acos(dire.normalize().dot(it.normalize())))}, " +
+//                                "spread: $spread") }
+            }
+
+            // TODO consider let PosPair mutable, create too much
+            proj.initDirection(PosDirePair(newPosPair.position, dire))
+
+            Profiler.get().pop()
             level.addFreshEntity(proj)
         }
     }
