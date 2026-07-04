@@ -13,12 +13,12 @@ import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.randomInCone
+import net.minecraft.core.Holder
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import java.util.*
-import kotlin.math.acos
 
 class ShotStateChunk private constructor (
     private var charge: Int,
@@ -30,8 +30,8 @@ class ShotStateChunk private constructor (
     }
     /** normal chunk can only release once */
     constructor(charge: Int = 1): this(charge, null)
-    constructor(mocc: MapOfCypherCounts): this() {
-        _countMap = mocc
+    constructor(ccMap: MapOfCypherCounts): this() {
+        _countMap = ccMap
     }
 
 
@@ -57,8 +57,8 @@ class ShotStateChunk private constructor (
 
         Profiler.get().push("cypherEntityInitialization")
         if (dirty) compute()
+        println("${level.isClientSide} client ccMap: $_countMap")
 
-        println("${level.isClientSide} client mocc: $_countMap")
         // do recoil only on root
         run recoil@ {
             itemWand ?: return@recoil
@@ -74,25 +74,24 @@ class ShotStateChunk private constructor (
         // handle entities only on server
         if (level !is ServerLevel) return
 
+        // apply invoking redirection
+        val hookedPosDire = hooks.cumulateHooks(
+            CypherBehaviorHooks.INVOKE_REDIRECT_POS_SERVER,
+            posDire
+        ) { h, l, pair ->
+            h.redirectPosDireServer(level, directInvoker, owner, l, pair, 0)
+        }
+
         for ((i, node) in projectiles.withIndex()) {
             val proj = node.instance.createProjectile(
                 level,
                 owner,
-                posDire.position,
-                posDire.direction,
                 this,
                 node,
                 hooks
             )
 
-            val newPosPair = hooks.cumulateHooks(
-                CypherBehaviorHooks.INVOKE_REDIRECT_POS_SERVER,
-                posDire
-            ) { h, l, pair ->
-                h.redirectPosDireServer(level, directInvoker, owner, proj, l, pair, i)
-            }
-
-            var dire = newPosPair.direction
+            var dire = hookedPosDire.direction
             run spread@ {
                 val random = owner?.random ?: directInvoker?.random ?: return@spread
                 val spreadMap = computedOperationMap[CypherAttributes.SPREAD.value()] ?: return@spread
@@ -100,14 +99,14 @@ class ShotStateChunk private constructor (
                 val spread = AttributeOperator.attributeCalculator(spreadMap, CypherAttributes.SPREAD.value().defaultValue)
                     .let { CypherAttributes.SPREAD.value().restrictRange(it) }
                 if (spread > 0.01)
-                    dire = newPosPair.direction.randomInCone(spread / 2, random)
+                    dire = hookedPosDire.direction.randomInCone(spread / 2, random)
 //                        .also { println("dire: $dire -> $it, " +
 //                                "actual scatter: ${Math.toDegrees(acos(dire.normalize().dot(it.normalize())))}, " +
 //                                "spread: $spread") }
             }
 
             // TODO consider let PosPair mutable, create too much
-            proj.initDirection(PosDirePair(newPosPair.position, dire))
+            proj.initDirection(PosDirePair(hookedPosDire.position, dire))
 
             Profiler.get().pop()
             level.addFreshEntity(proj)
@@ -176,5 +175,9 @@ class ShotStateChunk private constructor (
 
         dirty = false
         return this
+    }
+
+    inner class StateAttributeAccessor {
+        fun getAttribute(attr: Holder<CypherAttribute>) = computedOperationMap[attr.value()]
     }
 }

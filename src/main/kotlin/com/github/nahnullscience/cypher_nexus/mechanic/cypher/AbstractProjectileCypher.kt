@@ -24,8 +24,6 @@ abstract class AbstractProjectileCypher <CY> : AbstractCypher() where CY : Entit
     open fun createProjectile(
         level: ServerLevel,
         invoker: Entity?,
-        startPos: Vec3,
-        direction: Vec3?,
         shootState: ShotStateChunk,
         node: ProjectileNode,
         stateHooks: HookContainer?
@@ -35,11 +33,9 @@ abstract class AbstractProjectileCypher <CY> : AbstractCypher() where CY : Entit
             projectileType.get(),
             level,
             invoker,
-            direction,
             shootState,
             node,
         )
-        proj.setPos(startPos)
         return proj
     }
 

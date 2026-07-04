@@ -19,7 +19,7 @@ object SpawnEggCypher : ProjectileCypher<DedicatedCypherProjectile>() {
         return super.defaultAttributes()
             .manaDrain(20f)
             .draw(1)
-            .flags(CypherFlags.PHYSICS)
+            .flags(CypherFlags.LINGER)
             .projectileAttr(CypherAttributes.SPEED, 1.0)
             .projectileAttr(CypherAttributes.EXISTING, 300.0)
             .projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)

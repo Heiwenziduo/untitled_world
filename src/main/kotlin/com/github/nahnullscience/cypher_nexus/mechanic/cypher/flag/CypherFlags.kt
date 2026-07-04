@@ -39,7 +39,7 @@ enum class CypherFlags : IFlagExtension.IFlagEnum {
     IGNORE_BLOCK,
 
     /**
-     * ignore all collision, disable physics even with flag [PHYSICS] present
+     * ignore all collision, disable physics
      * */
     PENETRATE_WORLD,
 
@@ -67,10 +67,10 @@ enum class CypherFlags : IFlagExtension.IFlagEnum {
     WITH_ENDER_POWER,
 
     /**
-     *
+     * keep existence even speed is low
      * */
     // TODO
-    PHYSICS,
+    LINGER,
 
     /**
      * let the projectile movement client-authoritative, if the owner is client-authoritative
@@ -83,6 +83,10 @@ enum class CypherFlags : IFlagExtension.IFlagEnum {
     // TODO
     EXPLOSIVE,
 
+    /**
+     * do not play server sound
+     * */
+    SILENT
 
     ;
     override val value: Int = 1 shl ordinal

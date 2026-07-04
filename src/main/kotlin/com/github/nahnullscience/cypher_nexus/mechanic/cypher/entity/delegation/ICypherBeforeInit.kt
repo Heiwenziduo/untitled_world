@@ -30,9 +30,5 @@ interface ICypherBeforeInit {
     /**
      *
      * */
-    fun initDirection(direction: Vec3? = null)
-    /**
-     *
-     * */
     fun initDirection(pair: PosDirePair)
 }

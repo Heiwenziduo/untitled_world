@@ -213,7 +213,7 @@
       "delay": 0,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 50.0,
+      "manaDrain": 24.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {

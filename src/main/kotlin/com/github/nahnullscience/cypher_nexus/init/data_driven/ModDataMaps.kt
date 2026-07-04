@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.init
+package com.github.nahnullscience.cypher_nexus.init.data_driven
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers

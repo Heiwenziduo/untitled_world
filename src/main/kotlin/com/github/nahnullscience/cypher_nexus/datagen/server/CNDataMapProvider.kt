@@ -1,6 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.datagen.server
 
-import com.github.nahnullscience.cypher_nexus.init.ModDataMaps
+import com.github.nahnullscience.cypher_nexus.init.data_driven.ModDataMaps
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import net.minecraft.core.HolderLookup
 import net.minecraft.data.PackOutput

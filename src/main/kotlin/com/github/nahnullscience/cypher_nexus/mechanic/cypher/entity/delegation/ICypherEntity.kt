@@ -13,9 +13,13 @@ import com.github.nahnullscience.cypher_nexus.utility.EntityUtil.rotateTowardSpe
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import net.minecraft.core.Direction
 import net.minecraft.core.Holder
+import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.TraceableEntity
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.neoforged.bus.api.EventPriority
@@ -72,16 +76,12 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
     /**
      *
      * */
-    override fun initDirection(direction: Vec3?)
-    /**
-     *
-     * */
     override fun initDirection(pair: PosDirePair)
 
-    //    val attributeMap: Map<CypherAttribute, Double>
-    fun attributeMap(): Map<CypherAttribute, Double>
+    override fun getOwner(): Entity?
+    fun setOwner(owner: Entity?)
 
-//    val hooks: HookContainer?
+    fun attributeMap(): Map<CypherAttribute, Double>
     fun hooks(): HookContainer?
     val hooksSharedData: HooksSharedData<*>
     fun hooksSharedData(): HooksSharedData<*>
@@ -89,40 +89,36 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
     fun triggerType(): TriggerType
     fun payload(): ShotStateChunk?
 
-//    val trigger: TriggerType
-//    val payload: ShotStateChunk?
-
-    // quick access for common attributes
-//    val directionInitial: Vec3
+    //
     fun getDirectionInitial(): Vec3
-//    val positionInitial: Vec3
     fun getPositionInitial(): Vec3
-//    var existing: Int
+    fun getDamage(): Double
     fun getExisting(): Int
     fun getSpeed(): Double
     fun getBounce(): Int
-//    fun canBounce(): Boolean
-//    val speed: Double get() = getAttrOrProjDefault(CypherAttributes.SPEED)
-//    val bounce: Int get() = getAttrOrProjDefault(CypherAttributes.BOUNCE).toInt()
     fun getGravityFactor(): Float
     fun getSpeedFactor(): Float
+    fun getEffectRadius(): Double
     /**
      * used as a factor inside [rotateTowardSpeed],
      * the higher the faster the entity will rotate, to face the direction the deltaMovement is pointed at
      * */
     fun getRotationSpeed(): Float
-    fun getEffectRadius(): Double
+    fun getUnderwaterSpeedFactor(): Float
+    fun getInWallSpeedFactor(): Float
+    fun getBounceSpeedPenalty(): Double
+    fun needCaptureSurrounding(): Boolean
+    /**
+     *
+     * */
+    fun getDamageSource(): DamageSource
+
     /**
      * store bounce points triggered in one tick
      * */
     val bouncePoints: List<Vec3>
     val bouncedThisTick: Boolean
     val canBounce: Boolean
-//    val gravity: Float get() = getAttrOrProjDefault(CypherAttributes.GRAVITY_FACTOR).toFloat()
-//    val speedFactor: Float get() = 1f - getAttrOrProjDefault(CypherAttributes.FRICTION_FACTOR).toFloat()
-//    val rotationSpeed: Float
-//    val effectRadius: Double get() = getAttrOrProjDefault(CypherAttributes.EFFECT_RADIUS)
-
 
     // attributes access functions
     fun attribute(attr: CypherAttribute): Double?
@@ -135,12 +131,6 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
      * get value through entity-specific map > cypher default > attribute default
      * */
     fun attributeOrDefault(holer: Holder<CypherAttribute>): Double
-
-    //
-    fun needCaptureSurrounding(): Boolean
-    fun getUnderwaterSpeedFactor(): Float
-    fun getInWallSpeedFactor(): Float
-    fun getBounceSpeedPenalty(): Double
 
     fun trigger(type: TriggerType, releaseTo: PosDirePair)
 
@@ -167,9 +157,13 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
     /**
      * when the entity "hit" something,
      * both [net.minecraft.world.phys.EntityHitResult] and [net.minecraft.world.phys.BlockHitResult]
-     * will be passed into this method. this method is called on both sides
+     * will be passed into this method.
+     *
+     * this method is called on both sides
      * */
-    fun whenHit(result: HitResult)
+    fun whenHit(result: HitResult, direction: Direction)
+    fun whenHitEntity(result: EntityHitResult, direction: Direction)
+    fun whenHitBlock(result: BlockHitResult, direction: Direction)
     /**
      *
      * */
@@ -178,7 +172,4 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
      *
      * */
     fun whileHomeTarget(target: Entity)
-
-    override fun getOwner(): Entity?
-    fun setOwner(owner: Entity?)
 }

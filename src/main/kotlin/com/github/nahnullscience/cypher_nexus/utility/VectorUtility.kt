@@ -10,23 +10,23 @@ import org.joml.Vector3f
 import kotlin.math.*
 
 
-object VectorUtility {
-    fun getDireFromHit(hitPoint: Vec3?, aabb: AABB): Direction? {
-        if (hitPoint == null) return null
-        val epsilon = 1e-5
-        return when {
-            abs(hitPoint.x - aabb.minX) < epsilon -> Direction.WEST
-            abs(hitPoint.x - aabb.maxX) < epsilon -> Direction.EAST
-            abs(hitPoint.y - aabb.minY) < epsilon -> Direction.DOWN
-            abs(hitPoint.y - aabb.maxY) < epsilon -> Direction.UP
-            abs(hitPoint.z - aabb.minZ) < epsilon -> Direction.NORTH
-            abs(hitPoint.z - aabb.maxZ) < epsilon -> Direction.SOUTH
-            else -> null
-        }
+fun Vec3.toVec3i() = Vec3i(x.toInt(), y.toInt(), z.toInt())
+
+/**
+ * @return the surface of AABB the vector lies, null if they don't overlap
+ * */
+fun Vec3.getSurfaceOf(aabb: AABB): Direction? {
+    val epsilon = 1e-5
+    return when {
+        abs(x - aabb.minX) < epsilon -> Direction.WEST
+        abs(x - aabb.maxX) < epsilon -> Direction.EAST
+        abs(y - aabb.minY) < epsilon -> Direction.DOWN
+        abs(y - aabb.maxY) < epsilon -> Direction.UP
+        abs(z - aabb.minZ) < epsilon -> Direction.NORTH
+        abs(z - aabb.maxZ) < epsilon -> Direction.SOUTH
+        else -> null
     }
 }
-
-fun Vec3.toVec3i() = Vec3i(x.toInt(), y.toInt(), z.toInt())
 
 /**
  * @return new V3 xyz value same as "from", symbol same as "to"

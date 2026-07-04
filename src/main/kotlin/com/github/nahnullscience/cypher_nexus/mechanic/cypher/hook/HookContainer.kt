@@ -56,6 +56,7 @@ class HookContainer (
         if (parentMap.isNullOrEmpty()) return childMap
         if (childMap.isEmpty()) return parentMap
 
+        // TODO polish required, try pass in lambda and execute on-site and avoid new map creation
         // pre-allocate the capacity to avoid the internal array resizing overhead
         val merged = HashMap<T, Int>(parentMap.size + childMap.size)
         merged.putAll(parentMap)

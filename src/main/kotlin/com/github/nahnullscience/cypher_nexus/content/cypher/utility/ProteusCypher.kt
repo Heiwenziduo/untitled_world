@@ -39,7 +39,7 @@ object ProteusCypher : AbstractNonProjectileCypher(), IRecursiveCypher {
         if (state.drawEnabled)
             drawXForEach(helper, draw) { index, cypher ->
                 cypher.invokeInHand(helper, chunk, data, state)
-                if (cypher is ProteusCypher) data.manaCurrent += 100f
+                if (cypher is ProteusCypher) data.manaCurrent += 80f
                 else copyCypher(cypher, helper, chunk, data, state, index)
             }
     }

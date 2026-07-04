@@ -13,7 +13,9 @@ object EntityUtil {
         return true
     }
 
-    /** a direct duplication of #updateRotation in Projectile */
+    /**
+     * a direct duplication of #updateRotation in Projectile
+     * */
     fun Entity.rotateTowardSpeed(factor: Float) {
         val movement = this.deltaMovement
         val sd = movement.horizontalDistance()

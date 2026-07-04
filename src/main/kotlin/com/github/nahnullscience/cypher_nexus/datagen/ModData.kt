@@ -5,6 +5,9 @@ import com.github.nahnullscience.cypher_nexus.datagen.client.CNModelProvider
 import com.github.nahnullscience.cypher_nexus.datagen.server.CNAdvancementProviders
 import com.github.nahnullscience.cypher_nexus.datagen.server.CNDataMapProvider
 import com.github.nahnullscience.cypher_nexus.datagen.server.CNLootTableProviders
+import com.github.nahnullscience.cypher_nexus.init.data_driven.ModDamageTypes
+import net.minecraft.core.RegistrySetBuilder
+import net.minecraft.core.registries.Registries
 import net.minecraft.data.advancements.AdvancementProvider
 import net.minecraft.data.loot.LootTableProvider
 import net.neoforged.bus.api.SubscribeEvent
@@ -40,6 +43,11 @@ object ModData {
         event.createProvider { output, lookupProvider ->
             LootTableProvider(output, setOf(),
                 CNLootTableProviders.providers, lookupProvider) }
+
+        event.createDatapackRegistryObjects(
+            RegistrySetBuilder()
+                .add(Registries.DAMAGE_TYPE, ModDamageTypes::registerDamageType)
+        )
     }
 
     @SubscribeEvent

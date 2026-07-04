@@ -8,7 +8,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.MOCC_STREAM
 import net.minecraft.core.Holder
@@ -28,10 +27,6 @@ import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
-import net.minecraft.world.phys.BlockHitResult
-import net.minecraft.world.phys.EntityHitResult
-import net.minecraft.world.phys.HitResult
-import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn
 import java.util.function.Consumer
 
@@ -47,7 +42,6 @@ abstract class DedicatedCypherProjectile(
             entityType: EntityType<CY>,
             level: ServerLevel,
             invoker: Entity?,
-            direction: Vec3? = null,
             shotState: ShotStateChunk,
             node: ProjectileNode,
         ) : CY where CY : Entity, CY : ICypherEntity {
@@ -55,7 +49,6 @@ abstract class DedicatedCypherProjectile(
             throw IllegalStateException("Failed to create projectile [$entityType].")
             proj.setOwner(invoker)
             proj.initCypher(cypher, shotState, node)
-            proj.initDirection(direction)
             return proj
         }
 
@@ -130,33 +123,32 @@ abstract class DedicatedCypherProjectile(
     // handle collapse
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    override fun onHit(result: HitResult) {
-        super.onHit(result) // distribute hitResult
-        hitBoth(result)
-        if (level().isClientSide) return
-//        trigger(TriggerType.COLLISION,,)
-
-        val canPierce =
-            result is BlockHitResult && haveFlag(CypherFlags.IGNORE_BLOCK) ||
-                    result is EntityHitResult && haveFlag(CypherFlags.PIERCE_ENTITY)
-        if (!canPierce && !canBounce) {
-            level().broadcastEntityEvent(this, 3) // combine with #handleEntityEvent
-            discardCypher(if (result.type == HitResult.Type.BLOCK) DiscardReason.HIT_BLOCK else DiscardReason.HIT_ENTITY)
-        }
-
-    }
-    override fun onHitEntity(result: EntityHitResult) {
-        super.onHitEntity(result)
-        val target = result.entity
-        if (notHaveFlag(CypherFlags.SKIP_DAMAGE_CHECK)) {
-            val damage = attributeOrDefault(CypherAttributes.DAMAGE)
-            if (level() is ServerLevel)
-                target.hurtServer(level() as ServerLevel, damageSources().thrown(this, owner()), damage.toFloat())
-        }
-    }
-    override fun onHitBlock(result: BlockHitResult) {
-        super.onHitBlock(result)
-    }
+//    override fun onHit(result: HitResult) {
+//        super.onHit(result) // distribute hitResult
+//        hitBoth(result)
+//        if (level().isClientSide) return
+//
+//        val canPierce =
+//            result is BlockHitResult && haveFlag(CypherFlags.IGNORE_BLOCK) ||
+//                    result is EntityHitResult && haveFlag(CypherFlags.PIERCE_ENTITY)
+//        if (!canPierce && !canBounce) {
+//            level().broadcastEntityEvent(this, 3) // combine with #handleEntityEvent
+//            discardCypher(if (result.type == HitResult.Type.BLOCK) DiscardReason.HIT_BLOCK else DiscardReason.HIT_ENTITY)
+//        }
+//
+//    }
+//    override fun onHitEntity(result: EntityHitResult) {
+//        super.onHitEntity(result)
+//        val target = result.entity
+//        if (notHaveFlag(CypherFlags.SKIP_DAMAGE_CHECK)) {
+//            val damage = attributeOrDefault(CypherAttributes.DAMAGE)
+//            if (level() is ServerLevel)
+//                target.hurtServer(level() as ServerLevel, damageSources().thrown(this, owner()), damage.toFloat())
+//        }
+//    }
+//    override fun onHitBlock(result: BlockHitResult) {
+//        super.onHitBlock(result)
+//    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // trigger & hooks
@@ -235,7 +227,7 @@ abstract class DedicatedCypherProjectile(
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     private fun debugMsg() {
-        CypherNexus.LOGGER.debug("create projectile {}: {}", this, cypher)
+        CypherNexus.LOGGER.debug("create projectile [{} {}]: [{}]", this, getExisting(), cypher)
         CypherFlags.printFlag(enabledFlags)
 
         // modified AttrMap
