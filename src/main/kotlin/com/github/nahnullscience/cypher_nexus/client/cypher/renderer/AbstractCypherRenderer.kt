@@ -15,6 +15,6 @@ abstract class AbstractCypherRenderer <CE, State> (
 {
     override fun extractRenderState(entity: CE, state: State, partialTicks: Float) {
         super.extractRenderState(entity, state, partialTicks)
-        state.extractFrom(entity)
+        state.extractFrom(entity, state)
     }
 }

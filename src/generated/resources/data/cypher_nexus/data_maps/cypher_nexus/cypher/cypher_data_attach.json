@@ -333,6 +333,22 @@
         }
       }
     },
+    "cypher_nexus:effective_radius": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 30.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {
+        "cypher_nexus:damage": {
+          "add": 2.0
+        },
+        "cypher_nexus:effect_radius": {
+          "multiply_base": 0.5
+        }
+      }
+    },
     "cypher_nexus:empty_cypher": {
       "delay": 0,
       "draw": 0,
@@ -444,9 +460,6 @@
       "stateChunk": {
         "cypher_nexus:damage": {
           "add": 4.0
-        },
-        "cypher_nexus:effect_radius": {
-          "multiply_base": 0.2
         },
         "cypher_nexus:knockback": {
           "add": 1.0

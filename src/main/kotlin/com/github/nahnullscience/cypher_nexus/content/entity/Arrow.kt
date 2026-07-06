@@ -18,7 +18,7 @@ class Arrow(
         private set
 
     override fun discardVisualEffect() {
-        for (i in 0..7) {
+        for (i in 0..radiusFriendlyParticleCount(8)) {
             level().addParticle(ItemParticleOption(ParticleTypes.ITEM, Items.ARROW), x, y, z, 0.0, 0.0, 0.0)
         }
     }

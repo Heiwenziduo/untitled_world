@@ -171,6 +171,9 @@ object Cyphers {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // modifier
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    val LIGHT = registerModifier("light", 1f) {
+        flags(CypherFlags.GLOWING)
+    }
     val POWER = registerModifier("power", 10f) {
         delay(1)
         attribute(CypherAttributes.DAMAGE, AttributeOperator.ADD, 1.0)
@@ -192,7 +195,8 @@ object Cyphers {
     val CRIT_STRIKE = registerModifier("critical_strike", 10f) {
         attribute(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.25)
     }
-    val EFFECTIVE = registerModifier("effective", 20f) {
+    val EFFECTIVE_RADIUS = registerModifier("effective_radius", 30f) {
+        attribute(CypherAttributes.DAMAGE, AttributeOperator.ADD, 2.0)
         attribute(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, 0.5)
     }
     val BRISK = registerModifier("brisk", 5f) {

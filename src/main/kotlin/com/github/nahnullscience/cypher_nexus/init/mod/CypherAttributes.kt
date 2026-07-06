@@ -53,7 +53,7 @@ object CypherAttributes {
     { builder -> builder.default(200.0) }
     /** default 1.0 */
     val EFFECT_RADIUS = registerAttribute("effect_radius")
-    { builder -> builder.default(1.0).min(0.125).max(16.0) }
+    { builder -> builder.default(1.0).min(0.25).max(16.0) }
     /** int, bounce times */
     val BOUNCE = registerAttribute("bounce")
     { builder -> builder.max(1000.0) }

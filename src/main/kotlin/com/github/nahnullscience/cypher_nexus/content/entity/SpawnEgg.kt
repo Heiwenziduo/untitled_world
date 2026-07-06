@@ -18,7 +18,7 @@ class SpawnEgg(
     override fun getItem() = ItemStack(Items.EGG)
 
     override fun discardVisualEffect() {
-        for (i in 0..7) {
+        for (i in 0..radiusFriendlyParticleCount(8)) {
             level().addParticle(ItemParticleOption(ParticleTypes.ITEM, Items.EGG), x, y, z, 0.0, 0.0, 0.0)
         }
     }

@@ -88,6 +88,11 @@ enum class CypherFlags : IFlagExtension.IFlagEnum {
      * */
     SILENT,
 
+    /**
+     * always render in full light
+     * */
+    GLOWING,
+
 //    /**
 //     * disable rotation and save a few triangular computation each tick,
 //     * mainly for item-renderer projectiles (like snowball) on which rotations do nothing.
@@ -114,5 +119,7 @@ enum class CypherFlags : IFlagExtension.IFlagEnum {
         }
 
         fun fromFlags(vararg flags: CypherFlags): Int = flags.sumOf { it.value }
+
+        fun Int.containsFlag(flag: CypherFlags): Boolean = this and flag.value == flag.value
     }
 }
