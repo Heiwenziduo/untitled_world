@@ -17,13 +17,13 @@ interface IFlagExtension {
      * ALL given flags are present
      * */
     fun haveFlagsAll(vararg flags: IFlagEnum) =
-        flags.firstOrNull { flag -> notHaveFlag(flag) } ?.let { false } ?: true
+        flags.firstOrNull { flag -> noFlag(flag) } ?.let { false } ?: true
 
-    fun notHaveFlag(flag0: IFlagEnum) = !haveFlag(flag0)
+    fun noFlag(flag0: IFlagEnum) = !haveFlag(flag0)
     /**
-     * ALL given flags are not present
+     * NONE of given flags are present
      * */
-    fun notHaveFlagsAll(vararg flags: IFlagEnum) =
+    fun noFlagsNone(vararg flags: IFlagEnum) =
         flags.firstOrNull { flag -> haveFlag(flag) } ?.let { false } ?: true
 
     fun enableFlag(flag0: IFlagEnum) = let { enabledFlags = enabledFlags or flag0.value }

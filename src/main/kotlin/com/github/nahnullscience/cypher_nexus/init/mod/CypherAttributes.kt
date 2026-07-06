@@ -44,18 +44,19 @@ object CypherAttributes {
     val KNOCKBACK = registerAttribute("knockback")
     { builder -> builder.max(1000.0).noSync().hide() }
     val FORTUNE_LEVEL = registerAttribute("fortune")
-    { builder -> builder.min(-1.0).max(100.0).noSync().hide() }
+    { builder -> builder.min(-1.0).max(32.0).noSync().hide() }
     /** initial speed, in unit block per tick, will show block/sec to player */
     val SPEED = registerAttribute("speed")
     { builder -> builder.max(16.0) }
     /** tick, 200 by default */
     val EXISTING = registerAttribute("existing")
     { builder -> builder.default(200.0) }
+    /** default 1.0 */
     val EFFECT_RADIUS = registerAttribute("effect_radius")
     { builder -> builder.default(1.0).min(0.125).max(16.0) }
     /** int, bounce times */
     val BOUNCE = registerAttribute("bounce")
-    { builder -> builder.max(100.0) }
+    { builder -> builder.max(1000.0) }
     /** how much it falls each tick, 0.0 by default */
     val GRAVITY_FACTOR = registerAttribute("gravity_factor")
     { builder -> builder.min(-1.0).max(1.0).hide() }

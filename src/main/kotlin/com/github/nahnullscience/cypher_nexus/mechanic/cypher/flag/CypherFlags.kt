@@ -86,7 +86,15 @@ enum class CypherFlags : IFlagExtension.IFlagEnum {
     /**
      * do not play server sound
      * */
-    SILENT
+    SILENT,
+
+//    /**
+//     * disable rotation and save a few triangular computation each tick,
+//     * mainly for item-renderer projectiles (like snowball) on which rotations do nothing.
+//     *
+//     * not mandatory
+//     * */
+//    NO_ROTATION,
 
     ;
     override val value: Int = 1 shl ordinal

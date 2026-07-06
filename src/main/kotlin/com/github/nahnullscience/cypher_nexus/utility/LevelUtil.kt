@@ -5,6 +5,10 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 
 object LevelUtil {
+    const val CLIENT = "client"
+    const val SERVER = "server"
+
+    fun Level.side(): String = if (isClientSide) CLIENT else SERVER
 
     /**
      * an optimized entity searching function
@@ -32,4 +36,5 @@ object LevelUtil {
             }
         }
     }
+
 }

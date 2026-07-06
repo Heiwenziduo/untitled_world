@@ -445,6 +445,9 @@
         "cypher_nexus:damage": {
           "add": 4.0
         },
+        "cypher_nexus:effect_radius": {
+          "multiply_base": 0.2
+        },
         "cypher_nexus:knockback": {
           "add": 1.0
         },
@@ -452,7 +455,7 @@
           "add": 4.0
         },
         "cypher_nexus:speed": {
-          "multiply_total": 0.75
+          "multiply_total": 0.5
         }
       }
     },

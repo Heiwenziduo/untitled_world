@@ -69,6 +69,7 @@ class ItemWandInstance(
         if (_lastModifyTime == entity.level().gameTime) {
             CypherNexus.warn { "$this on [${entity.javaClass.name}] ticked multiple times" }
             // FIXME unknown bug that client instance occasionally tick twice
+            Thread.dumpStack()
             return
         }
 
@@ -87,7 +88,7 @@ class ItemWandInstance(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     fun isBeginning() = _deck == 0L
-    fun canInvoke() = !(_delayCurrent > 0 || (_deck == 0L && _rechargeCurrent > 0))
+    fun canInvoke() = !(_delayCurrent > 0 || (_deck == 0L && _rechargeCurrent > 0)) && aoc.invokableSize > 0
 //        .also { println("${side()} invoke check: delay=$_delayCurrent, recharge=$_rechargeCurrent") }
 
     fun invokeFinish(level: Level) {

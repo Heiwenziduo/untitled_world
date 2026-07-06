@@ -1,6 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
@@ -15,8 +16,10 @@ import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.TraceableEntity
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
@@ -50,6 +53,21 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
             if (entity is ICypherEntity) {
                 entity.initEntity(entity)
             }
+        }
+
+        fun ICypherEntity.exertDamage(level: ServerLevel, target: Entity) {
+            var damage = getAttributeOrDefault(CypherAttributes.DAMAGE)
+            var crit = getAttributeOrDefault(CypherAttributes.CRIT_CHANCE)
+            var critMulti = (owner as? LivingEntity)?.let { 1.5 } ?: 1.5 // there is no CritMultiplier Attribute, why
+            var t = 1
+            while (crit > 1 && t++ < Int.MAX_VALUE) {
+                crit -= 1
+                critMulti *= 1.5
+            }
+            if (t > 1 || target.random.nextFloat() < crit) {
+                damage *= critMulti
+            }
+            target.hurtServer(level, getDamageSource(), damage.toFloat())
         }
     }
 
@@ -89,16 +107,26 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
     fun triggerType(): TriggerType
     fun payload(): ShotStateChunk?
 
-    //
     fun getDirectionInitial(): Vec3
     fun getPositionInitial(): Vec3
-    fun getDamage(): Double
+
+    // attributes access functions
+    fun getAttribute(attr: CypherAttribute): Double?
+    fun getAttribute(holer: Holder<CypherAttribute>): Double?
+    /**
+     * get value through entity-specific map > cypher default > attribute default
+     * */
+    fun getAttributeOrDefault(attr: CypherAttribute): Double
+    /**
+     * get value through entity-specific map > cypher default > attribute default
+     * */
+    fun getAttributeOrDefault(holer: Holder<CypherAttribute>): Double
+    //
     fun getExisting(): Int
-    fun getSpeed(): Double
     fun getBounce(): Int
     fun getGravityFactor(): Float
     fun getSpeedFactor(): Float
-    fun getEffectRadius(): Double
+    fun getEffectRadius(): Float
     /**
      * used as a factor inside [rotateTowardSpeed],
      * the higher the faster the entity will rotate, to face the direction the deltaMovement is pointed at
@@ -120,20 +148,10 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
     val bouncedThisTick: Boolean
     val canBounce: Boolean
 
-    // attributes access functions
-    fun attribute(attr: CypherAttribute): Double?
-    fun attribute(holer: Holder<CypherAttribute>): Double?
-    /**
-     * get value through entity-specific map > cypher default > attribute default
-     * */
-    fun attributeOrDefault(attr: CypherAttribute): Double
-    /**
-     * get value through entity-specific map > cypher default > attribute default
-     * */
-    fun attributeOrDefault(holer: Holder<CypherAttribute>): Double
-
+    /***/
     fun trigger(type: TriggerType, releaseTo: PosDirePair)
 
+    /***/
     fun discardCypher(reason: DiscardReason)
 
     // hooks // TODO extensive refactor

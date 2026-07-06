@@ -2,6 +2,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
+import net.minecraft.util.profiling.Profiler
 import java.util.Optional
 import java.util.function.Supplier
 import kotlin.collections.iterator
@@ -46,6 +47,8 @@ class HookContainer (
 
     @Suppress("UNCHECKED_CAST")
     fun <T : Any> get(module: HookModule<T>): Map<T, Int> {
+        Profiler.get().incrementCounter { "cypherHookAccess" }
+
         val rawChild = _map[module]
         val childMap: Map<T, Int> = if (rawChild != null) rawChild as Map<T, Int> else emptyMap()
         val parentMap = parent.getOrNull()?.get(module)
@@ -65,6 +68,8 @@ class HookContainer (
             val parentCount = merged[hook] ?: 0
             merged[hook] = parentCount + childCount
         }
+
+        Profiler.get().pop()
         return merged as Map<T, Int>
     }
     fun <T : Any> get(module: Supplier<out HookModule<T>>) = get(module.get())

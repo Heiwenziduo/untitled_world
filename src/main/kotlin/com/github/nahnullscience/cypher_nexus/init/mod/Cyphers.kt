@@ -185,12 +185,15 @@ object Cyphers {
     val HEAVY_SHOT = registerModifier("heavy_shot", 30f) {
         delay(4)
         attribute(CypherAttributes.DAMAGE, AttributeOperator.ADD, 4.0)
-        attribute(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 0.75)
+        attribute(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 0.5)
         attribute(CypherAttributes.RECOIL, AttributeOperator.ADD, 4.0)
         attribute(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 1.0)
     }
     val CRIT_STRIKE = registerModifier("critical_strike", 10f) {
         attribute(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.25)
+    }
+    val EFFECTIVE = registerModifier("effective", 20f) {
+        attribute(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, 0.5)
     }
     val BRISK = registerModifier("brisk", 5f) {
         attribute(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 2.5)

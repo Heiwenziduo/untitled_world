@@ -73,7 +73,7 @@ object DaedalusCypher : ModifierCypher(), ServerInvokeRedirectPosHook {
             if (targetEntity != null) {
                 destination = targetEntity.position()
             }
-            val upward = Vec3(0.0, 1.0, 0.0).randomInCone(20.0, directInvoker.random).scale(heightMax) // TODO use SPREAD as factor
+            val upward = Vec3.Y_AXIS.randomInCone(20.0, directInvoker.random).scale(heightMax) // TODO use SPREAD as factor
             val blockResult2 = level.clipIncludingBorder(
                 ClipContext(destination, destination.add(upward), Block.COLLIDER, Fluid.NONE, directInvoker)
             )

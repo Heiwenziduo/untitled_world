@@ -1,5 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 
+import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.RECOIL
@@ -55,9 +56,9 @@ class ShotStateChunk private constructor (
     fun release(level: Level, directInvoker: Entity?, owner: Entity?, posDire: PosDirePair, itemWand: ItemWandInstance?) {
         if (charge-- <= 0) return
 
-        Profiler.get().push("cypherEntityInitialization")
+        Profiler.get().push { "cypherEntityCreation" }
         if (dirty) compute()
-        println("${level.isClientSide} client ccMap: $_countMap")
+        CypherNexus.debugCypher { "${level.isClientSide} client ccMap: $_countMap" }
 
         // do recoil only on root
         run recoil@ {

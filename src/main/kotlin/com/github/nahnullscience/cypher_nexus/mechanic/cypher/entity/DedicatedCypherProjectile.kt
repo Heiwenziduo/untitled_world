@@ -19,15 +19,19 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EntityDimensions
 import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.Pose
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
+import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn
+import java.util.*
 import java.util.function.Consumer
 
 abstract class DedicatedCypherProjectile(
@@ -95,13 +99,27 @@ abstract class DedicatedCypherProjectile(
         super.sendPairingData(serverPlayer, bundleBuilder)
     }
 
+    override fun moveOrInterpolateTo(position: Optional<Vec3>, yRot: Optional<Float>, xRot: Optional<Float>) {
+        // FIXME entity position flashes at almost always around the 11th tick and the ClientboundMoveEntityPacket / ClientboundEntityPositionSyncPacket is received
+//        println("${level().side()} interpolate: ${position()} -> ${position.getOrNull()} ${yRot.isPresent} ${xRot.isPresent} firstTick $firstTick")
+        if (level().isClientSide && tickCount < 3) {
+//            println("skip this Interpolation")
+            return
+        }
+        super.moveOrInterpolateTo(position, yRot, xRot)
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    init {
+        noPhysics = true
+    }
 
     abstract override val cypherHolder: Holder<out AbstractProjectileCypher<out DedicatedCypherProjectile>>
 
     private var _existing: Int? = null
-    override fun getExisting(): Int = _existing ?: attributeOrDefault(CypherAttributes.EXISTING).toInt()
+    override fun getExisting(): Int = _existing ?: getAttributeOrDefault(CypherAttributes.EXISTING).toInt()
     fun setExisting(t: Int) = run { _existing = t }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,46 +127,19 @@ abstract class DedicatedCypherProjectile(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     override fun tick() {
-        // FIXME entity desync "positon-flash" almost always happen at around first time they sync
-        // FIXME aiming deviation at high speed
         if (firstTick) debugMsg()
+        super.tick()
         doTick()
-        super.tick() // maybe prune default tick?
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // handle collapse
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//    override fun onHit(result: HitResult) {
-//        super.onHit(result) // distribute hitResult
-//        hitBoth(result)
-//        if (level().isClientSide) return
-//
-//        val canPierce =
-//            result is BlockHitResult && haveFlag(CypherFlags.IGNORE_BLOCK) ||
-//                    result is EntityHitResult && haveFlag(CypherFlags.PIERCE_ENTITY)
-//        if (!canPierce && !canBounce) {
-//            level().broadcastEntityEvent(this, 3) // combine with #handleEntityEvent
-//            discardCypher(if (result.type == HitResult.Type.BLOCK) DiscardReason.HIT_BLOCK else DiscardReason.HIT_ENTITY)
-//        }
-//
-//    }
-//    override fun onHitEntity(result: EntityHitResult) {
-//        super.onHitEntity(result)
-//        val target = result.entity
-//        if (notHaveFlag(CypherFlags.SKIP_DAMAGE_CHECK)) {
-//            val damage = attributeOrDefault(CypherAttributes.DAMAGE)
-//            if (level() is ServerLevel)
-//                target.hurtServer(level() as ServerLevel, damageSources().thrown(this, owner()), damage.toFloat())
-//        }
-//    }
-//    override fun onHitBlock(result: BlockHitResult) {
-//        super.onHitBlock(result)
-//    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // trigger & hooks
@@ -156,6 +147,9 @@ abstract class DedicatedCypherProjectile(
 
     /** client only */
     protected open fun discardVisualEffect() = Unit
+    override fun getDimensions(pose: Pose): EntityDimensions {
+        return super.getDimensions(pose).scale(getEffectRadius())
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -201,7 +195,7 @@ abstract class DedicatedCypherProjectile(
     // miscellaneous
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     override fun getPickResult(): ItemStack? = null // null by default, this is the creative mod middle button pick result
-    override fun isPickable() = false // false by default, entirely disable the picking activity
+    override fun isPickable() = false // false by default, entirely disable the picking activity // through canBeHitByProjectile, this also prevents cypher-projectile being select by level#getEntities
     override fun canSpawnSprintParticle() = false
     /**
      * since the projectile can't exist without a related cypher,

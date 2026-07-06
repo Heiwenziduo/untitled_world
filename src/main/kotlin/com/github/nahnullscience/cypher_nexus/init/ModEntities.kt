@@ -18,7 +18,10 @@ object ModEntities {
         DEFERRED_REGISTER.register(MOD_BUS)
     }
 
-    fun <T : DedicatedCypherProjectile> register(
+    /**
+     * check [EntityType]
+     * */
+    fun <T : DedicatedCypherProjectile> registerDedicated(
         name: String,
         factory: EntityType.EntityFactory<T>,
         category: MobCategory = MobCategory.MISC,
@@ -26,6 +29,8 @@ object ModEntities {
     ): DeferredHolder<EntityType<*>, EntityType<T>> {
         return DEFERRED_REGISTER.registerEntityType(name, factory, category) { builder ->
             builder.sized(0.125f, 0.125f)
+            .noLootTable()
+            .fireImmune()
             // Prevents the entity from being saved to disk.
             .noSave()
             // Disables the entity being summonable via /summon.
@@ -41,16 +46,16 @@ object ModEntities {
 
     // projectile ////////////////////////////////////////////////////////////////////////////////////////
     // using "cypher_" prefix is a convention
-    val CYPHER_ARROW = register("cypher_arrow", ::Arrow)
-    val CYPHER_SNOWBALL = register("cypher_snowball", ::Snowball)
-    val CYPHER_ENDER_TELEPORTATION = register("cypher_ender_teleportation", ::EnderTeleportation)
-    val CYPHER_ENDER_RECALL = register("cypher_ender_recall", ::EnderRecall)
-    val CYPHER_SPAWN_EGG = register("cypher_spawn_egg", ::SpawnEgg)
-    val CYPHER_BUBBLE_COLUMN = register("cypher_bubble_column", ::BubbleColumn)
-    val CYPHER_LLAMA_SPIT = register("cypher_llama_spit", ::LlamaSpit)
+    val CYPHER_ARROW = registerDedicated("cypher_arrow", ::Arrow)
+    val CYPHER_SNOWBALL = registerDedicated("cypher_snowball", ::Snowball)
+    val CYPHER_ENDER_TELEPORTATION = registerDedicated("cypher_ender_teleportation", ::EnderTeleportation)
+    val CYPHER_ENDER_RECALL = registerDedicated("cypher_ender_recall", ::EnderRecall)
+    val CYPHER_SPAWN_EGG = registerDedicated("cypher_spawn_egg", ::SpawnEgg)
+    val CYPHER_BUBBLE_COLUMN = registerDedicated("cypher_bubble_column", ::BubbleColumn)
+    val CYPHER_LLAMA_SPIT = registerDedicated("cypher_llama_spit", ::LlamaSpit)
 
     // static-projectile //////////////////////////////////////////////////////////////////////////////////
-    val CYPHER_EXPLOSION = register("cypher_explosion", ::SummonedExplosion)
-    val CYPHER_LIGHTING = register("cypher_lighting", ::SummonedLightning)
+    val CYPHER_EXPLOSION = registerDedicated("cypher_explosion", ::SummonedExplosion)
+    val CYPHER_LIGHTING = registerDedicated("cypher_lighting", ::SummonedLightning)
 }
 

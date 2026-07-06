@@ -11,11 +11,10 @@ import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.world.entity.projectile.ItemSupplier
 import net.minecraft.world.item.ItemDisplayContext
 
-class SimpleItemProjectileRenderer <CY> (
+class SimpleItemProjectileRenderer <CE> (
     context: EntityRendererProvider.Context,
-) : AbstractCypherRenderer<CY, ItemProjectileRenderState>(context) where CY : DedicatedCypherProjectile, CY : ItemSupplier {
+) : AbstractCypherRenderer<CE, ItemProjectileRenderState>(context) where CE : DedicatedCypherProjectile, CE : ItemSupplier {
     private val itemModelResolver: ItemModelResolver = context.itemModelResolver
-    val scale = 0.5f
 
     init {
         // println("SimpleItemProjectileRenderer init") // called when load into main menu
@@ -28,7 +27,7 @@ class SimpleItemProjectileRenderer <CY> (
         camera: CameraRenderState,
     ) {
         poseStack.pushPose()
-        poseStack.scale(scale, scale, scale)
+        poseStack.scale(state.effectRadius, state.effectRadius, state.effectRadius)
         poseStack.mulPose(camera.orientation)
         state.item.submit(
             poseStack,
@@ -43,7 +42,7 @@ class SimpleItemProjectileRenderer <CY> (
 
     override fun createRenderState() = ItemProjectileRenderState()
 
-    override fun extractRenderState(entity: CY, state: ItemProjectileRenderState, partialTicks: Float) {
+    override fun extractRenderState(entity: CE, state: ItemProjectileRenderState, partialTicks: Float) {
         super.extractRenderState(entity, state, partialTicks)
         itemModelResolver.updateForNonLiving(state.item, entity.item, ItemDisplayContext.GROUND, entity)
     }
