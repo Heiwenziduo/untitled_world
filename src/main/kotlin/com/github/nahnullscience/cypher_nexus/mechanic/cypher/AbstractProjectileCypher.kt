@@ -13,7 +13,9 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.phys.Vec3
 import java.util.function.Supplier
 
-abstract class AbstractProjectileCypher <CY> : AbstractCypher() where CY : Entity, CY : ICypherEntity {
+abstract class AbstractProjectileCypher <CY> (
+    defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE
+) : AbstractCypher(defaultAttribute) where CY : Entity, CY : ICypherEntity {
     abstract val projectileType: Supplier<out EntityType<out CY>>
 
     open fun addToStateChunk(chunk: ShotStateChunk): ShotStateChunk {

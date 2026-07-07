@@ -23,7 +23,13 @@ import net.minecraft.server.level.ServerPlayer
 /**
  *
  * */
-sealed class AbstractCypher: IRegisterable {
+sealed class AbstractCypher(
+    protected val defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE
+): IRegisterable {
+    companion object {
+        val NONE: CypherDataMap.Builder.() -> CypherDataMap.Builder = { this }
+    }
+
     abstract val category: Holder<CypherCategory>
 
     val manaDrain: Float get() = attributes().manaDrain
@@ -71,7 +77,7 @@ sealed class AbstractCypher: IRegisterable {
 
     private fun attributesData() = holder().getData(CYPHER_DATA_ATTACH)
 
-    open fun defaultAttributes(): CypherDataMap.Builder = CypherDataMap.builder()
+    open fun defaultAttributes(): CypherDataMap.Builder = CypherDataMap.builder().defaultAttribute()
 
     fun attributes() = attributesData() ?: run { CypherNexus.LOGGER.warn("cypher $this missing attributes data, this may cause lag"); defaultAttributes().build() }
 

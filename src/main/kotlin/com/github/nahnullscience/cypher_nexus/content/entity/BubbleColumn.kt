@@ -14,7 +14,7 @@ class BubbleColumn(
 
     override fun getUnderwaterSpeedFactor() = 1.05f
     override fun discardVisualEffect() {
-        for (i in 0..radiusFriendlyParticleCount(8)) {
+        for (i in 0..radiusFriendlyParticleCount(8, 32)) {
             level().addParticle(ParticleTypes.BUBBLE, x, y, z, 0.0, 0.0, 0.0)
         }
     }

@@ -14,6 +14,7 @@ import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.MutableComponent
 import net.minecraft.util.Mth
 import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.client.network.ClientPacketDistributor
@@ -29,6 +30,7 @@ class CypherIndexScreen(
         // specifications
         const val ICON_TEXTURE = 12
         const val ICON_SIZE = 12
+        const val ICON_SIZE_HALF = ICON_SIZE / 2
         const val MARGIN = 8 // space between content and border
         const val PADDING = 3 // space between icons
         const val ITEM_SIZE = ICON_SIZE + PADDING
@@ -38,13 +40,11 @@ class CypherIndexScreen(
 
         const val WAND_BLOCK_MARGIN = 20
     }
-    val indexWidth: Int
-        get() = (width * 0.5).toInt()
+    val indexWidth: Int get() = (width * 0.5).toInt()
 
-    private val indexColumns: Int
-        get() = max(1, (indexWidth - MARGIN * 2) / ITEM_SIZE)
+    private val indexColumns: Int get() = max(1, (indexWidth - MARGIN * 2) / ITEM_SIZE)
 
-    private val blocks = mutableListOf<CategoryBlock>()
+    private val layoutBlocks = mutableListOf<CategoryBlock>()
     private var totalHeight = 100
 
     // ====== scrollbar ===================
@@ -83,26 +83,25 @@ class CypherIndexScreen(
 
     override fun init() {
         // also fire each time player resizes the window
-        // println("window resize")
         // maybe we should move window size-related variables here
         super.init()
-        if (blocks.isEmpty()) {
+        if (layoutBlocks.isEmpty()) {
             cypherMap.keys.withIndex().forEach { (i, category) ->
-                blocks.add(CategoryBlock(category, cypherMap.getOrDefault(category, listOf()), i)) }
+                layoutBlocks.add(CategoryBlock(category, cypherMap.getOrDefault(category, listOf()), i))
+            }
         }
-        totalHeight = blocks.sumOf { block -> block.blockHeight }
+        totalHeight = layoutBlocks.sumOf { block -> block.blockHeight }
     }
 
     override fun extractBackground(guiGraphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTick: Float) {
         super.extractBackground(guiGraphics, mouseX, mouseY, partialTick)
-//        super.renderBackground(guiGraphics, mouseX, mouseY, partialTick)
         HoverContext.reset()
         guiGraphics.fill(0, 0, this.width, this.height, 0x99333333.toInt())
         guiGraphics.fill(0, 0, indexWidth, this.height, 0xCC333333.toInt()) //
         //
         // scissor test prevents rendering outside these bounds // necessary?
 //        guiGraphics.enableScissor(0, 0, indexWidth, this.height)
-        for (block in blocks) {
+        for (block in layoutBlocks) {
             renderCypherGrid(guiGraphics, mouseX, mouseY, block)
         }
 //        guiGraphics.disableScissor()
@@ -115,9 +114,8 @@ class CypherIndexScreen(
         // it seems methods call order decides the layer order
         if (HoverContext.isHolding) {
             HoverContext.hoverCypher?.let { cypher ->
-                // FIXME dragged item should be on top
-                val drawX = mouseX - (ICON_SIZE / 2) // Offset by half the icon size so the cursor holds the center of the icon
-                val drawY = mouseY - (ICON_SIZE / 2)
+                val drawX = mouseX - ICON_SIZE_HALF // Offset by half the icon size so the cursor holds the center of the icon
+                val drawY = mouseY - ICON_SIZE_HALF
                 renderCypherIcon(guiGraphics, cypher, drawX, drawY)
             }
         }
@@ -335,7 +333,6 @@ class CypherIndexScreen(
                 val row = i / cols
                 val x = reX + PADDING + col * ITEM_SIZE
                 val y = reY + PADDING + (row * ITEM_SIZE)
-                // FIXME index out of length
                 val cypher = currentEditCyphers[i]
 
                 renderWandBlocks(graphics, cypher, x, y)
@@ -384,7 +381,6 @@ class CypherIndexScreen(
     // ===========================================================================================================
     override fun onClose() {
         super.onClose()
-        // TODO send msg to server
         if (hasEdited && currentInvariableData != null) {
             val u = currentInvariableData!!.uuid
             ClientPacketDistributor.sendToServer(ServerboundEditWandCyphers(u, currentEditCyphers.toList()))
@@ -400,20 +396,12 @@ class CypherIndexScreen(
         val list: List<AbstractCypher>,
         val index: Int
     ) {
-        val title
-            get() = category.translation()
+        val title: MutableComponent = category.translation()
+        val show: Boolean = list.isNotEmpty()
 
-        val show
-            get() = list.isNotEmpty()
-
-        val blockRows: Int
-            get() = ceil(list.size.toDouble() / indexColumns).toInt()
-
-        val blockHeight: Int
-            get() = blockRows * ITEM_SIZE + CATEGORY_TITLE_PADDING
-
-        val reY: Int
-            get() = blocks.filter { it.index < index }.sumOf { it.blockHeight } + CATEGORY_TITLE_PADDING
+        val blockRows: Int get() = ceil(list.size.toDouble() / indexColumns).toInt()
+        val blockHeight: Int get() = blockRows * ITEM_SIZE + CATEGORY_TITLE_PADDING
+        val reY: Int get() = layoutBlocks.filter { it.index < index }.sumOf { it.blockHeight } + CATEGORY_TITLE_PADDING
     }
 
     private enum class HoverType() {

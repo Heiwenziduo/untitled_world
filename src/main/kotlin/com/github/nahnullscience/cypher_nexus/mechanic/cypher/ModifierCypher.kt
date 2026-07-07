@@ -4,9 +4,11 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import net.minecraft.core.Holder
 
-abstract class ModifierCypher () : AbstractNonProjectileCypher() {
+abstract class ModifierCypher (
+    defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE
+) : AbstractNonProjectileCypher(defaultAttribute) {
 
     final override val category: Holder<CypherCategory> = CypherCategories.MODIFIER
 
-    override fun defaultAttributes() = super.defaultAttributes().draw(1)
+    override fun defaultAttributes() = CypherDataMap.builder().draw(1).defaultAttribute()
 }

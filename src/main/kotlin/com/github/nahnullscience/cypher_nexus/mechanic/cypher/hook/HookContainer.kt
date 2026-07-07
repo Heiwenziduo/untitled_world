@@ -69,7 +69,6 @@ class HookContainer (
             merged[hook] = parentCount + childCount
         }
 
-        Profiler.get().pop()
         return merged as Map<T, Int>
     }
     fun <T : Any> get(module: Supplier<out HookModule<T>>) = get(module.get())

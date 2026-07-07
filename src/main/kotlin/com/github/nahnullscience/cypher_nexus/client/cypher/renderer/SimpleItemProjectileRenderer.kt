@@ -16,6 +16,7 @@ class SimpleItemProjectileRenderer <CE> (
 ) : AbstractCypherRenderer<CE, ItemProjectileRenderState>(context) where CE : DedicatedCypherProjectile, CE : ItemSupplier {
     private val itemModelResolver: ItemModelResolver = context.itemModelResolver
 
+    val defaultScale = 0.5f
     init {
         // println("SimpleItemProjectileRenderer init") // called when load into main menu
     }
@@ -27,6 +28,7 @@ class SimpleItemProjectileRenderer <CE> (
         camera: CameraRenderState,
     ) {
         poseStack.pushPose()
+        poseStack.scale(defaultScale, defaultScale, defaultScale)
         poseStack.scale(state.effectRadius, state.effectRadius, state.effectRadius)
         poseStack.mulPose(camera.orientation)
         state.item.submit(

@@ -47,7 +47,7 @@
       "delay": 0,
       "draw": 99,
       "flags": 0,
-      "manaDrain": 200.0,
+      "manaDrain": 99.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {}
@@ -516,6 +516,15 @@
         }
       }
     },
+    "cypher_nexus:light": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 4096,
+      "manaDrain": 1.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {}
+    },
     "cypher_nexus:lighting": {
       "delay": 15,
       "draw": 0,
@@ -552,7 +561,7 @@
       "recharge": 0,
       "stateChunk": {}
     },
-    "cypher_nexus:nullifier": {
+    "cypher_nexus:null_existing": {
       "delay": -4,
       "draw": 1,
       "flags": 0,

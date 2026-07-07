@@ -139,7 +139,8 @@ abstract class DedicatedCypherProjectile(
         doTick()
     }
 
-    protected fun radiusFriendlyParticleCount(base: Int): Int = base.times(getEffectRadius()).toInt()
+    protected fun radiusFriendlyParticleCount(base: Int, max: Int = Int.MAX_VALUE): Int =
+        base.times(getEffectRadius()).toInt().coerceAtMost(max)
     /** client only */
     protected open fun discardVisualEffect() = Unit
 

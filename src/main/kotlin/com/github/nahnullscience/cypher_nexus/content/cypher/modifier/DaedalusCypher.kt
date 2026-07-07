@@ -18,19 +18,14 @@ import net.minecraft.world.level.ClipContext.Fluid
 import net.minecraft.world.phys.HitResult.Type
 import net.minecraft.world.phys.Vec3
 
-object DaedalusCypher : ModifierCypher(), ServerInvokeRedirectPosHook {
-    const val MARGIN = 0.3
+class DaedalusCypher(
+    defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder
+) : ModifierCypher(defaultAttribute), ServerInvokeRedirectPosHook {
+    companion object {
+        const val MARGIN = 0.3
+    }
 
     override val resource = CypherNexus.modResource("daedalus")
-
-    override fun defaultAttributes(): CypherDataMap.Builder {
-        return super.defaultAttributes()
-            .manaDrain(24f)
-            .stateChunkAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 1.25)
-            .stateChunkAttr(CypherAttributes.RECOIL, AttributeOperator.MULTIPLY_TOTAL, 0.0)
-            .stateChunkAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 20.0)
-            .stateChunkAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.03)
-    }
 
     override fun redirectPosDireServer(
         level: ServerLevel,

@@ -43,12 +43,6 @@ class SimpleModifier(
         return this
     }
 
-    fun attribute(
-        holder: Holder<CypherAttribute>,
-        operator: AttributeOperator,
-        value: Double
-    ) = stateChunkAttr(holder, operator, value)
-
     fun createModifier(): ModifierCypher = object : ModifierCypher() {
         override val resource = CypherNexus.modResource(path)
         override val color = _color

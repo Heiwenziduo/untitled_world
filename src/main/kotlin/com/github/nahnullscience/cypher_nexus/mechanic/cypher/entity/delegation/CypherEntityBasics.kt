@@ -437,12 +437,13 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
             if (collideWithEntities) {
                 if (haveFlag(CypherFlags.PIERCE_ENTITY)) {
                     // if pierce, collide all
-                    level.forEachEntityWithin(
+                    level.getEntities(
                         cyEntity,
                         cyEntity.boundingBox.expandTowards(stepMovement),
                         cyEntity::canHitTarget
-                    ) { target ->
-                        // FIXME ConcurrentModificationException occurs when [pierce]
+                    ).forEach { target ->
+                        // there is a trigger call inside whenHit, which may modifies the entity list in section storage.
+                        // it seems we have to extract entities first and go through the list one more time
                         stepPosition.rayCastThen(destination, target.boundingBox, HIT_BB_INFLATION) { hitPoint, dir ->
                             whenHitDelegate(EntityHitResult(target, hitPoint), dir)
                         }

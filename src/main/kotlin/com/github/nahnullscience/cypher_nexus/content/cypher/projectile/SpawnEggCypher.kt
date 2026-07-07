@@ -11,19 +11,11 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.Projectil
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 
-object SpawnEggCypher : ProjectileCypher<DedicatedCypherProjectile>() {
+class SpawnEggCypher(
+    defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder
+) : ProjectileCypher<DedicatedCypherProjectile>(defaultAttribute) {
     override val resource = CypherNexus.modResource("spawn_egg")
     override val projectileType = ModEntities.CYPHER_SPAWN_EGG
-
-    override fun defaultAttributes(): CypherDataMap.Builder {
-        return super.defaultAttributes()
-            .manaDrain(20f)
-            .draw(1)
-            .flags(CypherFlags.LINGER)
-            .projectileAttr(CypherAttributes.SPEED, 1.0)
-            .projectileAttr(CypherAttributes.EXISTING, 300.0)
-            .projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
-    }
 
     override fun addToStateChunk(chunk: ShotStateChunk): ShotStateChunk {
         val subState = ShotStateChunk()

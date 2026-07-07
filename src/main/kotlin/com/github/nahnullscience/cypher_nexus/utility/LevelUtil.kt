@@ -1,5 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.utility
 
+import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
@@ -11,7 +12,7 @@ object LevelUtil {
     fun Level.side(): String = if (isClientSide) CLIENT else SERVER
 
     /**
-     * an optimized entity searching function
+     * an optimized(?) entity searching function.
      * */
     inline fun Level.forEachEntityWithin(
         except: Entity?,
@@ -19,7 +20,7 @@ object LevelUtil {
         crossinline selector: (Entity) -> Boolean,
         crossinline action: (Entity) -> Unit
     ) {
-
+        Profiler.get().incrementCounter { "getEntities" }
         this.entities.get(bb) { entity ->
             if (entity != except && selector(entity)) {
                 action(entity)
