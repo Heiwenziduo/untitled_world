@@ -12,7 +12,7 @@ object LevelUtil {
     fun Level.side(): String = if (isClientSide) CLIENT else SERVER
 
     /**
-     * an optimized(?) entity searching function.
+     * an optimized entity searching function.
      * */
     inline fun Level.forEachEntityWithin(
         except: Entity?,

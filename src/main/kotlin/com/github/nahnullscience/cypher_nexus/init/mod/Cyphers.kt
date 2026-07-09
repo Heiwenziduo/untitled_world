@@ -217,7 +217,7 @@ object Cyphers {
         stateChunkAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.25)
     }
     val EFFECTIVE_RADIUS = registerModifier("effective_radius", 30f) {
-        stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 2.0)
+        stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 1.5)
         stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, 0.5)
     }
     val BRISK = registerModifier("brisk", 5f) {

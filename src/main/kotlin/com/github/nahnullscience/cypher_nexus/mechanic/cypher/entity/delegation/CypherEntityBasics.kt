@@ -510,6 +510,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
 
         if (loopTimes > 0) {
             cyEntity.deltaMovement = cyEntity.deltaMovement.toSameDire(stepMovement).scale(cyEntity.getBounceSpeedPenalty().pow(loopTimes))
+            cyEntity.rotateTowardSpeed(1f) // instant facing direction after bounce
         }
 
         Profiler.get().pop()

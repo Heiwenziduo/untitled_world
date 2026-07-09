@@ -2,7 +2,9 @@ package com.github.nahnullscience.cypher_nexus.client.network
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.client.gui.CypherIndexScreen
+import com.github.nahnullscience.cypher_nexus.client.gui.CypherIndexScreen0
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
+import com.github.nahnullscience.cypher_nexus.mechanic.event.CNCommonEvents
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundEditWandCyphersConfirm
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundOpenIndexScreen
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
@@ -22,12 +24,16 @@ object ClientPayloadHandler {
         // Do something with the data, on the network thread, heavy computation should be done before pass to main thread
 //        println("client receive package -> openIndexScreen: \n$data")
 
-        val map = CypherUtility.sortCyphersByCategory(data.cyphersTotal) // TODO
+        val player = context.player()
+        val map = CypherUtility.sortCyphersByCategory(data.cyphersTotal)
+        val list = CNCommonEvents.livingGatherWandsTracking(player).wands()
+
         context.enqueueWork {
             // Do something with the data, on the main thread
 
-            // val player = context.player()
-            Minecraft.getInstance().setScreen(CypherIndexScreen(map))
+//            Minecraft.getInstance().setScreen(CypherIndexScreen0(map))
+            Minecraft.getInstance().setScreen(CypherIndexScreen(map, list))
+
         }.exceptionally {
             // Handle exception
             // context.disconnect(Component.translatable("my_mod.networking.failed", it.message)) // this kicks player out of the logical server

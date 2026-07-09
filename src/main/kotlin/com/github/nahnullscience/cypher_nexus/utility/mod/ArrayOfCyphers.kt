@@ -261,6 +261,15 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
         if (i < 0) return null
         return cyphers[i]
     }
+    /**
+     * @param startFrom the index to start count from, assume it's within 0..63
+     * @return the index of the first [EmptyCypher], -1 if there's no empty slot.
+     * */
+    fun firstEmptyIndex(startFrom: Int = 0): Int {
+        val empties = (bitsInvokable or bitsModule).inv().shr(startFrom)
+        val r = startFrom + empties.countTrailingZeroBits()
+        return if (r < capacity) r else -1
+    }
 
 
     override fun toString() = cyphers.toList().toString()

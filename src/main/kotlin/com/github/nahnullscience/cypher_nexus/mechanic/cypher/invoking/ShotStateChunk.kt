@@ -47,6 +47,7 @@ class ShotStateChunk private constructor (
 
     val hooks = HookContainer()
     private val projectiles = mutableListOf<ProjectileNode>()
+    val projectilesView get() = projectiles.toList()
 
     var delay: Int = 0
     private set
