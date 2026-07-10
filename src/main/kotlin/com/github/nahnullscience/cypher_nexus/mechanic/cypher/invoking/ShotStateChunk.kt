@@ -7,6 +7,7 @@ import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.RECOIL
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator.Companion.OperatorMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
@@ -43,7 +44,7 @@ class ShotStateChunk private constructor (
 
     override var enabledFlags: Int = 0
 
-    val computedOperationMap = HashMap<CypherAttribute, EnumMap<AttributeOperator, Double>>()
+    val computedOperationMap = HashMap<CypherAttribute, OperatorMap>()
 
     val hooks = HookContainer()
     private val projectiles = mutableListOf<ProjectileNode>()

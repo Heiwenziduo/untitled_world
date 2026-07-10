@@ -3,7 +3,7 @@ package com.github.nahnullscience.cypher_nexus.client.gui
 import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.CATEGORY_TITLE_PADDING
 import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.ICON_SIZE
 import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.ICON_SIZE_HALF
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.ITEM_SIZE
+import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.ELEMENT_SIZE
 import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.MARGIN
 import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.PADDING
 import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.SCROLLBAR_WIDTH
@@ -22,7 +22,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.input.MouseButtonEvent
-import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.sounds.Music
@@ -47,7 +46,7 @@ class CypherIndexScreen0(
     }
     val indexWidth: Int get() = (width * 0.5).toInt()
 
-    private val indexColumns: Int get() = max(1, (indexWidth - MARGIN * 2) / ITEM_SIZE)
+    private val indexColumns: Int get() = max(1, (indexWidth - MARGIN * 2) / ELEMENT_SIZE)
 
     private val layoutBlocks = mutableListOf<CategoryBlock>()
     private var totalHeight = 100
@@ -136,7 +135,7 @@ class CypherIndexScreen0(
     override fun mouseScrolled(mouseX: Double, mouseY: Double, scrollX: Double, scrollY: Double): Boolean {
         // Only scroll if the mouse is hovering over the left panel
         if (mouseX <= indexWidth) {
-            val scrollSpeed = ITEM_SIZE.toDouble() // this will scroll one full row at a time
+            val scrollSpeed = ELEMENT_SIZE.toDouble() // this will scroll one full row at a time
 
             // scrollY is typically 1.0 (up) or -1.0 (down)
             scrollOffset = Mth.clamp(scrollOffset - scrollY * scrollSpeed, 0.0, maxScroll)
@@ -243,8 +242,8 @@ class CypherIndexScreen0(
             val col = index % cols
             val row = index / cols
 
-            val x = MARGIN + col * ITEM_SIZE
-            val y = reY + PADDING + (row * ITEM_SIZE)
+            val x = MARGIN + col * ELEMENT_SIZE
+            val y = reY + PADDING + (row * ELEMENT_SIZE)
 
             // Optimization: Only render if the icon is actually visible on screen
             if (y + ICON_SIZE > 0 && y < this.height) {
@@ -313,7 +312,7 @@ class CypherIndexScreen0(
         val anchorX = indexWidth + WAND_BLOCK_MARGIN
         val anchorY1 = WAND_BLOCK_MARGIN
         val anchorY2 = anchorY1 + 60
-        val cols = max(1, (indexWidth - 2 * WAND_BLOCK_MARGIN) / ITEM_SIZE)
+        val cols = max(1, (indexWidth - 2 * WAND_BLOCK_MARGIN) / ELEMENT_SIZE)
 
         graphics.fill(anchorX, anchorY1, width - WAND_BLOCK_MARGIN, height - WAND_BLOCK_MARGIN, 0xCC333333.toInt())
 
@@ -331,8 +330,8 @@ class CypherIndexScreen0(
             for (i in 0 until currentEditCyphers.capacity) {
                 val col = i % cols
                 val row = i / cols
-                val x = anchorX + PADDING + col * ITEM_SIZE
-                val y = anchorY2 + PADDING + (row * ITEM_SIZE)
+                val x = anchorX + PADDING + col * ELEMENT_SIZE
+                val y = anchorY2 + PADDING + (row * ELEMENT_SIZE)
                 val cypher = currentEditCyphers[i]
 
                 renderWandBlocks(graphics, cypher, x, y)
@@ -402,7 +401,7 @@ class CypherIndexScreen0(
         val show: Boolean = list.isNotEmpty()
 
         val blockRows: Int get() = ceil(list.size.toDouble() / indexColumns).toInt()
-        val blockHeight: Int get() = blockRows * ITEM_SIZE + CATEGORY_TITLE_PADDING
+        val blockHeight: Int get() = blockRows * ELEMENT_SIZE + CATEGORY_TITLE_PADDING
         val reY: Int get() = layoutBlocks.filter { it.index < index }.sumOf { it.blockHeight } + CATEGORY_TITLE_PADDING
     }
 

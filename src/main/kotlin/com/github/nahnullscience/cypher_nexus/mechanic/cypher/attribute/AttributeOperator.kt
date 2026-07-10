@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
+import java.util.EnumMap
 import java.util.Locale.getDefault
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -91,6 +92,12 @@ enum class AttributeOperator {
 
     companion object {
 
+        typealias OperatorMap = EnumMap<AttributeOperator, Double>
+        /**
+         * calculate attribute value in vanilla style
+         * @param opMap contains pre-computed values for each [AttributeOperator],
+         * should champion [EnumMap] over [HashMap] for faster key access
+         * */
         fun attributeCalculator(opMap: Map<AttributeOperator, Double>, base: Double) : Double {
             val s = opMap[SET_ALL]
             if (s != null) return s
