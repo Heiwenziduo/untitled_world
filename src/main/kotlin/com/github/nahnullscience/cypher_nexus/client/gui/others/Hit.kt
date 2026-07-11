@@ -10,7 +10,8 @@ data class Hit(val cypher: AbstractCypher, val index: Int, val rect: ScreenRecta
     }
 
     override fun hashCode(): Int {
-        var result = cypher.hashCode()
+        var result = index
+        result = 31 * result + cypher.hashCode()
         result = 31 * result + rect.hashCode()
         return result
     }

@@ -66,7 +66,7 @@ class CypherIndexScreen(
 
     override fun extractBackground(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, a: Float) {
         super.extractBackground(graphics, mouseX, mouseY, a)
-        panels.forEach { panel -> graphics.outline(panel.x, panel.y, panel.w, panel.h, WHITE) }
+//        panels.forEach { panel -> graphics.outline(panel.x, panel.y, panel.w, panel.h, WHITE) }
     }
 
     override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {

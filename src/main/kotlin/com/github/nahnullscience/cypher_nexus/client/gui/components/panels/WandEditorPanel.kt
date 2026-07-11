@@ -1,21 +1,20 @@
 package com.github.nahnullscience.cypher_nexus.client.gui.components.panels
 
-import com.github.nahnullscience.cypher_nexus.client.gui.components.*
+import com.github.nahnullscience.cypher_nexus.client.gui.components.DragController
 import com.github.nahnullscience.cypher_nexus.client.gui.components.IScreenRect
+import com.github.nahnullscience.cypher_nexus.client.gui.components.IconGrid
 import com.github.nahnullscience.cypher_nexus.client.gui.components.RectBasics
 import com.github.nahnullscience.cypher_nexus.client.gui.others.Hit
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.DARK
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.ELEMENT_SIZE
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.ELEMENT_PADDING
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.ELEMENT_SIZE
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.WAND_BLOCK_MARGIN
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherHoverLayer
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherIcon
 import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEvent
 import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEventBus
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import net.minecraft.client.gui.GuiGraphicsExtractor
-import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.world.item.ItemStack
@@ -30,6 +29,9 @@ class WandEditorPanel(
 ) : IScreenRect by rectLayout, IScreenPanel {
 
     private val grid = IconGrid()
+    /**
+     * [Hit.cypher] maybe Empty, check before use
+     * */
     private var hovered: Hit? = null
 
     override fun resize(screenX: Int, screenY: Int) {
@@ -95,7 +97,7 @@ class WandEditorPanel(
         val aoc = data.highPayload.aoc
 
         val index = grid.indexAt(mouseX.toInt(), mouseY.toInt()) ?: return null
-        val cypher = aoc.getOrNull(index)?.takeIf { it.isNotEmpty() } ?: return null
+        val cypher = aoc.getOrNull(index) ?: return null
 
         return Hit(cypher, index, grid.cellRect(index))
     }

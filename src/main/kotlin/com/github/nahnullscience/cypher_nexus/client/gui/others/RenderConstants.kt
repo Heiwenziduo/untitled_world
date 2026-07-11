@@ -1,5 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.client.gui.others
 
+import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.renderer.RenderPipelines
@@ -15,6 +16,8 @@ object RenderConstants {
 
     const val ICON_TEXTURE = 12
     const val ICON_SIZE = 12
+    const val ICON_BORDER = 1
+    const val BORDER_SIZE = ICON_SIZE + ICON_BORDER * 2
     const val ICON_SIZE_HALF = ICON_SIZE / 2
     const val LIBRARY_MARGIN = 8 // space between content and border
     const val ELEMENT_PADDING = 3 // space between icons
@@ -25,11 +28,24 @@ object RenderConstants {
 
     const val WAND_BLOCK_MARGIN = 20
 
+    val cypherBg = CypherNexus.modResource("textures/gui/cypher_bg.png")
+
     fun renderCypherIcon(graphics: GuiGraphicsExtractor, cypher: AbstractCypher, x: Int, y: Int) {
         if (cypher.isNotEmpty()) {
             val borderColor = if (cypher.color != 0) cypher.color else cypher.category.value().color
-            graphics.outline(x - 1, y - 1, ICON_SIZE + 2, ICON_SIZE + 2, borderColor)
-//            graphics.blit(cypher.texture(), x, y, x + ICON_SIZE, y + ICON_SIZE, 0f, 0f, 0f, 0f)
+            graphics.blit(
+                RenderPipelines.GUI_TEXTURED,
+                cypherBg,
+                x - ICON_BORDER,
+                y - ICON_BORDER,
+                0.0f,
+                0.0f,
+                BORDER_SIZE,
+                BORDER_SIZE,
+                BORDER_SIZE,
+                BORDER_SIZE,
+                borderColor
+            )
             graphics.blit(
                 RenderPipelines.GUI_TEXTURED,
                 cypher.texture(),
