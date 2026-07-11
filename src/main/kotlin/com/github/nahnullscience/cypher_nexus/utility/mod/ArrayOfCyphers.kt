@@ -15,9 +15,6 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
     companion object {
         private fun AbstractCypher.isModule(): Boolean = isNotEmpty() && category.`is`(WAND_MODULE_RESOURCE)
 
-        /** O(n) */
-        fun of(list: List<AbstractCypher?>) = ArrayOfCyphers(list)
-
         const val MAX_LENGTH = Long.SIZE_BITS // max length capped at a Long-bits count (64), guess this is quite enough
 
         /**
@@ -82,9 +79,9 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
     internal val cyphers: Array<AbstractCypher> = Array(capacity) { EmptyCypher }
     /** not empty and not "passive" */
     var bitsInvokable: Long = 0
-    private set
+    protected set
     var bitsModule: Long = 0
-    private set
+    protected set
     /** the last Invokable index + 1 */
     val invokableSize : Int get() = 64 - bitsInvokable.countLeadingZeroBits()
 
@@ -102,48 +99,19 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
     }
     // this allows for-loop
     override fun iterator(): Iterator<AbstractCypher> = cyphers.iterator()
-    // this allows index-set: myInventory[0] = FireballCypher()
-    operator fun set(index: Int, cypher0: AbstractCypher?) {
-        val cypher = cypher0 ?: EmptyCypher
-        cyphers[index] = cypher
 
-        if (cypher.isInvokable) bitsInvokable = bitsInvokable or (1L shl index)
-        if (cypher.isModule()) bitsModule = bitsModule or (1L shl index)
-        if (cypher.isEmpty()) {
-            bitsInvokable = bitsInvokable and (1L shl index).inv()
-            bitsModule = bitsModule and (1L shl index).inv()
-        }
-    }
-    fun remove(index: Int) = set(index, null)
     /** O(n) */
     fun toList(): List<AbstractCypher> = cyphers.toList()
     /** Empty -> null */
     fun toNullableList(): List<AbstractCypher?> = cyphers.map { if (it.isEmpty()) null else it }
-    fun copy(): ArrayOfCyphers = ArrayOfCyphers(cyphers.toList())
+    /**
+     * @return a mutable `copy` of this [ArrayOfCyphers]
+     * */
+    fun toMutable(): MutableAoC = MutableAoC(this)
+    open fun copy(): ArrayOfCyphers = toMutable()
     fun isEmpty() = (bitsInvokable or bitsModule) == 0L
     fun isNotEmpty() = !isEmpty()
     fun isInvokable() = bitsInvokable != 0L
-
-    /** find the first Empty then replace that with given cypher
-     * @return the replaced index, -1 if no empty */
-    fun add(cypher: AbstractCypher) : Int {
-        // O(1) due to _bit-s
-        val first = (bitsInvokable or bitsModule).inv().countTrailingZeroBits()
-        if (first < capacity) {
-            set(first, cypher)
-            return first
-        }
-        return -1
-    }
-
-    fun switch(i0: Int, i1: Int) {
-        if (i0 >= capacity || i1 >= capacity) return
-        val t = this[i0]
-        this[i0] = this[i1] // this calls #set internally
-        this[i1] = t
-    }
-
-
 
     /** gets a bit representation of cyphers, non-invokable set to 0 */
     fun bits(): Long {
@@ -278,15 +246,58 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
 
     override fun toString() = cyphers.toList().toString()
 
-    class MutableAoC(val aoc: ArrayOfCyphers) : Iterable<AbstractCypher> by aoc {
-        constructor(capacity: Int) : this(ArrayOfCyphers(capacity))
-        // TODO consider move #set function here
-        fun clearAll() {
-            aoc.bitsInvokable = 0
-            aoc.bitsModule = 0
-            for (i in aoc.cyphers.indices) {
-                aoc.cyphers[i] = EmptyCypher
+
+    /**
+     *
+     * */
+    class MutableAoC(list: List<AbstractCypher?>) : ArrayOfCyphers(list) {
+        constructor(aoc: ArrayOfCyphers) : this(aoc.toList())
+
+
+        /** find the first Empty then replace that with given cypher
+         * @return the replaced index, -1 if no empty */
+        fun add(cypher: AbstractCypher) : Int {
+            // O(1) due to _bit-s
+            val first = (bitsInvokable or bitsModule).inv().countTrailingZeroBits()
+            if (first < capacity) {
+                set(first, cypher)
+                return first
+            }
+            return -1
+        }
+
+        fun switch(i0: Int, i1: Int) {
+            if (i0 >= capacity || i1 >= capacity) return
+            val t = this[i0]
+            this[i0] = this[i1] // this calls #set internally
+            this[i1] = t
+        }
+
+        // this allows index-set: myInventory[0] = FireballCypher()
+        operator fun set(index: Int, cypher0: AbstractCypher?) {
+            val cypher = cypher0 ?: EmptyCypher
+            cyphers[index] = cypher
+
+            if (cypher.isInvokable) bitsInvokable = bitsInvokable or (1L shl index)
+            if (cypher.isModule()) bitsModule = bitsModule or (1L shl index)
+            if (cypher.isEmpty()) {
+                bitsInvokable = bitsInvokable and (1L shl index).inv()
+                bitsModule = bitsModule and (1L shl index).inv()
             }
         }
+        fun remove(index: Int) = set(index, null)
+
+        fun clearAll() {
+            bitsInvokable = 0
+            bitsModule = 0
+            for (i in cyphers.indices) {
+                cyphers[i] = EmptyCypher
+            }
+        }
+
+        /**
+         * @return a copy of this [MutableAoC], changes made to the copy won't affect the original
+         * */
+        override fun copy(): MutableAoC = MutableAoC(toList())
     }
 }

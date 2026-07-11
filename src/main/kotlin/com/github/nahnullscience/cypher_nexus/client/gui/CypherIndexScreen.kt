@@ -93,6 +93,11 @@ class CypherIndexScreen(
                 || super.mouseScrolled(mouseX, mouseY, scrollX, scrollY)
     }
 
+    override fun onClose() {
+        super.onClose()
+        panels.forEach { it.onScreenClose() }
+    }
+
     override fun isPauseScreen() = false
     override fun getBackgroundMusic(): Music? = super.getBackgroundMusic()
 }

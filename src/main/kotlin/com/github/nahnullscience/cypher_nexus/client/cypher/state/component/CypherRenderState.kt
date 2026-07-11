@@ -24,8 +24,8 @@ class CypherRenderState : ICypherEntityRenderState {
         bouncePoints = cy.bouncePoints
 
         if (flags.containsFlag(CypherFlags.GLOWING)) {
-            val sky = LightCoordsUtil.sky(state.lightCoords)
-            state.lightCoords = LightCoordsUtil.pack(15, sky)
+            val block = LightCoordsUtil.block(state.lightCoords)
+            state.lightCoords = LightCoordsUtil.pack(block, 15)
         }
     }
 }

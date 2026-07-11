@@ -5,15 +5,15 @@ import com.github.nahnullscience.cypher_nexus.client.gui.components.IScreenRect
 import com.github.nahnullscience.cypher_nexus.client.gui.components.IconGrid
 import com.github.nahnullscience.cypher_nexus.client.gui.components.RectBasics
 import com.github.nahnullscience.cypher_nexus.client.gui.others.Hit
+import com.github.nahnullscience.cypher_nexus.client.gui.others.IndexScreenEvents.*
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.DARK
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.ELEMENT_PADDING
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.ELEMENT_SIZE
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.WAND_BLOCK_MARGIN
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherHoverLayer
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherIcon
-import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEvent
 import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEventBus
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
+import com.github.nahnullscience.cypher_nexus.client.gui.others.WandEditSession
+import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.input.MouseButtonEvent
@@ -22,21 +22,34 @@ import kotlin.math.max
 
 class WandEditorPanel(
     val screen: Screen,
-    val wands: List<ItemStack>,
+    wands: List<ItemStack>,
     val bus: UiEventBus,
     val drag: DragController,
     private val rectLayout: IScreenRect = RectBasics()
 ) : IScreenRect by rectLayout, IScreenPanel {
 
+    private val session = WandEditSession(wands)
     private val grid = IconGrid()
     /**
      * [Hit.cypher] maybe Empty, check before use
      * */
     private var hovered: Hit? = null
 
+    init {
+        // right-click quick-assign from the library — session owns the mutation, panel just relays
+        bus.subscribe { event ->
+            if (event is CypherQuickAssign) {
+                val aoc = session.currentAoc ?: return@subscribe
+                val slot = aoc.firstEmptyIndex().takeIf { it >= 0 } ?: return@subscribe
+                session.setSlot(slot, event.cypher)
+                bus.emit(WandSlotAssigned(event.cypher, grid.cellRect(slot), event.fromRect))
+            }
+        }
+    }
+
     override fun resize(screenX: Int, screenY: Int) {
         rectLayout.resize(screenX, screenY)
-        grid.cols = max(1, (w - 2 * WAND_BLOCK_MARGIN) / ELEMENT_SIZE)
+        grid.cols = max(1, (w - 2 * WAND_BLOCK_MARGIN) / grid.elementSize)
         grid.originX = x + WAND_BLOCK_MARGIN + ELEMENT_PADDING
         grid.originY = y + WAND_BLOCK_MARGIN + 60
     }
@@ -49,26 +62,17 @@ class WandEditorPanel(
     ) {
         hovered = hitTest(mouseX.toDouble(), mouseY.toDouble())
 
-        if (wands.isNotEmpty()) {
-            renderWandData(graphics, mouseX, mouseY, partial)
-        }
+        val stack = session.currentStack ?: return
+        val aoc = session.currentAoc ?: return
+        renderWandData(graphics, stack, aoc)
     }
 
-    fun renderWandData(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partial: Float) {
+    private fun renderWandData(graphics: GuiGraphicsExtractor, stack: ItemStack, aoc: ArrayOfCyphers) {
         val anchorX = x + WAND_BLOCK_MARGIN
         val anchorY1 = y + WAND_BLOCK_MARGIN
 
         graphics.fill(anchorX, anchorY1, right - WAND_BLOCK_MARGIN, bot - WAND_BLOCK_MARGIN, DARK)
-
-        val currentStack = wands[0]
-        val wand = currentStack.item as? IWandLike ?: return
-        val data = wand.getWandData(currentStack, null) ?: return
-
-        val (manaMax, manaRegen) = data.invariable.chunkF
-        val (draw, castDelay, rechargeTime) = data.invariable.chunkI
-        val aoc = data.highPayload.aoc
-
-        graphics.item(currentStack, anchorX, anchorY1)
+        graphics.item(stack, anchorX, anchorY1) // TODO: click this to session.selectNext(), or swap for a real wand selector
 
         for (i in 0 until aoc.capacity) {
             val rect = grid.cellRect(i)
@@ -82,23 +86,32 @@ class WandEditorPanel(
     override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
         val hit = hitTest(event.x, event.y) ?: return false
         when (event.button()) {
-            1 -> bus.emit(UiEvent.CypherActivated(hit.cypher, hit.rect))
-            0 -> bus.emit(UiEvent.DragStarted(hit.cypher, hit.rect))
+            0 -> bus.emit(DragStarted(hit.cypher, hit.rect))
+            1 -> {
+                session.setSlot(hit.index, null)
+//                bus.emit(CypherQuickAssign(hit.cypher, hit.rect))
+            }
         }
         return true
     }
 
+    override fun mouseReleased(event: MouseButtonEvent): Boolean {
+        val hit = hitTest(event.x, event.y) ?: return false
+        when (event.button()) {
+            0 -> {
+                bus.emit(DragEnded(true))
+            }
+        }
+        return true
+    }
+
+    override fun onScreenClose() = session.commitAll()
+
     private fun hitTest(mouseX: Double, mouseY: Double): Hit? {
         if (!contains(mouseX, mouseY)) return null
-
-        val currentStack = wands[0]
-        val wand = currentStack.item as? IWandLike ?: return null
-        val data = wand.getWandData(currentStack, null) ?: return null
-        val aoc = data.highPayload.aoc
-
+        val aoc = session.currentAoc ?: return null
         val index = grid.indexAt(mouseX.toInt(), mouseY.toInt()) ?: return null
-        val cypher = aoc.getOrNull(index) ?: return null
-
-        return Hit(cypher, index, grid.cellRect(index))
+        if (index !in 0 until aoc.capacity) return null
+        return Hit(aoc[index], index, grid.cellRect(index))
     }
 }

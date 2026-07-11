@@ -17,4 +17,5 @@ interface IScreenPanel : IScreenRect, Renderable {
     fun mouseDragged(event: MouseButtonEvent, dx: Double, dy: Double): Boolean = false
     fun mouseReleased(event: MouseButtonEvent): Boolean = false
     fun mouseScrolled(mouseX: Double, mouseY: Double, scrollX: Double, scrollY: Double): Boolean = false
+    fun onScreenClose() {}
 }

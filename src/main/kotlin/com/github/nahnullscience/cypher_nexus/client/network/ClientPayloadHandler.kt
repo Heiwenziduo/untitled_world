@@ -2,7 +2,6 @@ package com.github.nahnullscience.cypher_nexus.client.network
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.client.gui.CypherIndexScreen
-import com.github.nahnullscience.cypher_nexus.client.gui.CypherIndexScreen0
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
 import com.github.nahnullscience.cypher_nexus.mechanic.event.CNCommonEvents
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundEditWandCyphersConfirm
@@ -31,7 +30,6 @@ object ClientPayloadHandler {
         context.enqueueWork {
             // Do something with the data, on the main thread
 
-//            Minecraft.getInstance().setScreen(CypherIndexScreen0(map))
             Minecraft.getInstance().setScreen(CypherIndexScreen(map, list))
 
         }.exceptionally {

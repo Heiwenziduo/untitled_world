@@ -34,7 +34,7 @@ data class IconGrid(
     /** null if the point falls in a gap/margin, not inside any cell */
     fun indexAt(mouseX: Int, mouseY: Int): Int? {
         val mouseX = mouseX + mouseTolerance
-        val mouseY = mouseY + mouseTolerance
+        val mouseY = mouseY + mouseTolerance // weird, offset required
 
         val col = Math.floorDiv(mouseX - originX, elementSize)
         val borderLeft = originX + col * elementSize - mouseTolerance

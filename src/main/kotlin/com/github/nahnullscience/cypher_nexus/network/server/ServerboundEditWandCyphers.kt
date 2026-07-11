@@ -21,8 +21,10 @@ import org.apache.logging.log4j.Level
 
 data class ServerboundEditWandCyphers(
     val uuid: String,
-    val cyphers : List<AbstractCypher> // TODO use AOC instead
+    val cyphers : List<AbstractCypher>
 ) : CustomPacketPayload {
+    constructor(uuid: String, aoc: ArrayOfCyphers) : this(uuid, aoc.toList())
+
     override fun type() = TYPE
 
     fun confirm() = ClientboundEditWandCyphersConfirm(uuid, ArrayOfCyphers(cyphers))

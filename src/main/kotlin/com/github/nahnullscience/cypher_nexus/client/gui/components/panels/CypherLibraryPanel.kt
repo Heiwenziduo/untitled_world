@@ -14,8 +14,8 @@ import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.WHITE
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherHoverLayer
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherIcon
-import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEvent.CypherActivated
-import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEvent.DragStarted
+import com.github.nahnullscience.cypher_nexus.client.gui.others.IndexScreenEvents.CypherQuickAssign
+import com.github.nahnullscience.cypher_nexus.client.gui.others.IndexScreenEvents.DragStarted
 import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEventBus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
@@ -105,8 +105,8 @@ class CypherLibraryPanel(
 
         val hit = hitTest(event.x, event.y) ?: return false
         when (event.button()) {
-            1 -> bus.emit(CypherActivated(hit.cypher, hit.rect)) // right-click quick-assign hook
             0 -> bus.emit(DragStarted(hit.cypher, hit.rect))
+            1 -> bus.emit(CypherQuickAssign(hit.cypher, hit.rect)) // right-click quick-assign hook
         }
         return true
     }
