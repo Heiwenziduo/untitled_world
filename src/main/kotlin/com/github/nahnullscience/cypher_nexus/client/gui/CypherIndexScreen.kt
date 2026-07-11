@@ -2,11 +2,13 @@ package com.github.nahnullscience.cypher_nexus.client.gui
 
 import com.github.nahnullscience.cypher_nexus.client.gui.components.AnimationController
 import com.github.nahnullscience.cypher_nexus.client.gui.components.DragController
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.WHITE
-import com.github.nahnullscience.cypher_nexus.client.gui.components.UiEventBus
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.HEADER_HEIGHT
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.WHITE
+import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEventBus
 import com.github.nahnullscience.cypher_nexus.client.gui.components.panels.CypherLibraryPanel
+import com.github.nahnullscience.cypher_nexus.client.gui.components.panels.HeaderMenuPanel
 import com.github.nahnullscience.cypher_nexus.client.gui.components.panels.IScreenPanel
-import com.github.nahnullscience.cypher_nexus.client.gui.components.panels.WandInspectorPanel
+import com.github.nahnullscience.cypher_nexus.client.gui.components.panels.WandEditorPanel
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -24,26 +26,33 @@ class CypherIndexScreen(
     private val dragController = DragController(bus)
     private val animationController = AnimationController()
 
+    private val menu = HeaderMenuPanel(this, bus, dragController)
     private val library = CypherLibraryPanel(this, enabledCyphers, bus, dragController)
-    private val inspector = WandInspectorPanel(this, wandList, bus, dragController)
-    private val panels = listOf(library, inspector)
+    private val editor = WandEditorPanel(this, wandList, bus, dragController)
+    private val panels = listOf(menu, library, editor)
 
     // whichever panel consumes mouseClicked keeps receiving drag/release, even once the
     // pointer leaves its bounds mid-drag (e.g. dragging a scrollbar thumb below the panel)
     private var capturedPanel: IScreenPanel? = null
 
     init {
+        menu.setResizeFunction(
+            { 0 },
+            { 0 },
+            { w -> w },
+            { h -> HEADER_HEIGHT }
+        )
         library.setResizeFunction(
             { 0 },
-            { 0 },
+            { HEADER_HEIGHT },
             { w -> w / 2 },
-            { h -> h }
+            { h -> h - HEADER_HEIGHT }
         )
-        inspector.setResizeFunction(
+        editor.setResizeFunction(
             { x -> x / 2 },
-            { 0 },
+            { HEADER_HEIGHT },
             { w -> w / 2 },
-            { h -> h }
+            { h -> h - HEADER_HEIGHT }
         )
     }
 

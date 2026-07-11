@@ -91,6 +91,10 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
 
     // this allows index-get: myInventory[0]
     operator fun get(index: Int): AbstractCypher = cyphers[index]
+    /**
+     * Returns an element at the given [index] or `null` if the [index] is out of bounds of this array.
+     * */
+    fun getOrNull(index: Int): AbstractCypher? = cyphers.getOrNull(index)
     fun getInvokableOrNull(index: Int): AbstractCypher? {
         if (index >= capacity) return null
         val cy = this[index]

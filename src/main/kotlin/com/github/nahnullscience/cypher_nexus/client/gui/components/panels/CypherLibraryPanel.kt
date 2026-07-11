@@ -2,20 +2,21 @@ package com.github.nahnullscience.cypher_nexus.client.gui.components.panels
 
 import com.github.nahnullscience.cypher_nexus.client.gui.components.DragController
 import com.github.nahnullscience.cypher_nexus.client.gui.components.IScreenRect
+import com.github.nahnullscience.cypher_nexus.client.gui.components.IconGrid
 import com.github.nahnullscience.cypher_nexus.client.gui.components.RectBasics
 import com.github.nahnullscience.cypher_nexus.client.gui.components.Scrollbar
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.CATEGORY_TITLE_PADDING
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.DARK
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.ICON_SIZE
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.ELEMENT_SIZE
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.MARGIN
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.PADDING
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.SCROLLBAR_WIDTH
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.WHITE
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.renderCypherHoverLayer
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.renderCypherIcon
-import com.github.nahnullscience.cypher_nexus.client.gui.components.UiEvent
-import com.github.nahnullscience.cypher_nexus.client.gui.components.UiEventBus
+import com.github.nahnullscience.cypher_nexus.client.gui.others.Hit
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.CATEGORY_TITLE_PADDING
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.DARK
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.ELEMENT_SIZE
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.LIBRARY_MARGIN
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.SCROLLBAR_WIDTH
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.WHITE
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherHoverLayer
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherIcon
+import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEvent.CypherActivated
+import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEvent.DragStarted
+import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEventBus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -39,14 +40,14 @@ class CypherLibraryPanel(
 
     private var cols: Int = 1
     private val scrollbar = Scrollbar()
-    private var hovered: AbstractCypher? = null
+    private var hovered: Hit? = null
 
     private val totalContentHeight: Int
         get() = blocks.sumOf { it.height } + CATEGORY_TITLE_PADDING
 
     override fun resize(screenX: Int, screenY: Int) {
         rectLayout.resize(screenX, screenY)
-        cols = max(1, (w - MARGIN * 2) / ELEMENT_SIZE)
+        cols = max(1, (w - LIBRARY_MARGIN * 2) / ELEMENT_SIZE)
         blocks.forEach { it.resize() }
         scrollbar.layout(
             rect = ScreenRectangle(x, y, SCROLLBAR_WIDTH, h),
@@ -65,29 +66,27 @@ class CypherLibraryPanel(
 
         // computed once per frame here — read by both the highlight below and by click handling,
         // never rediscovered mid-draw
-        hovered = hitTest(mouseX.toDouble(), mouseY.toDouble())?.cypher
+        hovered = hitTest(mouseX.toDouble(), mouseY.toDouble())
 
-        for (b in blocks) renderCypherGrid(graphics, b)
+        graphics.enableScissor(x, y, x + w, y + h)
+        blocks.forEach { block ->
+            block.updateScroll()
+            renderCypherGrid(graphics, block)
+        }
         scrollbar.render(graphics)
+        graphics.disableScissor()
     }
 
     private fun renderCypherGrid(graphics: GuiGraphicsExtractor, block: CategoryBlock) {
-        val reY = y + block.reY - scrollbar.offset.toInt()
-        val reX = x + MARGIN + SCROLLBAR_WIDTH
+        val grid = block.grid
+        val reX = grid.originX
+        val reY = grid.originY
 
-        graphics.text(screen.font, block.title, reX, reY - 12, WHITE)
-        for ((index, cypher) in block.list.withIndex()) {
-            val col = index % cols
-            val row = index / cols
-            val drawX = reX + col * ELEMENT_SIZE
-            val drawY = reY + PADDING + (row * ELEMENT_SIZE)
-
-            if (drawY + ICON_SIZE > y && drawY < y + h) {
-                renderCypherIcon(graphics, cypher, drawX, drawY)
-                if (cypher === hovered) {
-                    renderCypherHoverLayer(graphics, drawX, drawY)
-                }
-            }
+        graphics.text(screen.font, block.title, reX, reY - 14, WHITE)
+        for ((i, cypher) in block.list.withIndex()) {
+            val rect = grid.cellRect(i)
+            renderCypherIcon(graphics, cypher, rect.left(), rect.top())
+            if (cypher === hovered?.cypher) renderCypherHoverLayer(graphics, rect.left(), rect.top())
         }
     }
 
@@ -106,8 +105,8 @@ class CypherLibraryPanel(
 
         val hit = hitTest(event.x, event.y) ?: return false
         when (event.button()) {
-            1 -> bus.emit(UiEvent.CypherActivated(hit.cypher, hit.rect)) // right-click quick-assign hook
-            0 -> bus.emit(UiEvent.DragStarted(hit.cypher, hit.rect))
+            1 -> bus.emit(CypherActivated(hit.cypher, hit.rect)) // right-click quick-assign hook
+            0 -> bus.emit(DragStarted(hit.cypher, hit.rect))
         }
         return true
     }
@@ -122,26 +121,16 @@ class CypherLibraryPanel(
     // hit-testing: pure inversion of the paint math above — O(#categories), no per-icon list
     // ================================================================================
 
-    private data class Hit(val cypher: AbstractCypher, val rect: ScreenRectangle)
-
     private fun hitTest(mouseX: Double, mouseY: Double): Hit? {
         if (!contains(mouseX, mouseY)) return null
 
         val localY = (mouseY - y).toInt() + scrollbar.offset.toInt()
-        val localX = (mouseX - x).toInt()
 
         val block = blocks.firstOrNull { localY >= it.reY && localY < it.reY + it.height } ?: return null
-        val row = (localY - block.reY - PADDING) / ELEMENT_SIZE
-        val col = (localX - MARGIN) / ELEMENT_SIZE
-        if (col !in 0 until cols || row < 0) return null
+        val index = block.grid.indexAt(mouseX.toInt(), mouseY.toInt()) ?: return null
+        val cypher = block.list.getOrNull(index)?.takeIf { it.isNotEmpty() } ?: return null
 
-        val cypher = block.list.getOrNull(row * cols + col)?.takeIf { it.isNotEmpty() } ?: return null
-        val rect = ScreenRectangle(
-            x + MARGIN + col * ELEMENT_SIZE,
-            y + block.reY - scrollbar.offset.toInt() + PADDING + row * ELEMENT_SIZE,
-            ICON_SIZE, ICON_SIZE
-        )
-        return Hit(cypher, rect)
+        return Hit(cypher, index, block.grid.cellRect(index))
     }
 
     private inner class CategoryBlock(
@@ -149,6 +138,7 @@ class CypherLibraryPanel(
         val list: List<AbstractCypher>,
         val index: Int
     ) {
+        val grid = IconGrid()
         val title: MutableComponent = category.translation()
 
         var reY: Int = 0
@@ -159,6 +149,14 @@ class CypherLibraryPanel(
             rows = (list.size + cols - 1) / cols // ceiling division — was silently adding a spare row
             height = rows * ELEMENT_SIZE + CATEGORY_TITLE_PADDING
             reY = blocks.filter { it.index < index }.sumOf { it.height } + CATEGORY_TITLE_PADDING
+
+            grid.cols = cols
+            grid.originX = x + LIBRARY_MARGIN + SCROLLBAR_WIDTH
+            updateScroll()
+        }
+
+        fun updateScroll() {
+            grid.originY = y + reY - scrollbar.offset.toInt()
         }
     }
 }

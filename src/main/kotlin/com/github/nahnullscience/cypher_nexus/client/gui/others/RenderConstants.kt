@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.client.gui.components
+package com.github.nahnullscience.cypher_nexus.client.gui.others
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -11,13 +11,15 @@ object RenderConstants {
     const val DARK = 0xCC333333.toInt()
     const val BLACK = 0xCC000000.toInt()
 
+    const val HEADER_HEIGHT = 16
+
     const val ICON_TEXTURE = 12
     const val ICON_SIZE = 12
     const val ICON_SIZE_HALF = ICON_SIZE / 2
-    const val MARGIN = 8 // space between content and border
-    const val PADDING = 3 // space between icons
-    const val ELEMENT_SIZE = ICON_SIZE + PADDING
-    const val CATEGORY_TITLE_PADDING = 18
+    const val LIBRARY_MARGIN = 8 // space between content and border
+    const val ELEMENT_PADDING = 3 // space between icons
+    const val ELEMENT_SIZE = ICON_SIZE + ELEMENT_PADDING
+    const val CATEGORY_TITLE_PADDING = 22
 
     const val SCROLLBAR_WIDTH = 4
 

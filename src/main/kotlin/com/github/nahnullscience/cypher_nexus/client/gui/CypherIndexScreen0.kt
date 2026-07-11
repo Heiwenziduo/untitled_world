@@ -1,15 +1,15 @@
 package com.github.nahnullscience.cypher_nexus.client.gui
 
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.CATEGORY_TITLE_PADDING
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.ICON_SIZE
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.ICON_SIZE_HALF
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.ELEMENT_SIZE
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.MARGIN
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.PADDING
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.SCROLLBAR_WIDTH
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.WAND_BLOCK_MARGIN
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.WHITE
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.renderCypherIcon
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.CATEGORY_TITLE_PADDING
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.ICON_SIZE
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.ICON_SIZE_HALF
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.ELEMENT_SIZE
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.LIBRARY_MARGIN
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.ELEMENT_PADDING
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.SCROLLBAR_WIDTH
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.WAND_BLOCK_MARGIN
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.WHITE
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherIcon
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
@@ -46,7 +46,7 @@ class CypherIndexScreen0(
     }
     val indexWidth: Int get() = (width * 0.5).toInt()
 
-    private val indexColumns: Int get() = max(1, (indexWidth - MARGIN * 2) / ELEMENT_SIZE)
+    private val indexColumns: Int get() = max(1, (indexWidth - LIBRARY_MARGIN * 2) / ELEMENT_SIZE)
 
     private val layoutBlocks = mutableListOf<CategoryBlock>()
     private var totalHeight = 100
@@ -234,7 +234,7 @@ class CypherIndexScreen0(
         // if (reY > this.height) return // out of border
 
         // render category title
-        graphics.text(font, block.title, MARGIN, reY - 12, WHITE)
+        graphics.text(font, block.title, LIBRARY_MARGIN, reY - 12, WHITE)
         ////////////////////////
 
         val cols = indexColumns
@@ -242,8 +242,8 @@ class CypherIndexScreen0(
             val col = index % cols
             val row = index / cols
 
-            val x = MARGIN + col * ELEMENT_SIZE
-            val y = reY + PADDING + (row * ELEMENT_SIZE)
+            val x = LIBRARY_MARGIN + col * ELEMENT_SIZE
+            val y = reY + ELEMENT_PADDING + (row * ELEMENT_SIZE)
 
             // Optimization: Only render if the icon is actually visible on screen
             if (y + ICON_SIZE > 0 && y < this.height) {
@@ -330,8 +330,8 @@ class CypherIndexScreen0(
             for (i in 0 until currentEditCyphers.capacity) {
                 val col = i % cols
                 val row = i / cols
-                val x = anchorX + PADDING + col * ELEMENT_SIZE
-                val y = anchorY2 + PADDING + (row * ELEMENT_SIZE)
+                val x = anchorX + ELEMENT_PADDING + col * ELEMENT_SIZE
+                val y = anchorY2 + ELEMENT_PADDING + (row * ELEMENT_SIZE)
                 val cypher = currentEditCyphers[i]
 
                 renderWandBlocks(graphics, cypher, x, y)

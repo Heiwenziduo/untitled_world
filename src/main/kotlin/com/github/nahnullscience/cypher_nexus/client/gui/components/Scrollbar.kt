@@ -1,6 +1,8 @@
 package com.github.nahnullscience.cypher_nexus.client.gui.components
 
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RenderConstants.SCROLLBAR_WIDTH
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.SCROLLBAR_WIDTH
+import com.github.nahnullscience.cypher_nexus.client.gui.others.Classic
+import com.github.nahnullscience.cypher_nexus.client.gui.others.ColorTheme
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.util.Mth

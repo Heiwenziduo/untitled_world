@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.client.gui.components
+package com.github.nahnullscience.cypher_nexus.client.gui.others
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import net.minecraft.client.gui.navigation.ScreenRectangle
