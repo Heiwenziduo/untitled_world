@@ -164,7 +164,14 @@
   "cypher.cypher_nexus.utility.proteus": "Proteus",
   "cypher.cypher_nexus.utility.proteus.description": "",
 
-  "gui.cypher_nexus.cypher_index.": "--tmp",
+  "gui.cypher_nexus.cypher_index.": "",
+  "gui.cypher_nexus.wand.mana_max": "Max Mana: %s",
+  "gui.cypher_nexus.wand.mana_regen": "Mana Regen: %s/s",
+  "gui.cypher_nexus.wand.spread": "Spread: %s°",
+  "gui.cypher_nexus.wand.cast_delay": "Delay: %ss",
+  "gui.cypher_nexus.wand.recharge_time": "Recharge: %ss",
+  "gui.cypher_nexus.wand.draw": "Draw: %s",
+  "gui.cypher_nexus.wand.etch": "Etch: %s",
 
   "item_group.cypher_nexus": "Cypher Nexus",
 

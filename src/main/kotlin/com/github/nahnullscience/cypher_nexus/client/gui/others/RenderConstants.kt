@@ -2,8 +2,12 @@ package com.github.nahnullscience.cypher_nexus.client.gui.others
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
+import net.minecraft.ChatFormatting
+import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.renderer.RenderPipelines
+import net.minecraft.network.chat.Component
+import java.util.Optional
 
 object RenderConstants {
     val theme: ColorTheme get() = Classic
@@ -19,14 +23,10 @@ object RenderConstants {
     const val ICON_BORDER = 1
     const val BORDER_SIZE = ICON_SIZE + ICON_BORDER * 2
     const val ICON_SIZE_HALF = ICON_SIZE / 2
-    const val LIBRARY_MARGIN = 8 // space between content and border
     const val ELEMENT_PADDING = 3 // space between icons
     const val ELEMENT_SIZE = ICON_SIZE + ELEMENT_PADDING
-    const val CATEGORY_TITLE_PADDING = 22
 
     const val SCROLLBAR_WIDTH = 4
-
-    const val WAND_BLOCK_MARGIN = 20
 
     val cypherBg = CypherNexus.modResource("textures/gui/cypher_bg.png")
 
@@ -60,7 +60,58 @@ object RenderConstants {
             )
         }
     }
+
     fun renderCypherHoverLayer(graphics: GuiGraphicsExtractor, x: Int, y: Int) {
         graphics.fill(x, y, x + ICON_SIZE, y + ICON_SIZE, LIGHT)
+    }
+
+    fun renderCypherTooltip(graphics: GuiGraphicsExtractor, font: Font, cypher: AbstractCypher, mouseX: Int, mouseY: Int) {
+        if (cypher.isEmpty()) return
+//        val components = mutableListOf<ClientTooltipComponent>()
+//
+//        val titleText = cypher.translation().withStyle(ChatFormatting.GOLD)
+//        components.add(ClientTooltipComponent.create(titleText.visualOrderText))
+//        val descriptionText = cypher.description().withStyle(ChatFormatting.GRAY)
+////        components.add(CypherDescriptionTooltip(CypherDescriptionTooltip.TooltipDataBundle(descText, cypher.texture())))
+//
+//        for (c in cypher.attributesTooltip) {
+//            components.add(ClientTooltipComponent.create(c.visualOrderText))
+//        }
+//
+//        graphics.tooltip(font, components, mouseX, mouseY, DefaultTooltipPositioner.INSTANCE, null)
+
+        val componentsList = mutableListOf<Component>()
+        val titleText = cypher.translation().withStyle(ChatFormatting.GOLD)
+        componentsList.add(titleText)
+        componentsList.addAll(cypher.attributesTooltip)
+        graphics.setTooltipForNextFrame(font, componentsList, Optional.empty(), mouseX, mouseY)
+    }
+
+    /**
+     * draws a small square glyph immediately followed by [text] on the same line, vertically centered
+     * against each other. returns the x-coordinate right after the text, so callers can chain several
+     * icon+text pairs on one line if they want.
+     *
+     * deliberately generic about what "the icon" is — pass a lambda that draws whatever: a flat color
+     * swatch, a real texture blit, or an existing helper like [renderCypherIcon]. that's what lets this
+     * one primitive cover a stat readout today and a cypher-icon-prefixed tooltip line later, without
+     * writing a second version of this function when that day comes.
+     * */
+    fun GuiGraphicsExtractor.renderIconText(
+        font: Font,
+        text: Component,
+        x: Int,
+        y: Int,
+        glyphSize: Int = 8,
+        gap: Int = 3,
+        color: Int = WHITE,
+        glyph: GuiGraphicsExtractor.(gx: Int, gy: Int, gSize: Int) -> Unit
+    ): Int {
+        val glyphY = y + (font.lineHeight - glyphSize) / 2 // center the glyph against the text's line height
+        val textX = x + glyphSize + gap
+
+        this.glyph(x, glyphY, glyphSize)
+        this.text(font, text, textX, y, color)
+        return textX + font.width(text)
     }
 }

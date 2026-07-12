@@ -14,7 +14,7 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor
  * owns wand-editing state: which wand is open, its working (possibly edited) cypher array,
  * and a queue of edits for wands the player switched away from without committing.
  *
- * knows nothing about pixels, mouse input, or GuiGraphics — [WandEditorPanel] is the only
+ * knows nothing about pixels, mouse input, or GuiGraphics — [com.github.nahnullscience.cypher_nexus.client.gui.components.panels.WandEditorPanel] is the only
  * thing that calls into this, and it's the only thing this class reports back to.
  * */
 class WandEditSession(private val wands: List<ItemStack>) {

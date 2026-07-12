@@ -8,15 +8,27 @@ import com.github.nahnullscience.cypher_nexus.client.gui.others.Hit
 import com.github.nahnullscience.cypher_nexus.client.gui.others.IndexScreenEvents.*
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.DARK
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.ELEMENT_PADDING
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.WAND_BLOCK_MARGIN
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.WHITE
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherHoverLayer
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherIcon
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherTooltip
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderIconText
 import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEventBus
 import com.github.nahnullscience.cypher_nexus.client.gui.others.WandEditSession
+import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty
+import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty.CastDelay
+import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty.Draw
+import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty.ManaMax
+import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty.ManaRegen
+import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty.RechargeTime
+import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty.Spread
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.input.MouseButtonEvent
+import net.minecraft.client.renderer.RenderPipelines
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import kotlin.math.max
 
@@ -28,6 +40,14 @@ class WandEditorPanel(
     private val rectLayout: IScreenRect = RectBasics()
 ) : IScreenRect by rectLayout, IScreenPanel {
 
+    companion object {
+        private const val WAND_BLOCK_MARGIN = 16
+        private const val ITEM_ICON_SIZE = 16
+        private const val STAT_LINE_HEIGHT = 10
+        private const val STAT_LINE_COUNT = 7
+        private const val STAT_GAP = 6 // horizontal gap between the item icon and the stat text
+    }
+
     private val session = WandEditSession(wands)
     private val grid = IconGrid()
     /**
@@ -35,8 +55,12 @@ class WandEditorPanel(
      * */
     private var hovered: Hit? = null
 
+    // single source of truth for "how tall is the stats block" — resize() and renderWandStats()
+    // both read this, so adding a stat line moves the grid down automatically instead of overlapping it
+    private val statsBlockHeight: Int
+        get() = max(ITEM_ICON_SIZE, STAT_LINE_COUNT * STAT_LINE_HEIGHT)
+
     init {
-        // right-click quick-assign from the library — session owns the mutation, panel just relays
         bus.subscribe { event ->
             if (event is CypherQuickAssign) {
                 val aoc = session.currentAoc ?: return@subscribe
@@ -51,7 +75,7 @@ class WandEditorPanel(
         rectLayout.resize(screenX, screenY)
         grid.cols = max(1, (w - 2 * WAND_BLOCK_MARGIN) / grid.elementSize)
         grid.originX = x + WAND_BLOCK_MARGIN + ELEMENT_PADDING
-        grid.originY = y + WAND_BLOCK_MARGIN + 60
+        grid.originY = y + WAND_BLOCK_MARGIN + statsBlockHeight + ELEMENT_PADDING * 2
     }
 
     override fun extractRenderState(
@@ -61,6 +85,10 @@ class WandEditorPanel(
         partial: Float
     ) {
         hovered = hitTest(mouseX.toDouble(), mouseY.toDouble())
+
+        if (!drag.isDragging) hovered?.let { hit ->
+            renderCypherTooltip(graphics, screen.font, hit.cypher, mouseX, mouseY)
+        }
 
         val stack = session.currentStack ?: return
         val aoc = session.currentAoc ?: return
@@ -74,6 +102,10 @@ class WandEditorPanel(
         graphics.fill(anchorX, anchorY1, right - WAND_BLOCK_MARGIN, bot - WAND_BLOCK_MARGIN, DARK)
         graphics.item(stack, anchorX, anchorY1) // TODO: click this to session.selectNext(), or swap for a real wand selector
 
+        session.currentInvariable?.let {
+            renderWandStats(graphics, it, anchorX + ITEM_ICON_SIZE + STAT_GAP, anchorY1)
+        }
+
         for (i in 0 until aoc.capacity) {
             val rect = grid.cellRect(i)
             val cypher = aoc[i]
@@ -83,19 +115,56 @@ class WandEditorPanel(
         }
     }
 
+    /** Noita-style stat readout: colored swatch + label, one stat per line */
+    private fun renderWandStats(graphics: GuiGraphicsExtractor, data: WandDataInvariable, x: Int, y: Int) {
+        val font = screen.font
+        var lineY = y
+
+        fun line(color: Int, label: String, value: String) {
+            graphics.renderIconText(font, Component.literal("$label $value"), x, lineY, 6, 4, WHITE)
+            { gx, gy, gSize ->
+                fill(x, y, gx + gSize, gy + gSize, color)
+            }
+            lineY += STAT_LINE_HEIGHT
+        }
+
+        fun <T : Any> property(p: WandProperty<T>, v: T) {
+            graphics.renderIconText(font, p.text(v), x, lineY, 6, 4) { gx, gy, gSize ->
+                blit(RenderPipelines.GUI_TEXTURED, p.icon, gx, gy, 0f, 0f, gSize, gSize, gSize, gSize)
+            }
+
+            lineY += STAT_LINE_HEIGHT
+        }
+
+        property(ManaMax, data.chunkF.manaMax)
+        property(ManaRegen, data.chunkF.manaRegen)
+        property(Spread, data.chunkF.spread)
+        property(CastDelay, data.chunkI.castDelay)
+        property(RechargeTime, data.chunkI.rechargeTime)
+        property(Draw, data.chunkI.draw)
+
+//        line(0xFF00FFFF.toInt(), "Mana Max", "${data.chunkF.manaMax.toInt()}")
+//        line(0xFF00FFFF.toInt(), "Mana/tick", "${data.chunkF.manaRegen}")
+//        line(0xFF32CD32.toInt(), "Cast Delay", "${data.chunkI.castDelay}t")
+//        line(0xFFFFD700.toInt(), "Recharge", "${data.chunkI.rechargeTime}t")
+    }
+
     override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
         val hit = hitTest(event.x, event.y) ?: return false
-        if (hit.cypher.isEmpty()) return false   // nothing to pick up or delete on a blank slot
+        if (hit.cypher.isEmpty()) return false
 
         when (event.button()) {
-            0 -> bus.emit(DragStarted(hit.cypher, hit.rect))
+            0 -> {
+                bus.emit(DragStarted(hit.cypher, hit.rect))
+                session.setSlot(hit.index, null)
+            }
             1 -> session.setSlot(hit.index, null)
         }
         return true
     }
 
     override fun mouseReleased(event: MouseButtonEvent): Boolean {
-        val payload = drag.current ?: return false // no drag active, nothing to do
+        val payload = drag.current ?: return false
         val index = grid.indexAt(event.x.toInt(), event.y.toInt()) ?: return false
         session.setSlot(index, payload.cypher)
         return true

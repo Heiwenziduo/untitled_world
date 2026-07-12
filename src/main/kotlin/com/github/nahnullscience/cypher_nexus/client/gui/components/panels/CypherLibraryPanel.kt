@@ -1,21 +1,16 @@
 package com.github.nahnullscience.cypher_nexus.client.gui.components.panels
 
-import com.github.nahnullscience.cypher_nexus.client.gui.components.DragController
-import com.github.nahnullscience.cypher_nexus.client.gui.components.IScreenRect
-import com.github.nahnullscience.cypher_nexus.client.gui.components.IconGrid
-import com.github.nahnullscience.cypher_nexus.client.gui.components.RectBasics
-import com.github.nahnullscience.cypher_nexus.client.gui.components.Scrollbar
+import com.github.nahnullscience.cypher_nexus.client.gui.components.*
 import com.github.nahnullscience.cypher_nexus.client.gui.others.Hit
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.CATEGORY_TITLE_PADDING
+import com.github.nahnullscience.cypher_nexus.client.gui.others.IndexScreenEvents.CypherQuickAssign
+import com.github.nahnullscience.cypher_nexus.client.gui.others.IndexScreenEvents.DragStarted
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.DARK
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.ELEMENT_SIZE
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.LIBRARY_MARGIN
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.SCROLLBAR_WIDTH
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.WHITE
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherHoverLayer
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherIcon
-import com.github.nahnullscience.cypher_nexus.client.gui.others.IndexScreenEvents.CypherQuickAssign
-import com.github.nahnullscience.cypher_nexus.client.gui.others.IndexScreenEvents.DragStarted
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherTooltip
 import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEventBus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
@@ -33,6 +28,11 @@ class CypherLibraryPanel(
     val drag: DragController,
     private val rectLayout: IScreenRect = RectBasics()
 ) : IScreenRect by rectLayout, IScreenPanel {
+
+    companion object {
+        private const val LIBRARY_MARGIN = 8
+        private const val CATEGORY_TITLE_PADDING = 22
+    }
 
     private val blocks: List<CategoryBlock> =
         cypherMap.entries.filter { it.value.isNotEmpty() } // drop empty categories up front
@@ -67,6 +67,10 @@ class CypherLibraryPanel(
         // computed once per frame here — read by both the highlight below and by click handling,
         // never rediscovered mid-draw
         hovered = hitTest(mouseX.toDouble(), mouseY.toDouble())
+
+        if (!drag.isDragging) hovered?.let { hit ->
+            renderCypherTooltip(graphics, screen.font, hit.cypher, mouseX, mouseY)
+        }
 
         graphics.enableScissor(x, y, x + w, y + h)
         blocks.forEach { block ->
