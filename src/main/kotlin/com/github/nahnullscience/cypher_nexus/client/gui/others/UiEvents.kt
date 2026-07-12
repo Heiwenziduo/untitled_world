@@ -18,7 +18,7 @@ sealed class IndexScreenEvents {
     /**
      *
      * */
-    data class DragStarted(val payload: AbstractCypher, val fromRect: ScreenRectangle) : IndexScreenEvents()
+    data class DragStarted(val cypher: AbstractCypher, val fromRect: ScreenRectangle) : IndexScreenEvents()
 
     /**
      *

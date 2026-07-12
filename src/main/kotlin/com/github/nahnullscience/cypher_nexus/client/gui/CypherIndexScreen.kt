@@ -9,6 +9,9 @@ import com.github.nahnullscience.cypher_nexus.client.gui.components.panels.Cyphe
 import com.github.nahnullscience.cypher_nexus.client.gui.components.panels.HeaderMenuPanel
 import com.github.nahnullscience.cypher_nexus.client.gui.components.panels.IScreenPanel
 import com.github.nahnullscience.cypher_nexus.client.gui.components.panels.WandEditorPanel
+import com.github.nahnullscience.cypher_nexus.client.gui.others.IndexScreenEvents.DragEnded
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.ICON_SIZE_HALF
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherIcon
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -66,7 +69,15 @@ class CypherIndexScreen(
 
     override fun extractBackground(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, a: Float) {
         super.extractBackground(graphics, mouseX, mouseY, a)
-//        panels.forEach { panel -> graphics.outline(panel.x, panel.y, panel.w, panel.h, WHITE) }
+        // panels.forEach { graphics.outline(it.x, it.y, it.w, it.h, WHITE) }
+    }
+
+    override fun extractRenderState(graphics: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, a: Float) {
+        super.extractRenderState(graphics, mouseX, mouseY, a)
+
+        dragController.current?.let { payload ->
+            renderCypherIcon(graphics, payload.cypher, mouseX - ICON_SIZE_HALF, mouseY - ICON_SIZE_HALF)
+        }
     }
 
     override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
@@ -82,6 +93,17 @@ class CypherIndexScreen(
         capturedPanel?.mouseDragged(event, dx, dy) ?: super.mouseDragged(event, dx, dy)
 
     override fun mouseReleased(event: MouseButtonEvent): Boolean {
+        if (dragController.isDragging) {
+            // drop target = whoever is under the cursor NOW, deliberately NOT capturedPanel —
+            // the destination is by definition a different panel than the one that started the drag
+            val target = panels.firstOrNull { it.contains(event.x, event.y) }
+            val consumed = target?.mouseReleased(event) ?: false
+            bus.emit(DragEnded(consumed))
+            capturedPanel = null
+            return consumed
+        }
+
+        // ordinary case (e.g. scrollbar): release still goes to whoever captured the click
         val target = capturedPanel
         capturedPanel = null
         return target?.mouseReleased(event) ?: super.mouseReleased(event)

@@ -31,12 +31,13 @@ sealed class LivingGatherWandsEvent(entity: LivingEntity) : LivingEvent(entity) 
                 }
             } else {
                 // collect wands in hotbar & offhand
+                val offHand = living.inventory.getItem(Inventory.SLOT_OFFHAND)
+                if (IWandLike.validateItemWand(offHand)) addWand(offHand)
+
                 for (i in 0 until 9) {
                     val stack = living.inventory.getItem(i)
                     if (IWandLike.validateItemWand(stack)) addWand(stack)
                 }
-                val offHand = living.inventory.getItem(Inventory.SLOT_OFFHAND)
-                if (IWandLike.validateItemWand(offHand)) addWand(offHand)
             }
         }
     }

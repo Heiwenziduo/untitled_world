@@ -1,6 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.client.gui.others
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
 import com.github.nahnullscience.cypher_nexus.network.server.ServerboundEditWandCyphers
@@ -63,6 +64,8 @@ class WandEditSession(private val wands: List<ItemStack>) {
     fun setSlot(index: Int, cypher: AbstractCypher?) {
         val copy = workingCopy ?: return
         if (index !in 0 until copy.capacity) return
+        val target = cypher ?: EmptyCypher
+        if (copy[index] === target) return
         copy[index] = cypher
         dirty = true
     }

@@ -85,23 +85,19 @@ class WandEditorPanel(
 
     override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {
         val hit = hitTest(event.x, event.y) ?: return false
+        if (hit.cypher.isEmpty()) return false   // nothing to pick up or delete on a blank slot
+
         when (event.button()) {
             0 -> bus.emit(DragStarted(hit.cypher, hit.rect))
-            1 -> {
-                session.setSlot(hit.index, null)
-//                bus.emit(CypherQuickAssign(hit.cypher, hit.rect))
-            }
+            1 -> session.setSlot(hit.index, null)
         }
         return true
     }
 
     override fun mouseReleased(event: MouseButtonEvent): Boolean {
-        val hit = hitTest(event.x, event.y) ?: return false
-        when (event.button()) {
-            0 -> {
-                bus.emit(DragEnded(true))
-            }
-        }
+        val payload = drag.current ?: return false // no drag active, nothing to do
+        val index = grid.indexAt(event.x.toInt(), event.y.toInt()) ?: return false
+        session.setSlot(index, payload.cypher)
         return true
     }
 
