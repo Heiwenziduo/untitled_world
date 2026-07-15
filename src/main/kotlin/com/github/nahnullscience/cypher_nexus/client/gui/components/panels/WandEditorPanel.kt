@@ -16,6 +16,7 @@ import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.
 import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEventBus
 import com.github.nahnullscience.cypher_nexus.client.gui.others.WandEditSession
 import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty
+import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty.Capacity
 import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty.CastDelay
 import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty.Draw
 import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty.ManaMax
@@ -44,7 +45,7 @@ class WandEditorPanel(
         private const val WAND_BLOCK_MARGIN = 16
         private const val ITEM_ICON_SIZE = 16
         private const val STAT_LINE_HEIGHT = 10
-        private const val STAT_LINE_COUNT = 7
+        private const val STAT_LINE_COUNT = 8
         private const val STAT_GAP = 6 // horizontal gap between the item icon and the stat text
     }
 
@@ -103,7 +104,8 @@ class WandEditorPanel(
         graphics.item(stack, anchorX, anchorY1) // TODO: click this to session.selectNext(), or swap for a real wand selector
 
         session.currentInvariable?.let {
-            renderWandStats(graphics, it, anchorX + ITEM_ICON_SIZE + STAT_GAP, anchorY1)
+            val aoc = session.currentAoc ?: return@let
+            renderWandStats(graphics, it, aoc, anchorX + ITEM_ICON_SIZE + STAT_GAP, anchorY1)
         }
 
         for (i in 0 until aoc.capacity) {
@@ -116,17 +118,9 @@ class WandEditorPanel(
     }
 
     /** Noita-style stat readout: colored swatch + label, one stat per line */
-    private fun renderWandStats(graphics: GuiGraphicsExtractor, data: WandDataInvariable, x: Int, y: Int) {
+    private fun renderWandStats(graphics: GuiGraphicsExtractor, data: WandDataInvariable, aoc: ArrayOfCyphers, x: Int, y: Int) {
         val font = screen.font
         var lineY = y
-
-        fun line(color: Int, label: String, value: String) {
-            graphics.renderIconText(font, Component.literal("$label $value"), x, lineY, 6, 4, WHITE)
-            { gx, gy, gSize ->
-                fill(x, y, gx + gSize, gy + gSize, color)
-            }
-            lineY += STAT_LINE_HEIGHT
-        }
 
         fun <T : Any> property(p: WandProperty<T>, v: T) {
             graphics.renderIconText(font, p.text(v), x, lineY, 6, 4) { gx, gy, gSize ->
@@ -138,15 +132,11 @@ class WandEditorPanel(
 
         property(ManaMax, data.chunkF.manaMax)
         property(ManaRegen, data.chunkF.manaRegen)
-        property(Spread, data.chunkF.spread)
+        property(Capacity, aoc.capacity)
+        property(Draw, data.chunkI.draw)
         property(CastDelay, data.chunkI.castDelay)
         property(RechargeTime, data.chunkI.rechargeTime)
-        property(Draw, data.chunkI.draw)
-
-//        line(0xFF00FFFF.toInt(), "Mana Max", "${data.chunkF.manaMax.toInt()}")
-//        line(0xFF00FFFF.toInt(), "Mana/tick", "${data.chunkF.manaRegen}")
-//        line(0xFF32CD32.toInt(), "Cast Delay", "${data.chunkI.castDelay}t")
-//        line(0xFFFFD700.toInt(), "Recharge", "${data.chunkI.rechargeTime}t")
+        property(Spread, data.chunkF.spread)
     }
 
     override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {

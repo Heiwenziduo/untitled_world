@@ -47,7 +47,7 @@ object CypherAttributes {
     { builder -> builder.min(-1.0).max(32.0).noSync().hide() }
     /** initial speed, in unit block per tick, will show block/sec to player */
     val SPEED = registerAttribute("speed")
-    { builder -> builder.max(16.0) }
+    { builder -> builder.max(8.0) }
     /** tick, 200 by default */
     val EXISTING = registerAttribute("existing")
     { builder -> builder.default(200.0) }

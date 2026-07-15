@@ -16,7 +16,7 @@ class Snowball(
     override fun getItem() = Items.SNOWBALL.defaultInstance
 
     override fun discardVisualEffect() {
-        for (i in 0..radiusFriendlyParticleCount(8, 64)) {
+        for (i in 0 until radiusFriendlyParticleCount(8, 64)) {
             level().addParticle(ParticleTypes.ITEM_SNOWBALL, x, y, z, 0.0, 0.0, 0.0)
         }
     }

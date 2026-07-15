@@ -40,6 +40,7 @@ sealed class WandProperty <T : Any> (
         }
     }
     object Draw : WandProperty<Int>("draw")
+    object Capacity : WandProperty<Int>("capacity")
     object Etch : WandProperty<ArrayOfCyphers>("etch")
 
     companion object {

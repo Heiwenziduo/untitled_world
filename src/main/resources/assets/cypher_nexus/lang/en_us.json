@@ -170,7 +170,8 @@
   "gui.cypher_nexus.wand.spread": "Spread: %s°",
   "gui.cypher_nexus.wand.cast_delay": "Delay: %ss",
   "gui.cypher_nexus.wand.recharge_time": "Recharge: %ss",
-  "gui.cypher_nexus.wand.draw": "Draw: %s",
+  "gui.cypher_nexus.wand.draw": "Invoke: %s",
+  "gui.cypher_nexus.wand.capacity": "Capacity: %s",
   "gui.cypher_nexus.wand.etch": "Etch: %s",
 
   "item_group.cypher_nexus": "Cypher Nexus",
