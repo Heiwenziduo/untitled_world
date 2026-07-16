@@ -7,9 +7,16 @@ import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.LlamaSpitCy
 import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.SimpleItemProjectileRenderer
 import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.SimpleParticleProjectileRenderer
 import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.SimpleSummonerRenderer
+import com.github.nahnullscience.cypher_nexus.client.devtools.WebServiceManager
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
+import com.mojang.brigadier.Command
+import com.mojang.brigadier.arguments.BoolArgumentType
+import com.mojang.brigadier.context.CommandContext
 import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.commands.CommandSourceStack
+import net.minecraft.commands.Commands
+import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.projectile.ItemSupplier
 import net.neoforged.api.distmarker.Dist
@@ -20,6 +27,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent
 import net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers.CONTEXTUAL_INFO_BAR
+import net.neoforged.neoforge.event.RegisterCommandsEvent
 import java.util.function.Supplier
 
 @EventBusSubscriber(modid = CypherNexus.MOD_ID, value = [Dist.CLIENT])
@@ -33,8 +41,6 @@ object ClientSetup {
      */
     @SubscribeEvent
     private fun onClientStarting(event: FMLClientSetupEvent) {
-        // Q: should we separate logical and physical clients?
-
 //        CypherNexus.LOGGER.info("HELLO FROM CLIENT SETUP")
 //        CypherNexus.LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().user.name)
 
@@ -85,19 +91,34 @@ object ClientSetup {
     private fun registerGuiLayersEvent(event: RegisterGuiLayersEvent) {
         event.registerBelow(CONTEXTUAL_INFO_BAR, CypherNexus.modResource("wand_data"), WandDataOverlay)
     }
+
+    private fun <CY> RegisterRenderers.registerItemProjectile (
+        cypherEntity: Supplier<out EntityType<out CY>>,
+    ) where CY : DedicatedCypherProjectile, CY : ItemSupplier
+            = registerEntityRenderer(cypherEntity.get()) { context -> SimpleItemProjectileRenderer(context) }
+
+    private fun <CY> RegisterRenderers.registerParticleProjectile (
+        cypherEntity: Supplier<out EntityType<out CY>>,
+    ) where CY : DedicatedCypherProjectile
+            = registerEntityRenderer(cypherEntity.get()) { context -> SimpleParticleProjectileRenderer(context) }
+
+    private fun <T : DedicatedCypherProjectile> RegisterRenderers.registerEntityRenderer(
+        cypherEntity: Supplier<out EntityType<out T>>,
+        factory: EntityRendererProvider<T>
+    ) = registerEntityRenderer(cypherEntity.get(), factory)
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @SubscribeEvent
+    private fun onRegisterCommands(event: RegisterCommandsEvent) {
+        val dispatcher = event.dispatcher
+        val buildContext = event.buildContext
+
+        dispatcher.register(
+            Commands.literal("cypher_nexus")
+                .then(WebServiceManager.command)
+        )
+    }
 }
-
-private fun <CY> RegisterRenderers.registerItemProjectile (
-    cypherEntity: Supplier<out EntityType<out CY>>,
-) where CY : DedicatedCypherProjectile, CY : ItemSupplier
-        = registerEntityRenderer(cypherEntity.get()) { context -> SimpleItemProjectileRenderer(context) }
-
-private fun <CY> RegisterRenderers.registerParticleProjectile (
-    cypherEntity: Supplier<out EntityType<out CY>>,
-) where CY : DedicatedCypherProjectile
-        = registerEntityRenderer(cypherEntity.get()) { context -> SimpleParticleProjectileRenderer(context) }
-
-private fun <T : DedicatedCypherProjectile> RegisterRenderers.registerEntityRenderer(
-    cypherEntity: Supplier<out EntityType<out T>>,
-    factory: EntityRendererProvider<T>
-) = registerEntityRenderer(cypherEntity.get(), factory)

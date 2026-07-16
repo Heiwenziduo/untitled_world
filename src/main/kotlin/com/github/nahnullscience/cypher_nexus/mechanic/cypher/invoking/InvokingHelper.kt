@@ -16,9 +16,10 @@ import kotlin.math.max
  * NOTE: do NOT modify invoker since compiler will run on threads
  * */
 class InvokingHelper (
-    val invoker: Entity?,
     val aoc: ArrayOfCyphers,
     val data: HelperDataBundle,
+    val tracer: InvokingTracer = InvokingTracer.NONE,
+    val invoker: Entity? = null,
 ) {
     val rootChunk = ShotStateChunk.root(this)
     /** safe to modify */

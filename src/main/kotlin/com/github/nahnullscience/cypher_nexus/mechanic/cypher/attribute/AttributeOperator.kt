@@ -14,13 +14,13 @@ import kotlin.math.min
 import kotlin.math.pow
 
 
-enum class AttributeOperator {
+enum class AttributeOperator(val cumulative: Boolean) {
     /**
      * Base value of one cast, mostly on ProjectileCyphers,
      * without base value, the attribute will be ignored.
      * Can be set via special ModifierCyphers.
      * */
-    BASE {
+    BASE(false) {
         override val defaultValue = 0.0
         override fun cumulate(last: Double, new: Double): Double = new // this should not happen
         override fun cumulate(last: Double, new: Double, times: Int): Double = cumulate(last, new)
@@ -34,7 +34,7 @@ enum class AttributeOperator {
 //    },
 
     /** 1.0 -> add 1.0 */
-    ADD {
+    ADD(true) {
         override val defaultValue = 0.0
         override fun cumulate(last: Double, new: Double): Double = last + new
         override fun cumulate(last: Double, new: Double, times: Int): Double = last + new * times
@@ -44,7 +44,7 @@ enum class AttributeOperator {
         }
     },
     /** 0.33 -> plus 33% */
-    MULTIPLY_BASE {
+    MULTIPLY_BASE(true) {
         // defaultValue may cumulate multiple times while map initialization(at AbsCypher & Helper)
         override val defaultValue = 0.0
         override fun cumulate(last: Double, new: Double): Double = last + new
@@ -55,7 +55,7 @@ enum class AttributeOperator {
         }
     },
     /** 0.33 -> times 33% */
-    MULTIPLY_TOTAL {
+    MULTIPLY_TOTAL(true) {
         override val defaultValue = 1.0
         override fun cumulate(last: Double, new: Double): Double = last * new
         override fun cumulate(last: Double, new: Double, times: Int): Double = last * new.pow(times)
@@ -65,14 +65,14 @@ enum class AttributeOperator {
      * Force an attribute to become an invariable value,
      * will ignore other operations.
      * */
-    SET_ALL {
+    SET_ALL(true) {
         override val defaultValue = 0.0
         override fun cumulate(last: Double, new: Double): Double = new
         override fun cumulate(last: Double, new: Double, times: Int): Double = new
         override fun formatSymbol() = "="
     },
 
-    CAP_AT {
+    CAP_AT(true) {
         override val defaultValue = Double.MAX_VALUE
         override fun cumulate(last: Double, new: Double): Double = min(last, new)
         override fun cumulate(last: Double, new: Double, times: Int): Double = min(last, new)

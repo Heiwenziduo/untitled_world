@@ -3,7 +3,8 @@ package com.github.nahnullscience.cypher_nexus.init.mod
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule.HookBuilder
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeRedirectPosHook
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokePosRedirectionHook
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeCaptureHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothBeforeDiscardHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothEntitySearchHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothTickMovementFinalizeHook
@@ -44,7 +45,8 @@ object CypherBehaviorHooks {
      * hooks should only modify the projectile itself who preforms the hook
      * */
 
-    val INVOKE_REDIRECT_POS_SERVER = registerHook(ServerInvokeRedirectPosHook.HOOK)
+    val INVOKE_POS_REDIRECTION_SERVER = registerHook(ServerInvokePosRedirectionHook.HOOK)
+    val INVOKE_CAPTURE = registerHook(ServerInvokeCaptureHook.HOOK)
 
     val HIT_ENTITY_BOTH = registerHook(BothHitEntityHook.HOOK)
     val BEFORE_DISCARD_BOTH = registerHook(BothBeforeDiscardHook.HOOK)

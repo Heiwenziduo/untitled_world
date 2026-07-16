@@ -3,7 +3,7 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeRedirectPosHook
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokePosRedirectionHook
 import com.github.nahnullscience.cypher_nexus.utility.LevelUtil.forEachEntityWithin
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.randomInCone
@@ -18,7 +18,7 @@ import net.minecraft.world.phys.Vec3
 
 class DaedalusCypher(
     defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder
-) : ModifierCypher(defaultAttribute), ServerInvokeRedirectPosHook {
+) : ModifierCypher(defaultAttribute), ServerInvokePosRedirectionHook {
     companion object {
         private const val MARGIN = 0.3
     }

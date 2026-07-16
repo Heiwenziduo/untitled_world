@@ -56,7 +56,7 @@ object CypherAttributes {
     { builder -> builder.default(1.0).min(0.25).max(16.0) }
     /** int, bounce times */
     val BOUNCE = registerAttribute("bounce")
-    { builder -> builder.max(1000.0) }
+    { builder -> builder.max(127.0) }
     /** how much it falls each tick, 0.0 by default */
     val GRAVITY_FACTOR = registerAttribute("gravity_factor")
     { builder -> builder.min(-1.0).max(1.0).hide() }

@@ -73,7 +73,7 @@ interface IWandLike {
         val wandData = getWandData(stack, entityWand) ?: return InvokingState.MISSING_DATA
 
         val data = getHelperDataBundle(level, invoker, stack)
-        val helper = InvokingHelper(invoker, wandData.highPayload.aoc, data)
+        val helper = InvokingHelper(wandData.highPayload.aoc, data, invoker = invoker)
 
 
 //        scope.launch { // TODO if async #checkInvokingPrerequisites should handle "pending" state

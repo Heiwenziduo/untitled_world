@@ -90,18 +90,42 @@ sealed class AbstractCypher(
         state: InvokingStateBundle,
     ) {
         state.recursionDepth = 0
-        invoke(helper, chunk, data, state, helper.lastDrawIndex, false)
+
+        traceInvoke(helper, chunk, data, state, helper.lastDrawIndex, false)
 
         if (helper.invoker is ServerPlayer) {
             // TODO award stats
         }
     }
 
-    /** call super# for basic behaviors
+    /**
+     * wrap [invoke] with an `InvokingTracer` handler.
+     * */
+    fun traceInvoke(
+        helper: InvokingHelper,
+        chunk: ShotStateChunk,
+        data: HelperDataBundle,
+        state: InvokingStateBundle,
+        relativeIndex: Int,
+        isCopy: Boolean,
+    ) {
+        helper.tracer.enter(this, chunk, data, state, relativeIndex, isCopy)
+        try {
+            invoke(helper, chunk, data, state, relativeIndex, isCopy)
+        } finally {
+            helper.tracer.exit(this, chunk, data, state)
+        }
+    }
+
+    /**
+     * invoke the cypher.
+     *
+     * NOTE should avoid use this method directly,
+     * use [invokeInHand] if cypher comes from a `draw`, or [IRecursiveCypher.copyCypher] if it's invoked by another cypher.
      * @param relativeIndex where the cypher should function at.
      * if the cypher comes from a draw, this should be the index of the cypher in [com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers]
      * */
-    open fun invoke(
+    protected open fun invoke(
         helper: InvokingHelper,
         chunk: ShotStateChunk,
         data: HelperDataBundle,

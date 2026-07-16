@@ -11,6 +11,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.Attribut
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
+import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
@@ -20,6 +21,7 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
+import net.minecraft.world.phys.AABB
 import java.util.*
 
 class ShotStateChunk private constructor (
@@ -28,19 +30,23 @@ class ShotStateChunk private constructor (
     private val helper: InvokingHelper?
 ) : IFlagExtension {
     companion object {
+        private const val CAPTURE_RADIUS = 8.0
+        private const val CAPTURE_RADIUS_HALF = CAPTURE_RADIUS / 2
+
         fun root(helper: InvokingHelper) = ShotStateChunk(1, helper)
     }
     /** normal chunk can only release once */
     constructor(charge: Int = 1): this(charge, null)
     constructor(ccMap: MapOfCypherCounts): this() {
-        _countMap = ccMap
+        _ccMap = ccMap
     }
 
+    val accessor: StateAccessor by lazy { StateAccessor() }
 
-    private var _countMap = MapOfCypherCounts.of()
-    private var dirty = true
-    val ccMap get() = _countMap
     val isRoot: Boolean by lazy { helper != null && helper.rootChunk == this }
+    private var dirty = true
+    private var _ccMap = MapOfCypherCounts.of()
+    val ccMap get() = _ccMap
 
     override var enabledFlags: Int = 0
 
@@ -60,7 +66,7 @@ class ShotStateChunk private constructor (
 
         Profiler.get().push { "cypherEntityCreation" }
         if (dirty) compute()
-        CypherNexus.debugCypher { "${level.isClientSide} client ccMap: $_countMap" }
+        CypherNexus.debugCypher { "${level.isClientSide} client ccMap: $_ccMap" }
 
         // do recoil only on root
         run recoil@ {
@@ -79,10 +85,22 @@ class ShotStateChunk private constructor (
 
         // apply invoking redirection
         val hookedPosDire = hooks.cumulateHooks(
-            CypherBehaviorHooks.INVOKE_REDIRECT_POS_SERVER,
+            CypherBehaviorHooks.INVOKE_POS_REDIRECTION_SERVER,
             posDire
         ) { h, l, pair ->
             h.redirectPosDireServer(level, directInvoker, owner, l, pair, 0)
+        }
+
+        // capture surroundings if hooked
+        val invokeCapture = hooks.get(CypherBehaviorHooks.INVOKE_CAPTURE)
+        if (invokeCapture.isNotEmpty()) {
+            val pairCopy = hookedPosDire.copy()
+            val entities = level.getEntities(null, pairCopy.position.centeredAABB(CAPTURE_RADIUS_HALF))
+            entities.forEach { entity ->
+                invokeCapture.forEach { (hook, l) ->
+                    hook.forEntityCaptured(level, entity, l, pairCopy, accessor, 0)
+                }
+            }
         }
 
         for ((i, node) in projectiles.withIndex()) {
@@ -133,13 +151,13 @@ class ShotStateChunk private constructor (
 
     fun record(cy: AbstractCypher): Int {
         dirty = true
-        return _countMap.count(cy)
+        return _ccMap.count(cy)
     }
 
     fun compute(): ShotStateChunk {
         if (!dirty) return this
 
-        _countMap.forEach { (cypher, counts) ->
+        _ccMap.forEach { (cypher, counts) ->
 
             if (cypher is AbstractNonProjectileCypher) {
                 enableFlags(cypher.flags)
@@ -161,13 +179,12 @@ class ShotStateChunk private constructor (
                 }
 
 
-                val chunkMap = targetChunk.computedOperationMap.getOrPut(attribute)
-                { EnumMap(AttributeOperator::class.java) }
+                val chunkMap = targetChunk.computedOperationMap.getOrPut(attribute) { EnumMap(AttributeOperator::class.java) }
                 // prune: if set, skip
                 if (chunkMap[AttributeOperator.SET_ALL] != null && cyMap[AttributeOperator.SET_ALL] == null) return@forEach
 
                 cyMap.forEach { (operator, value) ->
-                    if (operator != AttributeOperator.BASE) {
+                    if (operator.cumulative) {
                         chunkMap.compute(operator) { op, v ->
                             operator.cumulate(v ?: operator.defaultValue, value, counts)
                         }
@@ -180,7 +197,17 @@ class ShotStateChunk private constructor (
         return this
     }
 
-    inner class StateAttributeAccessor {
-        fun getAttribute(attr: Holder<CypherAttribute>) = computedOperationMap[attr.value()]
+    inner class StateAccessor {
+        fun getOpMap(attr: Holder<CypherAttribute>) = computedOperationMap[attr.value()]
+        /**
+         *
+         * */
+        fun addRaw(attr: Holder<CypherAttribute>, operator: AttributeOperator, value: Double) {
+            if (!operator.cumulative) return
+            val opMap = computedOperationMap.getOrPut(attr.value()) { EnumMap(AttributeOperator::class.java) }
+            opMap.compute(operator) { op, v ->
+                operator.cumulate(v ?: operator.defaultValue, value)
+            }
+        }
     }
 }

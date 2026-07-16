@@ -6,6 +6,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
  * serve as a token to rebuild the ProjectileStateChunk (payload info not included)
  * */
 //open class MapOfCypherCounts : Reference2IntOpenHashMap<AbstractCypher>() {
+// TODO data type polishing required
 open class MapOfCypherCounts(private val map: HashMap<AbstractCypher, Int>) : MutableMap<AbstractCypher, Int> by map {
     constructor(anyMap: Map<AbstractCypher, Int>) : this(HashMap<AbstractCypher, Int>(anyMap))
 

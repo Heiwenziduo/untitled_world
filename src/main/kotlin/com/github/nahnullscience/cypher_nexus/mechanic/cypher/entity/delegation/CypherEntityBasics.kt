@@ -201,7 +201,6 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
                     cyEntity.boundingBox.inflate(CAPTURE_SIZE)
                 ) { entity -> entity !is ICypherEntity }
 
-//                println("capture $entities")
                 for (entity in entities) {
                     onCaptureSurroundingBoth(entity)
                 }

@@ -46,6 +46,10 @@ fun Vec3.toSameDire(to: Vec3): Vec3 {
     )
 }
 
+fun Vec3.centeredAABB(halfLength: Double): AABB =
+    AABB(x - halfLength, y - halfLength, z - halfLength, x + halfLength, y + halfLength, z + halfLength)
+
+
 /**
  * Rotates this vector towards the target vector's direction by at most [maxAngleRadians].
  *

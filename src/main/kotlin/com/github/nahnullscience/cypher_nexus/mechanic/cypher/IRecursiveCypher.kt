@@ -44,10 +44,10 @@ interface IRecursiveCypher {
             CypherNexus.debugCypher { "[$this] will copy [$target $targetIndex]" }
             if (target is IRecursiveCypher && target.isRecursive) {
                 val s = state.recursionDepth++
-                target.invoke(helper, chunk, data, state, targetIndex, true)
+                target.traceInvoke(helper, chunk, data, state, targetIndex, true)
                 state.recursionDepth = s
             } else
-                target.invoke(helper, chunk, data, state, targetIndex, true)
+                target.traceInvoke(helper, chunk, data, state, targetIndex, true)
         }
     }
 }
