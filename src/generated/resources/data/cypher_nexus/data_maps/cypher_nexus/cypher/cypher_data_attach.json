@@ -43,6 +43,15 @@
       "recharge": 0,
       "stateChunk": {}
     },
+    "cypher_nexus:aiming_arc": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 36.0,
+      "projectile": {},
+      "recharge": 0,
+      "stateChunk": {}
+    },
     "cypher_nexus:all_invoking": {
       "delay": 0,
       "draw": 99,
@@ -56,7 +65,7 @@
       "delay": 5,
       "draw": 0,
       "flags": 0,
-      "manaDrain": 20.0,
+      "manaDrain": 30.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {}
@@ -342,7 +351,7 @@
       "recharge": 0,
       "stateChunk": {
         "cypher_nexus:damage": {
-          "add": 2.0
+          "add": 1.5
         },
         "cypher_nexus:effect_radius": {
           "multiply_base": 0.5
@@ -432,7 +441,7 @@
       "delay": 5,
       "draw": 0,
       "flags": 0,
-      "manaDrain": 20.0,
+      "manaDrain": 30.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {}
@@ -841,7 +850,7 @@
       "delay": 10,
       "draw": 0,
       "flags": 0,
-      "manaDrain": 80.0,
+      "manaDrain": 70.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {}

@@ -3,7 +3,6 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothEntitySearchHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothTickBehaviorHook
@@ -14,14 +13,14 @@ import kotlin.math.PI
 import kotlin.math.min
 
 /** these homing-s share the same "homing target" on HooksSharedData */
-abstract class AbstractHoming(
+abstract class AbstractTargetHoming(
     path: String,
     private val _manaDrain: Float
 ) : ModifierCypher(), BothTickBehaviorHook, BothEntitySearchHook {
 
     companion object {
-        const val HOMING_STRENGTH = 0.1
-        const val ROTATION_RADIUS = PI / 36
+        private const val HOMING_STRENGTH = 0.1
+        private const val ROTATION_RADIUS = PI / 36
     }
 
     override val resource = CypherNexus.modResource(path)
@@ -65,7 +64,7 @@ abstract class AbstractHoming(
 //    }
 
 
-    object Homing: AbstractHoming("homing", 60f) {
+    object Homing: AbstractTargetHoming("homing", 60f) {
         override fun <CY> tickBehaviorBoth(
             level: Level,
             projectile: CY,
@@ -81,7 +80,7 @@ abstract class AbstractHoming(
         }
     }
 
-    object TurnToTarget: AbstractHoming("turn_toward_target", 30f) {
+    object TurnToTarget: AbstractTargetHoming("turn_toward_target", 30f) {
         override fun <CY> tickBehaviorBoth(
             level: Level,
             projectile: CY,

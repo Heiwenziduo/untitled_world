@@ -1,8 +1,9 @@
 package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.AbstractHoming
+import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.AbstractTargetHoming
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.AbstractPathModifier
+import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.AimingArc
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.BoomerangCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.DaedalusCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.FieryCypher
@@ -283,9 +284,15 @@ object Cyphers {
     val KNOCKBACK = registerModifier("knockback", 5f) {
         stateChunkAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 10.0)
     }
-    val HOMING = registerCypher(AbstractHoming.Homing)
-    val TURN_TO_TARGET = registerCypher(AbstractHoming.TurnToTarget)
-    val BOOMERANG = registerCypher(BoomerangCypher)
+    val HOMING = registerCypher(AbstractTargetHoming.Homing)
+    val TURN_TO_TARGET = registerCypher(AbstractTargetHoming.TurnToTarget)
+    val BOOMERANG = registerCypher(::BoomerangCypher) {
+        manaDrain(10f)
+        flags(CypherFlags.MOTION_FOLLOWS_OWNER)
+    }
+    val AIMING_ARC = registerCypher(::AimingArc) {
+        manaDrain(36f)
+    }
     val PIERCE_ENTITY = registerModifier("pierce_entity", 110f) {
         flags(CypherFlags.HURT_OWNER, CypherFlags.PIERCE_ENTITY)
         stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -5.0)

@@ -1,10 +1,8 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeRedirectPosHook
 import com.github.nahnullscience.cypher_nexus.utility.LevelUtil.forEachEntityWithin
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
@@ -22,7 +20,7 @@ class DaedalusCypher(
     defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder
 ) : ModifierCypher(defaultAttribute), ServerInvokeRedirectPosHook {
     companion object {
-        const val MARGIN = 0.3
+        private const val MARGIN = 0.3
     }
 
     override val resource = CypherNexus.modResource("daedalus")

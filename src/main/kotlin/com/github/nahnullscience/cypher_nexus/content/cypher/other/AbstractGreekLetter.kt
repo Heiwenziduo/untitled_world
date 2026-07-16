@@ -37,7 +37,7 @@ abstract class AbstractGreekLetter(
 
     /** the first */
     // reduce some mana cost since we don't have limited-charge cyphers
-    object Alpha : AbstractGreekLetter("alpha", 20f) {
+    object Alpha : AbstractGreekLetter("alpha", 30f) {
         override fun defaultAttributes() = super.defaultAttributes().delay(5)
         override fun invoke(
             helper: InvokingHelper,
@@ -74,7 +74,7 @@ abstract class AbstractGreekLetter(
     }
 
     /** the last */
-    object Gamma : AbstractGreekLetter("gamma", 20f) {
+    object Gamma : AbstractGreekLetter("gamma", 30f) {
         override fun defaultAttributes() = super.defaultAttributes().delay(5)
         override fun invoke(
             helper: InvokingHelper,
@@ -138,7 +138,7 @@ abstract class AbstractGreekLetter(
     }
 
     /** next two */
-    object Tau : AbstractGreekLetter("tau", 80f) {
+    object Tau : AbstractGreekLetter("tau", 70f) {
         override fun defaultAttributes() = super.defaultAttributes().delay(10)
         override fun invoke(
             helper: InvokingHelper,
