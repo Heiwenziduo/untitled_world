@@ -7,12 +7,14 @@ import com.mojang.brigadier.context.CommandContext
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 import net.minecraft.network.chat.Component
+import net.neoforged.neoforge.client.ClientCommandSourceStack
 
 /**
  * a wrapper of [DevToolsServer] bridges mc command line and http services
  * */
 object WebServiceManager {
-    val command: LiteralArgumentBuilder<CommandSourceStack> get() = Commands.literal("test_server")
+    val command: LiteralArgumentBuilder<CommandSourceStack>
+        get() = Commands.literal("test_server")
         .requires(Commands.hasPermission(Commands.LEVEL_ALL))
         .then(
             Commands.literal("start")

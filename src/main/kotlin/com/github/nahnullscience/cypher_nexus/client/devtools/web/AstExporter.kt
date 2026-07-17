@@ -49,7 +49,8 @@ object AstExporter {
      * effectively unlimited mana (so the whole chain resolves instead of stopping on a mana check).
      */
     fun buildAst(cypherIds: List<String>): AstChunk {
-        val cyphers = cypherIds.map { raw -> Cyphers.getCypher(parseId(raw)) ?: EmptyCypher }
+        val cyphers = if (cypherIds.isEmpty()) listOf(EmptyCypher)
+            else cypherIds.map { raw -> Cyphers.getCypher(parseId(raw)) ?: EmptyCypher }
         val aoc = ArrayOfCyphers(cyphers)
 
         val data = HelperDataBundle(

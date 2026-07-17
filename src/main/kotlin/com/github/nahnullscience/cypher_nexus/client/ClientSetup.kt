@@ -10,13 +10,8 @@ import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.SimpleSummo
 import com.github.nahnullscience.cypher_nexus.client.devtools.WebServiceManager
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
-import com.mojang.brigadier.Command
-import com.mojang.brigadier.arguments.BoolArgumentType
-import com.mojang.brigadier.context.CommandContext
 import net.minecraft.client.renderer.entity.EntityRendererProvider
-import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
-import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.projectile.ItemSupplier
 import net.neoforged.api.distmarker.Dist
@@ -25,9 +20,9 @@ import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
 import net.neoforged.neoforge.client.event.EntityRenderersEvent
 import net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers
+import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers.CONTEXTUAL_INFO_BAR
-import net.neoforged.neoforge.event.RegisterCommandsEvent
 import java.util.function.Supplier
 
 @EventBusSubscriber(modid = CypherNexus.MOD_ID, value = [Dist.CLIENT])
@@ -112,7 +107,7 @@ object ClientSetup {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @SubscribeEvent
-    private fun onRegisterCommands(event: RegisterCommandsEvent) {
+    private fun registerClientCommands(event: RegisterClientCommandsEvent) {
         val dispatcher = event.dispatcher
         val buildContext = event.buildContext
 
