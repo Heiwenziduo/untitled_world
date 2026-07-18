@@ -9,6 +9,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataBundle
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.nearestHitPoint
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
@@ -19,7 +20,11 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.ItemUseAnimation
+import net.minecraft.world.level.ClipContext
+import net.minecraft.world.level.ClipContext.Block
+import net.minecraft.world.level.ClipContext.Fluid
 import net.minecraft.world.level.Level
+import net.minecraft.world.phys.HitResult.Type
 
 /**
  * item wand, its main duty is as follows:
@@ -84,7 +89,7 @@ abstract class AbstractItemWand(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    protected fun getWandData(stack: ItemStack) = getWandData(stack, null)
+    protected fun getWandData(stack: ItemStack?) = stack?.let { getWandData(stack, null) }
     override fun <EntityWand> getWandData(
         stack: ItemStack?,
         entityWand: EntityWand?
@@ -110,14 +115,17 @@ abstract class AbstractItemWand(
         return itemWandInstance(level, invoker, stack).canInvoke()
     }
 
-    // for an Item Wand, pos and dire just use the living's view vector
+    open fun wandLength(data: WandDataBundle?): Float =
+        data?.let { 0.4f + (it.highPayload.aoc.capacity.toFloat() / 16).coerceAtMost(3.0f) } ?: 0.4f
+
     override fun getInvokePosDire(level: Level, invoker: Entity, stack: ItemStack?): PosDirePair {
-        val tip = run {
-            getWandData(stack ?: return@run 0.8).invariable.chunkF.wandLength.toDouble()
-        }
+        // for an Item Wand, pos and dire just use the living's view vector
+        val tip = wandLength(getWandData(stack))
         val dire = invoker.headLookAngle
         val scale = tip + invoker.knownMovement.dot(dire).coerceAtLeast(0.0) // solve inertia problem
-        val pos = invoker.eyePosition.add(dire.scale(scale))
+        var pos = invoker.eyePosition.add(dire.scale(scale))
+        pos = level.nearestHitPoint(invoker.eyePosition, pos, invoker, 0.3)
+
         return PosDirePair(pos, dire)
     }
 

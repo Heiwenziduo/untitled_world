@@ -21,14 +21,13 @@ data class WandDataInvariable(
     val chunkI: WandDataChunkI,
     val chunkL: WandDataChunkL = WandDataChunkL(listOf()),
 ) {
-    data class WandDataChunkF(val manaMax: Float, val manaRegen: Float, val wandLength: Float, val spread: Float)
+    data class WandDataChunkF(val manaMax: Float, val manaRegen: Float, val spread: Float)
     data class WandDataChunkI(val draw: Int, val castDelay: Int, val rechargeTime: Int,)
     data class WandDataChunkL(val alwaysInvoke: List<AbstractCypher>)
 
     class Builder {
         var manaMax: Float = 100f
         var manaRegen: Float = 1f
-        var wandLength: Float = 1f
         var spread: Float = 0f
 
         var draw: Int = 1
@@ -39,7 +38,6 @@ data class WandDataInvariable(
 
         fun manaMax(v: Float) : Builder = run { manaMax += v; this }
         fun manaRegen(v: Float) : Builder = run { manaRegen += v; this }
-        fun wandLength(v: Float) : Builder = run { wandLength = v; this }
         fun spread(v: Float) : Builder = run { spread = v; this }
 
         fun draw(v: Int) : Builder = run { draw = v; this }
@@ -49,7 +47,7 @@ data class WandDataInvariable(
         fun build() : WandDataInvariable {
             return WandDataInvariable(
                 UUID.randomUUID().toString(),
-                WandDataChunkF(manaMax, manaRegen, wandLength, spread),
+                WandDataChunkF(manaMax, manaRegen, spread),
                 WandDataChunkI(draw, castDelay, rechargeTime),
                 WandDataChunkL(alwaysInvoke),
                 )
@@ -62,7 +60,6 @@ data class WandDataInvariable(
         val CHUNK0_CODEX: Codec<WandDataChunkF> = RecordCodecBuilder.create { it.group(
             Codec.FLOAT.fieldOf("manaMax").forGetter(WandDataChunkF::manaMax),
             Codec.FLOAT.fieldOf("manaRegen").forGetter(WandDataChunkF::manaRegen),
-            Codec.FLOAT.fieldOf("wandLength").forGetter(WandDataChunkF::wandLength),
             Codec.FLOAT.fieldOf("spread").forGetter(WandDataChunkF::spread),
         ).apply(it, ::WandDataChunkF) }
         val CHUNK1_CODEX: Codec<WandDataChunkI> = RecordCodecBuilder.create { it.group(
@@ -88,7 +85,6 @@ data class WandDataInvariable(
         val CHUNK0_STREAM: StreamCodec<ByteBuf, WandDataChunkF> = StreamCodec.composite(
             ByteBufCodecs.FLOAT, WandDataChunkF::manaMax,
             ByteBufCodecs.FLOAT, WandDataChunkF::manaRegen,
-            ByteBufCodecs.FLOAT, WandDataChunkF::wandLength,
             ByteBufCodecs.FLOAT, WandDataChunkF::spread,
             ::WandDataChunkF)
         val CHUNK1_STREAM: StreamCodec<ByteBuf, WandDataChunkI> = StreamCodec.composite(
@@ -114,7 +110,7 @@ data class WandDataInvariable(
             get() {
                 val data = WandDataInvariable(
                     UUID.randomUUID().toString(),
-                    WandDataChunkF(300f, 3f, 1.2f, 0f),
+                    WandDataChunkF(300f, 3f, 0f),
                     WandDataChunkI(1, 12, 15),
                     WandDataChunkL(listOf()),
 
@@ -124,7 +120,7 @@ data class WandDataInvariable(
 
         val TEST_GOOD_WAND = WandDataInvariable(
             uuid   = "mythical",
-            chunkF = WandDataChunkF(3000f, 30f, 1.6f, 7f),
+            chunkF = WandDataChunkF(3000f, 30f, 7f),
             chunkI = WandDataChunkI(1, 6, 10),
         )
 
@@ -138,7 +134,7 @@ data class WandDataInvariable(
         const val DATA_FAIL_UUID = "fall_back"
         val FALL_BACK = WandDataInvariable(
             uuid   = DATA_FAIL_UUID,
-            chunkF = WandDataChunkF(-Float.MAX_VALUE, 0f, 0f, 0f),
+            chunkF = WandDataChunkF(-Float.MAX_VALUE, 0f, 0f),
             chunkI = WandDataChunkI(0, 0, 0),
         )
     }

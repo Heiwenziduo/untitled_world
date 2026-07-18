@@ -1,14 +1,18 @@
 package com.github.nahnullscience.cypher_nexus.utility
 
+import com.github.nahnullscience.cypher_nexus.utility.LevelUtil.forEachEntityWithin
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.projectile.ProjectileUtil
 import net.minecraft.world.level.ClipContext
+import net.minecraft.world.level.ClipContext.Block
+import net.minecraft.world.level.ClipContext.Fluid
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.HitResult
+import net.minecraft.world.phys.HitResult.Type
 import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
 import org.joml.Vector3f
@@ -16,6 +20,7 @@ import java.util.function.Predicate
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.*
 
+typealias processHit = (hitPoint: Vec3, dir: Direction) -> Unit
 
 fun Vec3.toVec3i() = Vec3i(x.toInt(), y.toInt(), z.toInt())
 
@@ -179,6 +184,53 @@ fun getProjectileHitResult(
 }
 
 /**
+ * perform a [Level.clipIncludingBorder] and [Level.getEntities] to get the closest hit point between [from] and [to].
+ * */
+fun Level.nearestHitPoint(from: Vec3, to: Vec3, context: Entity, margin: Double): Vec3 {
+    var t = to
+    val f: processHit = { h, d -> t = h }
+    nearestHitPointThen(from, to, context, margin, f)
+    return t
+}
+
+/**
+ * perform a [Level.clipIncludingBorder] and [Level.getEntities] to get the closest hit point between [from] and [to].
+ * */
+inline fun Level.nearestHitPointThen(from: Vec3, to: Vec3, context: Entity, margin: Double, then: processHit) {
+    var hit = false
+    var hitDir: Direction = Direction.UP
+    var destination = to
+    val blockResult = this.clipIncludingBorder(
+        ClipContext(from, destination, Block.COLLIDER, Fluid.NONE, context)
+    )
+    if (blockResult.type != Type.MISS) {
+        destination = blockResult.location
+        hitDir = blockResult.direction
+        hit = true
+    }
+    var nearest = Double.MAX_VALUE
+    this.forEachEntityWithin(
+        context,
+        AABB(from, to),
+        { e -> e.canBeHitByProjectile() }
+    ) { target ->
+        from.rayCastThen(destination, target.boundingBox, margin) { hitPoint, dir ->
+            val dd: Double = from.distanceToSqr(hitPoint)
+            if (dd < nearest) {
+                nearest = dd
+                destination = hitPoint
+                hitDir = dir
+                hit = true
+            }
+        }
+    }
+
+    if (hit) {
+        then(destination, hitDir)
+    }
+}
+
+/**
  * @return the hit point the given line from this to [destination] collide with [bb], null if not collide
  * */
 fun Vec3.rayCast(destination: Vec3, bb: AABB, margin: Double): Vec3? {
@@ -188,14 +240,14 @@ fun Vec3.rayCast(destination: Vec3, bb: AABB, margin: Double): Vec3? {
 /**
  * immediately execute [task] if ray hit the given AABB
  * */
-inline fun Vec3.rayCastThen(destination: Vec3, bb: AABB, margin: Double, task: (hitPoint: Vec3, dir: Direction) -> Unit) {
+inline fun Vec3.rayCastThen(destination: Vec3, bb: AABB, margin: Double, task: processHit) {
     bb.inflate(margin).clipWithDirection(this, destination, task)
 }
 
 /**
  * direct copy from [AABB.clip], but pass a lambda to utilize the direction
  * */
-inline fun AABB.clipWithDirection(from: Vec3, to: Vec3, task: (hitPoint: Vec3, dir: Direction) -> Unit) = clipWithDirection(minX, minY, minZ, maxX, maxY, maxZ, from, to, task)
+inline fun AABB.clipWithDirection(from: Vec3, to: Vec3, task: processHit) = clipWithDirection(minX, minY, minZ, maxX, maxY, maxZ, from, to, task)
 inline fun AABB.clipWithDirection(
     minX: Double,
     minY: Double,
@@ -205,7 +257,7 @@ inline fun AABB.clipWithDirection(
     maxZ: Double,
     from: Vec3,
     to: Vec3,
-    task: (hitPoint: Vec3, dir: Direction) -> Unit
+    task: processHit
 ) {
     val scaleReference = doubleArrayOf(1.0)
     val dx: Double = to.x - from.x
