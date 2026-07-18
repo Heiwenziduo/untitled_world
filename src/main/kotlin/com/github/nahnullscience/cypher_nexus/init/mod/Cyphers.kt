@@ -1,29 +1,18 @@
 package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.AbstractTargetHoming
-import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.AbstractPathModifier
-import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.AimingArc
-import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.BoomerangCypher
-import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.DaedalusCypher
-import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.FieryCypher
-import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.SimpleModifier
+import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.module.PrimaryInvokingCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.*
-import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.*
+import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.SimpleProjectiles
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.SimpleProjectiles.SimpleProjectile
 import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.SimpleProjectiles.SimpleStaticProjectile
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.InnerForceCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.ProteusCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.RefresherRingCypher
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.*
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.NONE
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.StaticProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
@@ -73,7 +62,7 @@ object Cyphers {
 
     fun registerProjectile(
         projectileHolder: DeferredHolder<EntityType<*>, out EntityType<out DedicatedCypherProjectile>>,
-        config: SimpleProjectile.() -> Unit
+        config: SimpleProjectile.() -> Unit,
     ): Holder<ProjectileCypher<DedicatedCypherProjectile>> {
         // a projectile-related cypher knows the entity it can create,
         // but the cypher-projectile doesn't care who creates it.
@@ -84,6 +73,42 @@ object Cyphers {
         return registerCypher(simple.createProjectile())
     }
 
+    /**
+     * batch generate projectile cypher with trigger reloaded.
+     * the reload names `origin` + _[TriggerType.simpleName].
+     *
+     * note the `cypherHolder` in [DedicatedCypherProjectile] is always pointed to the `origin` one
+     * @return cypher-holder of the `origin`
+     * */
+    fun registerProjectile(
+        projectileHolder: DeferredHolder<EntityType<*>, out EntityType<out DedicatedCypherProjectile>>,
+        config: SimpleProjectiles<*>.() -> Unit,
+        vararg triggerOverride: TriggerType
+    ): Holder<ProjectileCypher<DedicatedCypherProjectile>> {
+        val name = projectileHolder.id.path.removePrefix("cypher_")
+        val simple = SimpleProjectile(name, projectileHolder)
+        simple.config()
+        val base = registerCypher(simple.createProjectile())
+
+        for (t in triggerOverride) {
+            if (t != simple.trigger) {
+                val n = name + "_${t.simpleName}"
+                val triggered = SimpleProjectile(n, projectileHolder)
+                triggered.config()
+
+                if (t == TriggerType.NONE) triggered.draw(0)
+                else triggered.draw(1)
+
+                triggered.manaDrain(simple.manaDrain + 20.0f)
+                triggered.trigger(t)
+
+                registerCypher(triggered.createProjectile())
+            }
+        }
+
+        return base
+    }
+
     fun registerStaticProjectile(
         projectileHolder: DeferredHolder<EntityType<*>, out EntityType<out DedicatedCypherProjectile>>,
         config: SimpleStaticProjectile.() -> Unit
@@ -92,6 +117,34 @@ object Cyphers {
         val simple = SimpleStaticProjectile(name, projectileHolder)
         simple.config()
         return registerCypher(simple.createProjectile())
+    }
+
+    fun registerStaticProjectile(
+        projectileHolder: DeferredHolder<EntityType<*>, out EntityType<out DedicatedCypherProjectile>>,
+        config: SimpleProjectiles<*>.() -> Unit,
+        vararg triggerOverride: TriggerType
+    ): Holder<StaticProjectileCypher<DedicatedCypherProjectile>> {
+        val name = projectileHolder.id.path.removePrefix("cypher_")
+        val simple = SimpleStaticProjectile(name, projectileHolder)
+        simple.config()
+        val base = registerCypher(simple.createProjectile())
+
+        for (t in triggerOverride) {
+            if (t != simple.trigger) {
+                val n = name + "_${t.simpleName}"
+                val triggered = SimpleStaticProjectile(n, projectileHolder)
+                triggered.config()
+
+                if (t == TriggerType.NONE) triggered.draw(0)
+                else triggered.draw(1)
+
+                triggered.manaDrain(simple.manaDrain + 20.0f)
+                triggered.trigger(t)
+
+                registerCypher(triggered.createProjectile())
+            }
+        }
+        return base
     }
 
     fun registerModifier(path: String, manaDrain: Float, config: SimpleModifier.() -> Unit): Holder<ModifierCypher> {
@@ -116,7 +169,7 @@ object Cyphers {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // projectile
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    val ARROW = registerProjectile(ModEntities.CYPHER_ARROW) {
+    val ARROW = registerProjectile(ModEntities.CYPHER_ARROW, {
         manaDrain(10f)
         delay(3)
         stateChunkAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -10.0)
@@ -125,13 +178,13 @@ object Cyphers {
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.01)
         projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.01)
-    }
-    val SNOWBALL = registerProjectile(ModEntities.CYPHER_SNOWBALL) {
+    }, TriggerType.COLLISION, TriggerType.TIMER_10)
+    val SNOWBALL = registerProjectile(ModEntities.CYPHER_SNOWBALL, {
         manaDrain(3f)
         projectileAttr(CypherAttributes.SPEED, 1.2)
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
-    }
+    }, TriggerType.COLLISION, TriggerType.TIMER_20, TriggerType.DEATH)
     val ENDER_TELEPORTATION = registerProjectile(ModEntities.CYPHER_ENDER_TELEPORTATION) {
         manaDrain(20f)
         flags(CypherFlags.SKIP_DAMAGE_CHECK, CypherFlags.WITH_ENDER_POWER)
@@ -163,10 +216,11 @@ object Cyphers {
         projectileAttr(CypherAttributes.EXISTING, 120.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.06)
     }
-    val SPAWN_EGG = registerCypher(::SpawnEggCypher) {
+    val SPAWN_EGG = registerProjectile(ModEntities.CYPHER_SPAWN_EGG) {
         manaDrain(20f)
         draw(1)
         flags(CypherFlags.LINGER)
+        trigger(TriggerType.COLLISION)
         projectileAttr(CypherAttributes.SPEED, 1.0)
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
@@ -374,15 +428,15 @@ object Cyphers {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     val ADD_TRIGGER = registerCypher(object : AbstractAddTrigger(10f) {
-        override val triggerType = TriggerType.COLLISION
+        override val addTrigger = TriggerType.COLLISION
         override val resource = CypherNexus.modResource("add_trigger")
     })
     val ADD_TRIGGER_TIMER = registerCypher(object : AbstractAddTrigger(20f) {
-        override val triggerType = TriggerType.TIMER_20
+        override val addTrigger = TriggerType.TIMER_20
         override val resource = CypherNexus.modResource("add_trigger_timer")
     })
     val ADD_TRIGGER_DEATH = registerCypher(object : AbstractAddTrigger(20f) {
-        override val triggerType = TriggerType.DEATH
+        override val addTrigger = TriggerType.DEATH
         override val resource = CypherNexus.modResource("add_trigger_death")
     })
 //    val ADD_TRIGGER_RED_STONE = registerCypher(object : AbstractAddTrigger(20f) {

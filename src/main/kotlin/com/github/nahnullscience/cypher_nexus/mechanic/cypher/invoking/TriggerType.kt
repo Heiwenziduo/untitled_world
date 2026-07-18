@@ -1,7 +1,11 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 
-/***/
-enum class TriggerType {
+import java.util.Locale.getDefault
+
+/**
+ *
+ * */
+enum class TriggerType() {
     NONE,
     COLLISION,
     TIMER_5,
@@ -12,4 +16,12 @@ enum class TriggerType {
     TIMER_200,
     DEATH,
     RED_STONE, // TODO
+
+    ;
+    var simpleName: String = ""
+        private set
+
+    init {
+        simpleName = name.lowercase(getDefault())
+    }
 }

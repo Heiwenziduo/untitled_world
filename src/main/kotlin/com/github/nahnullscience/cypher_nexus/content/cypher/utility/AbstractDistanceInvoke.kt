@@ -13,9 +13,5 @@ abstract class AbstractDistanceInvoke(
 ) : AbstractProjectileCypher<DedicatedCypherProjectile>() {
     override val category = CypherCategories.UTILITY
 
-    override fun addToStateChunk(chunk: ShotStateChunk): ShotStateChunk {
-        val subState = ShotStateChunk()
-        chunk.addProjectile(ProjectileNode(this, subState, TriggerType.DEATH))
-        return subState
-    }
+    override val builtinTrigger: TriggerType = TriggerType.DEATH
 }

@@ -121,6 +121,8 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
      * get value through entity-specific map > cypher default > attribute default
      * */
     fun getAttributeOrDefault(holer: Holder<CypherAttribute>): Double
+    fun getAttrBaseOrNull(holder: Holder<CypherAttribute>): Double?
+    fun getAttrBaseOrNull(attr: CypherAttribute): Double?
     //
     fun getExisting(): Int
     fun getBounce(): Int

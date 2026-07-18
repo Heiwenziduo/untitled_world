@@ -96,8 +96,10 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
 
     override fun getAttribute(attr: CypherAttribute): Double? = attributeMap[attr]
     override fun getAttribute(holer: Holder<CypherAttribute>): Double? = getAttribute(holer.value())
-    override fun getAttributeOrDefault(attr: CypherAttribute): Double = attributeMap[attr] ?: cypher.getAttrBaseOrDefault(attr)
-    override fun getAttributeOrDefault(holer: Holder<CypherAttribute>): Double = getAttributeOrDefault(holer.value())
+    override fun getAttributeOrDefault(attr: CypherAttribute) = attributeMap[attr] ?: cypher.getAttrBaseOrDefault(attr)
+    override fun getAttributeOrDefault(holer: Holder<CypherAttribute>) = getAttributeOrDefault(holer.value())
+    override fun getAttrBaseOrNull(holder: Holder<CypherAttribute>) = getAttrBaseOrNull(holder.value())
+    override fun getAttrBaseOrNull(attr: CypherAttribute) = attributeMap[attr]
 
     override fun getExisting(): Int = getAttributeOrDefault(CypherAttributes.EXISTING).toInt()
     override fun getBounce(): Int = getAttributeOrDefault(CypherAttributes.BOUNCE).toInt()

@@ -102,6 +102,44 @@
         }
       }
     },
+    "cypher_nexus:arrow_collision": {
+      "delay": 3,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 30.0,
+      "projectile": {
+        "cypher_nexus:damage": 3.0,
+        "cypher_nexus:existing": 300.0,
+        "cypher_nexus:friction_factor": 0.01,
+        "cypher_nexus:gravity_factor": 0.01,
+        "cypher_nexus:speed": 1.3
+      },
+      "recharge": 0,
+      "stateChunk": {
+        "cypher_nexus:spread": {
+          "add": -10.0
+        }
+      }
+    },
+    "cypher_nexus:arrow_timer_10": {
+      "delay": 3,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 30.0,
+      "projectile": {
+        "cypher_nexus:damage": 3.0,
+        "cypher_nexus:existing": 300.0,
+        "cypher_nexus:friction_factor": 0.01,
+        "cypher_nexus:gravity_factor": 0.01,
+        "cypher_nexus:speed": 1.3
+      },
+      "recharge": 0,
+      "stateChunk": {
+        "cypher_nexus:spread": {
+          "add": -10.0
+        }
+      }
+    },
     "cypher_nexus:bloodlust": {
       "delay": 3,
       "draw": 1,
@@ -825,6 +863,45 @@
       "draw": 0,
       "flags": 0,
       "manaDrain": 3.0,
+      "projectile": {
+        "cypher_nexus:existing": 300.0,
+        "cypher_nexus:gravity_factor": 0.03,
+        "cypher_nexus:speed": 1.2
+      },
+      "recharge": 0,
+      "stateChunk": {}
+    },
+    "cypher_nexus:snowball_collision": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 23.0,
+      "projectile": {
+        "cypher_nexus:existing": 300.0,
+        "cypher_nexus:gravity_factor": 0.03,
+        "cypher_nexus:speed": 1.2
+      },
+      "recharge": 0,
+      "stateChunk": {}
+    },
+    "cypher_nexus:snowball_death": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 23.0,
+      "projectile": {
+        "cypher_nexus:existing": 300.0,
+        "cypher_nexus:gravity_factor": 0.03,
+        "cypher_nexus:speed": 1.2
+      },
+      "recharge": 0,
+      "stateChunk": {}
+    },
+    "cypher_nexus:snowball_timer_20": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 23.0,
       "projectile": {
         "cypher_nexus:existing": 300.0,
         "cypher_nexus:gravity_factor": 0.03,

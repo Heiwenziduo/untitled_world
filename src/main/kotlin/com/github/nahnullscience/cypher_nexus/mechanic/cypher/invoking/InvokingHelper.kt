@@ -130,7 +130,8 @@ class InvokingHelper (
     }
 
     /**
-     * draw first card in the Deck, and put it into Hand, handles mana automatically
+     * draw first card in the Deck, and put it into Hand, handles mana automatically.
+     * Generally, the usage of this method should couple with [AbstractCypher.invokeInHand]
      * @return non-empty-cypher, or null if there's nothing to draw (deck is empty / mana not enough)
      * */
     fun drawNext(): AbstractCypher? {
@@ -161,13 +162,13 @@ class InvokingHelper (
         return cy
     }
 
-    fun wrap() = run {
+    fun wrap(): Boolean {
         if (data.discard > 0) CypherNexus.debugCypher {
-            "discard ${data.discard.toString(2).padStart(aoc.capacity, '0')} wrap back into deck"
+            "discard ${data.discard.toString(2).padStart(aoc.capacity, '0')} wraps back into deck"
         }
         else CypherNexus.debugCypher { "discard is empty, nothing to wrap" }
         states.wrapped = true
-        discard2deck()
+        return discard2deck()
     }
 
     /**

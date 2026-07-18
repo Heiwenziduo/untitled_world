@@ -40,11 +40,16 @@ data class CypherDataMap(
     }
 
     open class Builder {
-        private var manaDrain: Float = 0f
-        private var draw: Int? = null
-        private var delay: Int? = null
-        private var recharge: Int? = null
-        private var flags: Int = 0
+        var manaDrain: Float = 0f
+            private set
+        var draw: Int? = null
+            private set
+        var delay: Int? = null
+            private set
+        var recharge: Int? = null
+            private set
+        var flags: Int = 0
+            private set
         private val projectile: HashMap<CypherAttribute, Double> = HashMap()
         private val stateChunk: HashMap<CypherAttribute, EnumMap<AttributeOperator, Double>> = HashMap()
 

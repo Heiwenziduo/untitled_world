@@ -16,7 +16,11 @@ abstract class AbstractAddTrigger(
     private val _manaDrain: Float
 ) : AbstractNonProjectileCypher() {
     override val category = CypherCategories.OTHER
-    abstract val triggerType: TriggerType
+    abstract val addTrigger: TriggerType
+    init {
+        require(addTrigger != TriggerType.NONE)
+    }
+
     override fun modifyStateChunk(
         helper: InvokingHelper,
         data: InvokingHelper.HelperDataBundle,
@@ -80,12 +84,11 @@ abstract class AbstractAddTrigger(
             // the cypher activates the payload process doesn't have to be the payload
             if (cy2 != null) {
                 CypherNexus.debugCypher { "invoke [$cy1] with payload due to [$cy2]" }
-                val subChunk = ShotStateChunk(Int.MAX_VALUE)
-                chunk.addProjectile(ProjectileNode(cy1, subChunk, triggerType))
+                val subChunk = cy1.addCEToStateChunk(chunk, addTrigger, Int.MAX_VALUE)
                 val payload = helper.drawNext()
                 payload?.invokeInHand(helper, subChunk, data, state)
             } else {
-                chunk.addProjectile(ProjectileNode(cy1, null))
+                cy1.addCEToStateChunk(chunk)
             }
         }
     }

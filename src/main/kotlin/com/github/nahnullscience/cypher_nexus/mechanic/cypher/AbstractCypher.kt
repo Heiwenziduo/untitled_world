@@ -138,7 +138,7 @@ sealed class AbstractCypher(
 
         var forwardState = chunk
         if (this is AbstractProjectileCypher<*>) {
-            forwardState = addToStateChunk(chunk)
+            forwardState = addCEToStateChunk(chunk)
         }
 
         handleDraws(helper, forwardState, data, state)
