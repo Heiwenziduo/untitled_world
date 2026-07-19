@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation
 
 import com.github.nahnullscience.cypher_nexus.init.data_driven.ModDamageTypes.CYPHER_DEFAULT
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
-import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator.Companion.AttributeMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator.Companion.initAttributes
@@ -10,7 +10,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAt
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity.Companion.CAPTURE_SIZE
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity.Companion.HIT_BB_INFLATION
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity.Companion.LOW_SPEED_THRESHOLD
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity.Companion.LOW_SPEED_THRESHOLD_SQR
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity.Companion.exertDamage
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
@@ -21,8 +20,8 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.StateChunkPool
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.EntityUtil.rotateTowardSpeed
-import com.github.nahnullscience.cypher_nexus.utility.LevelUtil.forEachEntityWithin
 import com.github.nahnullscience.cypher_nexus.utility.exception.CypherEntityInitializationException
+import com.github.nahnullscience.cypher_nexus.utility.forEachEntityWithin
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.rayCastThen
@@ -190,7 +189,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
 
     protected open fun captureSurroundings() {
         if (cyEntity.firstTick || cyEntity.tickCount and 3 == 3) { // trigger on 1, 3 and then every 4 tick
-            val modules = hooks?.get(CypherBehaviorHooks.ENTITY_SEARCH_BOTH)?.toList() ?: return
+            val modules = hooks?.get(CypherHooks.ENTITY_SEARCH_BOTH)?.toList() ?: return
             var i = 0
             while (i < modules.size) {
                 if (modules[i].first.needSearch(level, cyEntity)) break
@@ -224,62 +223,62 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
 
     // TODO unify hook names
     /**
-     * remember call super to function state hooks [CypherBehaviorHooks.BEFORE_DISCARD_BOTH]
+     * remember call super to function state hooks [CypherHooks.BEFORE_DISCARD_BOTH]
      * */
     protected open fun onBeforeDiscardBoth(reason: DiscardReason) {
         cyEntity.beforeDiscardBoth(reason)
-        hooks?.playHooks(CypherBehaviorHooks.BEFORE_DISCARD_BOTH)
+        hooks?.playHooks(CypherHooks.BEFORE_DISCARD_BOTH)
         { h, i -> h.beforeDiscardBoth(level, cyEntity, i, reason) }
     }
     /**
-     * remember call super to function state hooks [CypherBehaviorHooks.HIT_ENTITY_BOTH]
+     * remember call super to function state hooks [CypherHooks.HIT_ENTITY_BOTH]
      * */
     protected open fun onHitBoth(result: HitResult) {
         cyEntity.hitBoth(result)
-        hooks?.playHooks(CypherBehaviorHooks.HIT_ENTITY_BOTH)
+        hooks?.playHooks(CypherHooks.HIT_ENTITY_BOTH)
         { h, i -> h.onHitBoth(level, cyEntity, i, result) }
     }
     /**
-     * remember call super to function state hooks [CypherBehaviorHooks.FIRST_TICK_BOTH]
+     * remember call super to function state hooks [CypherHooks.FIRST_TICK_BOTH]
      * */
     protected open fun onFirstTickBoth() {
         cyEntity.firstTickBoth()
-        hooks?.playHooks(CypherBehaviorHooks.FIRST_TICK_BOTH)
+        hooks?.playHooks(CypherHooks.FIRST_TICK_BOTH)
         { h, i -> h.firstTickBoth(level, cyEntity, i) }
     }
     /**
-     * remember call super to function state hooks [CypherBehaviorHooks.TICK_BEHAVIOR_BOTH]
+     * remember call super to function state hooks [CypherHooks.TICK_BEHAVIOR_BOTH]
      * change speed / attributes (here) -> finalize movement -> bounce & hit check
      * */
     protected open fun tickBehaviorChangeBoth() {
         cyEntity.tickBehaviorBoth()
-        hooks?.playHooks(CypherBehaviorHooks.TICK_BEHAVIOR_BOTH)
+        hooks?.playHooks(CypherHooks.TICK_BEHAVIOR_BOTH)
         { h, i -> h.tickBehaviorBoth(level, cyEntity, i) }
     }
     /**
-     * remember call super to function state hooks [CypherBehaviorHooks.TICK_MOVEMENT_FINALIZE_BOTH]
+     * remember call super to function state hooks [CypherHooks.TICK_MOVEMENT_FINALIZE_BOTH]
      * change speed / attributes -> finalize movement (here) -> bounce & hit check
      * */
     protected open fun tickMovementFinalizeBoth() {
         cyEntity.tickFinalizeMovementBoth()
-        hooks?.playHooks(CypherBehaviorHooks.TICK_MOVEMENT_FINALIZE_BOTH)
+        hooks?.playHooks(CypherHooks.TICK_MOVEMENT_FINALIZE_BOTH)
         { h, i -> h.finalizeTickMovementBoth(level, cyEntity, i) }
     }
     /**
-     * remember call super to function state hooks [CypherBehaviorHooks.ON_BOUNCE_BOTH]
+     * remember call super to function state hooks [CypherHooks.ON_BOUNCE_BOTH]
      * */
     protected open fun onBounceBoth(point: Vec3) {
         cyEntity.bounceBoth(point)
-        hooks?.playHooks(CypherBehaviorHooks.ON_BOUNCE_BOTH)
+        hooks?.playHooks(CypherHooks.ON_BOUNCE_BOTH)
         { h, i -> h.onBounceBoth(level, cyEntity, i, bounceCount, point) }
     }
     /**
-     * remember call super to function state hooks [CypherBehaviorHooks.ENTITY_SEARCH_BOTH]
+     * remember call super to function state hooks [CypherHooks.ENTITY_SEARCH_BOTH]
      * */
     protected open fun onCaptureSurroundingBoth(captured: Entity) {
         cyEntity.captureSurroundingBoth(captured)
         // TODO try further optimization, for this is O(m * n)
-        hooks?.playHooks(CypherBehaviorHooks.ENTITY_SEARCH_BOTH)
+        hooks?.playHooks(CypherHooks.ENTITY_SEARCH_BOTH)
         { h, i -> h.entitySearchBoth(level, cyEntity, i, captured) }
     }
     /**

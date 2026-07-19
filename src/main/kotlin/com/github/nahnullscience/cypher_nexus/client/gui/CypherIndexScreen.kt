@@ -76,7 +76,7 @@ class CypherIndexScreen(
         super.extractRenderState(graphics, mouseX, mouseY, a)
 
         dragController.current?.let { payload ->
-            renderCypherIcon(graphics, payload.cypher, mouseX - ICON_SIZE_HALF, mouseY - ICON_SIZE_HALF)
+            graphics.renderCypherIcon(payload.cypher, mouseX - ICON_SIZE_HALF, mouseY - ICON_SIZE_HALF)
         }
     }
 

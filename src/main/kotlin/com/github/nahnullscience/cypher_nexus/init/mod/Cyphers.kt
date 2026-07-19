@@ -4,9 +4,9 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.module.PrimaryInvokingCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.*
-import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.SimpleProjectiles
-import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.SimpleProjectiles.SimpleProjectile
-import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.SimpleProjectiles.SimpleStaticProjectile
+import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.AbstractSimpleProjectile
+import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.AbstractSimpleProjectile.SimpleProjectile
+import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.AbstractSimpleProjectile.SimpleStaticProjectile
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.InnerForceCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.ProteusCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.RefresherRingCypher
@@ -14,7 +14,7 @@ import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.*
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.NONE
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.exception.CypherNotFoundException
@@ -43,115 +43,6 @@ object Cyphers {
         DEFERRED_REGISTER.register(MOD_BUS)
     }
 
-    @Suppress("UNCHECKED_CAST")
-    fun <CY: AbstractCypher> registerCypher(cypher: CY): Holder<CY> {
-        return DEFERRED_REGISTER.register(cypher.resource.path) { -> cypher } as Holder<CY>
-    }
-
-    /**
-     * builder friendly reload
-     * */
-    @Suppress("UNCHECKED_CAST")
-    fun <CY: AbstractCypher> registerCypher(
-        constructor: (builder: CypherDataMap.Builder.() -> CypherDataMap.Builder) -> CY,
-        defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE
-    ): Holder<CY> {
-        val cy = constructor(defaultAttribute)
-        return DEFERRED_REGISTER.register(cy.resource.path) { -> cy } as Holder<CY>
-    }
-
-    fun registerProjectile(
-        projectileHolder: DeferredHolder<EntityType<*>, out EntityType<out DedicatedCypherProjectile>>,
-        config: SimpleProjectile.() -> Unit,
-    ): Holder<ProjectileCypher<DedicatedCypherProjectile>> {
-        // a projectile-related cypher knows the entity it can create,
-        // but the cypher-projectile doesn't care who creates it.
-        // this is a helper method utilizing the relation to directly tie one entity to a cypher and save boilerplate code
-        val name = projectileHolder.id.path.removePrefix("cypher_")
-        val simple = SimpleProjectile(name, projectileHolder)
-        simple.config()
-        return registerCypher(simple.createProjectile())
-    }
-
-    /**
-     * batch generate projectile cypher with trigger reloaded.
-     * the reload names `origin` + _[TriggerType.simpleName].
-     *
-     * note the `cypherHolder` in [DedicatedCypherProjectile] is always pointed to the `origin` one
-     * @return cypher-holder of the `origin`
-     * */
-    fun registerProjectile(
-        projectileHolder: DeferredHolder<EntityType<*>, out EntityType<out DedicatedCypherProjectile>>,
-        config: SimpleProjectiles<*>.() -> Unit,
-        vararg triggerOverride: TriggerType
-    ): Holder<ProjectileCypher<DedicatedCypherProjectile>> {
-        val name = projectileHolder.id.path.removePrefix("cypher_")
-        val simple = SimpleProjectile(name, projectileHolder)
-        simple.config()
-        val base = registerCypher(simple.createProjectile())
-
-        for (t in triggerOverride) {
-            if (t != simple.trigger) {
-                val n = name + "_${t.simpleName}"
-                val triggered = SimpleProjectile(n, projectileHolder)
-                triggered.config()
-
-                if (t == TriggerType.NONE) triggered.draw(0)
-                else triggered.draw(1)
-
-                triggered.manaDrain(simple.manaDrain + 20.0f)
-                triggered.trigger(t)
-
-                registerCypher(triggered.createProjectile())
-            }
-        }
-
-        return base
-    }
-
-    fun registerStaticProjectile(
-        projectileHolder: DeferredHolder<EntityType<*>, out EntityType<out DedicatedCypherProjectile>>,
-        config: SimpleStaticProjectile.() -> Unit
-    ): Holder<StaticProjectileCypher<DedicatedCypherProjectile>> {
-        val name = projectileHolder.id.path.removePrefix("cypher_")
-        val simple = SimpleStaticProjectile(name, projectileHolder)
-        simple.config()
-        return registerCypher(simple.createProjectile())
-    }
-
-    fun registerStaticProjectile(
-        projectileHolder: DeferredHolder<EntityType<*>, out EntityType<out DedicatedCypherProjectile>>,
-        config: SimpleProjectiles<*>.() -> Unit,
-        vararg triggerOverride: TriggerType
-    ): Holder<StaticProjectileCypher<DedicatedCypherProjectile>> {
-        val name = projectileHolder.id.path.removePrefix("cypher_")
-        val simple = SimpleStaticProjectile(name, projectileHolder)
-        simple.config()
-        val base = registerCypher(simple.createProjectile())
-
-        for (t in triggerOverride) {
-            if (t != simple.trigger) {
-                val n = name + "_${t.simpleName}"
-                val triggered = SimpleStaticProjectile(n, projectileHolder)
-                triggered.config()
-
-                if (t == TriggerType.NONE) triggered.draw(0)
-                else triggered.draw(1)
-
-                triggered.manaDrain(simple.manaDrain + 20.0f)
-                triggered.trigger(t)
-
-                registerCypher(triggered.createProjectile())
-            }
-        }
-        return base
-    }
-
-    fun registerModifier(path: String, manaDrain: Float, config: SimpleModifier.() -> Unit): Holder<ModifierCypher> {
-        val simple = SimpleModifier(path, manaDrain).also { it.config() }
-        return registerCypher(simple.createModifier())
-    }
-
     fun getCypher(resource: Identifier): AbstractCypher? = REGISTRY.getValue(resource)
     fun getCypherOrThrow(resource: Identifier): AbstractCypher {
         return getCypher(resource) ?:
@@ -169,8 +60,8 @@ object Cyphers {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // projectile
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    val ARROW = registerProjectile(ModEntities.CYPHER_ARROW, {
-        manaDrain(10f)
+    val ARROW = registerProjectile(ModEntities.CYPHER_ARROW, TriggerType.COLLISION, TriggerType.TIMER_10) {
+        manaDrain(15f)
         delay(3)
         stateChunkAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -10.0)
         projectileAttr(CypherAttributes.DAMAGE, 3.0)
@@ -178,13 +69,13 @@ object Cyphers {
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.01)
         projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.01)
-    }, TriggerType.COLLISION, TriggerType.TIMER_10)
-    val SNOWBALL = registerProjectile(ModEntities.CYPHER_SNOWBALL, {
-        manaDrain(3f)
+    }
+    val SNOWBALL = registerProjectile(ModEntities.CYPHER_SNOWBALL, TriggerType.COLLISION, TriggerType.TIMER_20, TriggerType.DEATH) {
+        manaDrain(5f)
         projectileAttr(CypherAttributes.SPEED, 1.2)
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
-    }, TriggerType.COLLISION, TriggerType.TIMER_20, TriggerType.DEATH)
+    }
     val ENDER_TELEPORTATION = registerProjectile(ModEntities.CYPHER_ENDER_TELEPORTATION) {
         manaDrain(20f)
         flags(CypherFlags.SKIP_DAMAGE_CHECK, CypherFlags.WITH_ENDER_POWER)
@@ -208,7 +99,7 @@ object Cyphers {
         projectileAttr(CypherAttributes.EXISTING, 160.0)
     }
     val LLAMA_SPIT = registerProjectile(ModEntities.CYPHER_LLAMA_SPIT) {
-        manaDrain(5f)
+        manaDrain(10f)
         recharge(2)
         stateChunkAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.1)
         projectileAttr(CypherAttributes.DAMAGE, 1.0)
@@ -345,7 +236,7 @@ object Cyphers {
         flags(CypherFlags.MOTION_FOLLOWS_OWNER)
     }
     val AIMING_ARC = registerCypher(::AimingArc) {
-        manaDrain(36f)
+        manaDrain(30f)
     }
     val PIERCE_ENTITY = registerModifier("pierce_entity", 110f) {
         flags(CypherFlags.HURT_OWNER, CypherFlags.PIERCE_ENTITY)
@@ -462,4 +353,84 @@ object Cyphers {
 
     val CYPHER_DUPLICATION = registerCypher(CypherDuplicationCypher)
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    @Suppress("UNCHECKED_CAST")
+    fun <CY: AbstractCypher> registerCypher(cypher: CY): Holder<CY> {
+        return DEFERRED_REGISTER.register(cypher.resource.path) { -> cypher } as Holder<CY>
+    }
+
+    /**
+     * builder friendly reload
+     * */
+    @Suppress("UNCHECKED_CAST")
+    fun <CY: AbstractCypher> registerCypher(
+        constructor: (builder: CypherDataMap.Builder.() -> CypherDataMap.Builder) -> CY,
+        defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE
+    ): Holder<CY> = registerCypher(constructor(defaultAttribute))
+
+
+    private typealias CypherProjectileHolder = DeferredHolder<EntityType<*>, out EntityType<out AbstractDedicatedCypherProjectile>>
+    /**
+     * Internal generic master handler that processes both standard and static projectiles,
+     * handling custom triggers automatically via a unified loop.
+     *
+     * @param triggerOverride batch generate projectile cypher with trigger reloaded.
+     * the reload names `origin` + _[TriggerType.simpleName].
+     *
+     * note the `cypherHolder` in respective `CypherEntity`-s is always pointed to the original one
+     * @return cypher-holder of the `origin`
+     */
+    private inline fun <C : AbstractProjectileCypher<AbstractDedicatedCypherProjectile>, reified B : AbstractSimpleProjectile<C>> registerGenericProjectile(
+        projectileHolder: CypherProjectileHolder,
+        crossinline builderFactory: (String, CypherProjectileHolder) -> B,
+        crossinline config: B.() -> Unit,
+        vararg triggerOverride: TriggerType
+    ): Holder<C> {
+        // a projectile-related cypher knows the entity it can create,
+        // but the cypher-projectile doesn't care who creates it.
+        // this is a helper method utilizing the relation to directly tie one entity to a cypher and save boilerplate code
+        val name = projectileHolder.id.path.removePrefix("cypher_")
+        val simple = builderFactory(name, projectileHolder)
+        simple.config()
+        val base = registerCypher(simple.createProjectile())
+
+        for (t in triggerOverride) {
+            if (t != simple.trigger) {
+                val n = name + "_${t.simpleName}"
+                val triggered = builderFactory(n, projectileHolder)
+                triggered.config()
+
+                if (t == TriggerType.NONE) triggered.draw(0)
+                else triggered.draw(1)
+
+                triggered.manaDrain(simple.manaDrain + 20.0f)
+                triggered.trigger(t)
+
+                registerCypher(triggered.createProjectile())
+            }
+        }
+        return base
+    }
+
+    fun registerProjectile(
+        projectileHolder: CypherProjectileHolder,
+        vararg triggerOverride: TriggerType,
+        config: SimpleProjectile.() -> Unit,
+    ): Holder<ProjectileCypher<AbstractDedicatedCypherProjectile>> =
+        registerGenericProjectile(projectileHolder, ::SimpleProjectile, config, *triggerOverride)
+
+    fun registerStaticProjectile(
+        projectileHolder: CypherProjectileHolder,
+        vararg triggerOverride: TriggerType,
+        config: SimpleStaticProjectile.() -> Unit,
+    ): Holder<StaticProjectileCypher<AbstractDedicatedCypherProjectile>> =
+        registerGenericProjectile(projectileHolder, ::SimpleStaticProjectile, config, *triggerOverride)
+
+    fun registerModifier(path: String, manaDrain: Float, config: SimpleModifier.() -> Unit): Holder<ModifierCypher> {
+        val simple = SimpleModifier(path, manaDrain).also { it.config() }
+        return registerCypher(simple.createModifier())
+    }
 }

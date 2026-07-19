@@ -7,7 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.StaticProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import net.minecraft.core.Holder
@@ -16,11 +16,11 @@ import java.util.EnumMap
 import java.util.function.Supplier
 
 /**
- * the idea is, put entity-specific logics inside those Entity [DedicatedCypherProjectile] classes, and leave the cypher simple
+ * the idea is, put entity-specific logics inside those Entity [AbstractDedicatedCypherProjectile] classes, and leave the cypher simple
  * */
-abstract class SimpleProjectiles <out C : AbstractProjectileCypher<DedicatedCypherProjectile>> (
+abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<AbstractDedicatedCypherProjectile>> (
     protected val path: String,
-    protected val type: Supplier<out EntityType<out DedicatedCypherProjectile>>
+    protected val type: Supplier<out EntityType<out AbstractDedicatedCypherProjectile>>
 ) : CypherDataMap.Builder() {
     init {
         manaDrain(1f)
@@ -46,12 +46,12 @@ abstract class SimpleProjectiles <out C : AbstractProjectileCypher<DedicatedCyph
 
     override fun projectileAttr(holder: Holder<CypherAttribute>, value: Double) = run {
         projectileAttrHolder[holder] = value
-        this@SimpleProjectiles
+        this@AbstractSimpleProjectile
     }
     override fun stateChunkAttr(holder: Holder<CypherAttribute>, operator: AttributeOperator, value: Double) = run {
         val opMap = stateChunkHolder.getOrPut(holder) { EnumMap(AttributeOperator::class.java) }
         opMap[operator] = value
-        this@SimpleProjectiles
+        this@AbstractSimpleProjectile
     }
 
     abstract fun createProjectile(): C
@@ -70,11 +70,12 @@ abstract class SimpleProjectiles <out C : AbstractProjectileCypher<DedicatedCyph
 
 
 
+    typealias Projectile = SimpleProjectile
     class SimpleProjectile(
         path: String,
-        type: Supplier<out EntityType<out DedicatedCypherProjectile>>
-    ) : SimpleProjectiles <ProjectileCypher<DedicatedCypherProjectile>> (path, type) {
-        override fun createProjectile() = object : ProjectileCypher<DedicatedCypherProjectile>() {
+        type: Supplier<out EntityType<out AbstractDedicatedCypherProjectile>>
+    ) : AbstractSimpleProjectile <ProjectileCypher<AbstractDedicatedCypherProjectile>> (path, type) {
+        override fun createProjectile() = object : ProjectileCypher<AbstractDedicatedCypherProjectile>() {
             override val resource = CypherNexus.modResource(path)
             override val projectileType = type
             override val color = this@SimpleProjectile.color
@@ -84,11 +85,12 @@ abstract class SimpleProjectiles <out C : AbstractProjectileCypher<DedicatedCyph
         }
     }
 
+    typealias Static = SimpleStaticProjectile
     class SimpleStaticProjectile(
         path: String,
-        type: Supplier<out EntityType<out DedicatedCypherProjectile>>
-    ) : SimpleProjectiles <StaticProjectileCypher<DedicatedCypherProjectile>> (path, type) {
-        override fun createProjectile() = object : StaticProjectileCypher<DedicatedCypherProjectile>() {
+        type: Supplier<out EntityType<out AbstractDedicatedCypherProjectile>>
+    ) : AbstractSimpleProjectile <StaticProjectileCypher<AbstractDedicatedCypherProjectile>> (path, type) {
+        override fun createProjectile() = object : StaticProjectileCypher<AbstractDedicatedCypherProjectile>() {
             override val resource = CypherNexus.modResource(path)
             override val projectileType = type
             override val color = this@SimpleStaticProjectile.color

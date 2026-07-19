@@ -3,13 +3,10 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothTickBehaviorHook
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
-import kotlin.math.PI
 import kotlin.math.min
 
 class BoomerangCypher(

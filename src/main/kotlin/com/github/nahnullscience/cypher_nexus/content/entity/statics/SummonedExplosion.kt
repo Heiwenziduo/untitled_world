@@ -1,14 +1,14 @@
 package com.github.nahnullscience.cypher_nexus.content.entity.statics
 
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers.EXPLOSION
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractStaticSummoner
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
 
 class SummonedExplosion (
-    entityType: EntityType<out DedicatedCypherProjectile>,
+    entityType: EntityType<out AbstractDedicatedCypherProjectile>,
     level: Level
 ) : AbstractStaticSummoner(entityType, level) {
 

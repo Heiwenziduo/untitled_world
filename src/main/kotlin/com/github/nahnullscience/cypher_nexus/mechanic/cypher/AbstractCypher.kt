@@ -3,11 +3,12 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.data_driven.ModDataMaps.CYPHER_DATA_ATTACH
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
-import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule.HookType
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
@@ -47,12 +48,13 @@ sealed class AbstractCypher(
 
     /** auto-detect hooks */
     val implementedHooks: List<HookModule<*>> by lazy {
-        if (this is AbstractProjectileCypher<*>) {
-            CypherNexus.LOGGER.warn("Don't register hooks on [{}], instead implement them on related entity directly.", this)
-            return@lazy emptyList()
+        CypherHooks.REGISTRY.filter { module ->
+            val c1 = module.hook.isInstance(this)
+            val c2 = (this is AbstractProjectileCypher<*> && module.type == HookType.BEHAVIOR)
+                .also { if (it) CypherNexus.LOGGER.warn("Don't register [behavior] hook [{}] on [{}], instead implement them on related entity directly.", module.hook, this) }
+
+            return@filter c1 && !c2
         }
-        val hookModules = CypherBehaviorHooks.REGISTRY
-        hookModules.filter { it.hook.isInstance(this) }
     }
 //    /** if a cypher may call itself, set this to true to avoid infinite loop */
 //    open val isRecursive: Boolean = false
@@ -79,7 +81,10 @@ sealed class AbstractCypher(
 
     open fun defaultAttributes(): CypherDataMap.Builder = CypherDataMap.builder().defaultAttribute()
 
-    fun attributes() = attributesData() ?: run { CypherNexus.LOGGER.warn("cypher $this missing attributes data, this may cause lag"); defaultAttributes().build() }
+    fun attributes() = attributesData() ?: run {
+        CypherNexus.LOGGER.warn("cypher $this missing attributes data, this may cause lag")
+        defaultAttributes().build()
+    }
 
     // ============================================================================================================
     /** when invoke from helper#draw */

@@ -47,7 +47,7 @@
       "delay": 0,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 36.0,
+      "manaDrain": 30.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {}
@@ -87,7 +87,7 @@
       "delay": 3,
       "draw": 0,
       "flags": 0,
-      "manaDrain": 10.0,
+      "manaDrain": 15.0,
       "projectile": {
         "cypher_nexus:damage": 3.0,
         "cypher_nexus:existing": 300.0,
@@ -106,7 +106,7 @@
       "delay": 3,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 30.0,
+      "manaDrain": 35.0,
       "projectile": {
         "cypher_nexus:damage": 3.0,
         "cypher_nexus:existing": 300.0,
@@ -125,7 +125,7 @@
       "delay": 3,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 30.0,
+      "manaDrain": 35.0,
       "projectile": {
         "cypher_nexus:damage": 3.0,
         "cypher_nexus:existing": 300.0,
@@ -298,7 +298,7 @@
       "delay": 15,
       "draw": 0,
       "flags": 0,
-      "manaDrain": 220.0,
+      "manaDrain": 320.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {
@@ -306,7 +306,7 @@
           "add": -10.0
         },
         "cypher_nexus:effect_radius": {
-          "multiply_base": -0.5
+          "multiply_base": -1.0
         }
       }
     },
@@ -322,7 +322,7 @@
           "add": -2.0
         },
         "cypher_nexus:effect_radius": {
-          "multiply_base": -0.1
+          "multiply_base": -0.2
         }
       }
     },
@@ -330,7 +330,7 @@
       "delay": 5,
       "draw": 0,
       "flags": 0,
-      "manaDrain": 90.0,
+      "manaDrain": 100.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {
@@ -338,7 +338,7 @@
           "add": -3.0
         },
         "cypher_nexus:effect_radius": {
-          "multiply_base": -0.15
+          "multiply_base": -0.3
         }
       }
     },
@@ -346,7 +346,7 @@
       "delay": 7,
       "draw": 0,
       "flags": 0,
-      "manaDrain": 150.0,
+      "manaDrain": 180.0,
       "projectile": {},
       "recharge": 0,
       "stateChunk": {
@@ -354,7 +354,7 @@
           "add": -4.0
         },
         "cypher_nexus:effect_radius": {
-          "multiply_base": -0.2
+          "multiply_base": -0.4
         }
       }
     },
@@ -585,7 +585,7 @@
       "delay": 0,
       "draw": 0,
       "flags": 0,
-      "manaDrain": 5.0,
+      "manaDrain": 10.0,
       "projectile": {
         "cypher_nexus:damage": 1.0,
         "cypher_nexus:existing": 120.0,
@@ -862,7 +862,7 @@
       "delay": 0,
       "draw": 0,
       "flags": 0,
-      "manaDrain": 3.0,
+      "manaDrain": 5.0,
       "projectile": {
         "cypher_nexus:existing": 300.0,
         "cypher_nexus:gravity_factor": 0.03,
@@ -875,7 +875,7 @@
       "delay": 0,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 23.0,
+      "manaDrain": 25.0,
       "projectile": {
         "cypher_nexus:existing": 300.0,
         "cypher_nexus:gravity_factor": 0.03,
@@ -888,7 +888,7 @@
       "delay": 0,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 23.0,
+      "manaDrain": 25.0,
       "projectile": {
         "cypher_nexus:existing": 300.0,
         "cypher_nexus:gravity_factor": 0.03,
@@ -901,7 +901,7 @@
       "delay": 0,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 23.0,
+      "manaDrain": 25.0,
       "projectile": {
         "cypher_nexus:existing": 300.0,
         "cypher_nexus:gravity_factor": 0.03,

@@ -9,7 +9,7 @@ import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.SimpleParti
 import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.SimpleSummonerRenderer
 import com.github.nahnullscience.cypher_nexus.client.devtools.WebServiceManager
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.commands.Commands
 import net.minecraft.world.entity.EntityType
@@ -89,15 +89,15 @@ object ClientSetup {
 
     private fun <CY> RegisterRenderers.registerItemProjectile (
         cypherEntity: Supplier<out EntityType<out CY>>,
-    ) where CY : DedicatedCypherProjectile, CY : ItemSupplier
+    ) where CY : AbstractDedicatedCypherProjectile, CY : ItemSupplier
             = registerEntityRenderer(cypherEntity.get()) { context -> SimpleItemProjectileRenderer(context) }
 
     private fun <CY> RegisterRenderers.registerParticleProjectile (
         cypherEntity: Supplier<out EntityType<out CY>>,
-    ) where CY : DedicatedCypherProjectile
+    ) where CY : AbstractDedicatedCypherProjectile
             = registerEntityRenderer(cypherEntity.get()) { context -> SimpleParticleProjectileRenderer(context) }
 
-    private fun <T : DedicatedCypherProjectile> RegisterRenderers.registerEntityRenderer(
+    private fun <T : AbstractDedicatedCypherProjectile> RegisterRenderers.registerEntityRenderer(
         cypherEntity: Supplier<out EntityType<out T>>,
         factory: EntityRendererProvider<T>
     ) = registerEntityRenderer(cypherEntity.get(), factory)

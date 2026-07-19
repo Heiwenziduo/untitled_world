@@ -12,6 +12,7 @@ import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherHoverLayer
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherIcon
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherTooltip
+import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderEmptyCypherSlot
 import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderIconText
 import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEventBus
 import com.github.nahnullscience.cypher_nexus.client.gui.others.WandEditSession
@@ -88,7 +89,7 @@ class WandEditorPanel(
         hovered = hitTest(mouseX.toDouble(), mouseY.toDouble())
 
         if (!drag.isDragging) hovered?.let { hit ->
-            renderCypherTooltip(graphics, screen.font, hit.cypher, mouseX, mouseY)
+            graphics.renderCypherTooltip(screen.font, hit.cypher, mouseX, mouseY)
         }
 
         val stack = session.currentStack ?: return
@@ -111,9 +112,9 @@ class WandEditorPanel(
         for (i in 0 until aoc.capacity) {
             val rect = grid.cellRect(i)
             val cypher = aoc[i]
-            graphics.fill(rect.left(), rect.top(), rect.right(), rect.bottom(), 0xFF444444.toInt())
-            renderCypherIcon(graphics, cypher, rect.left(), rect.top())
-            if (i == hovered?.index) renderCypherHoverLayer(graphics, rect.left(), rect.top())
+            graphics.renderEmptyCypherSlot(rect.left(), rect.top())
+            graphics.renderCypherIcon(cypher, rect.left(), rect.top())
+            if (i == hovered?.index) graphics.renderCypherHoverLayer(rect.left(), rect.top())
         }
     }
 

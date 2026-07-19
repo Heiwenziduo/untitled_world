@@ -69,7 +69,7 @@ class CypherLibraryPanel(
         hovered = hitTest(mouseX.toDouble(), mouseY.toDouble())
 
         if (!drag.isDragging) hovered?.let { hit ->
-            renderCypherTooltip(graphics, screen.font, hit.cypher, mouseX, mouseY)
+            graphics.renderCypherTooltip(screen.font, hit.cypher, mouseX, mouseY)
         }
 
         graphics.enableScissor(x, y, x + w, y + h)
@@ -89,8 +89,8 @@ class CypherLibraryPanel(
         graphics.text(screen.font, block.title, reX, reY - 14, WHITE)
         for ((i, cypher) in block.list.withIndex()) {
             val rect = grid.cellRect(i)
-            renderCypherIcon(graphics, cypher, rect.left(), rect.top())
-            if (cypher === hovered?.cypher) renderCypherHoverLayer(graphics, rect.left(), rect.top())
+            graphics.renderCypherIcon(cypher, rect.left(), rect.top())
+            if (cypher === hovered?.cypher) graphics.renderCypherHoverLayer(rect.left(), rect.top())
         }
     }
 

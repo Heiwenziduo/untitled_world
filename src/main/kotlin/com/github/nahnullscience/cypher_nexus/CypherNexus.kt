@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus
 
 import com.github.nahnullscience.cypher_nexus.init.*
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
-import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes
@@ -78,7 +78,7 @@ object CypherNexus {
         Cyphers.register()
         CypherAttributes.register()
         CypherCategories.register()
-        CypherBehaviorHooks.register()
+        CypherHooks.register()
         WandModuleTypes.register()
 
 //        // Kotlin style events register
@@ -126,7 +126,7 @@ object CypherNexus {
         event.register(Cyphers.REGISTRY)
         event.register(CypherAttributes.REGISTRY)
         event.register(CypherCategories.REGISTRY)
-        event.register(CypherBehaviorHooks.REGISTRY)
+        event.register(CypherHooks.REGISTRY)
         event.register(WandModuleTypes.REGISTRY)
     }
 

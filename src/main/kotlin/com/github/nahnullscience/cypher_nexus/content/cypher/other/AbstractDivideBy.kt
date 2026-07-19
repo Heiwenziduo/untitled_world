@@ -70,37 +70,37 @@ abstract class AbstractDivideBy(
                 .manaDrain(40f)
                 .delay(3)
                 .stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -2.0)
-                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.1)
+                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.2)
         }
     }
 
     object D3 : AbstractDivideBy("divide_by_3", 3, 3) {
         override fun defaultAttributes(): CypherDataMap.Builder {
             return super.defaultAttributes()
-                .manaDrain(90f)
+                .manaDrain(100f)
                 .delay(5)
                 .stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -3.0)
-                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.15)
+                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.3)
         }
     }
 
     object D4 : AbstractDivideBy("divide_by_4", 4, 3) {
         override fun defaultAttributes(): CypherDataMap.Builder {
             return super.defaultAttributes()
-                .manaDrain(150f)
+                .manaDrain(180f)
                 .delay(7)
                 .stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -4.0)
-                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.2)
+                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.4)
         }
     }
 
     object D10 : AbstractDivideBy("divide_by_10", 10, 2) {
         override fun defaultAttributes(): CypherDataMap.Builder {
             return super.defaultAttributes()
-                .manaDrain(220f)
+                .manaDrain(320f)
                 .delay(15)
                 .stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -10.0)
-                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.5)
+                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -1.0)
         }
     }
 }

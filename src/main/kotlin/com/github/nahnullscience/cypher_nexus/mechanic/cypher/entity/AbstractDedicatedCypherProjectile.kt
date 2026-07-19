@@ -34,11 +34,11 @@ import net.neoforged.neoforge.entity.IEntityWithComplexSpawn
 import java.util.*
 import java.util.function.Consumer
 
-abstract class DedicatedCypherProjectile(
-    entityType: EntityType<out DedicatedCypherProjectile>,
+abstract class AbstractDedicatedCypherProjectile(
+    entityType: EntityType<out AbstractDedicatedCypherProjectile>,
     level: Level
 ) : Projectile(entityType, level), IEntityWithComplexSpawn,
-    IFlagExtension, ICypherEntity by CypherEntityBasics<DedicatedCypherProjectile>() {
+    IFlagExtension, ICypherEntity by CypherEntityBasics<AbstractDedicatedCypherProjectile>() {
     companion object {
         /** generate projectile with attributes initialized */
         fun <CY> create(
@@ -56,7 +56,7 @@ abstract class DedicatedCypherProjectile(
             return proj
         }
 
-        fun <T : DedicatedCypherProjectile> createRaw(entityType: EntityType<T>, level: ServerLevel, owner: Entity?) : T {
+        fun <T : AbstractDedicatedCypherProjectile> createRaw(entityType: EntityType<T>, level: ServerLevel, owner: Entity?) : T {
             val proj = entityType.create(level, EntitySpawnReason.SPAWN_ITEM_USE) ?:
             throw IllegalStateException("Failed to create projectile [$entityType].")
             proj.setOwner(owner)
@@ -121,7 +121,7 @@ abstract class DedicatedCypherProjectile(
         noPhysics = true
     }
 
-    abstract override val cypherHolder: Holder<out AbstractProjectileCypher<out DedicatedCypherProjectile>>
+    abstract override val cypherHolder: Holder<out AbstractProjectileCypher<out AbstractDedicatedCypherProjectile>>
 
     private var _existing: Int? = null
     override fun getExisting(): Int = _existing ?: getAttributeOrDefault(CypherAttributes.EXISTING).toInt()

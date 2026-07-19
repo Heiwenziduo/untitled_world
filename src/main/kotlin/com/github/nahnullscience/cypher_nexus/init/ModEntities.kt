@@ -4,7 +4,7 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.entity.*
 import com.github.nahnullscience.cypher_nexus.content.entity.statics.SummonedExplosion
 import com.github.nahnullscience.cypher_nexus.content.entity.statics.SummonedLightning
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
 import net.neoforged.neoforge.registries.DeferredHolder
@@ -21,7 +21,7 @@ object ModEntities {
     /**
      * check [EntityType]
      * */
-    fun <T : DedicatedCypherProjectile> registerDedicated(
+    fun <T : AbstractDedicatedCypherProjectile> registerDedicated(
         name: String,
         factory: EntityType.EntityFactory<T>,
         category: MobCategory = MobCategory.MISC,

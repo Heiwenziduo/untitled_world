@@ -29,11 +29,28 @@ object RenderConstants {
     const val SCROLLBAR_WIDTH = 4
 
     val cypherBg = CypherNexus.modResource("textures/gui/cypher_bg.png")
+    val cypherBgEmpty = CypherNexus.modResource("textures/gui/cypher_bg_empty.png")
 
-    fun renderCypherIcon(graphics: GuiGraphicsExtractor, cypher: AbstractCypher, x: Int, y: Int) {
+    fun GuiGraphicsExtractor.renderEmptyCypherSlot(x: Int, y: Int) {
+        blit(
+            RenderPipelines.GUI_TEXTURED,
+            cypherBgEmpty,
+            x - ICON_BORDER,
+            y - ICON_BORDER,
+            0.0f,
+            0.0f,
+            BORDER_SIZE,
+            BORDER_SIZE,
+            BORDER_SIZE,
+            BORDER_SIZE,
+        )
+        fill(x, y, x + ICON_SIZE, y + ICON_SIZE, 0xFF444444.toInt())
+    }
+
+    fun GuiGraphicsExtractor.renderCypherIcon(cypher: AbstractCypher, x: Int, y: Int) {
         if (cypher.isNotEmpty()) {
             val borderColor = if (cypher.color != 0) cypher.color else cypher.category.value().color
-            graphics.blit(
+            blit(
                 RenderPipelines.GUI_TEXTURED,
                 cypherBg,
                 x - ICON_BORDER,
@@ -46,7 +63,7 @@ object RenderConstants {
                 BORDER_SIZE,
                 borderColor
             )
-            graphics.blit(
+            blit(
                 RenderPipelines.GUI_TEXTURED,
                 cypher.texture(),
                 x,
@@ -61,11 +78,11 @@ object RenderConstants {
         }
     }
 
-    fun renderCypherHoverLayer(graphics: GuiGraphicsExtractor, x: Int, y: Int) {
-        graphics.fill(x, y, x + ICON_SIZE, y + ICON_SIZE, LIGHT)
+    fun GuiGraphicsExtractor.renderCypherHoverLayer(x: Int, y: Int) {
+        fill(x, y, x + ICON_SIZE, y + ICON_SIZE, LIGHT)
     }
 
-    fun renderCypherTooltip(graphics: GuiGraphicsExtractor, font: Font, cypher: AbstractCypher, mouseX: Int, mouseY: Int) {
+    fun GuiGraphicsExtractor.renderCypherTooltip(font: Font, cypher: AbstractCypher, mouseX: Int, mouseY: Int) {
         if (cypher.isEmpty()) return
 //        val components = mutableListOf<ClientTooltipComponent>()
 //
@@ -84,7 +101,7 @@ object RenderConstants {
         val titleText = cypher.translation().withStyle(ChatFormatting.GOLD)
         componentsList.add(titleText)
         componentsList.addAll(cypher.attributesTooltip)
-        graphics.setTooltipForNextFrame(font, componentsList, Optional.empty(), mouseX, mouseY)
+        setTooltipForNextFrame(font, componentsList, Optional.empty(), mouseX, mouseY)
     }
 
     /**

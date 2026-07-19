@@ -18,12 +18,12 @@ class HookModule <out Hook : Any> (
 
     enum class HookType {
         INVOKING,
-        PROJECTILE
+        BEHAVIOR
     }
 
     class HookBuilder <out Hook : Any> (path: String, val hook: KClass<out Hook>) {
         val resource = CypherNexus.modResource(path)
-        private var type = HookType.PROJECTILE
+        private var type = HookType.BEHAVIOR
         private var uniqueness: Boolean = false
 
         fun invoking() = apply { type = HookType.INVOKING }

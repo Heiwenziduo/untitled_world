@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DedicatedCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
@@ -50,7 +50,7 @@ abstract class AbstractProjectileCypher <CE> (
         node: ProjectileNode,
         stateHooks: HookContainer?
     ): CE {
-        val proj = DedicatedCypherProjectile.create(
+        val proj = AbstractDedicatedCypherProjectile.create(
             this,
             projectileType.get(),
             level,

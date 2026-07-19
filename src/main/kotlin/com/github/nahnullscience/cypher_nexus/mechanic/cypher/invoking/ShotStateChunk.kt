@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
-import com.github.nahnullscience.cypher_nexus.init.mod.CypherBehaviorHooks
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.RECOIL
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
@@ -21,7 +21,6 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
-import net.minecraft.world.phys.AABB
 import java.util.*
 
 class ShotStateChunk private constructor (
@@ -85,14 +84,14 @@ class ShotStateChunk private constructor (
 
         // apply invoking redirection
         val hookedPosDire = hooks.cumulateHooks(
-            CypherBehaviorHooks.INVOKE_POS_REDIRECTION_SERVER,
+            CypherHooks.INVOKE_POS_REDIRECTION_SERVER,
             posDire
         ) { h, l, pair ->
             h.redirectPosDireServer(level, directInvoker, owner, l, pair, 0)
         }
 
         // capture surroundings if hooked
-        val invokeCapture = hooks.get(CypherBehaviorHooks.INVOKE_CAPTURE)
+        val invokeCapture = hooks.get(CypherHooks.INVOKE_CAPTURE)
         if (invokeCapture.isNotEmpty()) {
             val pairCopy = hookedPosDire.copy()
             val entities = level.getEntities(null, pairCopy.position.centeredAABB(CAPTURE_RADIUS_HALF))

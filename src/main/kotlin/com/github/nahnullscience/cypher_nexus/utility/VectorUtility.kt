@@ -1,18 +1,14 @@
 package com.github.nahnullscience.cypher_nexus.utility
 
-import com.github.nahnullscience.cypher_nexus.utility.LevelUtil.forEachEntityWithin
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.projectile.ProjectileUtil
 import net.minecraft.world.level.ClipContext
-import net.minecraft.world.level.ClipContext.Block
-import net.minecraft.world.level.ClipContext.Fluid
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.HitResult
-import net.minecraft.world.phys.HitResult.Type
 import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
 import org.joml.Vector3f
@@ -181,53 +177,6 @@ fun getProjectileHitResult(
     }
 
     return hitresult
-}
-
-/**
- * perform a [Level.clipIncludingBorder] and [Level.getEntities] to get the closest hit point between [from] and [to].
- * */
-fun Level.nearestHitPoint(from: Vec3, to: Vec3, context: Entity, margin: Double): Vec3 {
-    var t = to
-    val f: processHit = { h, d -> t = h }
-    nearestHitPointThen(from, to, context, margin, f)
-    return t
-}
-
-/**
- * perform a [Level.clipIncludingBorder] and [Level.getEntities] to get the closest hit point between [from] and [to].
- * */
-inline fun Level.nearestHitPointThen(from: Vec3, to: Vec3, context: Entity, margin: Double, then: processHit) {
-    var hit = false
-    var hitDir: Direction = Direction.UP
-    var destination = to
-    val blockResult = this.clipIncludingBorder(
-        ClipContext(from, destination, Block.COLLIDER, Fluid.NONE, context)
-    )
-    if (blockResult.type != Type.MISS) {
-        destination = blockResult.location
-        hitDir = blockResult.direction
-        hit = true
-    }
-    var nearest = Double.MAX_VALUE
-    this.forEachEntityWithin(
-        context,
-        AABB(from, to),
-        { e -> e.canBeHitByProjectile() }
-    ) { target ->
-        from.rayCastThen(destination, target.boundingBox, margin) { hitPoint, dir ->
-            val dd: Double = from.distanceToSqr(hitPoint)
-            if (dd < nearest) {
-                nearest = dd
-                destination = hitPoint
-                hitDir = dir
-                hit = true
-            }
-        }
-    }
-
-    if (hit) {
-        then(destination, hitDir)
-    }
 }
 
 /**

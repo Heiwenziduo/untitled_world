@@ -19,7 +19,7 @@ import net.neoforged.neoforge.registries.RegistryBuilder
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 import java.util.function.Supplier
 
-object CypherBehaviorHooks {
+object CypherHooks {
     val RESOURCE_KEY: ResourceKey<Registry<HookModule<*>>> =
         ResourceKey.createRegistryKey(CypherNexus.modResource("cypher/hook"))
     val REGISTRY: Registry<HookModule<*>> = RegistryBuilder(RESOURCE_KEY).sync(true).create()
