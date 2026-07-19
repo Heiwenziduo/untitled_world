@@ -157,14 +157,22 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
     fun discardCypher(reason: DiscardReason)
 
     // hooks // TODO extensive refactor
-    fun beforeDiscardBoth(reason: DiscardReason)
-    fun hitBoth(result: HitResult)
-    fun firstTickBoth()
-    fun tickBehaviorBoth()
-    fun tickFinalizeMovementBoth()
-    fun bounceBoth(bouncePoint: Vec3)
-    fun captureSurroundingBoth(captured: Entity)
-    fun lowSpeedBoth(count: Int)
+    /** call on both sides, override friendly */
+    fun beforeDiscard(reason: DiscardReason)
+    /** call on both sides, override friendly */
+    fun onHit(result: HitResult)
+    /** call on both sides, override friendly */
+    fun onFirstTick()
+    /** call on both sides, override friendly */
+    fun onTick()
+    /** call on both sides, override friendly */
+    fun finalizeTickMovement()
+    /** call on both sides, override friendly */
+    fun onBounce(bouncePoint: Vec3)
+    /** call on both sides, override friendly */
+    fun forEntityCaptured(captured: Entity)
+    /** call on both sides, override friendly */
+    fun onLowSpeed(count: Int)
 
     /**
      * should call inside Entity#tick, this handles all cypher-related logic

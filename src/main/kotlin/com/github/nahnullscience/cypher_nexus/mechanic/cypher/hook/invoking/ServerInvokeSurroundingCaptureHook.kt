@@ -2,24 +2,24 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.IHook
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk.ShotStateViewer
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk.ShotStateAccessor
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 
-interface ServerInvokePosRedirectionHook : IHook {
+interface ServerInvokeSurroundingCaptureHook : IHook {
 
-    fun redirectPosDireServer(
+    fun forEntityCapturedServer(
         index: Int,
         count: Int,
         level: ServerLevel,
         owner: Entity?,
-        state: ShotStateViewer,
-        directInvoker: Entity?,
+        state: ShotStateAccessor,
         pair: PosDirePair,
-    ): PosDirePair
+        captured: Entity,
+    )
 
     companion object {
-        val HOOK = HookModule.HookBuilder("invoke_pos_redirect", ServerInvokePosRedirectionHook::class).invoking()
+        val HOOK = HookModule.HookBuilder("invoke_surround_capture", ServerInvokeSurroundingCaptureHook::class).invoking()
     }
 }

@@ -49,7 +49,7 @@ open class EnderTeleportation(
         }
     }
 
-    override fun beforeDiscardBoth(reason: DiscardReason) {
+    override fun beforeDiscard(reason: DiscardReason) {
         if (!level().isClientSide && owner() != null) {
             // compare to #teleportTo on Entity, this can handle dimension
             // owner()?.teleportTo(x, y, z)
@@ -70,6 +70,6 @@ open class EnderTeleportation(
         }
 
 
-        super.beforeDiscardBoth(reason)
+        super.beforeDiscard(reason)
     }
 }

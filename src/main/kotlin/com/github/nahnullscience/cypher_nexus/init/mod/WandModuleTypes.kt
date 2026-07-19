@@ -1,11 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.AbstractManaShieldModule
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.AbstractPrimaryModule
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.AbstractRecoilModule
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.AbstractSecondaryModule
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.AbstractSpecialModule
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.*
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.IWandModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.InputModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.WandModuleType
@@ -18,14 +14,15 @@ import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 import java.util.function.Supplier
 
 object WandModuleTypes {
+    const val ID_CAP = 31
     val RESOURCE_KEY: ResourceKey<Registry<WandModuleType<*>>> =
         ResourceKey.createRegistryKey(CypherNexus.modResource("wand/module_type"))
-    val REGISTRY: Registry<WandModuleType<*>> = RegistryBuilder(RESOURCE_KEY).sync(true).maxId(31).create()
+    val REGISTRY: Registry<WandModuleType<*>> = RegistryBuilder(RESOURCE_KEY).sync(true).maxId(ID_CAP).create()
 
     fun WandModuleType<*>.id(): Int {
         return REGISTRY.getId(this).also {
-            if (it > 31) CypherNexus.debugWand(Level.ERROR)
-            { "$this $it: wand-module-type registry length is over 31! this may lead to modules function unproperly." }
+            if (it > ID_CAP) CypherNexus.debugWand(Level.ERROR)
+            { "$this $it: wand-module-type registry length is over $ID_CAP! this may lead to modules function unproperly." }
         }
     }
 

@@ -40,11 +40,11 @@ class ShotStateChunk private constructor (
         _ccMap = ccMap
     }
 
-    val accessor: StateAccessor by lazy { StateAccessor() }
+    val accessor: ShotStateAccessor by lazy { ShotStateAccessor() }
 
     val isRoot: Boolean by lazy { helper != null && helper.rootChunk == this }
     private var dirty = true
-    private var _ccMap = MapOfCypherCounts.of()
+    private var _ccMap = MapOfCypherCounts()
     val ccMap get() = _ccMap
 
     override var enabledFlags: Int = 0
@@ -82,26 +82,29 @@ class ShotStateChunk private constructor (
         // handle entities only on server
         if (level !is ServerLevel) return
 
-        // apply invoking redirection
-        val hookedPosDire = hooks.cumulateHooks(
-            CypherHooks.INVOKE_POS_REDIRECTION_SERVER,
-            posDire
-        ) { h, l, pair ->
-            h.redirectPosDireServer(level, directInvoker, owner, l, pair, 0)
+        // apply invoking redirection if hooked
+        var hookedPosDire = posDire
+        hooks[CypherHooks.INVOKE_POS_REDIRECTION_SERVER]?.let {
+            hookedPosDire = hooks.cumulateHooks(
+                CypherHooks.INVOKE_POS_REDIRECTION_SERVER,
+                posDire
+            ) { index, hook, count, cumulate ->
+                hook.redirectPosDireServer(index, count, level, owner, accessor, directInvoker, cumulate)
+            }
         }
 
         // capture surroundings if hooked
-        val invokeCapture = hooks.get(CypherHooks.INVOKE_CAPTURE)
-        if (invokeCapture.isNotEmpty()) {
+        hooks[CypherHooks.INVOKE_CAPTURE_SERVER]?.let {
             val pairCopy = hookedPosDire.copy()
             val entities = level.getEntities(null, pairCopy.position.centeredAABB(CAPTURE_RADIUS_HALF))
             entities.forEach { entity ->
-                invokeCapture.forEach { (hook, l) ->
-                    hook.forEntityCaptured(level, entity, l, pairCopy, accessor, 0)
+                hooks.playHooks(CypherHooks.INVOKE_CAPTURE_SERVER) { index, hook, count ->
+                    hook.forEntityCapturedServer(index, count, level, owner, accessor, pairCopy, entity)
                 }
             }
         }
 
+        // generate bullets
         for ((i, node) in projectiles.withIndex()) {
             val proj = node.instance.createProjectile(
                 level,
@@ -125,7 +128,6 @@ class ShotStateChunk private constructor (
 //                                "spread: $spread") }
             }
 
-            // TODO consider let PosPair mutable, create too much
             proj.initDirection(PosDirePair(hookedPosDire.position, dire))
 
             Profiler.get().pop()
@@ -196,8 +198,15 @@ class ShotStateChunk private constructor (
         return this
     }
 
-    inner class StateAccessor {
+    /***/
+    abstract inner class ShotStateViewer {
         fun getOpMap(attr: Holder<CypherAttribute>) = computedOperationMap[attr.value()]
+
+    }
+
+    /***/
+    inner class ShotStateAccessor : ShotStateViewer() {
+
         /**
          *
          * */

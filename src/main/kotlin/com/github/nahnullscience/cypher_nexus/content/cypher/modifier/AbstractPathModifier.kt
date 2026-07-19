@@ -2,49 +2,50 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothTickMovementFinalizeHook
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickMovementFinalizeHook
 import net.minecraft.core.Direction
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 
 abstract class AbstractPathModifier(
     path: String,
-    private val _manaDrain: Float,
-    private val damage: Double = 0.0,
-): ModifierCypher(), BothTickMovementFinalizeHook {
+    defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder
+): ModifierCypher(defaultAttribute), TickMovementFinalizeHook {
 
     override val resource = CypherNexus.modResource(path)
-    override fun defaultAttributes(): Builder {
-        return super.defaultAttributes()
-            .manaDrain(_manaDrain)
-            .stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, damage)
-    }
 
-    object HorizontalPath : AbstractPathModifier("horizontal_path", 0f, 0.5) {
+    class HorizontalPath(
+        defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder
+    ) : AbstractPathModifier("horizontal_path", defaultAttribute) {
 
-        override fun <CY> finalizeTickMovementBoth(
+        override fun <CE> finalizeTickMovement(
+            index: Int,
+            count: Int,
             level: Level,
-            projectile: CY,
-            strength: Int
-        ) where CY : Entity, CY : ICypherEntity {
-            projectile.deltaMovement = projectile.deltaMovement.horizontal()
+            cyEntity: CE
+        ) where CE : Entity, CE : ICypherEntity {
+            cyEntity.deltaMovement = cyEntity.deltaMovement.horizontal()
         }
     }
 
-    object CardinalPath : AbstractPathModifier("cardinal_path", 0f, 0.5) {
+    class CardinalPath(
+        defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder
+    ) : AbstractPathModifier("cardinal_path", defaultAttribute) {
 
-        override fun <CY> finalizeTickMovementBoth(
+        override fun <CE> finalizeTickMovement(
+            index: Int,
+            count: Int,
             level: Level,
-            projectile: CY,
-            strength: Int
-        ) where CY : Entity, CY : ICypherEntity {
-            val t = Direction.getApproximateNearest(projectile.deltaMovement)
-            projectile.deltaMovement = projectile.deltaMovement.projectedOn(t.unitVec3)
-            projectile.hooksSharedData.pathDirection = t
+            cyEntity: CE
+        ) where CE : Entity, CE : ICypherEntity {
+            val t = Direction.getApproximateNearest(cyEntity.deltaMovement)
+            cyEntity.deltaMovement = cyEntity.deltaMovement.projectedOn(t.unitVec3)
+            cyEntity.hooksSharedData.pathDirection = t
         }
     }
 }

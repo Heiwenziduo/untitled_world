@@ -5,7 +5,7 @@ import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.resources.Identifier
 import kotlin.reflect.KClass
 
-class HookModule <out Hook : Any> (
+class HookModule <out Hook : IHook> (
     override val resource: Identifier,
     val hook: KClass<out Hook>,
     val type: HookType,
@@ -21,13 +21,14 @@ class HookModule <out Hook : Any> (
         BEHAVIOR
     }
 
-    class HookBuilder <out Hook : Any> (path: String, val hook: KClass<out Hook>) {
+    class HookBuilder <out Hook : IHook> (path: String, val hook: KClass<out Hook>) {
         val resource = CypherNexus.modResource(path)
         private var type = HookType.BEHAVIOR
         private var uniqueness: Boolean = false
 
         fun invoking() = apply { type = HookType.INVOKING }
         fun unique() = apply { uniqueness = true }
+
         fun build() = HookModule<Hook>(resource, hook, type, uniqueness)
     }
 }

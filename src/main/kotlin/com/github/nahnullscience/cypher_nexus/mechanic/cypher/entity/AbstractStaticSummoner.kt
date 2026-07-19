@@ -14,9 +14,9 @@ abstract class AbstractStaticSummoner(
 
     override fun getExisting() = 2
 
-    override fun beforeDiscardBoth(reason: DiscardReason) {
+    override fun beforeDiscard(reason: DiscardReason) {
         summon()
-        super.beforeDiscardBoth(reason)
+        super.beforeDiscard(reason)
     }
 
     abstract fun summon()

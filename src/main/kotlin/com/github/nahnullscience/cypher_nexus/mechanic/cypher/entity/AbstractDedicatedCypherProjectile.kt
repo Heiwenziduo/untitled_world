@@ -29,6 +29,7 @@ import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
+import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn
 import java.util.*
@@ -130,6 +131,9 @@ abstract class AbstractDedicatedCypherProjectile(
     fun owner() = getOwner()
     override fun getOwner(): Entity? = super<Projectile>.getOwner()
     override fun setOwner(owner: Entity?) = super<Projectile>.setOwner(owner)
+    override fun onHit(result: HitResult) {
+        super<Projectile>.onHit(result)
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

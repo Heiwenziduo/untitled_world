@@ -4,6 +4,7 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokePosRedirectionHook
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk.ShotStateViewer
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.nearestHitPointThen
 import com.github.nahnullscience.cypher_nexus.utility.randomInCone
@@ -26,17 +27,18 @@ class DaedalusCypher(
     override val resource = CypherNexus.modResource("daedalus")
 
     override fun redirectPosDireServer(
+        index: Int,
+        count: Int,
         level: ServerLevel,
-        directInvoker: Entity?,
         owner: Entity?,
-        strength: Int,
-        pair: PosDirePair,
-        index: Int
+        state: ShotStateViewer,
+        directInvoker: Entity?,
+        pair: PosDirePair
     ): PosDirePair {
         if (directInvoker == null) return pair
 
-        val heightMax = (16.0 + 8.0 * strength).coerceAtMost(128.0)
-        val lengthMax = (16.0 + 8.0 * strength).coerceAtMost(128.0)
+        val heightMax = (16.0 + 8.0 * count).coerceAtMost(128.0)
+        val lengthMax = (16.0 + 8.0 * count).coerceAtMost(128.0)
         val (start, direction) = pair
         if (direction != Vec3.ZERO) {
             val angle = 20.0 // TODO use SPREAD as factor

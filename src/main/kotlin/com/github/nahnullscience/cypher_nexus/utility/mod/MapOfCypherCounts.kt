@@ -1,33 +1,36 @@
 package com.github.nahnullscience.cypher_nexus.utility.mod
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
+import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
 
 /**
- * serve as a token to rebuild the ProjectileStateChunk (payload info not included)
+ * ccMap or MoCC,
+ * serve as a token to ship across network and rebuild the `ShotStateChunk` on the other side
+ * (payload info not included)
  * */
-//open class MapOfCypherCounts : Reference2IntOpenHashMap<AbstractCypher>() {
-// TODO data type polishing required
-open class MapOfCypherCounts(private val map: HashMap<AbstractCypher, Int>) : MutableMap<AbstractCypher, Int> by map {
-    constructor(anyMap: Map<AbstractCypher, Int>) : this(HashMap<AbstractCypher, Int>(anyMap))
+open class MapOfCypherCounts(
+    private val r2IMap: Reference2IntOpenHashMap<AbstractCypher> = Reference2IntOpenHashMap(32),
+) : MutableMap<AbstractCypher, Int> by r2IMap {
+    constructor(anyMap: Map<AbstractCypher, Int>) : this(Reference2IntOpenHashMap(anyMap))
 
     companion object {
-        fun of() = MapOfCypherCounts(HashMap())
+        fun ofSize(s: Int) = MapOfCypherCounts(Reference2IntOpenHashMap(s))
     }
 
-    override fun get(key: AbstractCypher): Int {
-        return map[key] ?: 0
-    }
-
-    fun innerMap() = map
-
-    override fun toString() = map.toString()
+    var max: Int = 0
+        private set
 
     /**
      *
      * */
     fun count(cy: AbstractCypher, n: Int = 1): Int {
-        val v = map.getOrPut(cy) { 0 }
-        map[cy] = v + n
-        return v
+        val i = r2IMap.addTo(cy, n)
+        if (max < i + n) max = i + n
+        return i
     }
+
+    fun getMap() = r2IMap.toMap()
+    fun getMutableMap() = r2IMap.toMutableMap()
+
+    override fun toString() = r2IMap.toString()
 }

@@ -189,21 +189,25 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
 
     protected open fun captureSurroundings() {
         if (cyEntity.firstTick || cyEntity.tickCount and 3 == 3) { // trigger on 1, 3 and then every 4 tick
-            val modules = hooks?.get(CypherHooks.ENTITY_SEARCH_BOTH)?.toList() ?: return
-            var i = 0
-            while (i < modules.size) {
-                if (modules[i].first.needSearch(level, cyEntity)) break
-                i++
-            }
-            // if someone need a refresh-search
-            if (i < modules.size || cyEntity.needCaptureSurrounding()) {
-                val entities = level.getEntities(
-                    cyEntity,
-                    cyEntity.boundingBox.inflate(CAPTURE_SIZE)
-                ) { entity -> entity !is ICypherEntity }
+            hooks?.get(CypherHooks.ENTITY_CAPTURE)?.let {
+                var need = cyEntity.needCaptureSurrounding()
+                run {
+                    hooks?.cumulateHooks(CypherHooks.ENTITY_CAPTURE, need) { index, hook, count, cumulate ->
+                        if (need) return@run
+                        need = hook.needCapture(level, cyEntity)
+                        need
+                    }
+                }
 
-                for (entity in entities) {
-                    onCaptureSurroundingBoth(entity)
+                if (need) {
+                    val entities = level.getEntities(
+                        cyEntity,
+                        cyEntity.boundingBox.inflate(CAPTURE_SIZE)
+                    ) { entity -> cyEntity.canHitTarget(entity) && entity !is ICypherEntity }
+
+                    for (entity in entities) {
+                        delegateForEntityCaptured(entity)
+                    }
                 }
             }
         }
@@ -221,71 +225,76 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
         if (f != 1f) cyEntity.deltaMovement = cyEntity.deltaMovement.scale(f.toDouble())
     }
 
-    // TODO unify hook names
     /**
-     * remember call super to function state hooks [CypherHooks.BEFORE_DISCARD_BOTH]
+     * [CypherHooks.BEFORE_DISCARD]
      * */
-    protected open fun onBeforeDiscardBoth(reason: DiscardReason) {
-        cyEntity.beforeDiscardBoth(reason)
-        hooks?.playHooks(CypherHooks.BEFORE_DISCARD_BOTH)
-        { h, i -> h.beforeDiscardBoth(level, cyEntity, i, reason) }
+    protected open fun delegateBeforeDiscard(reason: DiscardReason) {
+        cyEntity.beforeDiscard(reason)
+        hooks?.playHooks(CypherHooks.BEFORE_DISCARD) { index, hook, count ->
+            hook.beforeDiscard(index, count, level, cyEntity, reason)
+        }
     }
     /**
-     * remember call super to function state hooks [CypherHooks.HIT_ENTITY_BOTH]
+     * [CypherHooks.HIT_ENTITY]
      * */
-    protected open fun onHitBoth(result: HitResult) {
-        cyEntity.hitBoth(result)
-        hooks?.playHooks(CypherHooks.HIT_ENTITY_BOTH)
-        { h, i -> h.onHitBoth(level, cyEntity, i, result) }
+    protected open fun delegateOnHit(result: HitResult) {
+        cyEntity.onHit(result)
+        hooks?.playHooks(CypherHooks.HIT_ENTITY) { index, hook, count ->
+            hook.onHit(index, count, level, cyEntity, result)
+        }
     }
     /**
-     * remember call super to function state hooks [CypherHooks.FIRST_TICK_BOTH]
+     * [CypherHooks.FIRST_TICK]
      * */
-    protected open fun onFirstTickBoth() {
-        cyEntity.firstTickBoth()
-        hooks?.playHooks(CypherHooks.FIRST_TICK_BOTH)
-        { h, i -> h.firstTickBoth(level, cyEntity, i) }
+    protected open fun delegateOnFirstTick() {
+        cyEntity.onFirstTick()
+        hooks?.playHooks(CypherHooks.FIRST_TICK) { index, hook, count ->
+            hook.onFirstTick(index, count, level, cyEntity)
+        }
     }
     /**
-     * remember call super to function state hooks [CypherHooks.TICK_BEHAVIOR_BOTH]
+     * [CypherHooks.TICK_BEHAVIOR]
      * change speed / attributes (here) -> finalize movement -> bounce & hit check
      * */
-    protected open fun tickBehaviorChangeBoth() {
-        cyEntity.tickBehaviorBoth()
-        hooks?.playHooks(CypherHooks.TICK_BEHAVIOR_BOTH)
-        { h, i -> h.tickBehaviorBoth(level, cyEntity, i) }
+    protected open fun delegateOnTick() {
+        cyEntity.onTick()
+        hooks?.playHooks(CypherHooks.TICK_BEHAVIOR) { index, hook, count ->
+            hook.onTick(index, count, level, cyEntity)
+        }
     }
     /**
-     * remember call super to function state hooks [CypherHooks.TICK_MOVEMENT_FINALIZE_BOTH]
+     * [CypherHooks.TICK_MOVEMENT_FINALIZE]
      * change speed / attributes -> finalize movement (here) -> bounce & hit check
      * */
-    protected open fun tickMovementFinalizeBoth() {
-        cyEntity.tickFinalizeMovementBoth()
-        hooks?.playHooks(CypherHooks.TICK_MOVEMENT_FINALIZE_BOTH)
-        { h, i -> h.finalizeTickMovementBoth(level, cyEntity, i) }
+    protected open fun delegateFinalizeTickMovement() {
+        cyEntity.finalizeTickMovement()
+        hooks?.playHooks(CypherHooks.TICK_MOVEMENT_FINALIZE) { index, hook, count ->
+            hook.finalizeTickMovement(index, count, level, cyEntity)
+        }
     }
     /**
-     * remember call super to function state hooks [CypherHooks.ON_BOUNCE_BOTH]
+     * [CypherHooks.ON_BOUNCE]
      * */
-    protected open fun onBounceBoth(point: Vec3) {
-        cyEntity.bounceBoth(point)
-        hooks?.playHooks(CypherHooks.ON_BOUNCE_BOTH)
-        { h, i -> h.onBounceBoth(level, cyEntity, i, bounceCount, point) }
+    protected open fun delegateOnBounce(point: Vec3) {
+        cyEntity.onBounce(point)
+        hooks?.playHooks(CypherHooks.ON_BOUNCE) { index, hook, count ->
+            hook.onBounce(index, count, level, cyEntity, bounceCount, point)
+        }
     }
     /**
-     * remember call super to function state hooks [CypherHooks.ENTITY_SEARCH_BOTH]
+     * [CypherHooks.ENTITY_CAPTURE]
      * */
-    protected open fun onCaptureSurroundingBoth(captured: Entity) {
-        cyEntity.captureSurroundingBoth(captured)
-        // TODO try further optimization, for this is O(m * n)
-        hooks?.playHooks(CypherHooks.ENTITY_SEARCH_BOTH)
-        { h, i -> h.entitySearchBoth(level, cyEntity, i, captured) }
+    protected open fun delegateForEntityCaptured(captured: Entity) {
+        cyEntity.forEntityCaptured(captured)
+        hooks?.playHooks(CypherHooks.ENTITY_CAPTURE) { index, hook, count ->
+            hook.forEntityCaptured(index, count, level, cyEntity, captured)
+        }
     }
     /**
-     * remember call super to function state hooks []
+     * []
      * */
-    protected open fun onLowSpeedBoth(count: Int) {
-        cyEntity.lowSpeedBoth(count)
+    protected open fun delegateOnLowSpeed(count: Int) {
+        cyEntity.onLowSpeed(count)
     }
 
     override fun trigger(type: TriggerType, releaseTo: PosDirePair) {
@@ -309,28 +318,28 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
         when(reason){
             DiscardReason.ERASE -> {}
             else -> {
-                onBeforeDiscardBoth(reason)
+                delegateBeforeDiscard(reason)
             }
         }
         level.broadcastEntityEvent(cyEntity, 3)
         cyEntity.discard()
     }
 
-    override fun beforeDiscardBoth(reason: DiscardReason) {}
+    override fun beforeDiscard(reason: DiscardReason) {}
 
-    override fun hitBoth(result: HitResult) {}
+    override fun onHit(result: HitResult) {}
 
-    override fun firstTickBoth() {}
+    override fun onFirstTick() {}
 
-    override fun tickBehaviorBoth() {}
+    override fun onTick() {}
 
-    override fun tickFinalizeMovementBoth() {}
+    override fun finalizeTickMovement() {}
 
-    override fun bounceBoth(bouncePoint: Vec3) {}
+    override fun onBounce(bouncePoint: Vec3) {}
 
-    override fun captureSurroundingBoth(captured: Entity) {}
+    override fun forEntityCaptured(captured: Entity) {}
 
-    override fun lowSpeedBoth(count: Int) {
+    override fun onLowSpeed(count: Int) {
         if (count < 30) return
 
         // this means the projectile is decelerated to low speed
@@ -347,7 +356,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
 
         captureSurroundings()
         if (cyEntity.firstTick) {
-            onFirstTickBoth()
+            delegateOnFirstTick()
         }
         when (cyEntity.tickCount) {
             5 -> trigger(TriggerType.TIMER_5, cyEntity.position())
@@ -381,14 +390,14 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
          * deltaMovement: the movement for the "next tick", client smooth animation relay on this
          * an AABB check is used everyTick every vanilla projectile, sounds outrageous, but is ok in performance
          * */
-        tickBehaviorChangeBoth()
+        delegateOnTick()
 
         cyEntity.rotateTowardSpeed(cyEntity.getRotationSpeed())
         applyFriction()
         applyGravity()
-        tickMovementFinalizeBoth()
+        delegateFinalizeTickMovement()
 
-        if (cyEntity.deltaMovement.lengthSqr() <= LOW_SPEED_THRESHOLD_SQR) onLowSpeedBoth(lowSpeedTickCount++)
+        if (cyEntity.deltaMovement.lengthSqr() <= LOW_SPEED_THRESHOLD_SQR) delegateOnLowSpeed(lowSpeedTickCount++)
         else lowSpeedTickCount = 0
 
         loopHitAndBounce()
@@ -490,7 +499,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
 
                 if (canBounce) {
                     bounceCount++
-                    onBounceBoth(bouncePoint)
+                    delegateOnBounce(bouncePoint)
                     bouncePoints.add(bouncePoint)
 
                     stepPosition = bouncePoint.add(bounceDirection.unitVec3.scale(1E-7)) // avoid "diving into blocks" bug
@@ -533,7 +542,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     // cyEntity.whenHit -> Delegation.whenHit -> interface default
     protected fun whenHitDelegate(result: HitResult, direction: Direction) = cyEntity.whenHit(result, direction)
     override fun whenHit(result: HitResult, direction: Direction) {
-        onHitBoth(result)
+        delegateOnHit(result)
         if (level.isClientSide || result.type == Type.MISS) return
         trigger(TriggerType.COLLISION, result.location)
 

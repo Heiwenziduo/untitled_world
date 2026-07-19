@@ -34,16 +34,16 @@ object CNCodecs {
     val MOCC_CODEC: Codec<MapOfCypherCounts> =
         Codec.unboundedMap(CYPHER, Codec.INT).xmap(
             { map -> MapOfCypherCounts(map) },
-            { mocc -> mocc.innerMap() }
+            { mocc -> mocc.getMap() }
         )
     val MOCC_STREAM: StreamCodec<RegistryFriendlyByteBuf, MapOfCypherCounts> =
         ByteBufCodecs.map(
-            { HashMap<AbstractCypher, Int>() },
+            { HashMap<AbstractCypher, Int>() as MutableMap<AbstractCypher, Int> },
             CYPHER_STREAM,
             ByteBufCodecs.VAR_INT
         ).map(
             { map -> MapOfCypherCounts(map) },
-            { mocc -> mocc.innerMap() }
+            { mocc -> mocc.getMutableMap() }
         )
 
     val CYPHER_ATTRIBUTE: Codec<CypherAttribute> = CypherAttributes.REGISTRY.byNameCodec()
@@ -59,21 +59,4 @@ object CNCodecs {
             },
             { enumMap -> enumMap }
         )
-
-//    val HOOK_CONTAINER: Codec<HookContainer> = Codec.recursive(HookContainer::class.simpleName) {
-//        recursedCodec -> RecordCodecBuilder.create()
-//        {
-//            it.group(
-//                recursedCodec.optionalFieldOf("parent").forGetter(HookContainer::parent)
-//            ).apply(it, ::HookContainer)
-//        }
-//    }
-//    val HOOK_CONTAINER_STREAM: StreamCodec<ByteBuf, HookContainer> = StreamCodec.recursive {
-//        recursedStreamCodec -> StreamCodec.composite(
-//            recursedStreamCodec.apply(ByteBufCodecs::optional),
-//            HookContainer::parent,
-//            ::HookContainer
-//        )
-//    }
-
 }

@@ -4,8 +4,8 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothEntitySearchHook
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.BothTickBehaviorHook
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.EntityCaptureHook
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickBehaviorHook
 import com.github.nahnullscience.cypher_nexus.utility.rotateTowards
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
@@ -16,7 +16,7 @@ import kotlin.math.min
 abstract class AbstractTargetHoming(
     path: String,
     private val _manaDrain: Float
-) : ModifierCypher(), BothTickBehaviorHook, BothEntitySearchHook {
+) : ModifierCypher(), TickBehaviorHook, EntityCaptureHook {
 
     companion object {
         private const val HOMING_STRENGTH = 0.1
@@ -30,27 +30,28 @@ abstract class AbstractTargetHoming(
             .manaDrain(_manaDrain)
     }
 
-    override fun <CY> entitySearchBoth(
+    override fun <CE> forEntityCaptured(
+        index: Int,
+        count: Int,
         level: Level,
-        projectile: CY,
-        strength: Int,
+        cyEntity: CE,
         target: Entity
-    ) where CY : Entity, CY : ICypherEntity {
-        if (projectile.hooksSharedData.homingTarget == target) return
-        if (projectile.canHomeTarget(target)) {
-            if (projectile.hooksSharedData.homingTarget == null)
-                projectile.hooksSharedData.homingTarget = target
+    ) where CE : Entity, CE : ICypherEntity {
+        if (cyEntity.hooksSharedData.homingTarget == target) return
+        if (cyEntity.canHomeTarget(target)) {
+            if (cyEntity.hooksSharedData.homingTarget == null)
+                cyEntity.hooksSharedData.homingTarget = target
             else {
-                val old = projectile.position().distanceToSqr(projectile.hooksSharedData.homingTarget!!.eyePosition)
-                val new = projectile.position().distanceToSqr(target.eyePosition)
-                if (new < old) projectile.hooksSharedData.homingTarget = target
+                val old = cyEntity.position().distanceToSqr(cyEntity.hooksSharedData.homingTarget!!.eyePosition)
+                val new = cyEntity.position().distanceToSqr(target.eyePosition)
+                if (new < old) cyEntity.hooksSharedData.homingTarget = target
             }
         }
     }
 
-    override fun <CY> needSearch(level: Level, projectile: CY): Boolean where CY : Entity, CY : ICypherEntity {
-        val target = projectile.hooksSharedData.homingTarget ?: return true
-        return !projectile.canHomeTarget(target)
+    override fun <CE> needCapture(level: Level, cyEntity: CE): Boolean where CE : Entity, CE : ICypherEntity {
+        val target = cyEntity.hooksSharedData.homingTarget ?: return true
+        return !cyEntity.canHomeTarget(target)
     }
 
 //    protected open fun authenticateTarget(projectile: AbstractCypherProjectile): Boolean {
@@ -65,31 +66,33 @@ abstract class AbstractTargetHoming(
 
 
     object Homing: AbstractTargetHoming("homing", 60f) {
-        override fun <CY> tickBehaviorBoth(
+        override fun <CE> onTick(
+            index: Int,
+            count: Int,
             level: Level,
-            projectile: CY,
-            strength: Int
-        ) where CY : Entity, CY : ICypherEntity {
-            val target = projectile.hooksSharedData.homingTarget ?: return
-            if (!target.boundingBox.contains(projectile.position())) {
-                val dir = projectile.position().vectorTo(target.eyePosition)
-                val dis =  min(dir.length(), strength * HOMING_STRENGTH)
+            cyEntity: CE
+        ) where CE : Entity, CE : ICypherEntity {
+            val target = cyEntity.hooksSharedData.homingTarget ?: return
+            if (!target.boundingBox.contains(cyEntity.position())) {
+                val dir = cyEntity.position().vectorTo(target.eyePosition)
+                val dis =  min(dir.length(), count * HOMING_STRENGTH)
                 val speed = dir.normalize().scale(dis)
-                projectile.addDeltaMovement(speed)
+                cyEntity.addDeltaMovement(speed)
             }
         }
     }
 
     object TurnToTarget: AbstractTargetHoming("turn_toward_target", 30f) {
-        override fun <CY> tickBehaviorBoth(
+        override fun <CE> onTick(
+            index: Int,
+            count: Int,
             level: Level,
-            projectile: CY,
-            strength: Int
-        ) where CY : Entity, CY : ICypherEntity {
-            val target = projectile.hooksSharedData.homingTarget ?: return
-            if (!target.boundingBox.contains(projectile.position())) {
-                val dir = projectile.position().vectorTo(target.eyePosition)
-                projectile.deltaMovement = projectile.deltaMovement.rotateTowards(dir, ROTATION_RADIUS * strength)
+            cyEntity: CE
+        ) where CE : Entity, CE : ICypherEntity {
+            val target = cyEntity.hooksSharedData.homingTarget ?: return
+            if (!target.boundingBox.contains(cyEntity.position())) {
+                val dir = cyEntity.position().vectorTo(target.eyePosition)
+                cyEntity.deltaMovement = cyEntity.deltaMovement.rotateTowards(dir, ROTATION_RADIUS * count)
             }
         }
     }

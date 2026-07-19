@@ -67,7 +67,7 @@ object AstExporter {
     private fun ShotStateChunk.toAstChunk(): AstChunk {
         compute() // populate delay/recharge + computedOperationMap before we read them
 
-        val contributors = ccMap.innerMap()
+        val contributors = ccMap.getMap()
             .filterKeys { it.isNotEmpty() && it !is AbstractProjectileCypher<*> }
             .map { (cy, count) -> AstContribution(cy.toRef(), count) }
 

@@ -260,8 +260,14 @@ object Cyphers {
         stateChunkAttr(CypherAttributes.FORTUNE_LEVEL, AttributeOperator.ADD, 1.0)
     }
 
-    val HORIZONTAL_PATH = registerCypher(AbstractPathModifier.HorizontalPath)
-    val CARDINAL_PATH = registerCypher(AbstractPathModifier.CardinalPath)
+    val HORIZONTAL_PATH = registerCypher(AbstractPathModifier::HorizontalPath) {
+        manaDrain(0f)
+        stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 0.5)
+    }
+    val CARDINAL_PATH = registerCypher(AbstractPathModifier::CardinalPath) {
+        manaDrain(0f)
+        stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 0.5)
+    }
 
     const val COLOR_MULTI_INVOKE = 0xFFADEEC5.toInt()
     val DOUBLE_INVOKING = registerModifier("double_invoking", 1f) {
