@@ -7,8 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProject
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 
@@ -21,18 +20,18 @@ abstract class AbstractAddTrigger(
         require(addTrigger != TriggerType.NONE)
     }
 
-    override fun modifyStateChunk(
+    override fun modifyShotState(
         helper: InvokingHelper,
         data: InvokingHelper.HelperDataBundle,
-        chunk: ShotStateChunk
+        shotState: ShotStateChunk
     ) = Unit
     override fun defaultAttributes() = super.defaultAttributes().manaDrain(_manaDrain).draw(0)
 
     override fun invoke(
         helper: InvokingHelper,
-        chunk: ShotStateChunk,
+        shotState: ShotStateChunk,
         data: HelperDataBundle,
-        state: InvokingStateBundle,
+        paras: InvokingParameterBundle,
         relativeIndex: Int,
         isCopy: Boolean
     ) {
@@ -52,7 +51,7 @@ abstract class AbstractAddTrigger(
                     // so wrapper this with a run block and return there
                     return@run
                 }
-                cypher.modifyStateChunk(helper, data, chunk)
+                cypher.modifyShotState(helper, data, shotState)
                 CypherNexus.debugCypher { "[$this] modify the state through [$cypher $index]" }
             }
         }
@@ -64,7 +63,7 @@ abstract class AbstractAddTrigger(
                 CypherNexus.debugCypher { "[$this] attach process terminate due to [$cy1 $attachIndex]" }
                 return
             }
-            cy1.modifyStateChunk(helper, data, chunk)
+            cy1.modifyShotState(helper, data, shotState)
 
             // discard if attach is found
             CypherNexus.debugCypher { "[$this] find trigger attachable [$cy1 $attachIndex]" }
@@ -84,11 +83,11 @@ abstract class AbstractAddTrigger(
             // the cypher activates the payload process doesn't have to be the payload
             if (cy2 != null) {
                 CypherNexus.debugCypher { "invoke [$cy1] with payload due to [$cy2]" }
-                val subChunk = cy1.addCEToStateChunk(chunk, addTrigger, Int.MAX_VALUE)
+                val subShot = cy1.addToShotState(shotState, addTrigger, Int.MAX_VALUE)
                 val payload = helper.drawNext()
-                payload?.invokeInHand(helper, subChunk, data, state)
+                payload?.invokeInHand(helper, subShot, data, paras)
             } else {
-                cy1.addCEToStateChunk(chunk)
+                cy1.addToShotState(shotState)
             }
         }
     }

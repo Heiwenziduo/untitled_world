@@ -61,7 +61,7 @@ object AstExporter {
         )
         val helper = InvokingHelper(aoc, data, invoker = null, tracer = CallTreeTracer())
         helper.processSync()
-        return helper.rootChunk.toAstChunk()
+        return helper.shotRoot.toAstChunk()
     }
 
     private fun ShotStateChunk.toAstChunk(): AstChunk {

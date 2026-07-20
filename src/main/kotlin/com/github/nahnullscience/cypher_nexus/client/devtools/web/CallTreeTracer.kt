@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.client.devtools.web
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingTracer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 
@@ -15,9 +15,9 @@ class CallTreeTracer : InvokingTracer {
 
     override fun enter(
         cypher: AbstractCypher,
-        chunk: ShotStateChunk,
+        shotState: ShotStateChunk,
         data: HelperDataBundle,
-        state: InvokingStateBundle,
+        paras: InvokingParameterBundle,
         relativeIndex: Int,
         isCopy: Boolean
     ) {
@@ -27,9 +27,9 @@ class CallTreeTracer : InvokingTracer {
     }
     override fun exit(
         cypher: AbstractCypher,
-        chunk: ShotStateChunk,
+        shotState: ShotStateChunk,
         data: HelperDataBundle,
-        state: InvokingStateBundle
+        paras: InvokingParameterBundle
     ) {
         stack.removeLast()
     }

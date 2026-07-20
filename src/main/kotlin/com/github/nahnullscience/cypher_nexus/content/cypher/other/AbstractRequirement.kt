@@ -5,16 +5,16 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 
 /** invoke the next a few cyphers only when the requirements are met */
 sealed class AbstractRequirement : AbstractNonProjectileCypher() {
     override val category = CypherCategories.OTHER
-    override fun modifyStateChunk(
+    override fun modifyShotState(
         helper: InvokingHelper,
-        data: InvokingHelper.HelperDataBundle,
-        chunk: ShotStateChunk
+        data: HelperDataBundle,
+        shotState: ShotStateChunk
     ) = Unit
     override fun defaultAttributes() = super.defaultAttributes().manaDrain(0f).draw(1)
 
@@ -22,24 +22,24 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
         /** true if conditions are met */
         abstract fun requirement(
             helper: InvokingHelper,
-            chunk: ShotStateChunk,
-            data: InvokingHelper.HelperDataBundle,
-            state: InvokingHelper.InvokingStateBundle,
+            shotState: ShotStateChunk,
+            data: HelperDataBundle,
+            paras: InvokingParameterBundle,
         ) : Boolean
 
         override fun invoke(
             helper: InvokingHelper,
-            chunk: ShotStateChunk,
+            shotState: ShotStateChunk,
             data: HelperDataBundle,
-            state: InvokingStateBundle,
+            paras: InvokingParameterBundle,
             relativeIndex: Int,
             isCopy: Boolean
         ) {
             CypherNexus.debugCypher { "[$this $relativeIndex] is invoked" }
             val startIndex = helper.peekNextIndex(relativeIndex + 1)
-            if (startIndex == -1) return handleDraws(helper, chunk, data, state)
+            if (startIndex == -1) return handleDraws(helper, shotState, data, paras)
 
-            val ok = requirement(helper, chunk, data, state)
+            val ok = requirement(helper, shotState, data, paras)
             var otherwise = -1
             var endpoint = -1
 
@@ -80,7 +80,7 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
                 }
             }
 
-            handleDraws(helper, chunk, data, state)
+            handleDraws(helper, shotState, data, paras)
         }
     }
 

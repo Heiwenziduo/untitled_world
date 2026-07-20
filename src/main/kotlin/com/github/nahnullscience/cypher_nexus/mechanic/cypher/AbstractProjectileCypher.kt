@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
@@ -22,24 +23,30 @@ abstract class AbstractProjectileCypher <CE> (
     protected open val builtinTriggerCharge: Int = 1
 
     /**
+     * register cypher-entity(s) to [ShotStateChunk]
      * @param trigger externally forced `TriggerType` override. use [builtinTrigger] if null.
      * @param charge only consulted when [trigger] is non-null; builtin path uses [builtinTriggerCharge].
-     * @return the chunk subsequent draws in this invocation should populate.
+     * @return the shot-state subsequent draws in this invocation should populate.
      *
-     * Note there should be at least one [draw] to make trigger function
+     * Note there should be at least one [draw] to make trigger function.
      */
-    open fun addCEToStateChunk(
-        chunk: ShotStateChunk,
+    open fun addToShotState(
+        shotState: ShotStateChunk,
         trigger: TriggerType? = null,
         charge: Int = Int.MAX_VALUE,
     ): ShotStateChunk {
         val t = trigger ?: builtinTrigger
         if (t == TriggerType.NONE) {
-            chunk.addProjectile(ProjectileNode(this, null))
-            return chunk
+            shotState.addProjectileNode(this, null)
+            return shotState
         }
-        val subState = ShotStateChunk(if (trigger != null) charge else builtinTriggerCharge)
-        chunk.addProjectile(ProjectileNode(this, subState, t))
+        val charge =
+            if (trigger != null) charge
+            else if (shotState.haveFlag(CypherFlags.PIERCE_ENTITY)) Int.MAX_VALUE
+            else builtinTriggerCharge
+
+        val subState = ShotStateChunk(charge)
+        shotState.addProjectileNode(this, subState, t)
         return subState
     }
 

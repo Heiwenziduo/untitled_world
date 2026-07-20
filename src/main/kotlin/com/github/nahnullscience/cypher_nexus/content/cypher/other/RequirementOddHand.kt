@@ -7,9 +7,9 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 object RequirementOddHand : AbstractRequirement.RequirementIf() {
     override fun requirement(
         helper: InvokingHelper,
-        chunk: ShotStateChunk,
+        shotState: ShotStateChunk,
         data: InvokingHelper.HelperDataBundle,
-        state: InvokingHelper.InvokingStateBundle,
+        paras: InvokingHelper.InvokingParameterBundle,
     ): Boolean {
         return helper.data.hand.countOneBits() and 1 > 0 // odd number cards in hand, go
     }

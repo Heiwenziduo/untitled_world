@@ -94,7 +94,7 @@ interface IWandLike {
             getInvokePosDire(level, invoker, stack),
             itemWandInstance(level, invoker, stack)
         )
-        return afterInvoke(level, invoker, stack, data, helper.rootChunk)
+        return afterInvoke(level, invoker, stack, data, helper.shotRoot)
 
     }
 

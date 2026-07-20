@@ -37,7 +37,7 @@ import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent
  * ONLY methods start with prefix "get" can be overridden in respective entity classes,
  * overriding other method have no effect.
  * */
-interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherBeforeInit {
+interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherEntityBeforeInit {
     @EventBusSubscriber(modid = CypherNexus.MOD_ID)
     companion object {
         const val CLIP_MARGIN = 0.2f

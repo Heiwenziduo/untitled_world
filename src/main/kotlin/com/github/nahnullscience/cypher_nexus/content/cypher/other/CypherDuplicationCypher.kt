@@ -7,7 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.IRecursiveCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 
 object CypherDuplicationCypher : AbstractNonProjectileCypher(), IRecursiveCypher {
@@ -25,33 +25,33 @@ object CypherDuplicationCypher : AbstractNonProjectileCypher(), IRecursiveCypher
 
     override fun invoke(
         helper: InvokingHelper,
-        chunk: ShotStateChunk,
+        shotState: ShotStateChunk,
         data: HelperDataBundle,
-        state: InvokingStateBundle,
+        paras: InvokingParameterBundle,
         relativeIndex: Int,
         isCopy: Boolean
     ) {
         CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
 
-        modifyStateChunk(helper, data, chunk)
+        modifyShotState(helper, data, shotState)
 
-        duplicate(helper, chunk, data, state, relativeIndex)
+        duplicate(helper, shotState, data, paras, relativeIndex)
 
-        handleDraws(helper, chunk, data, state)
+        handleDraws(helper, shotState, data, paras)
     }
 
     // re-invoke every cypher in Hand
     private fun duplicate(
         helper: InvokingHelper,
-        chunk: ShotStateChunk,
+        shotState: ShotStateChunk,
         data: HelperDataBundle,
-        state: InvokingStateBundle,
+        paras: InvokingParameterBundle,
         relativeIndex: Int,
     ) {
         val remember = data.hand
         helper.aoc.invokableForEach(remember) { index, cypher ->
             if (cypher is CypherDuplicationCypher) return@invokableForEach
-            copyCypher(cypher, helper, chunk, data, state, index)
+            copyCypher(cypher, helper, shotState, data, paras, index)
         }
     }
 }

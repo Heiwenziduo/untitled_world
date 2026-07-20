@@ -6,6 +6,7 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.RECOIL
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator.Companion.OperatorMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
@@ -43,7 +44,7 @@ class ShotStateChunk private constructor (
 
     val accessor: ShotStateAccessor by lazy { ShotStateAccessor() }
 
-    val isRoot: Boolean by lazy { helper != null && helper.rootChunk == this }
+    val isRoot: Boolean by lazy { helper != null && helper.shotRoot == this }
     private var dirty = true
     private var _ccMap = MapOfCypherCounts()
     val ccMap get() = _ccMap
@@ -140,8 +141,12 @@ class ShotStateChunk private constructor (
         }
     }
 
-    fun addProjectile(node: ProjectileNode): ShotStateChunk {
-        projectiles.add(node)
+    fun addProjectileNode(
+        cypher: AbstractProjectileCypher<*>,
+        payload: ShotStateChunk? = null,
+        trigger: TriggerType = TriggerType.NONE
+    ): ShotStateChunk {
+        projectiles.add(ProjectileNode(cypher, payload, trigger))
         return this
     }
 
@@ -181,7 +186,7 @@ class ShotStateChunk private constructor (
                 if (isRoot &&
                     CypherAttributes.RECOIL.`is`(attribute.resource)
                     ) {
-                    targetChunk = helper!!.rootChunk
+                    targetChunk = helper!!.shotRoot
                 }
 
 

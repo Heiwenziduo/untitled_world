@@ -8,9 +8,9 @@ import net.minecraft.world.entity.LivingEntity
 object RequirementLowHP : AbstractRequirement.RequirementIf() {
     override fun requirement(
         helper: InvokingHelper,
-        chunk: ShotStateChunk,
+        shotState: ShotStateChunk,
         data: InvokingHelper.HelperDataBundle,
-        state: InvokingHelper.InvokingStateBundle,
+        paras: InvokingHelper.InvokingParameterBundle,
     ): Boolean {
         if (helper.invoker !is LivingEntity) return false
         return helper.invoker.health / helper.invoker.maxHealth <= 0.25

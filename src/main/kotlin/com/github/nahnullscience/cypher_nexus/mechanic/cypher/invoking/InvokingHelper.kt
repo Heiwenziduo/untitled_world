@@ -21,9 +21,9 @@ class InvokingHelper (
     val tracer: InvokingTracer = InvokingTracer.NONE,
     val invoker: Entity? = null,
 ) {
-    val rootChunk = ShotStateChunk.root(this)
+    val shotRoot = ShotStateChunk.root(this)
     /** safe to modify */
-    val states = InvokingStateBundle()
+    val paras = InvokingParameterBundle()
     /**
      * the position of last-drawn cypher
      * */
@@ -40,13 +40,13 @@ class InvokingHelper (
 
     // =================================================================================
     /**
-     * AST: produce the invoking stateChunk through given [ArrayOfCyphers]
+     * AST: produce the invoking shot-state through given [ArrayOfCyphers]
      * */
     suspend fun process() = processSync()
 
     /**
      * build the depth-first tree
-     * AST: produce the invoking stateChunk through given [ArrayOfCyphers]
+     * AST: produce the invoking shot-state through given [ArrayOfCyphers]
      * */
     fun processSync() {
         Profiler.get().push("cypherArrayParsing") // F3 + L to record time cost
@@ -58,7 +58,7 @@ class InvokingHelper (
         }
         hand2discard()
 
-        if (states.wrapped) {
+        if (paras.wrapped) {
             // force a reload
             CypherNexus.debugCypher { "wand reload due to wrapped" }
             reload()
@@ -73,13 +73,13 @@ class InvokingHelper (
      * @param itemWand [ItemWandInstance], can be null if invoked from an EntityWand
      * */
     fun finalizeInvoking(level: Level, posDire: PosDirePair, itemWand: ItemWandInstance?) {
-        rootChunk.release(level, invoker, invoker, posDire, itemWand)
+        shotRoot.release(level, invoker, invoker, posDire, itemWand)
     }
 
     private fun step(): Boolean {
         val cy = drawNext()
         if (cy != null) {
-            cy.invokeInHand(this, rootChunk, data, states)
+            cy.invokeInHand(this, shotRoot, data, paras)
             data.draw--
             return true
         }
@@ -167,7 +167,7 @@ class InvokingHelper (
             "discard ${data.discard.toString(2).padStart(aoc.capacity, '0')} wraps back into deck"
         }
         else CypherNexus.debugCypher { "discard is empty, nothing to wrap" }
-        states.wrapped = true
+        paras.wrapped = true
         return discard2deck()
     }
 
@@ -341,7 +341,7 @@ class InvokingHelper (
     /**
      * for special data persist along the invoking
      * */
-    data class InvokingStateBundle (
+    data class InvokingParameterBundle (
         var wrapped: Boolean = false,
         var alreadyRefreshed: Boolean = false,
 

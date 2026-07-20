@@ -7,7 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.IRecursiveCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 
 object ProteusCypher : AbstractNonProjectileCypher(), IRecursiveCypher {
@@ -27,20 +27,20 @@ object ProteusCypher : AbstractNonProjectileCypher(), IRecursiveCypher {
      * */
     override fun invoke(
         helper: InvokingHelper,
-        chunk: ShotStateChunk,
+        shotState: ShotStateChunk,
         data: HelperDataBundle,
-        state: InvokingStateBundle,
+        paras: InvokingParameterBundle,
         relativeIndex: Int,
         isCopy: Boolean
     ) {
         CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
-        modifyStateChunk(helper, data, chunk)
+        modifyShotState(helper, data, shotState)
 
-        if (state.drawEnabled)
+        if (paras.drawEnabled)
             drawXForEach(helper, draw) { index, cypher ->
-                cypher.invokeInHand(helper, chunk, data, state)
+                cypher.invokeInHand(helper, shotState, data, paras)
                 if (cypher is ProteusCypher) data.manaCurrent += 80f
-                else copyCypher(cypher, helper, chunk, data, state, index)
+                else copyCypher(cypher, helper, shotState, data, paras, index)
             }
     }
 }

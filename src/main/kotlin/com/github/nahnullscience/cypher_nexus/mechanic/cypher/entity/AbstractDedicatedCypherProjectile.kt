@@ -42,14 +42,14 @@ abstract class AbstractDedicatedCypherProjectile(
     IFlagExtension, ICypherEntity by CypherEntityBasics<AbstractDedicatedCypherProjectile>() {
     companion object {
         /** generate projectile with attributes initialized */
-        fun <CY> create(
+        fun <CE> create(
             cypher: AbstractProjectileCypher<*>,
-            entityType: EntityType<CY>,
+            entityType: EntityType<CE>,
             level: ServerLevel,
             invoker: Entity?,
             shotState: ShotStateChunk,
             node: ProjectileNode,
-        ) : CY where CY : Entity, CY : ICypherEntity {
+        ) : CE where CE : Entity, CE : ICypherEntity {
             val proj = entityType.create(level, EntitySpawnReason.SPAWN_ITEM_USE) ?:
             throw IllegalStateException("Failed to create projectile [$entityType].")
             proj.setOwner(invoker)
@@ -57,7 +57,11 @@ abstract class AbstractDedicatedCypherProjectile(
             return proj
         }
 
-        fun <T : AbstractDedicatedCypherProjectile> createRaw(entityType: EntityType<T>, level: ServerLevel, owner: Entity?) : T {
+        fun <CE> createRaw(
+            entityType: EntityType<CE>,
+            level: ServerLevel,
+            owner: Entity?
+        ) : CE where CE : Entity, CE : ICypherEntity {
             val proj = entityType.create(level, EntitySpawnReason.SPAWN_ITEM_USE) ?:
             throw IllegalStateException("Failed to create projectile [$entityType].")
             proj.setOwner(owner)

@@ -7,7 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProject
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.IRecursiveCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import org.apache.logging.log4j.Level
 
@@ -25,14 +25,14 @@ abstract class AbstractGreekLetter(
 
     override fun invoke(
         helper: InvokingHelper,
-        chunk: ShotStateChunk,
+        shotState: ShotStateChunk,
         data: HelperDataBundle,
-        state: InvokingStateBundle,
+        paras: InvokingParameterBundle,
         relativeIndex: Int,
         isCopy: Boolean
     ) {
         CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
-        modifyStateChunk(helper, data, chunk)
+        modifyShotState(helper, data, shotState)
     }
 
     /** the first */
@@ -41,13 +41,13 @@ abstract class AbstractGreekLetter(
         override fun defaultAttributes() = super.defaultAttributes().delay(5)
         override fun invoke(
             helper: InvokingHelper,
-            chunk: ShotStateChunk,
+            shotState: ShotStateChunk,
             data: HelperDataBundle,
-            state: InvokingStateBundle,
+            paras: InvokingParameterBundle,
             relativeIndex: Int,
             isCopy: Boolean
         ) {
-            super.invoke(helper, chunk, data, state, relativeIndex, isCopy)
+            super.invoke(helper, shotState, data, paras, relativeIndex, isCopy)
             // find first through: discard -> hand -> deck
             // since we don't keep a list but use bits instead, the order of certain card pile
             // may not be identical to the order they get there, especially for discard
@@ -66,7 +66,7 @@ abstract class AbstractGreekLetter(
                         return@let
                     }
 
-                    copyCypher(cy, helper, chunk, data, state, relativeIndex)
+                    copyCypher(cy, helper, shotState, data, paras, relativeIndex)
                 }
             } else
                 CypherNexus.debugCypher { "[$this $relativeIndex] didn't find a valid target" }
@@ -78,13 +78,13 @@ abstract class AbstractGreekLetter(
         override fun defaultAttributes() = super.defaultAttributes().delay(5)
         override fun invoke(
             helper: InvokingHelper,
-            chunk: ShotStateChunk,
+            shotState: ShotStateChunk,
             data: HelperDataBundle,
-            state: InvokingStateBundle,
+            paras: InvokingParameterBundle,
             relativeIndex: Int,
             isCopy: Boolean
         ) {
-            super.invoke(helper, chunk, data, state, relativeIndex, isCopy)
+            super.invoke(helper, shotState, data, paras, relativeIndex, isCopy)
             // find first through: deck -> hand -> discard
             val target = sequenceOf(
                 helper.data.deck,
@@ -101,7 +101,7 @@ abstract class AbstractGreekLetter(
                         return@let
                     }
 
-                    copyCypher(cy, helper, chunk, data, state, relativeIndex)
+                    copyCypher(cy, helper, shotState, data, paras, relativeIndex)
                 }
             } else
                 CypherNexus.debugCypher { "[$this $relativeIndex] didn't find a valid target" }
@@ -113,13 +113,13 @@ abstract class AbstractGreekLetter(
         override fun defaultAttributes() = super.defaultAttributes().delay(15)
         override fun invoke(
             helper: InvokingHelper,
-            chunk: ShotStateChunk,
+            shotState: ShotStateChunk,
             data: HelperDataBundle,
-            state: InvokingStateBundle,
+            paras: InvokingParameterBundle,
             relativeIndex: Int,
             isCopy: Boolean
         ) {
-            super.invoke(helper, chunk, data, state, relativeIndex, isCopy)
+            super.invoke(helper, shotState, data, paras, relativeIndex, isCopy)
             helper.aoc.invokableForEach() { index, cypher ->
                 if (helper.isIndexInHand(index) && cypher is IRecursiveCypher && cypher.isRecursive) {
                     // CypherNexus.debugCypher { "" }
@@ -130,9 +130,9 @@ abstract class AbstractGreekLetter(
                 // RefresherRing will be skipped
                 if (cypher is RefresherRingCypher) return@invokableForEach
 
-                state.disableDraw()
-                copyCypher(cypher, helper, chunk, data, state, relativeIndex)
-                state.enableDraw()
+                paras.disableDraw()
+                copyCypher(cypher, helper, shotState, data, paras, relativeIndex)
+                paras.enableDraw()
             }
         }
     }
@@ -142,20 +142,20 @@ abstract class AbstractGreekLetter(
         override fun defaultAttributes() = super.defaultAttributes().delay(10)
         override fun invoke(
             helper: InvokingHelper,
-            chunk: ShotStateChunk,
+            shotState: ShotStateChunk,
             data: HelperDataBundle,
-            state: InvokingStateBundle,
+            paras: InvokingParameterBundle,
             relativeIndex: Int,
             isCopy: Boolean
         ) {
-            super.invoke(helper, chunk, data, state, relativeIndex, isCopy)
+            super.invoke(helper, shotState, data, paras, relativeIndex, isCopy)
 
             val merge = -1L shl (relativeIndex + 1)
             run {
                 var count = 0
                 helper.aoc.invokableForEach(merge) { index, cypher ->
                     count++
-                    copyCypher(cypher, helper, chunk, data, state, relativeIndex)
+                    copyCypher(cypher, helper, shotState, data, paras, relativeIndex)
                     if (count >= 2) return@run
                 }
             }

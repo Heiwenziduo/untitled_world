@@ -11,7 +11,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule.HookType
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.ChatFormatting
@@ -90,13 +90,13 @@ sealed class AbstractCypher(
     /** when invoke from helper#draw */
     fun invokeInHand(
         helper: InvokingHelper,
-        chunk: ShotStateChunk,
+        shotState: ShotStateChunk,
         data: HelperDataBundle,
-        state: InvokingStateBundle,
+        paras: InvokingParameterBundle,
     ) {
-        state.recursionDepth = 0
+        paras.recursionDepth = 0
 
-        traceInvoke(helper, chunk, data, state, helper.lastDrawIndex, false)
+        traceInvoke(helper, shotState, data, paras, helper.lastDrawIndex, false)
 
         if (helper.invoker is ServerPlayer) {
             // TODO award stats
@@ -108,17 +108,17 @@ sealed class AbstractCypher(
      * */
     fun traceInvoke(
         helper: InvokingHelper,
-        chunk: ShotStateChunk,
+        shotState: ShotStateChunk,
         data: HelperDataBundle,
-        state: InvokingStateBundle,
+        paras: InvokingParameterBundle,
         relativeIndex: Int,
         isCopy: Boolean,
     ) {
-        helper.tracer.enter(this, chunk, data, state, relativeIndex, isCopy)
+        helper.tracer.enter(this, shotState, data, paras, relativeIndex, isCopy)
         try {
-            invoke(helper, chunk, data, state, relativeIndex, isCopy)
+            invoke(helper, shotState, data, paras, relativeIndex, isCopy)
         } finally {
-            helper.tracer.exit(this, chunk, data, state)
+            helper.tracer.exit(this, shotState, data, paras)
         }
     }
 
@@ -132,21 +132,21 @@ sealed class AbstractCypher(
      * */
     protected open fun invoke(
         helper: InvokingHelper,
-        chunk: ShotStateChunk,
+        shotState: ShotStateChunk,
         data: HelperDataBundle,
-        state: InvokingStateBundle,
+        paras: InvokingParameterBundle,
         relativeIndex: Int,
         isCopy: Boolean,
     ) {
         CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
-        modifyStateChunk(helper, data, chunk)
+        modifyShotState(helper, data, shotState)
 
-        var forwardState = chunk
+        var nextState = shotState
         if (this is AbstractProjectileCypher<*>) {
-            forwardState = addCEToStateChunk(chunk)
+            nextState = addToShotState(shotState)
         }
 
-        handleDraws(helper, forwardState, data, state)
+        handleDraws(helper, nextState, data, paras)
     }
 
 
@@ -155,13 +155,13 @@ sealed class AbstractCypher(
      * */
     protected fun handleDraws(
         helper: InvokingHelper,
-        chunk: ShotStateChunk,
+        shotState: ShotStateChunk,
         data: HelperDataBundle,
-        state: InvokingStateBundle,
+        paras: InvokingParameterBundle,
     ) {
-        if (state.drawEnabled)
+        if (paras.drawEnabled)
         drawXForEach(helper, draw) { index, cypher ->
-            cypher.invokeInHand(helper, chunk, data, state)
+            cypher.invokeInHand(helper, shotState, data, paras)
         }
     }
 
@@ -188,11 +188,11 @@ sealed class AbstractCypher(
         }
     }
 
-    open fun modifyStateChunk(helper: InvokingHelper, data: HelperDataBundle, chunk: ShotStateChunk) {
+    open fun modifyShotState(helper: InvokingHelper, data: HelperDataBundle, shotState: ShotStateChunk) {
 
-        chunk.record(this)
+        shotState.record(this)
 
-        if (chunk.isRoot) data.delay += delay
+        if (shotState.isRoot) data.delay += delay
         data.recharge += recharge
     }
 

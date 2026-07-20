@@ -3,7 +3,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 
 /**
@@ -13,9 +13,9 @@ interface IRecursiveCypher {
     companion object {
         const val RECURSION_LIMIT = 2
 
-        fun AbstractCypher.canRecursionContinue(state: InvokingStateBundle): Boolean {
+        fun AbstractCypher.canRecursionContinue(paras: InvokingParameterBundle): Boolean {
             if (this !is IRecursiveCypher) return true
-            if (this.isRecursive && state.recursionDepth >= RECURSION_LIMIT) {
+            if (this.isRecursive && paras.recursionDepth >= RECURSION_LIMIT) {
                 CypherNexus.debugCypher { "[$this] has reached the recursion depth limit and stops function." }
                 return false
             }
@@ -35,19 +35,19 @@ interface IRecursiveCypher {
     fun copyCypher(
         target: AbstractCypher,
         helper: InvokingHelper,
-        chunk: ShotStateChunk,
+        shotState: ShotStateChunk,
         data: HelperDataBundle,
-        state: InvokingStateBundle,
+        paras: InvokingParameterBundle,
         targetIndex: Int,
     ) {
-        if (target.canRecursionContinue(state)) {
+        if (target.canRecursionContinue(paras)) {
             CypherNexus.debugCypher { "[$this] will copy [$target $targetIndex]" }
             if (target is IRecursiveCypher && target.isRecursive) {
-                val s = state.recursionDepth++
-                target.traceInvoke(helper, chunk, data, state, targetIndex, true)
-                state.recursionDepth = s
+                val s = paras.recursionDepth++
+                target.traceInvoke(helper, shotState, data, paras, targetIndex, true)
+                paras.recursionDepth = s
             } else
-                target.traceInvoke(helper, chunk, data, state, targetIndex, true)
+                target.traceInvoke(helper, shotState, data, paras, targetIndex, true)
         }
     }
 }

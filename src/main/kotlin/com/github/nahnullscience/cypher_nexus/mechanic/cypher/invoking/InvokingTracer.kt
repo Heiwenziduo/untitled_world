@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingStateBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
 
 /**
  *
@@ -10,34 +10,34 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingH
 interface InvokingTracer {
     fun enter(
         cypher: AbstractCypher,
-        chunk: ShotStateChunk,
+        shotState: ShotStateChunk,
         data: HelperDataBundle,
-        state: InvokingStateBundle,
+        paras: InvokingParameterBundle,
         relativeIndex: Int,
         isCopy: Boolean
     )
     fun exit(
         cypher: AbstractCypher,
-        chunk: ShotStateChunk,
+        shotState: ShotStateChunk,
         data: HelperDataBundle,
-        state: InvokingStateBundle
+        paras: InvokingParameterBundle
     )
 
     companion object {
         val NONE: InvokingTracer = object : InvokingTracer {
             override fun enter(
                 cypher: AbstractCypher,
-                chunk: ShotStateChunk,
+                shotState: ShotStateChunk,
                 data: HelperDataBundle,
-                state: InvokingStateBundle,
+                paras: InvokingParameterBundle,
                 relativeIndex: Int,
                 isCopy: Boolean
             ) = Unit
             override fun exit(
                 cypher: AbstractCypher,
-                chunk: ShotStateChunk,
+                shotState: ShotStateChunk,
                 data: HelperDataBundle,
-                state: InvokingStateBundle
+                paras: InvokingParameterBundle
             ) = Unit
         }
     }

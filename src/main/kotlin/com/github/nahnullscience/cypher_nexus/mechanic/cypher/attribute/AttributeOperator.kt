@@ -14,7 +14,7 @@ import kotlin.math.pow
 
 
 enum class AttributeOperator(
-    val cumulative: Boolean
+    val exclusive: Boolean
 ) {
 //    /**
 //     * Base value of one cast, mostly on ProjectileCyphers,
@@ -35,7 +35,7 @@ enum class AttributeOperator(
 //    },
 
     /** 1.0 -> add 1.0 */
-    ADD(true) {
+    ADD(false) {
         override val defaultValue = 0.0
         override fun cumulate(last: Double, new: Double): Double = last + new
         override fun cumulate(last: Double, new: Double, times: Int): Double = last + new * times
@@ -45,7 +45,7 @@ enum class AttributeOperator(
         }
     },
     /** 0.33 -> plus 33% */
-    MULTIPLY_BASE(true) {
+    MULTIPLY_BASE(false) {
         // defaultValue may cumulate multiple times while map initialization(at AbsCypher & Helper)
         override val defaultValue = 0.0
         override fun cumulate(last: Double, new: Double): Double = last + new
@@ -56,7 +56,7 @@ enum class AttributeOperator(
         }
     },
     /** 0.33 -> times 33% */
-    MULTIPLY_TOTAL(true) {
+    MULTIPLY_TOTAL(false) {
         override val defaultValue = 1.0
         override fun cumulate(last: Double, new: Double): Double = last * new
         override fun cumulate(last: Double, new: Double, times: Int): Double = last * new.pow(times)
@@ -73,7 +73,7 @@ enum class AttributeOperator(
         override fun formatSymbol() = "="
     },
 
-    CAP_AT(true) {
+    CAP_AT(false) {
         override val defaultValue = Double.MAX_VALUE
         override fun cumulate(last: Double, new: Double): Double = min(last, new)
         override fun cumulate(last: Double, new: Double, times: Int): Double = min(last, new)

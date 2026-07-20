@@ -8,9 +8,9 @@ import net.minecraft.world.entity.player.Player
 object RequirementNotPlayer : AbstractRequirement.RequirementIf() {
     override fun requirement(
         helper: InvokingHelper,
-        chunk: ShotStateChunk,
+        shotState: ShotStateChunk,
         data: InvokingHelper.HelperDataBundle,
-        state: InvokingHelper.InvokingStateBundle,
+        paras: InvokingHelper.InvokingParameterBundle,
     ): Boolean {
         return helper.invoker !is Player
     }
