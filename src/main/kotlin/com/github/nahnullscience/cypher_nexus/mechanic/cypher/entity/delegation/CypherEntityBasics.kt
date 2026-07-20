@@ -67,7 +67,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     protected var ccMap: MapOfCypherCounts? = null
     override fun ccMap(): MapOfCypherCounts? = ccMap
 
-    protected val attributeMap: AttributeMap = Reference2ObjectOpenHashMap(16)
+    protected val attributeMap: AttributeMap = Reference2ObjectOpenHashMap()
     override fun attributeMap(): Map<CypherAttribute, Double> = attributeMap
 
     protected var hooks: HookContainer? = null

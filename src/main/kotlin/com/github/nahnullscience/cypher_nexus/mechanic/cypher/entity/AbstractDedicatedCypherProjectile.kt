@@ -48,7 +48,7 @@ abstract class AbstractDedicatedCypherProjectile(
             level: ServerLevel,
             invoker: Entity?,
             shotState: ShotStateChunk,
-            node: ProjectileNode,
+            node: ProjectileNode?,
         ) : CE where CE : Entity, CE : ICypherEntity {
             val proj = entityType.create(level, EntitySpawnReason.SPAWN_ITEM_USE) ?:
             throw IllegalStateException("Failed to create projectile [$entityType].")

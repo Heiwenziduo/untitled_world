@@ -17,6 +17,7 @@ import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.randomInCone
+import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.minecraft.core.Holder
 import net.minecraft.server.level.ServerLevel
@@ -30,37 +31,70 @@ class ShotStateChunk private constructor (
     /** only root has access to the helper */
     private val helper: InvokingHelper?
 ) : IFlagExtension {
+    /** normal chunk can only release once */
+    constructor(charge: Int = 1): this(charge, null)
+    constructor(ccMap: MapOfCypherCounts): this() { dirty = true; _ccMap = ccMap }
+
     companion object {
         private const val CAPTURE_RADIUS = 8.0
         private const val CAPTURE_RADIUS_HALF = CAPTURE_RADIUS / 2
 
         fun root(helper: InvokingHelper) = ShotStateChunk(1, helper)
     }
-    /** normal chunk can only release once */
-    constructor(charge: Int = 1): this(charge, null)
-    constructor(ccMap: MapOfCypherCounts): this() {
-        _ccMap = ccMap
-    }
-
-    val accessor: ShotStateAccessor by lazy { ShotStateAccessor() }
 
     val isRoot: Boolean by lazy { helper != null && helper.shotRoot == this }
-    private var dirty = true
-    private var _ccMap = MapOfCypherCounts()
-    val ccMap get() = _ccMap
+    val accessor: ShotStateAccessor by lazy { ShotStateAccessor() }
 
+    val attr2opMap: Reference2ObjectOpenHashMap<CypherAttribute, OperatorMap> by
+    lazy { Reference2ObjectOpenHashMap() }
+
+    val hooks: HookContainer by lazy { HookContainer() }
+
+    private val simpleProjectiles: Reference2IntOpenHashMap<AbstractProjectileCypher<*>> by
+    lazy { Reference2IntOpenHashMap() } // projectiles with no trigger
+
+    private val triggeredProjectiles = mutableListOf<ProjectileNode>()
+    val projectilesView get() = triggeredProjectiles.toList()
+
+    private var _ccMap: MapOfCypherCounts? = null
+    val ccMap: MapOfCypherCounts get() = _ccMap ?: MapOfCypherCounts().also { _ccMap = it }
+
+
+    private var dirty = false
     override var enabledFlags: Int = 0
-
-    val attr2opMap = Reference2ObjectOpenHashMap<CypherAttribute, OperatorMap>(16)
-
-    val hooks = HookContainer()
-    private val projectiles = mutableListOf<ProjectileNode>()
-    val projectilesView get() = projectiles.toList()
 
     var delay: Int = 0
     private set
     var recharge: Int = 0
     private set
+
+    private fun spawnProjectile(
+        cypher: AbstractProjectileCypher<*>,
+        node: ProjectileNode?,
+        hookedPosDire: PosDirePair,
+        level: ServerLevel,
+        owner: Entity?,
+        directInvoker: Entity?
+    ) {
+        val proj = cypher.createProjectile(level, owner, this, node)
+        var dire = hookedPosDire.direction
+        run spread@ {
+            val random = owner?.random ?: directInvoker?.random ?: return@spread
+            val spreadMap = attr2opMap[CypherAttributes.SPREAD.value()] ?: return@spread
+
+            val spread = AttributeOperator.attributeCalculator(CypherAttributes.SPREAD.value().defaultValue, spreadMap).let {
+                CypherAttributes.SPREAD.value().restrictRange(it)
+            }
+
+            if (spread > 0.01)
+                dire = hookedPosDire.direction.randomInCone(spread / 2, random)
+//                        .also { println("dire: $dire -> $it, " +
+//                                "actual scatter: ${Math.toDegrees(acos(dire.normalize().dot(it.normalize())))}, " +
+//                                "spread: $spread") }
+        }
+        proj.initDirection(PosDirePair(hookedPosDire.position, dire))
+        level.addFreshEntity(proj)
+    }
 
     fun release(level: Level, directInvoker: Entity?, owner: Entity?, posDire: PosDirePair, itemWand: ItemWandInstance?) {
         if (charge-- <= 0) return
@@ -109,66 +143,42 @@ class ShotStateChunk private constructor (
         }
 
         // generate bullets
-        for ((i, node) in projectiles.withIndex()) {
-            val proj = node.instance.createProjectile(
-                level,
-                owner,
-                this,
-                node,
-                hooks
-            )
-
-            var dire = hookedPosDire.direction
-            run spread@ {
-                val random = owner?.random ?: directInvoker?.random ?: return@spread
-                val spreadMap = attr2opMap[CypherAttributes.SPREAD.value()] ?: return@spread
-
-                val spread = AttributeOperator.attributeCalculator(CypherAttributes.SPREAD.value().defaultValue, spreadMap).let {
-                    CypherAttributes.SPREAD.value().restrictRange(it)
-                }
-
-                if (spread > 0.01)
-                    dire = hookedPosDire.direction.randomInCone(spread / 2, random)
-//                        .also { println("dire: $dire -> $it, " +
-//                                "actual scatter: ${Math.toDegrees(acos(dire.normalize().dot(it.normalize())))}, " +
-//                                "spread: $spread") }
-            }
-
-            proj.initDirection(PosDirePair(hookedPosDire.position, dire))
-
-            Profiler.get().pop()
-            level.addFreshEntity(proj)
+        simpleProjectiles.reference2IntEntrySet().forEach { (cypher, count) ->
+            repeat(count) { spawnProjectile(cypher, null, hookedPosDire, level, owner, directInvoker) }
         }
+        triggeredProjectiles.forEach { node ->
+            spawnProjectile(node.instance, node, hookedPosDire, level, owner, directInvoker)
+        }
+
+        Profiler.get().pop()
     }
 
     fun addProjectileNode(
         cypher: AbstractProjectileCypher<*>,
-        payload: ShotStateChunk? = null,
-        trigger: TriggerType = TriggerType.NONE
-    ): ShotStateChunk {
-        projectiles.add(ProjectileNode(cypher, payload, trigger))
-        return this
-    }
-
-    fun attachHooks(cypher: AbstractNonProjectileCypher): ShotStateChunk {
-        hooks.add(cypher)
-        return this
-    }
-
-    fun enableFlags(flag: Int): ShotStateChunk {
-        enableFlag(flag)
-        return this
-    }
-
-    fun record(cy: AbstractCypher): Int {
+        payload: ShotStateChunk,
+        trigger: TriggerType
+    ): ShotStateChunk = apply {
         dirty = true
-        return _ccMap.count(cy)
+        triggeredProjectiles.add(ProjectileNode(cypher, payload, trigger))
+    }
+    fun addProjectileNode(cypher: AbstractProjectileCypher<*>): ShotStateChunk = apply {
+        dirty = true
+        simpleProjectiles.addTo(cypher, 1)
+    }
+
+    fun attachHooks(cypher: AbstractNonProjectileCypher): ShotStateChunk = apply { hooks.add(cypher) }
+
+    fun enableFlags(flag: Int): ShotStateChunk = apply { enableFlag(flag) }
+
+    fun record(cy: AbstractCypher): ShotStateChunk = apply {
+        dirty = true
+        ccMap.count(cy)
     }
 
     fun compute(): ShotStateChunk {
         if (!dirty) return this
 
-        _ccMap.forEach { (cypher, counts) ->
+        _ccMap?.forEach { (cypher, counts) ->
 
             if (cypher is AbstractNonProjectileCypher) {
                 enableFlag(cypher.flags)

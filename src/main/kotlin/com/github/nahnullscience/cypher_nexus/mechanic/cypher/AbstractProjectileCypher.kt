@@ -37,7 +37,7 @@ abstract class AbstractProjectileCypher <CE> (
     ): ShotStateChunk {
         val t = trigger ?: builtinTrigger
         if (t == TriggerType.NONE) {
-            shotState.addProjectileNode(this, null)
+            shotState.addProjectileNode(this)
             return shotState
         }
         val charge =
@@ -54,8 +54,7 @@ abstract class AbstractProjectileCypher <CE> (
         level: ServerLevel,
         invoker: Entity?,
         shootState: ShotStateChunk,
-        node: ProjectileNode,
-        stateHooks: HookContainer?
+        node: ProjectileNode?,
     ): CE {
         val proj = AbstractDedicatedCypherProjectile.create(
             this,
