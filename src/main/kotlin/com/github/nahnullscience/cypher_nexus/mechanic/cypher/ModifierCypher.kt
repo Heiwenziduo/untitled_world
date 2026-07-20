@@ -5,7 +5,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCat
 import net.minecraft.core.Holder
 
 abstract class ModifierCypher (
-    defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE
+    defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder
 ) : AbstractNonProjectileCypher(defaultAttribute) {
 
     final override val category: Holder<CypherCategory> = CypherCategories.MODIFIER

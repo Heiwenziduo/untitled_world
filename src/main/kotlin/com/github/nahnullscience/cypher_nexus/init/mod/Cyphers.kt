@@ -177,8 +177,10 @@ object Cyphers {
         stateChunkAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 1.625)
         stateChunkAttr(CypherAttributes.FRICTION_FACTOR, AttributeOperator.ADD, 0.03)
     }
-    val FIERY = registerCypher(FieryCypher)
-
+    val FIERY = registerCypher(::FieryCypher) {
+        manaDrain(5f)
+        flags(CypherFlags.WITH_FIRE)
+    }
     val ANTIGRAVITY = registerModifier("antigravity", 2f) {
         stateChunkAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, -0.03)
     }
@@ -210,7 +212,7 @@ object Cyphers {
     }
     val CURTAIL_EXISTING = registerModifier("curtail_existing", 10f) {
         delay(-3)
-        stateChunkAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, -38.0)
+        stateChunkAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, -28.0)
     }
     val REDUCE_SPREAD = registerModifier("reduce_spread", 1f) {
         stateChunkAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -60.0)
@@ -229,8 +231,12 @@ object Cyphers {
     val KNOCKBACK = registerModifier("knockback", 5f) {
         stateChunkAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 10.0)
     }
-    val HOMING = registerCypher(AbstractTargetHoming.Homing)
-    val TURN_TO_TARGET = registerCypher(AbstractTargetHoming.TurnToTarget)
+    val HOMING = registerCypher(AbstractTargetHoming::Homing) {
+        manaDrain(60f)
+    }
+    val TURN_TO_TARGET = registerCypher(AbstractTargetHoming::TurnToTarget) {
+        manaDrain(30f)
+    }
     val BOOMERANG = registerCypher(::BoomerangCypher) {
         manaDrain(10f)
         flags(CypherFlags.MOTION_FOLLOWS_OWNER)
@@ -259,7 +265,6 @@ object Cyphers {
         recharge(10)
         stateChunkAttr(CypherAttributes.FORTUNE_LEVEL, AttributeOperator.ADD, 1.0)
     }
-
     val HORIZONTAL_PATH = registerCypher(AbstractPathModifier::HorizontalPath) {
         manaDrain(0f)
         stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 0.5)
@@ -267,6 +272,14 @@ object Cyphers {
     val CARDINAL_PATH = registerCypher(AbstractPathModifier::CardinalPath) {
         manaDrain(0f)
         stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 0.5)
+    }
+    val PING_PONG_PATH = registerCypher(::PingPongPath) {
+        manaDrain(0f)
+        stateChunkAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 24.0)
+    }
+    val CHAOTIC_PATH = registerCypher(::ChaoticPath) {
+        manaDrain(0f)
+        stateChunkAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 2.0)
     }
 
     const val COLOR_MULTI_INVOKE = 0xFFADEEC5.toInt()

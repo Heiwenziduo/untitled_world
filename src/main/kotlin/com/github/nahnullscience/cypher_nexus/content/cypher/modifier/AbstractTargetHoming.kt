@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.EntityCaptureHook
@@ -15,20 +15,16 @@ import kotlin.math.min
 /** these homing-s share the same "homing target" on HooksSharedData */
 abstract class AbstractTargetHoming(
     path: String,
-    private val _manaDrain: Float
-) : ModifierCypher(), TickBehaviorHook, EntityCaptureHook {
+    defaultAttribute: Builder.() -> Builder
+) : ModifierCypher(defaultAttribute), TickBehaviorHook, EntityCaptureHook {
 
     companion object {
         private const val HOMING_STRENGTH = 0.1
+        private const val HOMING_STRENGTH_LEVEL = 0.02
         private const val ROTATION_RADIUS = PI / 36
     }
 
     override val resource = CypherNexus.modResource(path)
-
-    override fun defaultAttributes(): CypherDataMap.Builder {
-        return super.defaultAttributes()
-            .manaDrain(_manaDrain)
-    }
 
     override fun <CE> forEntityCaptured(
         index: Int,
@@ -65,7 +61,7 @@ abstract class AbstractTargetHoming(
 //    }
 
 
-    object Homing: AbstractTargetHoming("homing", 60f) {
+    class Homing(defaultAttribute: Builder.() -> Builder) : AbstractTargetHoming("homing", defaultAttribute) {
         override fun <CE> onTick(
             index: Int,
             count: Int,
@@ -75,14 +71,14 @@ abstract class AbstractTargetHoming(
             val target = cyEntity.hooksSharedData.homingTarget ?: return
             if (!target.boundingBox.contains(cyEntity.position())) {
                 val dir = cyEntity.position().vectorTo(target.eyePosition)
-                val dis =  min(dir.length(), count * HOMING_STRENGTH)
+                val dis =  min(dir.length(), count * HOMING_STRENGTH_LEVEL + HOMING_STRENGTH)
                 val speed = dir.normalize().scale(dis)
                 cyEntity.addDeltaMovement(speed)
             }
         }
     }
 
-    object TurnToTarget: AbstractTargetHoming("turn_toward_target", 30f) {
+    class TurnToTarget(defaultAttribute: Builder.() -> Builder) : AbstractTargetHoming("turn_toward_target", defaultAttribute) {
         override fun <CE> onTick(
             index: Int,
             count: Int,

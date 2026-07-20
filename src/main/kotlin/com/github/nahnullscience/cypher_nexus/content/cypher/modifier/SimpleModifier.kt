@@ -43,7 +43,7 @@ class SimpleModifier(
         return this
     }
 
-    fun createModifier(): ModifierCypher = object : ModifierCypher() {
+    fun createModifier(): ModifierCypher = object : ModifierCypher(NONE) {
         override val resource = CypherNexus.modResource(path)
         override val color = _color
         override fun defaultAttributes() = this@SimpleModifier

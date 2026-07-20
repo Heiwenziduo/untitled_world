@@ -9,6 +9,7 @@ class HooksSharedData <CY> where CY : Entity, CY : ICypherEntity {
     var homingTarget: Entity? = null
     var pathDirection0: Direction? = null
     var pathDirection: Direction? = null
+    var chaoticPathTick: Int = 7
 
     fun tick(entity: CY) {
 

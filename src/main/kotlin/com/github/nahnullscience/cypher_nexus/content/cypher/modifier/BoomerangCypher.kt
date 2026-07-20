@@ -14,6 +14,7 @@ class BoomerangCypher(
 ) : ModifierCypher(defaultAttribute), TickBehaviorHook {
     companion object {
         private const val BOOMERANG_STRENGTH = 0.08
+        private const val BOOMERANG_STRENGTH_LEVEL = 0.01
     }
     override val resource = CypherNexus.modResource("boomerang")
 
@@ -26,7 +27,7 @@ class BoomerangCypher(
         val target = cyEntity.owner ?: return
         if (!target.boundingBox.contains(cyEntity.position())) {
             val dir = cyEntity.position().vectorTo(target.eyePosition)
-            val dis =  min(dir.length(), count * BOOMERANG_STRENGTH)
+            val dis =  min(dir.length(), count * BOOMERANG_STRENGTH_LEVEL + BOOMERANG_STRENGTH)
             val speed = dir.normalize().scale(dis)
             cyEntity.addDeltaMovement(speed)
         }
