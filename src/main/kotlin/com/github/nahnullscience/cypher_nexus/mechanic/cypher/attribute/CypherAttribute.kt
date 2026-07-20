@@ -38,6 +38,10 @@ open class CypherAttribute(
     override fun translation(): MutableComponent =
         Component.translatable("cypher.attribute.${resource.namespace}.${resource.path}")
 
+    fun tooltip(v: Double): MutableComponent {
+        return translation()
+    }
+
 
     enum class AttributeApply {
         /** Invoking attributes will not cumulate on projectile-entity */

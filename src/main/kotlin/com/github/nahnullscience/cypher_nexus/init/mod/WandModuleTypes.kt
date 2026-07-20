@@ -5,24 +5,23 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.*
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.IWandModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.InputModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.WandModuleType
+import com.github.nahnullscience.cypher_nexus.utility.exception.VanillaMisuseException
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceKey
 import net.neoforged.neoforge.registries.DeferredRegister
 import net.neoforged.neoforge.registries.RegistryBuilder
-import org.apache.logging.log4j.Level
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 import java.util.function.Supplier
 
 object WandModuleTypes {
-    const val ID_CAP = 31
+    const val MODULE_ID_CAP = 31
     val RESOURCE_KEY: ResourceKey<Registry<WandModuleType<*>>> =
         ResourceKey.createRegistryKey(CypherNexus.modResource("wand/module_type"))
-    val REGISTRY: Registry<WandModuleType<*>> = RegistryBuilder(RESOURCE_KEY).sync(true).maxId(ID_CAP).create()
+    val REGISTRY: Registry<WandModuleType<*>> = RegistryBuilder(RESOURCE_KEY).sync(true).maxId(MODULE_ID_CAP).create()
 
     fun WandModuleType<*>.id(): Int {
         return REGISTRY.getId(this).also {
-            if (it > ID_CAP) CypherNexus.debugWand(Level.ERROR)
-            { "$this $it: wand-module-type registry length is over $ID_CAP! this may lead to modules function unproperly." }
+            if (it > MODULE_ID_CAP) throw VanillaMisuseException("[${REGISTRY}] registry id-$it is out of bound $MODULE_ID_CAP")
         }
     }
 

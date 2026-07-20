@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.init.mod
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute.AttributeApply
+import com.github.nahnullscience.cypher_nexus.utility.exception.VanillaMisuseException
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceKey
@@ -14,9 +15,16 @@ import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
  * registry attribute keys
  * */
 object CypherAttributes {
+    const val ATTR_ID_CAP = 31
     val RESOURCE_KEY: ResourceKey<Registry<CypherAttribute>> =
         ResourceKey.createRegistryKey(CypherNexus.modResource("cypher/attribute"))
-    val REGISTRY: Registry<CypherAttribute> = RegistryBuilder(RESOURCE_KEY).sync(true).create()
+    val REGISTRY: Registry<CypherAttribute> = RegistryBuilder(RESOURCE_KEY).sync(true).maxId(ATTR_ID_CAP).create()
+
+    fun CypherAttribute.id(): Int {
+        return REGISTRY.getId(this).also {
+            if (it > ATTR_ID_CAP) throw VanillaMisuseException("[$REGISTRY] registry id-$it is out of bound $ATTR_ID_CAP")
+        }
+    }
 
     val DEFERRED_REGISTER: DeferredRegister<CypherAttribute> =
         DeferredRegister.create(REGISTRY, CypherNexus.MOD_ID)
@@ -56,7 +64,7 @@ object CypherAttributes {
     { builder -> builder.default(1.0).min(0.25).max(16.0) }
     /** int, bounce times */
     val BOUNCE = registerAttribute("bounce")
-    { builder -> builder.max(127.0) }
+    { builder -> builder.max(256.0) }
     /** how much it falls each tick, 0.0 by default */
     val GRAVITY_FACTOR = registerAttribute("gravity_factor")
     { builder -> builder.min(-1.0).max(1.0).hide() }

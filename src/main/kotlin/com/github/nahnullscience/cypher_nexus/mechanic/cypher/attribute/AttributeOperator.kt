@@ -4,28 +4,29 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
-import java.util.EnumMap
+import java.util.*
 import java.util.Locale.getDefault
-import kotlin.collections.component1
-import kotlin.collections.component2
 import kotlin.math.min
 import kotlin.math.pow
 
 
-enum class AttributeOperator(val cumulative: Boolean) {
-    /**
-     * Base value of one cast, mostly on ProjectileCyphers,
-     * without base value, the attribute will be ignored.
-     * Can be set via special ModifierCyphers.
-     * */
-    BASE(false) {
-        override val defaultValue = 0.0
-        override fun cumulate(last: Double, new: Double): Double = new // this should not happen
-        override fun cumulate(last: Double, new: Double, times: Int): Double = cumulate(last, new)
-        override fun formatSymbol() = ""
-    },
+enum class AttributeOperator(
+    val cumulative: Boolean
+) {
+//    /**
+//     * Base value of one cast, mostly on ProjectileCyphers,
+//     * without base value, the attribute will be ignored.
+//     * Can be set via special ModifierCyphers.
+//     * */
+//    BASE(false) {
+//        override val defaultValue = 0.0
+//        override fun cumulate(last: Double, new: Double): Double = new // this should not happen
+//        override fun cumulate(last: Double, new: Double, times: Int): Double = cumulate(last, new)
+//        override fun formatSymbol() = ""
+//    },
 //    /**
 //     * specify self-set inside each projectile-entities */
 //    SET_SELF {
@@ -97,8 +98,10 @@ enum class AttributeOperator(val cumulative: Boolean) {
          * calculate attribute value in vanilla style
          * @param opMap contains pre-computed values for each [AttributeOperator],
          * should champion [EnumMap] over [HashMap] for faster key access
+         * @return the calculation result, since the method don't care about which `Attribute` is calculated,
+         * you should perform range restriction manually
          * */
-        fun attributeCalculator(opMap: Map<AttributeOperator, Double>, base: Double) : Double {
+        fun attributeCalculator(base: Double, opMap: Map<AttributeOperator, Double>) : Double {
             val s = opMap[SET_ALL]
             if (s != null) return s
 
@@ -111,17 +114,20 @@ enum class AttributeOperator(val cumulative: Boolean) {
 
         typealias AttributeMap = MutableMap<CypherAttribute, Double>
         /**
-         * cumulate attributes from a state to a single cypher-entity
+         * cumulate attributes from a shot-state to a single cypher-entity.
+         * @param [AttributeMap] where `Attribute`s will cumulate to.
+         * Despite the specification of the broad `MutableMap` type,
+         * [Reference2ObjectOpenHashMap] should be preferred over a standard `HashMap` for performance reasons.
          * */
-        fun AttributeMap.initAttributes(state: ShotStateChunk, cypher: AbstractProjectileCypher<*>) {
-            state.computedOperationMap.forEach { (attr, opMap) ->
+        fun AttributeMap.initFromShotState(state: ShotStateChunk, cypher: AbstractProjectileCypher<*>) {
+            state.attr2opMap.forEach { (attr, opMap) ->
                 if (!attr.isEntityAttribute) return@forEach
 //            if (haveFlag(CypherFlags.CONSTANT_EXISTING) && CypherAttributes.EXISTING.`is`(attr.resource)) return@forEach
                 // TODO prune cumulation, some of attributes will not be used, depends on cypher implementation
 
                 this.compute(attr) { a, v ->
-                    val def = cypher.getAttrBaseOrDefault(attr)
-                    val final = AttributeOperator.attributeCalculator(opMap, def)
+                    val base = cypher.getAttrBaseOrDefault(attr)
+                    val final = this@Companion.attributeCalculator(base, opMap)
                     attr.restrictRange(final)
                 }
             }
@@ -130,13 +136,11 @@ enum class AttributeOperator(val cumulative: Boolean) {
 
         fun string2operator(string: String) : AttributeOperator {
             return when(string) {
-                "base" -> BASE
-//                "set_self" -> SET_SELF
                 "add" -> ADD
                 "multiply_base" -> MULTIPLY_BASE
                 "multiply_total" -> MULTIPLY_TOTAL
                 "set_all" -> SET_ALL
-                "cap_at" -> SET_ALL
+                "cap_at" -> CAP_AT
                 else -> throw IllegalArgumentException("$string is not a valid operator, valid operators are: ${entries.toList().map{ operation -> "$operation" }}")
             }
         }

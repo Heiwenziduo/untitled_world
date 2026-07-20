@@ -37,13 +37,24 @@ fun Vec3.getSurfaceOf(aabb: AABB): Direction? {
 }
 
 /**
+ *
+ * */
+fun Vec3.flipByDirection(dir: Direction, factor: Double = 1.0): Vec3 {
+    return when(dir) {
+        Direction.DOWN, Direction.UP -> multiply(1.0, -factor, 1.0)
+        Direction.NORTH, Direction.SOUTH -> multiply(1.0, 1.0, -factor)
+        Direction.WEST, Direction.EAST -> multiply(-factor, 1.0, 1.0)
+    }
+}
+
+/**
  * @return new V3 xyz value same as "from", symbol same as "to"
  * */
 fun Vec3.toSameDire(to: Vec3): Vec3 {
     return Vec3(
-        MathUtility.toSameSymbol(this.x, to.x),
-        MathUtility.toSameSymbol(this.y, to.y),
-        MathUtility.toSameSymbol(this.z, to.z)
+        x.toSameSymbol(to.x),
+        y.toSameSymbol(to.y),
+        z.toSameSymbol(to.z)
     )
 }
 

@@ -16,6 +16,7 @@ import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.randomInCone
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.minecraft.core.Holder
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.profiling.Profiler
@@ -49,7 +50,7 @@ class ShotStateChunk private constructor (
 
     override var enabledFlags: Int = 0
 
-    val computedOperationMap = HashMap<CypherAttribute, OperatorMap>()
+    val attr2opMap = Reference2ObjectOpenHashMap<CypherAttribute, OperatorMap>(16)
 
     val hooks = HookContainer()
     private val projectiles = mutableListOf<ProjectileNode>()
@@ -71,11 +72,13 @@ class ShotStateChunk private constructor (
         run recoil@ {
             itemWand ?: return@recoil
             directInvoker ?: return@recoil
-            val recoilMap = computedOperationMap[CypherAttributes.RECOIL.value()] ?: return@recoil
+            val recoilMap = attr2opMap[CypherAttributes.RECOIL.value()] ?: return@recoil
             val recoilModule = itemWand.module(RECOIL) ?: return@recoil
 
-            var recoil = AttributeOperator.attributeCalculator(recoilMap, CypherAttributes.RECOIL.value().defaultValue)
-            recoil = CypherAttributes.RECOIL.value().restrictRange(recoil)
+            val recoil = AttributeOperator.attributeCalculator(CypherAttributes.RECOIL.value().defaultValue, recoilMap).let {
+                CypherAttributes.RECOIL.value().restrictRange(it)
+            }
+
             recoilModule.recoil(directInvoker, recoil, posDire)
         }
 
@@ -117,10 +120,12 @@ class ShotStateChunk private constructor (
             var dire = hookedPosDire.direction
             run spread@ {
                 val random = owner?.random ?: directInvoker?.random ?: return@spread
-                val spreadMap = computedOperationMap[CypherAttributes.SPREAD.value()] ?: return@spread
+                val spreadMap = attr2opMap[CypherAttributes.SPREAD.value()] ?: return@spread
 
-                val spread = AttributeOperator.attributeCalculator(spreadMap, CypherAttributes.SPREAD.value().defaultValue)
-                    .let { CypherAttributes.SPREAD.value().restrictRange(it) }
+                val spread = AttributeOperator.attributeCalculator(CypherAttributes.SPREAD.value().defaultValue, spreadMap).let {
+                    CypherAttributes.SPREAD.value().restrictRange(it)
+                }
+
                 if (spread > 0.01)
                     dire = hookedPosDire.direction.randomInCone(spread / 2, random)
 //                        .also { println("dire: $dire -> $it, " +
@@ -161,7 +166,7 @@ class ShotStateChunk private constructor (
         _ccMap.forEach { (cypher, counts) ->
 
             if (cypher is AbstractNonProjectileCypher) {
-                enableFlags(cypher.flags)
+                enableFlag(cypher.flags)
                 hooks.add(cypher, counts)
             }
 
@@ -180,15 +185,13 @@ class ShotStateChunk private constructor (
                 }
 
 
-                val chunkMap = targetChunk.computedOperationMap.getOrPut(attribute) { EnumMap(AttributeOperator::class.java) }
+                val chunkMap = targetChunk.attr2opMap.getOrPut(attribute) { EnumMap(AttributeOperator::class.java) }
                 // prune: if set, skip
                 if (chunkMap[AttributeOperator.SET_ALL] != null && cyMap[AttributeOperator.SET_ALL] == null) return@forEach
 
                 cyMap.forEach { (operator, value) ->
-                    if (operator.cumulative) {
-                        chunkMap.compute(operator) { op, v ->
-                            operator.cumulate(v ?: operator.defaultValue, value, counts)
-                        }
+                    chunkMap.compute(operator) { op, v ->
+                        operator.cumulate(v ?: operator.defaultValue, value, counts)
                     }
                 }
             }
@@ -200,7 +203,7 @@ class ShotStateChunk private constructor (
 
     /***/
     abstract inner class ShotStateViewer {
-        fun getOpMap(attr: Holder<CypherAttribute>) = computedOperationMap[attr.value()]
+        fun getOpMap(attr: Holder<CypherAttribute>) = attr2opMap[attr.value()]
 
     }
 
@@ -211,8 +214,7 @@ class ShotStateChunk private constructor (
          *
          * */
         fun addRaw(attr: Holder<CypherAttribute>, operator: AttributeOperator, value: Double) {
-            if (!operator.cumulative) return
-            val opMap = computedOperationMap.getOrPut(attr.value()) { EnumMap(AttributeOperator::class.java) }
+            val opMap = attr2opMap.getOrPut(attr.value()) { EnumMap(AttributeOperator::class.java) }
             opMap.compute(operator) { op, v ->
                 operator.cumulate(v ?: operator.defaultValue, value)
             }

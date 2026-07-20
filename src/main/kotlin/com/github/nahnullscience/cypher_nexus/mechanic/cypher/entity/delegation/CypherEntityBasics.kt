@@ -5,7 +5,7 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator.Companion.AttributeMap
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator.Companion.initAttributes
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator.Companion.initFromShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity.Companion.CAPTURE_SIZE
@@ -20,12 +20,14 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.StateChunkPool
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.EntityUtil.rotateTowardSpeed
-import com.github.nahnullscience.cypher_nexus.utility.exception.CypherEntityInitializationException
+import com.github.nahnullscience.cypher_nexus.utility.exception.CypherEntityException
+import com.github.nahnullscience.cypher_nexus.utility.flipByDirection
 import com.github.nahnullscience.cypher_nexus.utility.forEachEntityWithin
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.rayCastThen
 import com.github.nahnullscience.cypher_nexus.utility.toSameDire
+import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.core.registries.Registries
@@ -49,22 +51,12 @@ import kotlin.math.pow
 
 open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICypherEntity {
     companion object {
-        /**
-         *
-         * */
-        fun Vec3.flipByDirection(dir: Direction, factor: Double = 1.0): Vec3 {
-            return when(dir) {
-                Direction.DOWN, Direction.UP -> multiply(1.0, -factor, 1.0)
-                Direction.NORTH, Direction.SOUTH -> multiply(1.0, 1.0, -factor)
-                Direction.WEST, Direction.EAST -> multiply(-factor, 1.0, 1.0)
-            }
-        }
 
     }
 
     private var _cyEntity: CE? = null
     protected val cyEntity: CE get() = _cyEntity ?:
-    throw CypherEntityInitializationException("CypherEntityDelegation failed to initialize! make sure call #initEntity before it's adding to world!")
+    throw CypherEntityException("CypherEntityDelegation failed to initialize! make sure call #initEntity before it's adding to world!")
     protected val level get() = cyEntity.level()
     protected val random get() = cyEntity.random
     override val cypherHolder: Holder<out AbstractProjectileCypher<*>> get() = cyEntity.cypherHolder // FIXME this may lead to infinite loop
@@ -75,7 +67,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     protected var ccMap: MapOfCypherCounts? = null
     override fun ccMap(): MapOfCypherCounts? = ccMap
 
-    protected val attributeMap: AttributeMap = HashMap<CypherAttribute, Double>()
+    protected val attributeMap: AttributeMap = Reference2ObjectOpenHashMap(16)
     override fun attributeMap(): Map<CypherAttribute, Double> = attributeMap
 
     protected var hooks: HookContainer? = null
@@ -143,7 +135,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
 
     override fun initCypher(cypher: AbstractProjectileCypher<*>, state: ShotStateChunk, node: ProjectileNode?) {
         if (isInit) return
-        attributeMap.initAttributes(state, cypher)
+        attributeMap.initFromShotState(state, cypher)
         enabledFlags = state.enabledFlags or cypher.flags
         hooks = state.hooks
         ccMap = state.ccMap
@@ -414,8 +406,8 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
         var hitSomething: Boolean
         var loopTimes = 0
         // Block: { normal, ignore } X Entity: { normal, pierce, ignore }
-        if (!collideWithBlocks && !collideWithEntities) 1 // penetrate, do nothing
-//        else if (speedSqr <= LOW_SPEED_THRESHOLD_SQR) 1 // too slow, do nothing
+        if (!collideWithBlocks && !collideWithEntities) {} // penetrate, do nothing
+//        else if (speedSqr <= LOW_SPEED_THRESHOLD_SQR) {} // too slow, do nothing
         else
         do {
             if (cyEntity.isRemoved) break
