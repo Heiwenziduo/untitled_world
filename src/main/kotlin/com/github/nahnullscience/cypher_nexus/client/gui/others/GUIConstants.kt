@@ -13,7 +13,7 @@ object GUIConstants {
     val theme: ColorTheme get() = Classic
     const val WHITE = 0xFFFFFFFF.toInt()
     const val LIGHT = 0x33FFFFFF
-    const val GREY = 0xEE444444.toInt()
+    const val GREY = 0xCC777777.toInt()
     const val DARK = 0xCC333333.toInt()
     const val BLACK = 0xCC000000.toInt()
 
@@ -32,7 +32,9 @@ object GUIConstants {
     val cypherBg = CypherNexus.modResource("textures/gui/cypher_bg.png")
     val cypherBgEmpty = CypherNexus.modResource("textures/gui/cypher_bg_empty.png")
 
-    fun GuiGraphicsExtractor.renderEmptyCypherSlot(x: Int, y: Int) {
+    fun GuiGraphicsExtractor.renderCypherSlotBG(cypher: AbstractCypher, x: Int, y: Int) {
+        fill(x, y, x + ICON_SIZE, y + ICON_SIZE, DARK)
+        if (cypher.isEmpty())
         blit(
             RenderPipelines.GUI_TEXTURED,
             cypherBgEmpty,
@@ -46,7 +48,6 @@ object GUIConstants {
             BORDER_SIZE,
             GREY
         )
-        fill(x, y, x + ICON_SIZE, y + ICON_SIZE, GREY)
     }
 
     fun GuiGraphicsExtractor.renderCypherIcon(cypher: AbstractCypher, x: Int, y: Int) {

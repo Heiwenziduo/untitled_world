@@ -20,11 +20,11 @@ interface ICypherEntityBeforeInit {
     /**
      * initialize from [MapOfCypherCounts]
      * */
-    fun initCypher(cypher: AbstractProjectileCypher<*>, map: MapOfCypherCounts?)
+    fun initCypher(cypher: AbstractProjectileCypher<*>, ccMap: MapOfCypherCounts?)
     /**
      * init from [ShotStateChunk]
      * */
-    fun initCypher(cypher: AbstractProjectileCypher<*>, state: ShotStateChunk, node: ProjectileNode?)
+    fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk, node: ProjectileNode?)
     /**
      *
      * */

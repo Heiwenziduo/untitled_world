@@ -28,18 +28,20 @@ object ModEntities {
         updateInterval: Int = 10
     ): DeferredHolder<EntityType<*>, EntityType<T>> {
         return DEFERRED_REGISTER.registerEntityType(name, factory, category) { builder ->
-            builder.sized(0.125f, 0.125f)
-            .noLootTable()
-            .fireImmune()
-            // Prevents the entity from being saved to disk.
-            .noSave()
-            // Disables the entity being summonable via /summon.
-            .noSummon()
-            // The range in which the entity is kept loaded by the client, capped at client's chunk view distance
-            .clientTrackingRange(10)
-            // How often update packets are sent for this entity, in once every x ticks. This is set to higher values
-            // for entities that have predictable movement patterns, for example, projectiles. Defaults to 3.
-            .updateInterval(updateInterval)
+            builder
+                .sized(0.125f, 0.125f)
+                .eyeHeight(0.0625f)
+                .noLootTable()
+                .fireImmune()
+                // Prevents the entity from being saved to disk.
+                .noSave()
+                // Disables the entity being summonable via /summon.
+                .noSummon()
+                // The range in which the entity is kept loaded by the client, capped at client's chunk view distance
+                .clientTrackingRange(10)
+                // How often update packets are sent for this entity, in once every x ticks. This is set to higher values
+                // for entities that have predictable movement patterns, for example, projectiles. Defaults to 3.
+                .updateInterval(updateInterval)
         }
     }
 

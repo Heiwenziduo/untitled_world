@@ -12,7 +12,7 @@ class BubbleColumn(
 ) : AbstractDedicatedCypherProjectile(entityType, level) {
     override val cypherHolder = BUBBLE_COLUMN
 
-    override fun getUnderwaterSpeedFactor() = 1.05f
+    override fun getUnderwaterSpeedFactor() = 1.05
     override fun discardVisualEffect() {
         for (i in 0 until radiusFriendlyParticleCount(8, 32)) {
             level().addParticle(ParticleTypes.BUBBLE, x, y, z, 0.0, 0.0, 0.0)

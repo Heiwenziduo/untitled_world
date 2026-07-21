@@ -8,6 +8,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.MOCC_STREAM
 import net.minecraft.core.Holder
@@ -29,6 +30,7 @@ import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
+import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn
@@ -89,9 +91,12 @@ abstract class AbstractDedicatedCypherProjectile(
 
     override fun readSpawnData(buffer: RegistryFriendlyByteBuf) {
         // only on client
+        // should note this function is called after EntityJoinLevelEvent
+        // this result initEntity -> initCypher order on client side
         if (buffer.readBoolean()) {
             val ccMap = MOCC_STREAM.decode(buffer)
             initCypher(cypher, ccMap)
+            refreshDimensions() // let BB fit effect-radius // server auto handles dimension when creation
         }
     }
 
@@ -143,6 +148,7 @@ abstract class AbstractDedicatedCypherProjectile(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     override fun tick() {
         if (firstTick) debugMsg()
+
         super.tick()
         doTick()
     }
@@ -156,25 +162,20 @@ abstract class AbstractDedicatedCypherProjectile(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // assume effectRadius won't change over time
+    val storedDimension by lazy { type.dimensions.scale(getEffectRadius()) }
     override fun getDimensions(pose: Pose): EntityDimensions {
-        return super.getDimensions(pose).scale(getEffectRadius())
+        return storedDimension
+//            .also { println("side: ${level().isClientSide}"); println(getEffectRadius()); println(it); }
     }
 
-    override fun handleEntityEvent(id: Byte) {
-        // trigger on client
-        super.handleEntityEvent(id)
-        if (id.toInt() == 3) {
-            discardVisualEffect()
-        }
+    // dimension cares nothing about practical entity position
+    // let position V3 be in the center of AABB instead bottom for convenience
+    override fun makeBoundingBox(position: Vec3): AABB {
+        if (firstTick) return super.makeBoundingBox(position)
+        val wh = getDimensions(pose).width / 2
+        return position.centeredAABB(wh)
     }
-
-    override fun shouldRender(x: Double, y: Double, z: Double): Boolean = super.shouldRender(x, y, z)
-    override fun shouldRenderAtSqrDistance(distance: Double): Boolean {
-        val v = getEffectRadius() * getViewScale() * 48
-        return distance < v * v
-    }
-
-    override fun displayFireAnimation() = haveFlag(CypherFlags.WITH_FIRE)
 
     override fun isClientAuthoritative(): Boolean {
         // make boomerang client-track smooth
@@ -187,6 +188,24 @@ abstract class AbstractDedicatedCypherProjectile(
         return super.isLocalClientAuthoritative() ||
                 (haveFlag(CypherFlags.MOTION_FOLLOWS_OWNER) && owner()?.isLocalClientAuthoritative == true) ||
                 hooksSharedData.homingTarget?.isLocalClientAuthoritative == true
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    override fun handleEntityEvent(id: Byte) {
+        // trigger on client
+        super.handleEntityEvent(id)
+        if (id.toInt() == 3) {
+            discardVisualEffect()
+        }
+    }
+
+    override fun displayFireAnimation() = haveFlag(CypherFlags.WITH_FIRE)
+
+    override fun shouldRender(x: Double, y: Double, z: Double): Boolean = super.shouldRender(x, y, z)
+    override fun shouldRenderAtSqrDistance(distance: Double): Boolean {
+        val v = getEffectRadius() * getViewScale() * 48
+        return distance < v * v
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

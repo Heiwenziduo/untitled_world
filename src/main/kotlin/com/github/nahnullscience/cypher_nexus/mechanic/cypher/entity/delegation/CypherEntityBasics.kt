@@ -26,6 +26,7 @@ import com.github.nahnullscience.cypher_nexus.utility.forEachEntityWithin
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.rayCastThen
+import com.github.nahnullscience.cypher_nexus.utility.times
 import com.github.nahnullscience.cypher_nexus.utility.toSameDire
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.minecraft.core.Direction
@@ -94,11 +95,11 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
 
     override fun getExisting(): Int = getAttributeOrDefault(CypherAttributes.EXISTING).toInt()
     override fun getBounce(): Int = getAttributeOrDefault(CypherAttributes.BOUNCE).toInt()
-    override fun getGravityFactor(): Float = getAttributeOrDefault(CypherAttributes.GRAVITY_FACTOR).toFloat()
-    override fun getSpeedFactor(): Float = 1f - getAttributeOrDefault(CypherAttributes.FRICTION_FACTOR).toFloat()
+    override fun getGravityFactor(): Double = getAttributeOrDefault(CypherAttributes.GRAVITY_FACTOR)
+    override fun getSpeedFactor(): Double = 1f - getAttributeOrDefault(CypherAttributes.FRICTION_FACTOR)
     override fun getEffectRadius(): Float = getAttributeOrDefault(CypherAttributes.EFFECT_RADIUS).toFloat()
-    override fun getUnderwaterSpeedFactor() = 0.8f
-    override fun getInWallSpeedFactor() = 0.5f
+    override fun getUnderwaterSpeedFactor() = 0.8
+    override fun getInWallSpeedFactor() = 0.5
     override fun getBounceSpeedPenalty() = 0.95
     override fun getRotationSpeed(): Float = 0.25f
 
@@ -133,12 +134,12 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     override fun getOwner(): Entity? = owner
     override fun setOwner(owner: Entity?) = let { this.owner = owner }
 
-    override fun initCypher(cypher: AbstractProjectileCypher<*>, state: ShotStateChunk, node: ProjectileNode?) {
+    override fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk, node: ProjectileNode?) {
         if (isInit) return
-        attributeMap.initFromShotState(state, cypher)
-        enabledFlags = state.enabledFlags or cypher.flags
-        hooks = state.hooks
-        ccMap = state.ccMap
+        attributeMap.initFromShotState(shotState, cypher)
+        enabledFlags = shotState.enabledFlags or cypher.flags
+        hooks = shotState.hooks
+        ccMap = shotState.ccMap
         if (node != null) {
             trigger = node.trigger
             payload = node.payload
@@ -146,16 +147,19 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
 
         isInit = true
     }
-    override fun initCypher(cypher: AbstractProjectileCypher<*>, map: MapOfCypherCounts?) {
-        if (map == null) return
-        val state = StateChunkPool.getOrCreateStateChunk(map)
-        initCypher(cypher, state, null)
-    }
+
     @Suppress("UNCHECKED_CAST")
     override fun <E> initEntity (cy: E) where E : Entity, E : ICypherEntity {
         _cyEntity = cy as CE
         initDirection()
     }
+
+    override fun initCypher(cypher: AbstractProjectileCypher<*>, ccMap: MapOfCypherCounts?) {
+        if (ccMap == null) return
+        val state = StateChunkPool.getOrCreateStateChunk(ccMap)
+        initCypher(cypher, state, null)
+    }
+
 
     private var _initPosition: Vec3? = null // due to CyEntity init timing, remember direction data and init later
     private var _initDirection: Vec3? = null
@@ -175,19 +179,18 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
                 cyEntity.rotateTowardSpeed(1f)
             }
         }
-        cyEntity.refreshDimensions()
         cyEntity.needsSync = true
     }
 
     protected open fun captureSurroundings() {
-        if (cyEntity.firstTick || cyEntity.tickCount and 3 == 3) { // trigger on 1, 3 and then every 4 tick
+        if (cyEntity.tickCount == 1 || cyEntity.tickCount and 3 == 3) { // trigger on 1, 3 and then every 4 tick
             hooks?.get(CypherHooks.ENTITY_CAPTURE)?.let {
                 var need = cyEntity.needCaptureSurrounding()
-                run {
-                    hooks?.cumulateHooks(CypherHooks.ENTITY_CAPTURE, need) { index, hook, count, cumulate ->
-                        if (need) return@run
+                if (!need) run {
+                    hooks?.cumulateHooks(CypherHooks.ENTITY_CAPTURE, false) { _, hook, _, _ ->
                         need = hook.needCapture(level, cyEntity)
-                        need
+                        if (need) return@run
+                        false
                     }
                 }
 
@@ -206,15 +209,15 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     }
 
     protected open fun applyGravity() {
-        if (cyEntity.getGravityFactor() != 0f)
-            cyEntity.deltaMovement = cyEntity.deltaMovement.add(0.0, -(cyEntity.getGravityFactor()).toDouble(), 0.0)
+        if (cyEntity.getGravityFactor() != 0.0)
+            cyEntity.deltaMovement = cyEntity.deltaMovement.add(0.0, -cyEntity.getGravityFactor(), 0.0)
     }
 
     protected open fun applyFriction() {
-        val f: Float =
+        val f: Double =
             if (cyEntity.isInWater) cyEntity.getUnderwaterSpeedFactor() * cyEntity.getSpeedFactor()
             else cyEntity.getSpeedFactor()
-        if (f != 1f) cyEntity.deltaMovement = cyEntity.deltaMovement.scale(f.toDouble())
+        if (f != 1.0) cyEntity.deltaMovement *= f
     }
 
     /**
@@ -342,14 +345,13 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
 
     override fun doTick() {
         Profiler.get().push { "cypherEntityTick" }
-//        if (level.isClientSide && cyEntity.tickCount and 4 == 4) {
-//            println(cyEntity)
-//        }
 
-        captureSurroundings()
-        if (cyEntity.firstTick) {
+        if (cyEntity.tickCount == 1) {
             delegateOnFirstTick()
         }
+
+        captureSurroundings()
+
         when (cyEntity.tickCount) {
             5 -> trigger(TriggerType.TIMER_5, cyEntity.position())
             10 -> trigger(TriggerType.TIMER_10, cyEntity.position())
@@ -413,7 +415,6 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
             if (cyEntity.isRemoved) break
             hitSomething = false
 
-            // TODO use BB based on step position
             val stepDestination0 = stepPosition.add(stepMovement)
             var destination = stepDestination0
             var bouncePoint: Vec3? = null
@@ -436,16 +437,18 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
 
             // handle entity collisions
             if (collideWithEntities) {
+                val margin = HIT_BB_INFLATION + cyEntity.getDimensions(cyEntity.pose).width / 2
                 if (haveFlag(CypherFlags.PIERCE_ENTITY)) {
-                    // if pierce, collide all
+                    // if tagged pierce, collide all
                     level.getEntities(
                         cyEntity,
                         cyEntity.boundingBox.expandTowards(stepMovement),
                         cyEntity::canHitTarget
                     ).forEach { target ->
                         // there is a trigger call inside whenHit, which may modifies the entity list in section storage.
+                        // execute an on-site sub-effect may raise ConcurrentModificationException
                         // it seems we have to extract entities first and go through the list one more time
-                        stepPosition.rayCastThen(destination, target.boundingBox, HIT_BB_INFLATION) { hitPoint, dir ->
+                        stepPosition.rayCastThen(destination, target.boundingBox, margin) { hitPoint, dir ->
                             whenHitDelegate(EntityHitResult(target, hitPoint), dir)
                         }
                     }
@@ -454,19 +457,12 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
                     var nearest = Double.MAX_VALUE
                     var hitEntity: Entity? = null
 
-                    /**
-                     * [Entity.makeBoundingBox]
-                     * TODO resize bounding box to fit Effect-Radius attribute
-                     * */
                     level.forEachEntityWithin(
                         cyEntity,
                         cyEntity.boundingBox.expandTowards(stepMovement),
                         cyEntity::canHitTarget
                     ) { target ->
-                        /**
-                         * TODO replace [HIT_BB_INFLATION] with Effect-Radius-friendly cy-entity-bb size
-                         * */
-                        stepPosition.rayCastThen(destination, target.boundingBox, HIT_BB_INFLATION) { hitPoint, dir ->
+                        stepPosition.rayCastThen(destination, target.boundingBox, margin) { hitPoint, dir ->
                             val dd: Double = stepPosition.distanceToSqr(hitPoint)
                             if (dd < nearest) {
                                 hitEntity = target
@@ -499,15 +495,14 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
                         bounceDirection,
                         cyEntity.getBounceSpeedPenalty()
                     )
+                    cyEntity.setPos(stepPosition)
                 }
             }
 
-        } while (hitSomething && canBounce && loopTimes++ < 10)
+        } while (hitSomething && canBounce && loopTimes++ <= 8)
 
-//        if (cyEntity.firstTick) CypherNexus.LOGGER.info("${level.side()} removed ${cyEntity.isRemoved} \nstart ${cyEntity.position()}\nstep $stepPosition\ndelta $stepMovement")
         // finalize position
         cyEntity.setPos(stepPosition.add(stepMovement))
-//        if (cyEntity.firstTick) CypherNexus.LOGGER.info("${level.side()} current ${cyEntity.position()}")
 
         if (loopTimes > 0) {
             cyEntity.deltaMovement = cyEntity.deltaMovement.toSameDire(stepMovement).scale(cyEntity.getBounceSpeedPenalty().pow(loopTimes))
@@ -517,7 +512,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
         Profiler.get().pop()
     }
 
-    fun canHurtOwner(entity: CE): Boolean = entity.haveFlag(CypherFlags.HURT_OWNER) && !entity.firstTick
+    fun canHurtOwner(entity: CE): Boolean = entity.haveFlag(CypherFlags.HURT_OWNER) && entity.tickCount != 1
     override fun canHitTarget(target: Entity): Boolean {
         if (!target.canBeHitByProjectile()) {
             return false // vanilla logic, for item-entities

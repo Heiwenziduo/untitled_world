@@ -20,9 +20,6 @@ class SimpleItemProjectileRenderer <CE> (
 
     companion object {
         const val DEFAULT_SCALE = 0.5f
-        // these two translate put item in the center of a bounding box, no matter how it scaled
-        private val translatePost = Vector3f(0f, -0.125f, 0f)
-        private val translatePre = translatePost * -DEFAULT_SCALE
     }
 
     private val itemModelResolver: ItemModelResolver = context.itemModelResolver
@@ -38,11 +35,10 @@ class SimpleItemProjectileRenderer <CE> (
         camera: CameraRenderState,
     ) {
         poseStack.pushPose()
-        poseStack.translate(translatePre)
         poseStack.cypherSetup(state, submitNodeCollector, camera)
         poseStack.scale(DEFAULT_SCALE, DEFAULT_SCALE, DEFAULT_SCALE)
         poseStack.mulPose(camera.orientation)
-        poseStack.translate(translatePost)
+        poseStack.translate(0f, -0.125f, 0f) // put item in the center of a bounding box, no matter how it scaled
         state.item.submit(
             poseStack,
             submitNodeCollector,

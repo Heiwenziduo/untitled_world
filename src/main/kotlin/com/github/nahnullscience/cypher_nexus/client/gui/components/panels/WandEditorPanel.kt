@@ -11,7 +11,7 @@ import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.ELE
 import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.renderCypherHoverLayer
 import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.renderCypherIcon
 import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.renderCypherTooltip
-import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.renderEmptyCypherSlot
+import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.renderCypherSlotBG
 import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.renderIconText
 import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEventBus
 import com.github.nahnullscience.cypher_nexus.client.gui.others.WandEditSession
@@ -110,7 +110,8 @@ class WandEditorPanel(
         for (i in 0 until aoc.capacity) {
             val rect = grid.cellRect(i)
             val cypher = aoc[i]
-            graphics.renderEmptyCypherSlot(rect.left(), rect.top())
+
+            graphics.renderCypherSlotBG(cypher, rect.left(), rect.top())
             graphics.renderCypherIcon(cypher, rect.left(), rect.top())
             if (i == hovered?.index) graphics.renderCypherHoverLayer(rect.left(), rect.top())
         }

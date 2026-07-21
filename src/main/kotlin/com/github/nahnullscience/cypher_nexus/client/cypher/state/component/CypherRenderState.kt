@@ -1,5 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.client.cypher.state.component
 
+import com.github.nahnullscience.cypher_nexus.init.config.ModClientConfig
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
@@ -33,5 +34,8 @@ class CypherRenderState : ICypherEntityRenderState {
 
 //        state.boundingBoxHeight *= ce.getEffectRadius()
 //        state.boundingBoxWidth *= ce.getEffectRadius()
+        if (ModClientConfig.CONFIG.bouncePointsInterpolate.isTrue && bouncePoints.isNotEmpty()) {
+
+        }
     }
 }

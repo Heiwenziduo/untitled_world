@@ -26,28 +26,28 @@ abstract class AbstractCypherRenderer <CE, State> (
               State : EntityRenderState, State : ICypherEntityRenderState
 {
 
-    override fun submit(
-        state: State,
-        poseStack: PoseStack,
-        submitNodeCollector: SubmitNodeCollector,
-        camera: CameraRenderState
-    ) {
-        poseStack.pushPose()
-        poseStack.scale(state.effectRadius, state.effectRadius, state.effectRadius)
-        poseStack.submitCypher(state, submitNodeCollector, camera)
-        poseStack.popPose()
-        super.submit(state, poseStack, submitNodeCollector, camera)
-    }
-
-
-    protected open fun submitCypher(
-        state: State,
-        poseStack: PoseStack,
-        submitNodeCollector: SubmitNodeCollector,
-        camera: CameraRenderState
-    ) { }
-    protected fun PoseStack.submitCypher(state: State, submitNodeCollector: SubmitNodeCollector, camera: CameraRenderState) =
-        submitCypher(state, this, submitNodeCollector, camera)
+//    override fun submit(
+//        state: State,
+//        poseStack: PoseStack,
+//        submitNodeCollector: SubmitNodeCollector,
+//        camera: CameraRenderState
+//    ) {
+//        poseStack.pushPose()
+//        poseStack.scale(state.effectRadius, state.effectRadius, state.effectRadius)
+//        poseStack.submitCypher(state, submitNodeCollector, camera)
+//        poseStack.popPose()
+//        super.submit(state, poseStack, submitNodeCollector, camera)
+//    }
+//
+//
+//    protected open fun submitCypher(
+//        state: State,
+//        poseStack: PoseStack,
+//        submitNodeCollector: SubmitNodeCollector,
+//        camera: CameraRenderState
+//    ) { }
+//    protected fun PoseStack.submitCypher(state: State, submitNodeCollector: SubmitNodeCollector, camera: CameraRenderState) =
+//        submitCypher(state, this, submitNodeCollector, camera)
 
     /**
      *

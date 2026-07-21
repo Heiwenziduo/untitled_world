@@ -79,18 +79,19 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherEntityBeforeIn
      * this field initialized in server and will be shipped to client to sync shot-data
      * */
     override fun ccMap(): MapOfCypherCounts?
-    /**
-     * initialize from [MapOfCypherCounts]
-     * */
-    override fun initCypher(cypher: AbstractProjectileCypher<*>, map: MapOfCypherCounts?)
+
     /**
      * init from [ShotStateChunk]
      * */
-    override fun initCypher(cypher: AbstractProjectileCypher<*>, state: ShotStateChunk, node: ProjectileNode?)
+    override fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk, node: ProjectileNode?)
     /**
      *
      * */
     fun <E> initEntity(cy: E) where E : Entity, E : ICypherEntity
+    /**
+     * initialize from [MapOfCypherCounts]
+     * */
+    override fun initCypher(cypher: AbstractProjectileCypher<*>, ccMap: MapOfCypherCounts?)
     /**
      *
      * */
@@ -126,16 +127,16 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherEntityBeforeIn
     //
     fun getExisting(): Int
     fun getBounce(): Int
-    fun getGravityFactor(): Float
-    fun getSpeedFactor(): Float
+    fun getGravityFactor(): Double
+    fun getSpeedFactor(): Double
     fun getEffectRadius(): Float
     /**
      * used as a factor inside [rotateTowardSpeed],
      * the higher the faster the entity will rotate, to face the direction the deltaMovement is pointed at
      * */
     fun getRotationSpeed(): Float
-    fun getUnderwaterSpeedFactor(): Float
-    fun getInWallSpeedFactor(): Float
+    fun getUnderwaterSpeedFactor(): Double
+    fun getInWallSpeedFactor(): Double
     fun getBounceSpeedPenalty(): Double
     fun needCaptureSurrounding(): Boolean
     /**
