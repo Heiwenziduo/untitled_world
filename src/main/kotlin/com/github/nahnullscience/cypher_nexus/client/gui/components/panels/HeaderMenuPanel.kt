@@ -3,7 +3,7 @@ package com.github.nahnullscience.cypher_nexus.client.gui.components.panels
 import com.github.nahnullscience.cypher_nexus.client.gui.components.DragController
 import com.github.nahnullscience.cypher_nexus.client.gui.components.IScreenRect
 import com.github.nahnullscience.cypher_nexus.client.gui.components.RectBasics
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.BLACK
+import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.BLACK
 import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEventBus
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen

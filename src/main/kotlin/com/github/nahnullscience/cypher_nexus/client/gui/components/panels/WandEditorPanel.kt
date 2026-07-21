@@ -6,14 +6,13 @@ import com.github.nahnullscience.cypher_nexus.client.gui.components.IconGrid
 import com.github.nahnullscience.cypher_nexus.client.gui.components.RectBasics
 import com.github.nahnullscience.cypher_nexus.client.gui.others.Hit
 import com.github.nahnullscience.cypher_nexus.client.gui.others.IndexScreenEvents.*
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.DARK
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.ELEMENT_PADDING
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.WHITE
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherHoverLayer
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherIcon
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherTooltip
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderEmptyCypherSlot
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderIconText
+import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.DARK
+import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.ELEMENT_PADDING
+import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.renderCypherHoverLayer
+import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.renderCypherIcon
+import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.renderCypherTooltip
+import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.renderEmptyCypherSlot
+import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.renderIconText
 import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEventBus
 import com.github.nahnullscience.cypher_nexus.client.gui.others.WandEditSession
 import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty
@@ -30,7 +29,6 @@ import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.client.renderer.RenderPipelines
-import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import kotlin.math.max
 

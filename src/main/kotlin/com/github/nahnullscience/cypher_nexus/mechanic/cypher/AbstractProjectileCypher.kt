@@ -4,6 +4,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAt
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags.Companion.containsFlag
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
@@ -17,6 +18,11 @@ import java.util.function.Supplier
 abstract class AbstractProjectileCypher <CE> (
     defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE
 ) : AbstractCypher(defaultAttribute) where CE : Entity, CE : ICypherEntity {
+
+    companion object {
+        const val TRIGGER_CHARGE_MAX = 299_792_458 // large but finite, so decrements are traceable
+    }
+
     abstract val projectileType: Supplier<out EntityType<out CE>>
 
     protected open val builtinTrigger: TriggerType = TriggerType.NONE
@@ -33,7 +39,7 @@ abstract class AbstractProjectileCypher <CE> (
     open fun addToShotState(
         shotState: ShotStateChunk,
         trigger: TriggerType? = null,
-        charge: Int = Int.MAX_VALUE,
+        charge: Int = TRIGGER_CHARGE_MAX,
     ): ShotStateChunk {
         val t = trigger ?: builtinTrigger
         if (t == TriggerType.NONE) {
@@ -42,7 +48,7 @@ abstract class AbstractProjectileCypher <CE> (
         }
         val charge =
             if (trigger != null) charge
-            else if (shotState.haveFlag(CypherFlags.PIERCE_ENTITY)) Int.MAX_VALUE
+            else if ((flags and shotState.enabledFlags).containsFlag(CypherFlags.PIERCE_ENTITY)) TRIGGER_CHARGE_MAX
             else builtinTriggerCharge
 
         val subState = ShotStateChunk(charge)

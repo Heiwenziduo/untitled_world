@@ -9,8 +9,8 @@ interface ColorTheme {
 }
 
 object Classic : ColorTheme {
-    override val primary: Int = RenderConstants.BLACK
-    override val secondary: Int = RenderConstants.DARK
+    override val primary: Int = GUIConstants.BLACK
+    override val secondary: Int = GUIConstants.DARK
     override val light: Int = 0xCC333333.toInt()
     override val middle: Int = 0xCC333333.toInt()
     override val dark: Int = 0xCC333333.toInt()

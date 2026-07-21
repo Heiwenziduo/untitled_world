@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.client.gui.components
 
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.ELEMENT_PADDING
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.ICON_SIZE
+import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.ELEMENT_PADDING
+import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.ICON_SIZE
 import net.minecraft.client.gui.navigation.ScreenRectangle
 
 /**

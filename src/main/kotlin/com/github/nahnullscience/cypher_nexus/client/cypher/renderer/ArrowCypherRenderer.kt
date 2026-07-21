@@ -24,9 +24,10 @@ class ArrowCypherRenderer (
         camera: CameraRenderState
     ) {
         poseStack.pushPose()
+        poseStack.cypherSetup(state, submitNodeCollector, camera)
         poseStack.mulPose(Axis.YP.rotationDegrees(state.yRot - 90.0f))
         poseStack.mulPose(Axis.ZP.rotationDegrees(state.xRot))
-        poseStack.scale(state.effectRadius, state.effectRadius, state.effectRadius)
+        poseStack.translate(-0.125f, 0f, 0f)
         submitNodeCollector.submitModel(
             model,
             state,
@@ -40,6 +41,27 @@ class ArrowCypherRenderer (
         poseStack.popPose()
         super.submit(state, poseStack, submitNodeCollector, camera)
     }
+//
+//    override fun submitCypher(
+//        state: ArrowCypherRenderState,
+//        poseStack: PoseStack,
+//        submitNodeCollector: SubmitNodeCollector,
+//        camera: CameraRenderState
+//    ) {
+//        poseStack.mulPose(Axis.YP.rotationDegrees(state.yRot - 90.0f))
+//        poseStack.mulPose(Axis.ZP.rotationDegrees(state.xRot))
+//        poseStack.translate(0.0f, 0.0f, 0.25f)
+//        submitNodeCollector.submitModel(
+//            model,
+//            state,
+//            poseStack,
+//            NORMAL_ARROW_LOCATION,
+//            state.lightCoords,
+//            OverlayTexture.NO_OVERLAY,
+//            state.outlineColor,
+//            null
+//        )
+//    }
 
     override fun createRenderState() = ArrowCypherRenderState()
     override fun extractRenderState(entity: Arrow, state: ArrowCypherRenderState, partialTicks: Float) {

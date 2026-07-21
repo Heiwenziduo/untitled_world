@@ -1,6 +1,7 @@
 package com.github.nahnullscience.cypher_nexus
 
 import com.github.nahnullscience.cypher_nexus.init.*
+import com.github.nahnullscience.cypher_nexus.init.config.ModClientConfig
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
@@ -14,8 +15,10 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.Identifier
 import net.neoforged.bus.api.SubscribeEvent
+import net.neoforged.fml.ModLoadingContext
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.common.Mod
+import net.neoforged.fml.config.ModConfig
 import net.neoforged.neoforge.event.server.ServerStartingEvent
 import net.neoforged.neoforge.registries.NewRegistryEvent
 import org.apache.logging.log4j.Level
@@ -64,6 +67,8 @@ object CypherNexus {
 
     init {
         LOGGER.info("Hello world!")
+        val container = ModLoadingContext.get().activeContainer
+        container.registerConfig(ModConfig.Type.CLIENT, ModClientConfig.CONFIG_SPEC)
 
         ModBlocks.register()
         ModItems.register()

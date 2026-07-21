@@ -6,6 +6,9 @@
 
   "block.cypher_nexus.cypher_index": "Cypher Index",
 
+  "cypher_nexus.config.bounce_points_interpolate": "Bounce Points Interpolate",
+  "cypher_nexus.config.circular_interpolate": "Circular Interpolate",
+
   "cypher.attribute.cypher_nexus.category": "Category",
   "cypher.attribute.cypher_nexus.mana_drain": "Mana Drain",
   "cypher.attribute.cypher_nexus.draw": "Draw",

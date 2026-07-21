@@ -22,7 +22,13 @@ fun Vec3.toVec3i() = Vec3i(x.toInt(), y.toInt(), z.toInt())
 
 operator fun Vec3.unaryMinus() = Vec3(-x, -y, -z)
 operator fun Vec3.times(v: Double) = multiply(v, v, v)
+operator fun Vec3.times(v: Float) = v.toDouble().let { multiply(it, it, it) }
 operator fun Vec3.plus(v: Vec3) = Vec3(x + v.x, y + v.y, z + v.z)
+
+operator fun Vector3f.unaryMinus() = Vector3f(-x, -y, -z)
+operator fun Vector3f.times(v: Double) = times(v.toFloat())
+operator fun Vector3f.times(v: Float) = Vector3f(x * v, y * v, z * v)
+operator fun Vector3f.plus(v: Vector3f) = Vector3f(x + v.x, y + v.y, z + v.z)
 
 /**
  * @return the surface of AABB the vector lies, null if they don't overlap

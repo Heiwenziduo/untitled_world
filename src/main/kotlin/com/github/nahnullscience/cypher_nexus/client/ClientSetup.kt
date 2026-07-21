@@ -1,13 +1,9 @@
 package com.github.nahnullscience.cypher_nexus.client
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.client.gui.WandDataOverlay
-import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.ArrowCypherRenderer
-import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.LlamaSpitCypherRenderer
-import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.SimpleItemProjectileRenderer
-import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.SimpleParticleProjectileRenderer
-import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.SimpleSummonerRenderer
+import com.github.nahnullscience.cypher_nexus.client.cypher.renderer.*
 import com.github.nahnullscience.cypher_nexus.client.devtools.WebServiceManager
+import com.github.nahnullscience.cypher_nexus.client.gui.WandDataOverlay
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import net.minecraft.client.renderer.entity.EntityRendererProvider
@@ -16,12 +12,15 @@ import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.projectile.ItemSupplier
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
+import net.neoforged.fml.ModLoadingContext
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
 import net.neoforged.neoforge.client.event.EntityRenderersEvent
 import net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent
+import net.neoforged.neoforge.client.gui.ConfigurationScreen
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers.CONTEXTUAL_INFO_BAR
 import java.util.function.Supplier
 
@@ -42,6 +41,16 @@ object ClientSetup {
 //        // only on physical client
 //        // sided setup is the last step of 4-step neo lifecycle, here registry is fully prepared
 //        CypherVisualizerRegistry.init()
+
+
+        val container = ModLoadingContext.get().activeContainer
+        // register default config screen
+        container.registerExtensionPoint(
+            IConfigScreenFactory::class.java,
+            IConfigScreenFactory { container, parent ->
+                ConfigurationScreen(container, parent)
+            }
+        )
     }
 
 //    @SubscribeEvent

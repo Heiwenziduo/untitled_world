@@ -9,10 +9,11 @@ import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.network.chat.Component
 import java.util.Optional
 
-object RenderConstants {
+object GUIConstants {
     val theme: ColorTheme get() = Classic
     const val WHITE = 0xFFFFFFFF.toInt()
     const val LIGHT = 0x33FFFFFF
+    const val GREY = 0xEE444444.toInt()
     const val DARK = 0xCC333333.toInt()
     const val BLACK = 0xCC000000.toInt()
 
@@ -43,8 +44,9 @@ object RenderConstants {
             BORDER_SIZE,
             BORDER_SIZE,
             BORDER_SIZE,
+            GREY
         )
-        fill(x, y, x + ICON_SIZE, y + ICON_SIZE, 0xFF444444.toInt())
+        fill(x, y, x + ICON_SIZE, y + ICON_SIZE, GREY)
     }
 
     fun GuiGraphicsExtractor.renderCypherIcon(cypher: AbstractCypher, x: Int, y: Int) {

@@ -17,15 +17,21 @@ class CypherRenderState : ICypherEntityRenderState {
         private set
     override var bouncePoints: List<Vec3> = listOf()
         private set
+    override var deltaMove: Vec3 = Vec3.ZERO
+        private set
 
-    override fun <CE> extractFrom(cy: CE, state: EntityRenderState) where CE : Entity, CE : ICypherEntity {
-        flags = cy.enabledFlags
-        effectRadius = cy.getEffectRadius()
-        bouncePoints = cy.bouncePoints
+    override fun <CE> extractFrom(ce: CE, state: EntityRenderState) where CE : Entity, CE : ICypherEntity {
+        flags = ce.enabledFlags
+        effectRadius = ce.getEffectRadius()
+        bouncePoints = ce.bouncePoints
+        deltaMove = ce.deltaMovement
 
         if (flags.containsFlag(CypherFlags.GLOWING)) {
             val block = LightCoordsUtil.block(state.lightCoords)
             state.lightCoords = LightCoordsUtil.pack(block, 15)
         }
+
+//        state.boundingBoxHeight *= ce.getEffectRadius()
+//        state.boundingBoxWidth *= ce.getEffectRadius()
     }
 }

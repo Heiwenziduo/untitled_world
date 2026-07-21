@@ -332,7 +332,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     override fun forEntityCaptured(captured: Entity) {}
 
     override fun onLowSpeed(count: Int) {
-        if (count < 30) return
+        if (count < 7) return
 
         // this means the projectile is decelerated to low speed
         if (capturedInitialSpeed > LOW_SPEED_THRESHOLD_SQR) {

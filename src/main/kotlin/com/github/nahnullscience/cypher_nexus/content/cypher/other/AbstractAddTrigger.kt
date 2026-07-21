@@ -5,6 +5,7 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher.Companion.TRIGGER_CHARGE_MAX
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
@@ -83,7 +84,7 @@ abstract class AbstractAddTrigger(
             // the cypher activates the payload process doesn't have to be the payload
             if (cy2 != null) {
                 CypherNexus.debugCypher { "invoke [$cy1] with payload due to [$cy2]" }
-                val subShot = cy1.addToShotState(shotState, addTrigger, Int.MAX_VALUE)
+                val subShot = cy1.addToShotState(shotState, addTrigger, TRIGGER_CHARGE_MAX)
                 val payload = helper.drawNext()
                 payload?.invokeInHand(helper, subShot, data, paras)
             } else {

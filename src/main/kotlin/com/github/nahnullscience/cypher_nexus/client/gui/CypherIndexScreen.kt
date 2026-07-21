@@ -2,16 +2,15 @@ package com.github.nahnullscience.cypher_nexus.client.gui
 
 import com.github.nahnullscience.cypher_nexus.client.gui.components.AnimationController
 import com.github.nahnullscience.cypher_nexus.client.gui.components.DragController
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.HEADER_HEIGHT
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.WHITE
+import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.HEADER_HEIGHT
 import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEventBus
 import com.github.nahnullscience.cypher_nexus.client.gui.components.panels.CypherLibraryPanel
 import com.github.nahnullscience.cypher_nexus.client.gui.components.panels.HeaderMenuPanel
 import com.github.nahnullscience.cypher_nexus.client.gui.components.panels.IScreenPanel
 import com.github.nahnullscience.cypher_nexus.client.gui.components.panels.WandEditorPanel
 import com.github.nahnullscience.cypher_nexus.client.gui.others.IndexScreenEvents.DragEnded
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.ICON_SIZE_HALF
-import com.github.nahnullscience.cypher_nexus.client.gui.others.RenderConstants.renderCypherIcon
+import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.ICON_SIZE_HALF
+import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.renderCypherIcon
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import net.minecraft.client.gui.GuiGraphicsExtractor

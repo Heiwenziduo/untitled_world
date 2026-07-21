@@ -169,7 +169,10 @@ abstract class AbstractDedicatedCypherProjectile(
     }
 
     override fun shouldRender(x: Double, y: Double, z: Double): Boolean = super.shouldRender(x, y, z)
-    override fun shouldRenderAtSqrDistance(distance: Double): Boolean = distance < 4096
+    override fun shouldRenderAtSqrDistance(distance: Double): Boolean {
+        val v = getEffectRadius() * getViewScale() * 48
+        return distance < v * v
+    }
 
     override fun displayFireAnimation() = haveFlag(CypherFlags.WITH_FIRE)
 

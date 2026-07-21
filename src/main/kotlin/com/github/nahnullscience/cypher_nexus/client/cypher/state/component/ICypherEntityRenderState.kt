@@ -12,5 +12,6 @@ interface ICypherEntityRenderState {
     val flags: Int
     val effectRadius: Float
     val bouncePoints: List<Vec3>
-    fun <CE> extractFrom(cy: CE, state: EntityRenderState) where CE : Entity, CE : ICypherEntity
+    val deltaMove: Vec3
+    fun <CE> extractFrom(ce: CE, state: EntityRenderState) where CE : Entity, CE : ICypherEntity
 }
