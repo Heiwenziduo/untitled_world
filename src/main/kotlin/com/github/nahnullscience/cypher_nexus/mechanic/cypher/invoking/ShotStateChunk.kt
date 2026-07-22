@@ -52,9 +52,10 @@ class ShotStateChunk private constructor (
 
     private val simpleProjectiles: Reference2IntOpenHashMap<AbstractProjectileCypher<*>> by
     lazy { Reference2IntOpenHashMap() } // projectiles with no trigger
+    val simpleProjectilesView get() = simpleProjectiles.toMap()
 
     private val triggeredProjectiles = mutableListOf<ProjectileNode>()
-    val projectilesView get() = triggeredProjectiles.toList()
+    val triggeredProjectilesView get() = triggeredProjectiles.toList()
 
     private var _ccMap: MapOfCypherCounts? = null
     val ccMap: MapOfCypherCounts get() = _ccMap ?: MapOfCypherCounts().also { _ccMap = it }

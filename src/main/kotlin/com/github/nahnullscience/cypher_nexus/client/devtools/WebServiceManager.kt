@@ -14,7 +14,7 @@ import net.neoforged.neoforge.client.ClientCommandSourceStack
  * */
 object WebServiceManager {
     val command: LiteralArgumentBuilder<CommandSourceStack>
-        get() = Commands.literal("test_server")
+        get() = Commands.literal("tinker_service")
         .requires(Commands.hasPermission(Commands.LEVEL_ALL))
         .then(
             Commands.literal("start")
@@ -30,7 +30,9 @@ object WebServiceManager {
         DevToolsServer.start()
         source.sendSuccess(
             {
-                Component.literal("§a[CypherNexus] server started. ${DevToolsServer.ip}")
+                // DevToolsServer.url already points at "/", which redirects straight to
+                // WebTinker with ?api= pre-filled - open it and you're in.
+                Component.literal("§a[CypherNexus] server started - open ${DevToolsServer.url}")
             }, false)
 
         return Command.SINGLE_SUCCESS
