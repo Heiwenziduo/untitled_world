@@ -68,7 +68,7 @@ object GUIConstants {
             )
             blit(
                 RenderPipelines.GUI_TEXTURED,
-                cypher.texture(),
+                cypher.texture,
                 x,
                 y,
                 0.0f,

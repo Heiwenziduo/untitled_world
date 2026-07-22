@@ -2,11 +2,14 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.utility.dot0digit
+import com.github.nahnullscience.cypher_nexus.utility.dot2digit
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
+import java.text.DecimalFormat
 import java.util.*
 import java.util.Locale.getDefault
 import kotlin.math.min
@@ -14,81 +17,81 @@ import kotlin.math.pow
 
 
 enum class AttributeOperator(
-    val exclusive: Boolean
+    val exclusive: Boolean,
+    val needUnit: Boolean
 ) {
-//    /**
-//     * Base value of one cast, mostly on ProjectileCyphers,
-//     * without base value, the attribute will be ignored.
-//     * Can be set via special ModifierCyphers.
-//     * */
-//    BASE(false) {
-//        override val defaultValue = 0.0
-//        override fun cumulate(last: Double, new: Double): Double = new // this should not happen
-//        override fun cumulate(last: Double, new: Double, times: Int): Double = cumulate(last, new)
-//        override fun formatSymbol() = ""
-//    },
-//    /**
-//     * specify self-set inside each projectile-entities */
-//    SET_SELF {
-//        override fun cumulate(last: Double, new: Double): Double = new
-//        override fun formatString() = "="
-//    },
-
     /** 1.0 -> add 1.0 */
-    ADD(false) {
+    ADD(false, true) {
+        override val defaultFormatter: DecimalFormat = dot2digit
         override val defaultValue = 0.0
         override fun cumulate(last: Double, new: Double): Double = last + new
         override fun cumulate(last: Double, new: Double, times: Int): Double = last + new * times
-        override fun formatSymbol() = "+"
-        override fun format(value: Double): MutableComponent {
-            return if (value > 0) super.format(value) else Component.literal("$value")
+        override fun format(value: Double, format: DecimalFormat?): String {
+            val n = if (value > 0) "+" else ""
+            val s = format?.format(value) ?: value.toString()
+            return "$n$s"
         }
     },
     /** 0.33 -> plus 33% */
-    MULTIPLY_BASE(false) {
-        // defaultValue may cumulate multiple times while map initialization(at AbsCypher & Helper)
+    MULTIPLY_BASE(false, false) {
+        override val defaultFormatter: DecimalFormat = dot0digit
         override val defaultValue = 0.0
         override fun cumulate(last: Double, new: Double): Double = last + new
         override fun cumulate(last: Double, new: Double, times: Int): Double = last + new * times
-        override fun formatSymbol() = "+"
-        override fun format(value: Double): MutableComponent {
-            return super.format(value * 100).append("%")
+        override fun format(value: Double, format: DecimalFormat?): String {
+            val n = if (value > 0) "+" else ""
+            val s = format?.format(value * 100) ?: (value * 100).toString()
+            return "$n$s%"
         }
     },
     /** 0.33 -> times 33% */
-    MULTIPLY_TOTAL(false) {
+    MULTIPLY_TOTAL(false, false) {
+        override val defaultFormatter: DecimalFormat = dot0digit
         override val defaultValue = 1.0
         override fun cumulate(last: Double, new: Double): Double = last * new
         override fun cumulate(last: Double, new: Double, times: Int): Double = last * new.pow(times)
-        override fun formatSymbol() = "x"
+        override fun format(value: Double, format: DecimalFormat?): String {
+            val s = format?.format(value * 100) ?: (value * 100).toString()
+            val l = if (value > 0) "x$s%" else "x($s)"
+            return l
+        }
     },
     /**
      * Force an attribute to become an invariable value,
      * will ignore other operations.
      * */
-    SET_ALL(true) {
+    SET_ALL(true, true) {
+        override val defaultFormatter: DecimalFormat = dot2digit
         override val defaultValue = 0.0
         override fun cumulate(last: Double, new: Double): Double = new
         override fun cumulate(last: Double, new: Double, times: Int): Double = new
-        override fun formatSymbol() = "="
+        override fun format(value: Double, format: DecimalFormat?): String {
+            val s = format?.format(value) ?: value.toString()
+            val l = if (value > 0) "=$s" else "=($s)"
+            return l
+        }
     },
 
-    CAP_AT(false) {
+    CAP_AT(false, true) {
+        override val defaultFormatter: DecimalFormat = dot2digit
         override val defaultValue = Double.MAX_VALUE
-        override fun cumulate(last: Double, new: Double): Double = min(last, new)
-        override fun cumulate(last: Double, new: Double, times: Int): Double = min(last, new)
-        override fun formatSymbol() = "<"
+        override fun cumulate(last: Double, new: Double): Double = last.coerceAtMost(new)
+        override fun cumulate(last: Double, new: Double, times: Int): Double = last.coerceAtMost(new)
+        override fun format(value: Double, format: DecimalFormat?): String {
+            val s = format?.format(value) ?: value.toString()
+            val l = if (value > 0) "<$s" else "<($s)"
+            return l
+        }
     }
 
 
     ;
-//    abstract fun <T> apply(v1: T, v2: T) : T
+    abstract val defaultFormatter: DecimalFormat
     abstract val defaultValue: Double
     abstract fun cumulate(last: Double, new: Double) : Double
     abstract fun cumulate(last: Double, new: Double, times: Int) : Double
-    abstract fun formatSymbol() : String
+    abstract fun format(value: Double, format: DecimalFormat? = defaultFormatter) : String
 
-    open fun format(value: Double) : MutableComponent = Component.literal("${formatSymbol()}$value")
     override fun toString() = super.toString().lowercase(getDefault())
 
     companion object {

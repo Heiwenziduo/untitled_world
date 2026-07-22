@@ -6,6 +6,7 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherProperties.*
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
@@ -206,72 +207,51 @@ sealed class AbstractCypher(
     /**
      * lang-JSON key: cypher.{MOD_ID}.{cypher_category}.{cypher_name}
      * */
-    private fun translationKey() = "cypher.${resource.namespace}.${category.value().registryName()}.${resource.path}"
-    override fun translation(): MutableComponent = Component.translatable(translationKey())
-    open fun description(): MutableComponent = Component.translatable("${translationKey()}.description")
+    private val translationKey by lazy { "cypher.${resource.namespace}.${category.value().registryName()}.${resource.path}" }
+    private val descriptionKey by lazy { "cypher.${resource.namespace}.${category.value().registryName()}.${resource.path}.description" }
+    override fun translation(): MutableComponent = Component.translatable(translationKey)
+    open fun description(): MutableComponent = Component.translatable(descriptionKey)
 
     /** icons: {MOD_ID}/textures/cypher/{cypher_category}/{cypher_name}.png */
-    open fun texture(): Identifier =
-        Identifier.fromNamespaceAndPath(resource.namespace, "textures/cypher/${category.value().registryName()}/${resource.path}.png")
+    open val texture by lazy {
+        Identifier.fromNamespaceAndPath(
+            resource.namespace,
+            "textures/cypher/${category.value().registryName()}/${resource.path}.png"
+        )
+    }
 
     /** detailed tooltip in index-screen */
-    open val attributesTooltip: List<MutableComponent> by lazy {
+    open val attributesTooltip: List<Component> by lazy {
         // since attributes won't change once initialized
-        val components = mutableListOf<MutableComponent>()
+        val components = mutableListOf<Component>()
 
-        val cate = Component.literal("  ")
-            .append(Component.translatable("cypher.attribute.${CypherNexus.MOD_ID}.category"))
-            .append(Component.literal(": "))
-            .append(category.value().translation().withStyle(ChatFormatting.YELLOW))
-        components.add(cate)
-
-        val mana = Component.literal("  ")
-            .append(Component.translatable("cypher.attribute.${CypherNexus.MOD_ID}.mana_drain")) // not attribute though keeping lang format
-            .append(Component.literal(": "))
-            .append(Component.literal("$manaDrain").withStyle(ChatFormatting.YELLOW))
-        components.add(mana)
-
-        if (draw > 1) {
-            val compon = Component.literal("  ")
-                .append(Component.translatable("cypher.attribute.${CypherNexus.MOD_ID}.draw"))
-                .append(Component.literal(": "))
-                .append(Component.literal("$draw").withStyle(ChatFormatting.YELLOW))
-            components.add(compon)
-        }
-
-        if (delay != 0) {
-            val compon = Component.literal("  ")
-                .append(Component.translatable("cypher.attribute.${CypherNexus.MOD_ID}.delay"))
-                .append(Component.literal(": "))
-                .append(Component.literal("$delay").withStyle(ChatFormatting.YELLOW))
-            components.add(compon)
-        }
-
-        if (recharge != 0) {
-            val compon = Component.literal("  ")
-                .append(Component.translatable("cypher.attribute.${CypherNexus.MOD_ID}.recharge"))
-                .append(Component.literal(": "))
-                .append(Component.literal("$recharge").withStyle(ChatFormatting.YELLOW))
-            components.add(compon)
-        }
+        components.add(CategoryRow.row(category.value()))
+        if (manaDrain != 0f) components.add(ManaDrainRow.row(manaDrain))
+        if (draw > 1) components.add(DrawRow.row(draw))
+        if (delay != 0) components.add(CastDelayRow.row(delay))
+        if (recharge != 0) components.add(RechargeTimeRow.row(recharge))
 
         // keep the order attrs registered
         CypherAttributes.REGISTRY.forEach registry@ { attribute ->
             if (attribute.hide) return@registry
             val opMap = attributes().shotState.getOrElse(attribute) { return@registry }
+
             var values: MutableComponent? = null
-            AttributeOperator.entries.forEach enum@ { op ->
-                val v = opMap.getOrElse(op) { return@enum }
-                if (values == null) values = op.format(v)
-                else values.append("; ").append(op.format(v))
+            AttributeOperator.entries.forEach enum@ { operator ->
+                val v = opMap.getOrElse(operator) { return@enum }
+                val t = operator.format(v)
+                val c = if (operator.needUnit) attribute.wrapWithUnit(t)
+                else Component.literal(t)
+
+                if (values == null) values = c
+                else values.append(";  ").append(c)
             }
-            val comp = Component.literal("  ")
-                .append(attribute.translation())
-                .append(Component.literal(": "))
-                .append(values ?: Component.literal("ERROR").withStyle(ChatFormatting.YELLOW))
-            components.add(comp)
+
+            values?.let {
+                components.add(attribute.displayRow(it.withStyle(ChatFormatting.GOLD)))
+            }
         }
 
-        components
+        return@lazy components
     }
 }

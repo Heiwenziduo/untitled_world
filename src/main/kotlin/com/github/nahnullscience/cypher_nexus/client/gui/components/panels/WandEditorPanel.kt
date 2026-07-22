@@ -15,14 +15,14 @@ import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.ren
 import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.renderIconText
 import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEventBus
 import com.github.nahnullscience.cypher_nexus.client.gui.others.WandEditSession
-import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty
-import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty.Capacity
-import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty.CastDelay
-import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty.Draw
-import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty.ManaMax
-import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty.ManaRegen
-import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty.RechargeTime
-import com.github.nahnullscience.cypher_nexus.client.gui.others.WandProperty.Spread
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.CapacityRow
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.WandCastDelayRow
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.WandDrawRow
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.ManaMaxRow
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.ManaRegenRow
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.WandRechargeTimeRow
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.SpreadRow
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -122,21 +122,21 @@ class WandEditorPanel(
         val font = screen.font
         var lineY = y
 
-        fun <T : Any> property(p: WandProperty<T>, v: T) {
-            graphics.renderIconText(font, p.text(v), x, lineY, 6, 4) { gx, gy, gSize ->
+        fun <T : Any> property(p: WandProperties<T>, v: T) {
+            graphics.renderIconText(font, p.row(v), x, lineY, 6, 4) { gx, gy, gSize ->
                 blit(RenderPipelines.GUI_TEXTURED, p.icon, gx, gy, 0f, 0f, gSize, gSize, gSize, gSize)
             }
 
             lineY += STAT_LINE_HEIGHT
         }
 
-        property(ManaMax, data.chunkF.manaMax)
-        property(ManaRegen, data.chunkF.manaRegen)
-        property(Capacity, aoc.capacity)
-        property(Draw, data.chunkI.draw)
-        property(CastDelay, data.chunkI.castDelay)
-        property(RechargeTime, data.chunkI.rechargeTime)
-        property(Spread, data.chunkF.spread)
+        property(ManaMaxRow, data.chunkF.manaMax)
+        property(ManaRegenRow, data.chunkF.manaRegen)
+        property(CapacityRow, aoc.capacity)
+        property(WandDrawRow, data.chunkI.draw)
+        property(WandCastDelayRow, data.chunkI.castDelay)
+        property(WandRechargeTimeRow, data.chunkI.rechargeTime)
+        property(SpreadRow, data.chunkF.spread)
     }
 
     override fun mouseClicked(event: MouseButtonEvent, doubleClick: Boolean): Boolean {

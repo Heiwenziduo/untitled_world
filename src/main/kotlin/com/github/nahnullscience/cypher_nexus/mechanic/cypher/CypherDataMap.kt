@@ -29,9 +29,9 @@ data class CypherDataMap(
             Codec.INT.fieldOf("recharge").orElse(0).forGetter(CypherDataMap::recharge),
             Codec.INT.fieldOf("flags").orElse(0).forGetter(CypherDataMap::flags),
             Codec.unboundedMap(CYPHER_ATTRIBUTE, Codec.DOUBLE)
-                    .fieldOf("projectile").orElse(HashMap()).forGetter(CypherDataMap::projectile),
+                    .fieldOf("projectile").orElse(emptyMap()).forGetter(CypherDataMap::projectile),
             Codec.unboundedMap(CYPHER_ATTRIBUTE, CYPHER_OPERATION_MAP)
-                    .fieldOf("shotState").orElse(HashMap()).forGetter(CypherDataMap::shotState),
+                    .fieldOf("shotState").orElse(emptyMap()).forGetter(CypherDataMap::shotState),
         ).apply(it, ::CypherDataMap) }
 
         val CODEC_SYNC = CODEC

@@ -1,5 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute
 
+import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.core.Holder
@@ -25,22 +26,29 @@ open class CypherAttribute(
 
     fun restrictRange(v: Double) = v.coerceIn(min, max)
 
-    // ==========================================================================================================
     fun holder(): Holder<CypherAttribute> {
 //        val resourceKeyOptional = CypherAttributes.REGISTRY.getResourceKey(attr)
 //        return resourceKeyOptional.flatMap { CypherAttributes.REGISTRY.getHolder(resourceKeyOptional) }.orElse(null)
         return CypherAttributes.REGISTRY.get(resource).get() // if this throw, means the attr is not registered
     }
 
+    // ==========================================================================================================
+
+    // TODO add value formatter to Existing Crit Speed
+
     override fun toString(): String = "attribute_${resource.path}"
 
     /** lang-JSON key: cypher.attribute.{MOD_ID}.{attribute_name} */
-    override fun translation(): MutableComponent =
-        Component.translatable("cypher.attribute.${resource.namespace}.${resource.path}")
+    private val translationKey by lazy { "cypher.attribute.${resource.namespace}.${resource.path}" }
+    override fun translation(): MutableComponent = Component.translatable(translationKey)
 
-    fun tooltip(v: Double): MutableComponent {
-        return translation()
-    }
+    /** wrap a given value with the unit of this attribute, for example, `seconds`. not all attributes require a unit */
+    private val unitKey by lazy { "gui.${resource.namespace}.cypher.property.${resource.path}.unit" }
+    fun wrapWithUnit(value: String) = Component.translatableWithFallback(unitKey, value, value)
+
+    /** gui.{MOD_ID}.cypher.property.{attribute_name} */
+    private val displayKey by lazy { "gui.${resource.namespace}.cypher.property.${resource.path}" }
+    fun displayRow(value: MutableComponent): MutableComponent = Component.translatable(displayKey, value)
 
 
     enum class AttributeApply {

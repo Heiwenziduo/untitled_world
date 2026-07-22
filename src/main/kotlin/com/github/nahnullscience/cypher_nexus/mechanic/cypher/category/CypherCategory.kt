@@ -9,7 +9,7 @@ class CypherCategory(
     override val resource: Identifier,
     val color: Int
 ): IRegisterable {
+    private val translationKey by lazy { "cypher.category.${resource.namespace}.${resource.path}" }
     /** lang-JSON key: cypher.category.{MOD_ID}.{category_name} */
-    override fun translation(): MutableComponent =
-        Component.translatable("cypher.category.${resource.namespace}.${resource.path}")
+    override fun translation(): MutableComponent = Component.translatable(translationKey)
 }
