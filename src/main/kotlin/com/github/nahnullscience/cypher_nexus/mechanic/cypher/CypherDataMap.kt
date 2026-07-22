@@ -19,7 +19,7 @@ data class CypherDataMap(
     val flags: Int,
 
     val projectile: Map<CypherAttribute, Double>,
-    val stateChunk: Map<CypherAttribute, EnumMap<AttributeOperator, Double>>,
+    val shotState: Map<CypherAttribute, EnumMap<AttributeOperator, Double>>,
 ) {
     companion object {
         val CODEC: Codec<CypherDataMap> = RecordCodecBuilder.create() { it.group(
@@ -31,7 +31,7 @@ data class CypherDataMap(
             Codec.unboundedMap(CYPHER_ATTRIBUTE, Codec.DOUBLE)
                     .fieldOf("projectile").orElse(HashMap()).forGetter(CypherDataMap::projectile),
             Codec.unboundedMap(CYPHER_ATTRIBUTE, CYPHER_OPERATION_MAP)
-                    .fieldOf("stateChunk").orElse(HashMap()).forGetter(CypherDataMap::stateChunk),
+                    .fieldOf("shotState").orElse(HashMap()).forGetter(CypherDataMap::shotState),
         ).apply(it, ::CypherDataMap) }
 
         val CODEC_SYNC = CODEC
@@ -51,26 +51,22 @@ data class CypherDataMap(
         var flags: Int = 0
             private set
         private val projectile: HashMap<CypherAttribute, Double> = HashMap()
-        private val stateChunk: HashMap<CypherAttribute, EnumMap<AttributeOperator, Double>> = HashMap()
+        private val shotState: HashMap<CypherAttribute, EnumMap<AttributeOperator, Double>> = HashMap()
 
-        open fun manaDrain(float: Float): Builder = run { manaDrain = float; this@Builder }
-        open fun draw(int: Int): Builder = run { draw = int; this@Builder }
-        open fun delay(int: Int): Builder = run { delay = int; this@Builder }
-        open fun recharge(int: Int): Builder = run { recharge = int; this@Builder }
-        open fun flags(vararg flag: CypherFlags) = run { flag.forEach { flags = flags or it.value }; this }
+        open fun manaDrain(float: Float): Builder = apply { manaDrain = float }
+        open fun draw(int: Int): Builder = apply { draw = int }
+        open fun delay(int: Int): Builder = apply { delay = int }
+        open fun recharge(int: Int): Builder = apply { recharge = int }
+        open fun flags(vararg flag: CypherFlags) = apply { flag.forEach { flags = flags or it.value } }
 
         // it seems datagen has a special lifecycle that can unpacks a holder directly (?)
         open fun projectileAttr(holder: Holder<CypherAttribute>, value: Double) = projectileAttr(holder.value(), value)
-        open fun projectileAttr(attr: CypherAttribute, value: Double): Builder {
-            projectile[attr] = value
-            return this
-        }
+        open fun projectileAttr(attr: CypherAttribute, value: Double): Builder = apply { projectile[attr] = value }
 
-        open fun stateChunkAttr(holder: Holder<CypherAttribute>, operator: AttributeOperator, value: Double) = stateChunkAttr(holder.value(), operator, value)
-        open fun stateChunkAttr(attr: CypherAttribute, operator: AttributeOperator, value: Double): Builder {
-            val opMap = stateChunk.getOrPut(attr) { EnumMap(AttributeOperator::class.java) }
+        open fun shotStateAttr(holder: Holder<CypherAttribute>, operator: AttributeOperator, value: Double) = shotStateAttr(holder.value(), operator, value)
+        open fun shotStateAttr(attr: CypherAttribute, operator: AttributeOperator, value: Double): Builder = apply {
+            val opMap = shotState.getOrPut(attr) { EnumMap(AttributeOperator::class.java) }
             opMap[operator] = value
-            return this
         }
 
         open fun build(): CypherDataMap = CypherDataMap(
@@ -80,7 +76,7 @@ data class CypherDataMap(
             recharge ?: 0,
             flags,
             projectile,
-            stateChunk
+            shotState
         )
     }
 }

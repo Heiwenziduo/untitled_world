@@ -69,8 +69,8 @@ abstract class AbstractDivideBy(
             return super.defaultAttributes()
                 .manaDrain(40f)
                 .delay(3)
-                .stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -2.0)
-                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.2)
+                .shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -2.0)
+                .shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.2)
         }
     }
 
@@ -79,8 +79,8 @@ abstract class AbstractDivideBy(
             return super.defaultAttributes()
                 .manaDrain(100f)
                 .delay(5)
-                .stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -3.0)
-                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.3)
+                .shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -3.0)
+                .shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.3)
         }
     }
 
@@ -89,8 +89,8 @@ abstract class AbstractDivideBy(
             return super.defaultAttributes()
                 .manaDrain(180f)
                 .delay(7)
-                .stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -4.0)
-                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.4)
+                .shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -4.0)
+                .shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.4)
         }
     }
 
@@ -99,8 +99,8 @@ abstract class AbstractDivideBy(
             return super.defaultAttributes()
                 .manaDrain(320f)
                 .delay(15)
-                .stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -10.0)
-                .stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -1.0)
+                .shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -10.0)
+                .shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -1.0)
         }
     }
 }

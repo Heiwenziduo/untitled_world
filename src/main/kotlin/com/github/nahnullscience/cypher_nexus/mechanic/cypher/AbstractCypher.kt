@@ -5,6 +5,7 @@ import com.github.nahnullscience.cypher_nexus.init.data_driven.ModDataMaps.CYPHE
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
@@ -25,10 +26,10 @@ import net.minecraft.server.level.ServerPlayer
  *
  * */
 sealed class AbstractCypher(
-    protected val defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE
+    protected val defaultAttribute: Builder.() -> Builder = NONE_ATTR
 ): IRegisterable {
     companion object {
-        val NONE: CypherDataMap.Builder.() -> CypherDataMap.Builder = { this }
+        val NONE_ATTR: Builder.() -> Builder = { this }
     }
 
     abstract val category: Holder<CypherCategory>
@@ -42,7 +43,7 @@ sealed class AbstractCypher(
     /** whether the cypher shows in the index(left side) */
     open val hide: Boolean = false
     /** override colors from category */
-    open val color: Int = 0
+    open val color: Int? = null
 
     open val isInvokable: Boolean = true
 
@@ -79,7 +80,7 @@ sealed class AbstractCypher(
 
     private fun attributesData() = holder().getData(CYPHER_DATA_ATTACH)
 
-    open fun defaultAttributes(): CypherDataMap.Builder = CypherDataMap.builder().defaultAttribute()
+    open fun defaultAttributes(): Builder = CypherDataMap.builder().defaultAttribute()
 
     fun attributes() = attributesData() ?: run {
         CypherNexus.LOGGER.warn("cypher $this missing attributes data, this may cause lag")
@@ -257,7 +258,7 @@ sealed class AbstractCypher(
         // keep the order attrs registered
         CypherAttributes.REGISTRY.forEach registry@ { attribute ->
             if (attribute.hide) return@registry
-            val opMap = attributes().stateChunk.getOrElse(attribute) { return@registry }
+            val opMap = attributes().shotState.getOrElse(attribute) { return@registry }
             var values: MutableComponent? = null
             AttributeOperator.entries.forEach enum@ { op ->
                 val v = opMap.getOrElse(op) { return@enum }

@@ -1,19 +1,21 @@
 package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.content.cypher.AbstractSimpleProjectile
+import com.github.nahnullscience.cypher_nexus.content.cypher.AbstractSimpleProjectile.SimpleProjectile
+import com.github.nahnullscience.cypher_nexus.content.cypher.AbstractSimpleProjectile.SimpleStaticProjectile
+import com.github.nahnullscience.cypher_nexus.content.cypher.SimpleNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.module.PrimaryInvokingCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.*
-import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.AbstractSimpleProjectile
-import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.AbstractSimpleProjectile.SimpleProjectile
-import com.github.nahnullscience.cypher_nexus.content.cypher.projectile.AbstractSimpleProjectile.SimpleStaticProjectile
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.InnerForceCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.ProteusCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.RefresherRingCypher
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.*
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.NONE
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.NONE_ATTR
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
@@ -63,7 +65,7 @@ object Cyphers {
     val ARROW = registerProjectile(ModEntities.CYPHER_ARROW, TriggerType.COLLISION, TriggerType.TIMER_10) {
         manaDrain(15f)
         delay(3)
-        stateChunkAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -10.0)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -10.0)
         projectileAttr(CypherAttributes.DAMAGE, 3.0)
         projectileAttr(CypherAttributes.SPEED, 1.3)
         projectileAttr(CypherAttributes.EXISTING, 300.0)
@@ -93,7 +95,7 @@ object Cyphers {
     val BUBBLE_COLUMN = registerProjectile(ModEntities.CYPHER_BUBBLE_COLUMN) {
         manaDrain(15f)
         recharge(-2)
-        stateChunkAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 23.0)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 23.0)
         projectileAttr(CypherAttributes.DAMAGE, 2.0)
         projectileAttr(CypherAttributes.SPEED, 1.3)
         projectileAttr(CypherAttributes.EXISTING, 160.0)
@@ -101,7 +103,7 @@ object Cyphers {
     val LLAMA_SPIT = registerProjectile(ModEntities.CYPHER_LLAMA_SPIT) {
         manaDrain(10f)
         recharge(2)
-        stateChunkAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.1)
+        shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.1)
         projectileAttr(CypherAttributes.DAMAGE, 1.0)
         projectileAttr(CypherAttributes.SPEED, 1.3)
         projectileAttr(CypherAttributes.EXISTING, 120.0)
@@ -143,49 +145,49 @@ object Cyphers {
     }
     val POWER = registerModifier("power", 10f) {
         delay(1)
-        stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 1.0)
-        stateChunkAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 1.0)
+        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 1.0)
+        shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 1.0)
     }
     val BLOODLUST = registerModifier("bloodlust", 5f) {
         delay(3)
-        stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 3.0)
-        stateChunkAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 2.0)
+        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 3.0)
+        shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 2.0)
         flags(CypherFlags.HURT_OWNER)
     }
     val HEAVY_SHOT = registerModifier("heavy_shot", 30f) {
         delay(4)
-        stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 4.0)
-        stateChunkAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 0.5)
-        stateChunkAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 4.0)
-        stateChunkAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 1.0)
+        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 4.0)
+        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 0.5)
+        shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 4.0)
+        shotStateAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 1.0)
     }
     val CRIT_STRIKE = registerModifier("critical_strike", 10f) {
-        stateChunkAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.25)
+        shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.25)
     }
     val EFFECTIVE_RADIUS = registerModifier("effective_radius", 30f) {
-        stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 1.5)
-        stateChunkAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, 0.5)
+        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 1.5)
+        shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, 0.5)
     }
     val BRISK = registerModifier("brisk", 5f) {
-        stateChunkAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 2.5)
+        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 2.5)
     }
     val ACCELERATING = registerModifier("accelerating", 5f) {
-        stateChunkAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 0.375)
-        stateChunkAttr(CypherAttributes.FRICTION_FACTOR, AttributeOperator.ADD, -0.06)
+        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 0.375)
+        shotStateAttr(CypherAttributes.FRICTION_FACTOR, AttributeOperator.ADD, -0.06)
     }
     val DECELERATION = registerModifier("decelerating", 5f) {
-        stateChunkAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 1.625)
-        stateChunkAttr(CypherAttributes.FRICTION_FACTOR, AttributeOperator.ADD, 0.03)
+        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 1.625)
+        shotStateAttr(CypherAttributes.FRICTION_FACTOR, AttributeOperator.ADD, 0.03)
     }
     val FIERY = registerCypher(::FieryCypher) {
         manaDrain(5f)
         flags(CypherFlags.WITH_FIRE)
     }
     val ANTIGRAVITY = registerModifier("antigravity", 2f) {
-        stateChunkAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, -0.03)
+        shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, -0.03)
     }
     val GRAVITY = registerModifier("gravity", 2f) {
-        stateChunkAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.02)
+        shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.02)
     }
     val MANA_SURGE = registerModifier("mana_surge", -40f) {
         delay(5)
@@ -198,38 +200,38 @@ object Cyphers {
         flags(CypherFlags.SKIP_DAMAGE_CHECK)
     }
     val BOUNCY = registerModifier("bouncy", 5f) {
-        stateChunkAttr(CypherAttributes.BOUNCE, AttributeOperator.ADD, 10.0)
+        shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.ADD, 10.0)
     }
     val REMOVE_BOUNCE = registerModifier("remove_bounce", 0f) {
-        stateChunkAttr(CypherAttributes.BOUNCE, AttributeOperator.SET_ALL, 0.0)
+        shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.SET_ALL, 0.0)
     }
     val REMOVE_DAMAGE = registerModifier("remove_damage", 0f) {
-        stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.SET_ALL, 0.0)
+        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.SET_ALL, 0.0)
     }
     val EXTEND_EXISTING = registerModifier("extend_existing", 40f) {
         delay(5)
-        stateChunkAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 42.0)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 42.0)
     }
     val CURTAIL_EXISTING = registerModifier("curtail_existing", 10f) {
         delay(-3)
-        stateChunkAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, -28.0)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, -28.0)
     }
     val REDUCE_SPREAD = registerModifier("reduce_spread", 1f) {
-        stateChunkAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -60.0)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -60.0)
     }
     val RANDOMIZE_SHOT = registerModifier("randomize_shot", 3f) {
         delay(-3)
         recharge(-5)
-        stateChunkAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 720.0)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 720.0)
     }
     val RECOIL = registerModifier("recoil", 5f) {
-        stateChunkAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 20.0)
+        shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 20.0)
     }
     val RECOIL_DAMPER = registerModifier("recoil_damper", 5f) {
-        stateChunkAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, -20.0)
+        shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, -20.0)
     }
     val KNOCKBACK = registerModifier("knockback", 5f) {
-        stateChunkAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 10.0)
+        shotStateAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 10.0)
     }
     val HOMING = registerCypher(AbstractTargetHoming::Homing) {
         manaDrain(60f)
@@ -246,79 +248,78 @@ object Cyphers {
     }
     val PIERCE_ENTITY = registerModifier("pierce_entity", 110f) {
         flags(CypherFlags.HURT_OWNER, CypherFlags.PIERCE_ENTITY)
-        stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -5.0)
+        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -5.0)
     }
     val DAEDALUS = registerCypher(::DaedalusCypher) {
         manaDrain(24f)
-        stateChunkAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 1.25)
-        stateChunkAttr(CypherAttributes.RECOIL, AttributeOperator.MULTIPLY_TOTAL, 0.0)
-        stateChunkAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 20.0)
-        stateChunkAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.03)
+        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 1.25)
+        shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.MULTIPLY_TOTAL, 0.0)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 20.0)
+        shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.03)
     }
     val NULL_EXISTING = registerModifier("null_existing", 14f) {
         delay(-4)
         recharge(-4)
-        stateChunkAttr(CypherAttributes.EXISTING, AttributeOperator.SET_ALL, 1.0)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.SET_ALL, 1.0)
     }
     val FORTUNE = registerModifier("fortune", 180f) {
         delay(16)
         recharge(10)
-        stateChunkAttr(CypherAttributes.FORTUNE_LEVEL, AttributeOperator.ADD, 1.0)
+        shotStateAttr(CypherAttributes.FORTUNE_LEVEL, AttributeOperator.ADD, 1.0)
     }
     val HORIZONTAL_PATH = registerCypher(AbstractPathModifier::HorizontalPath) {
         manaDrain(0f)
-        stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 0.5)
+        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 0.5)
     }
     val CARDINAL_PATH = registerCypher(AbstractPathModifier::CardinalPath) {
         manaDrain(0f)
-        stateChunkAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 0.5)
+        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 0.5)
     }
     val PING_PONG_PATH = registerCypher(::PingPongPath) {
         manaDrain(0f)
-        stateChunkAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 24.0)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 24.0)
     }
     val CHAOTIC_PATH = registerCypher(::ChaoticPath) {
         manaDrain(0f)
-        stateChunkAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 2.0)
+        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 2.0)
     }
 
     const val COLOR_MULTI_INVOKE = 0xFFADEEC5.toInt()
-    val DOUBLE_INVOKING = registerModifier("double_invoking", 1f) {
+    val DOUBLE_INVOKING = registerCypher("double_invoking", CypherCategories.MULTI_INVOKING) {
+        manaDrain(1f)
         draw(2)
-        color(COLOR_MULTI_INVOKE)
     }
-    val TREBLE_INVOKING = registerModifier("treble_invoking", 5f) {
+    val TREBLE_INVOKING = registerCypher("treble_invoking", CypherCategories.MULTI_INVOKING) {
+        manaDrain(5f)
         draw(3)
-        color(COLOR_MULTI_INVOKE)
     }
-    val QUADRUPLE_INVOKING = registerModifier("quadruple_invoking", 20f) {
+    val QUADRUPLE_INVOKING = registerCypher("quadruple_invoking", CypherCategories.MULTI_INVOKING) {
+        manaDrain(15f)
         draw(4)
-        color(COLOR_MULTI_INVOKE)
     }
-    val OCTUPLE_INVOKING = registerModifier("octuple_invoking", 50f) {
+    val OCTUPLE_INVOKING = registerCypher("octuple_invoking", CypherCategories.MULTI_INVOKING) {
+        manaDrain(35f)
         draw(8)
-        color(COLOR_MULTI_INVOKE)
     }
-    val ALL_INVOKING = registerModifier("all_invoking", 99f) {
+    val ALL_INVOKING = registerCypher("all_invoking", CypherCategories.MULTI_INVOKING) {
+        manaDrain(99f)
         draw(99)
-        color(COLOR_MULTI_INVOKE)
     }
-    val DOUBLE_SCATTER = registerModifier("double_scatter", 0f) {
+    val DOUBLE_SCATTER = registerCypher("double_scatter", CypherCategories.MULTI_INVOKING) {
+        manaDrain(0f)
         draw(2)
-        color(COLOR_MULTI_INVOKE)
-        stateChunkAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 20.0)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 20.0)
     }
-    val TREBLE_SCATTER = registerModifier("treble_scatter", 1f) {
+    val TREBLE_SCATTER = registerCypher("treble_scatter", CypherCategories.MULTI_INVOKING) {
+        manaDrain(1f)
         draw(3)
-        color(COLOR_MULTI_INVOKE)
-        stateChunkAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 30.0)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 30.0)
     }
-    val QUADRUPLE_SCATTER = registerModifier("quadruple_scatter", 5f) {
+    val QUADRUPLE_SCATTER = registerCypher("quadruple_scatter", CypherCategories.MULTI_INVOKING) {
+        manaDrain(5f)
         draw(4)
-        color(COLOR_MULTI_INVOKE)
-        stateChunkAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 40.0)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 40.0)
     }
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // wand module
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -387,7 +388,7 @@ object Cyphers {
     @Suppress("UNCHECKED_CAST")
     fun <CY: AbstractCypher> registerCypher(
         constructor: (builder: CypherDataMap.Builder.() -> CypherDataMap.Builder) -> CY,
-        defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE
+        defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE_ATTR
     ): Holder<CY> = registerCypher(constructor(defaultAttribute))
 
 
@@ -451,5 +452,14 @@ object Cyphers {
     fun registerModifier(path: String, manaDrain: Float, config: SimpleModifier.() -> Unit): Holder<ModifierCypher> {
         val simple = SimpleModifier(path, manaDrain).also { it.config() }
         return registerCypher(simple.createModifier())
+    }
+
+    fun registerCypher(
+        path: String,
+        category: Holder<CypherCategory>,
+        config: SimpleNonProjectileCypher.() -> Unit
+    ): Holder<AbstractNonProjectileCypher> {
+        val s = SimpleNonProjectileCypher(path, category).also { it.config() }
+        return registerCypher(s.createCypher())
     }
 }

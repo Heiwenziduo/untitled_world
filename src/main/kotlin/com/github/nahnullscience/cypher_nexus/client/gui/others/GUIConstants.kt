@@ -52,7 +52,7 @@ object GUIConstants {
 
     fun GuiGraphicsExtractor.renderCypherIcon(cypher: AbstractCypher, x: Int, y: Int) {
         if (cypher.isNotEmpty()) {
-            val borderColor = if (cypher.color != 0) cypher.color else cypher.category.value().color
+            val borderColor = cypher.color ?: cypher.category.value().color
             blit(
                 RenderPipelines.GUI_TEXTURED,
                 cypherBg,

@@ -5,7 +5,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDed
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags.Companion.containsFlag
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
@@ -16,7 +15,7 @@ import net.minecraft.world.entity.EntityType
 import java.util.function.Supplier
 
 abstract class AbstractProjectileCypher <CE> (
-    defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE
+    defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE_ATTR
 ) : AbstractCypher(defaultAttribute) where CE : Entity, CE : ICypherEntity {
 
     companion object {

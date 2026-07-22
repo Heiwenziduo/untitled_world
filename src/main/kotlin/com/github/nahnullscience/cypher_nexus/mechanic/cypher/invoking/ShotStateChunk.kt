@@ -190,7 +190,7 @@ class ShotStateChunk private constructor (
             if (isRoot) delay += cypher.delay * counts
             recharge += cypher.recharge * counts
 
-            cypher.attributes().stateChunk.forEach { (attribute, cyMap) ->
+            cypher.attributes().shotState.forEach { (attribute, cyMap) ->
                 var targetChunk = this
 
                 // FIXME cumulate from children

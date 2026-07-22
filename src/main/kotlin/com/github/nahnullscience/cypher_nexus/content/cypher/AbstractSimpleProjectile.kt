@@ -1,12 +1,12 @@
-package com.github.nahnullscience.cypher_nexus.content.cypher.projectile
+package com.github.nahnullscience.cypher_nexus.content.cypher
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.StaticProjectileCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
@@ -16,7 +16,7 @@ import java.util.EnumMap
 import java.util.function.Supplier
 
 /**
- * the idea is, put entity-specific logics inside those Entity [AbstractDedicatedCypherProjectile] classes, and leave the cypher simple
+ * the idea is, put entity-specific logics inside those Entity [com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile] classes, and leave the cypher simple
  * */
 abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<AbstractDedicatedCypherProjectile>> (
     protected val path: String,
@@ -30,26 +30,23 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
         private set
     var triggerCount: Int = 1
         private set
-    var color: Int = 0
+    var color: Int? = null
         private set
 
     private val projectileAttrHolder: HashMap<Holder<CypherAttribute>, Double> = HashMap()
-    private val stateChunkHolder: HashMap<Holder<CypherAttribute>, EnumMap<AttributeOperator, Double>> = HashMap()
+    private val shotStateAttrHolder: HashMap<Holder<CypherAttribute>, EnumMap<AttributeOperator, Double>> = HashMap()
 
-    override fun manaDrain(float: Float) = run { super.manaDrain(float); this }
-    override fun draw(int: Int) = run { super.draw(int); this }
-    override fun delay(int: Int) = run { super.delay(int); this }
-    override fun recharge(int: Int) = run { super.recharge(int); this }
-    override fun flags(vararg flag: CypherFlags) = run { super.flags(*flag); this }
-    fun color(int: Int) = run { color = int; this }
+    override fun manaDrain(float: Float) = apply { super.manaDrain(float) }
+    override fun draw(int: Int) = apply { super.draw(int) }
+    override fun delay(int: Int) = apply { super.delay(int) }
+    override fun recharge(int: Int) = apply { super.recharge(int) }
+    override fun flags(vararg flag: CypherFlags) = apply { super.flags(*flag) }
+    fun color(int: Int) = apply { color = int }
     fun trigger(type: TriggerType, count: Int = 1) = apply { trigger = type; triggerCount = count }
 
-    override fun projectileAttr(holder: Holder<CypherAttribute>, value: Double) = run {
-        projectileAttrHolder[holder] = value
-        this@AbstractSimpleProjectile
-    }
-    override fun stateChunkAttr(holder: Holder<CypherAttribute>, operator: AttributeOperator, value: Double) = run {
-        val opMap = stateChunkHolder.getOrPut(holder) { EnumMap(AttributeOperator::class.java) }
+    override fun projectileAttr(holder: Holder<CypherAttribute>, value: Double) = apply { projectileAttrHolder[holder] = value }
+    override fun shotStateAttr(holder: Holder<CypherAttribute>, operator: AttributeOperator, value: Double) = run {
+        val opMap = shotStateAttrHolder.getOrPut(holder) { EnumMap(AttributeOperator::class.java) }
         opMap[operator] = value
         this@AbstractSimpleProjectile
     }
@@ -60,9 +57,9 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
         projectileAttrHolder.forEach { (holder, d) ->
             super.projectileAttr(holder, d)
         }
-        stateChunkHolder.forEach { (holder, opMap) ->
+        shotStateAttrHolder.forEach { (holder, opMap) ->
             opMap.forEach { (op, d) ->
-                super.stateChunkAttr(holder, op, d)
+                super.shotStateAttr(holder, op, d)
             }
         }
         return super.build()
@@ -70,7 +67,6 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
 
 
 
-    typealias Projectile = SimpleProjectile
     class SimpleProjectile(
         path: String,
         type: Supplier<out EntityType<out AbstractDedicatedCypherProjectile>>
@@ -85,7 +81,6 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
         }
     }
 
-    typealias Static = SimpleStaticProjectile
     class SimpleStaticProjectile(
         path: String,
         type: Supplier<out EntityType<out AbstractDedicatedCypherProjectile>>

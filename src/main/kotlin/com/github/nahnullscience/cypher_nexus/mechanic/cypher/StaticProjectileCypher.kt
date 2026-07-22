@@ -4,9 +4,9 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import net.minecraft.world.entity.Entity
 
-abstract class StaticProjectileCypher <CY> (
-    defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE
-): AbstractProjectileCypher <CY> (defaultAttribute) where CY : Entity, CY : ICypherEntity {
+abstract class StaticProjectileCypher <CE> (
+    defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE_ATTR
+): AbstractProjectileCypher <CE> (defaultAttribute) where CE : Entity, CE : ICypherEntity {
 
     final override val category = CypherCategories.STATIC_PROJECTILE
 

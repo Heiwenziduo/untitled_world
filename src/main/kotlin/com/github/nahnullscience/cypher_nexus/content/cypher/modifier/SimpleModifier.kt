@@ -1,61 +1,43 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
+import com.github.nahnullscience.cypher_nexus.content.cypher.SimpleNonProjectileCypher
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import net.minecraft.core.Holder
-import java.util.EnumMap
+import net.minecraft.resources.Identifier
 
 /** easy way to create lots of simple modifiers */
 class SimpleModifier(
-    val path: String,
+    path: String,
     manaDrain: Float,
-) : CypherDataMap.Builder() {
+) : SimpleNonProjectileCypher(path, CypherCategories.MODIFIER) {
     init {
         manaDrain(manaDrain)
         draw(1)
     }
 
-    private var _color: Int = 0
-    // register timing can't unpack holder, so use holder directly here
-    private val stateChunkHolder: HashMap<Holder<CypherAttribute>, EnumMap<AttributeOperator, Double>> = HashMap()
+    override fun manaDrain(float: Float) = apply { super.manaDrain(float) }
+    override fun draw(int: Int) = apply { super.draw(int) }
+    override fun delay(int: Int) = apply { super.delay(int) }
+    override fun recharge(int: Int) = apply { super.recharge(int) }
+    override fun flags(vararg flag: CypherFlags) = apply { super.flags(*flag) }
+    override fun color(int: Int) = apply { super.color(int) }
 
-    override fun manaDrain(float: Float) = run { super.manaDrain(float); this }
-    override fun draw(int: Int) = run { super.draw(int); this }
-    override fun delay(int: Int) = run { super.delay(int); this }
-    override fun recharge(int: Int) = run { super.recharge(int); this }
-    override fun flags(vararg flag: CypherFlags) = run { super.flags(*flag); this }
-    fun color(int: Int) = run { _color = int; this }
-
-    // do nothing since this is a modifier
-    override fun projectileAttr(holder: Holder<CypherAttribute>, value: Double) = this as CypherDataMap.Builder
-
-    override fun stateChunkAttr(
+    override fun shotStateAttr(
         holder: Holder<CypherAttribute>,
         operator: AttributeOperator,
         value: Double
-    ): SimpleModifier {
-        val opMap = stateChunkHolder.getOrPut(holder) { EnumMap(AttributeOperator::class.java) }
-        opMap[operator] = value
-        return this
-    }
+    ): SimpleModifier = apply { super.shotStateAttr(holder, operator, value) }
 
-    fun createModifier(): ModifierCypher = object : ModifierCypher(NONE) {
-        override val resource = CypherNexus.modResource(path)
-        override val color = _color
+    override fun createCypher(): ModifierCypher = object : ModifierCypher(NONE_ATTR) {
+        override val resource: Identifier = CypherNexus.modResource(path)
+        override val color: Int? = this@SimpleModifier.color
         override fun defaultAttributes() = this@SimpleModifier
     }
 
-    override fun build(): CypherDataMap {
-        // this timing should be fine
-        stateChunkHolder.forEach { (holder, opMap) ->
-            opMap.forEach { (op, d) ->
-                super.stateChunkAttr(holder, op, d)
-            }
-        }
-        return super.build()
-    }
+    fun createModifier(): ModifierCypher = createCypher()
 }
