@@ -73,9 +73,9 @@ abstract class AbstractProjectileCypher <CE> (
     }
 
     fun getAttrBaseOrDefault(holder: Holder<CypherAttribute>) = getAttrBaseOrDefault(holder.value())
-    fun getAttrBaseOrDefault(attr: CypherAttribute): Double = attributes().projectile[attr] ?: attr.defaultValue
+    fun getAttrBaseOrDefault(attr: CypherAttribute): Double = attributes().projectile.getAttrOrDefault(attr)
     fun getAttrBaseOrNull(holder: Holder<CypherAttribute>) = getAttrBaseOrNull(holder.value())
-    fun getAttrBaseOrNull(attr: CypherAttribute): Double? = attributes().projectile[attr]
+    fun getAttrBaseOrNull(attr: CypherAttribute): Double? = attributes().projectile.getAttrOrNull(attr)
 
     override fun triggerInterplay() = true
 }

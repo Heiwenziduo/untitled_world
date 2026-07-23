@@ -1,21 +1,18 @@
-package com.github.nahnullscience.cypher_nexus.client.cypher.renderer
+package com.github.nahnullscience.cypher_nexus.client.renderer.cypher
 
-import com.github.nahnullscience.cypher_nexus.client.cypher.state.ItemProjectileRenderState
+import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.ItemProjectileRenderState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
-import com.github.nahnullscience.cypher_nexus.utility.times
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.SubmitNodeCollector
-import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.entity.EntityRendererProvider.Context
 import net.minecraft.client.renderer.item.ItemModelResolver
 import net.minecraft.client.renderer.state.level.CameraRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.world.entity.projectile.ItemSupplier
 import net.minecraft.world.item.ItemDisplayContext
-import net.minecraft.world.phys.Vec3
-import org.joml.Vector3f
 
 class SimpleItemProjectileRenderer <CE> (
-    context: EntityRendererProvider.Context,
+    context: Context,
 ) : AbstractCypherRenderer<CE, ItemProjectileRenderState>(context) where CE : AbstractDedicatedCypherProjectile, CE : ItemSupplier {
 
     companion object {

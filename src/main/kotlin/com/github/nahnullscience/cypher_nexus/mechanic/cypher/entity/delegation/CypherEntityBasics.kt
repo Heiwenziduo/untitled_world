@@ -4,8 +4,6 @@ import com.github.nahnullscience.cypher_nexus.init.data_driven.ModDamageTypes.CY
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator.Companion.AttributeMap
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator.Companion.initFromShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity.Companion.CAPTURE_SIZE
@@ -19,16 +17,13 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.Projectil
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.StateChunkPool
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
+import com.github.nahnullscience.cypher_nexus.utility.*
 import com.github.nahnullscience.cypher_nexus.utility.EntityUtil.rotateTowardSpeed
 import com.github.nahnullscience.cypher_nexus.utility.exception.CypherEntityException
-import com.github.nahnullscience.cypher_nexus.utility.flipByDirection
-import com.github.nahnullscience.cypher_nexus.utility.forEachEntityWithin
+import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastMap
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
-import com.github.nahnullscience.cypher_nexus.utility.rayCastThen
-import com.github.nahnullscience.cypher_nexus.utility.times
-import com.github.nahnullscience.cypher_nexus.utility.toSameDire
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.core.registries.Registries
@@ -68,8 +63,8 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     protected var ccMap: MapOfCypherCounts? = null
     override fun ccMap(): MapOfCypherCounts? = ccMap
 
-    protected val attributeMap: AttributeMap = Reference2ObjectOpenHashMap()
-    override fun attributeMap(): Map<CypherAttribute, Double> = attributeMap
+    protected val attributeMap by lazy { AttributeFastMap() }
+    override fun attributeMap(): Reference2DoubleMap<CypherAttribute> = attributeMap
 
     protected var hooks: HookContainer? = null
     override fun hooks(): HookContainer? = hooks
@@ -86,12 +81,12 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     override fun getDirectionInitial(): Vec3 = _initDirection ?: Vec3.ZERO
     override fun getPositionInitial(): Vec3  = _initPosition ?: cyEntity.owner?.position() ?: Vec3.ZERO
 
-    override fun getAttribute(attr: CypherAttribute): Double? = attributeMap[attr]
+    override fun getAttribute(attr: CypherAttribute): Double? = attributeMap.getAttrOrNull(attr)
     override fun getAttribute(holer: Holder<CypherAttribute>): Double? = getAttribute(holer.value())
-    override fun getAttributeOrDefault(attr: CypherAttribute) = attributeMap[attr] ?: cypher.getAttrBaseOrDefault(attr)
+    override fun getAttributeOrDefault(attr: CypherAttribute) = attributeMap.getAttrOrNull(attr) ?: cypher.getAttrBaseOrDefault(attr)
     override fun getAttributeOrDefault(holer: Holder<CypherAttribute>) = getAttributeOrDefault(holer.value())
     override fun getAttrBaseOrNull(holder: Holder<CypherAttribute>) = getAttrBaseOrNull(holder.value())
-    override fun getAttrBaseOrNull(attr: CypherAttribute) = attributeMap[attr]
+    override fun getAttrBaseOrNull(attr: CypherAttribute) = cypher.getAttrBaseOrNull(attr)
 
     override fun getExisting(): Int = getAttributeOrDefault(CypherAttributes.EXISTING).toInt()
     override fun getBounce(): Int = getAttributeOrDefault(CypherAttributes.BOUNCE).toInt()

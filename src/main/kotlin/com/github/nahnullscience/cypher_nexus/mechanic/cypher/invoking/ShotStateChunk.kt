@@ -8,17 +8,16 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator.Companion.OperatorMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
+import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastOpMap
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.randomInCone
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import net.minecraft.core.Holder
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.profiling.Profiler
@@ -45,8 +44,7 @@ class ShotStateChunk private constructor (
     val isRoot: Boolean by lazy { helper != null && helper.shotRoot == this }
     val accessor: ShotStateAccessor by lazy { ShotStateAccessor() }
 
-    val attr2opMap: Reference2ObjectOpenHashMap<CypherAttribute, OperatorMap> by
-    lazy { Reference2ObjectOpenHashMap() }
+    val attr2opMap: AttributeFastOpMap by lazy { AttributeFastOpMap() }
 
     val hooks: HookContainer by lazy { HookContainer() }
 

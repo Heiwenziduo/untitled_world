@@ -19,11 +19,18 @@ object ModDataComponents {
     }
 
     val WAND_INVARIABLE: Supplier<DataComponentType<WandDataInvariable>> =
-        DEFERRED_REGISTER.registerComponentType("wand_invariable")
-        { it.persistent(WandDataInvariable.Companion.INVARIABLE_DATA_CODEC).networkSynchronized(WandDataInvariable.Companion.INVARIABLE_DATA_STREAM) }
+        DEFERRED_REGISTER.registerComponentType("wand_invariable") { builder ->
+            builder
+                .persistent(WandDataInvariable.INVARIABLE_DATA_CODEC)
+                .networkSynchronized(WandDataInvariable.INVARIABLE_DATA_STREAM)
+                .cacheEncoding()
+        }
 
     val WAND_HIGH_PAYLOAD: Supplier<DataComponentType<WandDataHighPayload>> =
-        DEFERRED_REGISTER.registerComponentType("wand_high_payload")
-        { it.persistent(WandDataHighPayload.Companion.HIGH_PAYLOAD_DATA_CODEC).networkSynchronized(WandDataHighPayload.Companion.HIGH_PAYLOAD_DATA_STREAM) }
+        DEFERRED_REGISTER.registerComponentType("wand_high_payload") { builder ->
+            builder
+                .persistent(WandDataHighPayload.HIGH_PAYLOAD_DATA_CODEC)
+                .networkSynchronized(WandDataHighPayload.HIGH_PAYLOAD_DATA_STREAM)
+        }
 
 }

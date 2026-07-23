@@ -1,20 +1,19 @@
-package com.github.nahnullscience.cypher_nexus.client.cypher.renderer
+package com.github.nahnullscience.cypher_nexus.client.renderer.cypher
 
-import com.github.nahnullscience.cypher_nexus.client.cypher.state.LlamaSpitCypherRenderState
+import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.LlamaSpitCypherRenderState
 import com.github.nahnullscience.cypher_nexus.content.entity.LlamaSpit
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.model.animal.llama.LlamaSpitModel
 import net.minecraft.client.model.geom.ModelLayers
 import net.minecraft.client.renderer.SubmitNodeCollector
-import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.entity.EntityRendererProvider.Context
 import net.minecraft.client.renderer.entity.LlamaSpitRenderer
-import net.minecraft.client.renderer.entity.state.LlamaSpitRenderState
 import net.minecraft.client.renderer.state.level.CameraRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
 
 class LlamaSpitCypherRenderer (
-    context: EntityRendererProvider.Context
+    context: Context
 ) : AbstractCypherRenderer<LlamaSpit, LlamaSpitCypherRenderState>(context) {
 
     val model = LlamaSpitModel(context.bakeLayer(ModelLayers.LLAMA_SPIT))

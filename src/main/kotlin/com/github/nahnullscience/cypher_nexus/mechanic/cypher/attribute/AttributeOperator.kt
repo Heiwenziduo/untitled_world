@@ -1,19 +1,17 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute
 
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.dot0digit
 import com.github.nahnullscience.cypher_nexus.utility.dot1digit
-import com.github.nahnullscience.cypher_nexus.utility.dot2digit
-import com.mojang.serialization.Codec
-import com.mojang.serialization.DataResult
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import java.text.DecimalFormat
 import java.util.*
 import java.util.Locale.getDefault
 import kotlin.math.pow
 
-
+/**
+ * an attribute-operator system, the operator part
+ *
+ * it doesn't care what an Attribute is, but provides a general computation role
+ * */
 enum class AttributeOperator(
     val exclusive: Boolean,
     val needUnit: Boolean
@@ -30,6 +28,7 @@ enum class AttributeOperator(
             return "$n$s"
         }
     },
+
     /** 0.33 -> plus 33% */
     MULTIPLY_BASE(false, false) {
         override val defaultFormatter: DecimalFormat = dot0digit
@@ -42,6 +41,7 @@ enum class AttributeOperator(
             return "$n$s%"
         }
     },
+
     /** 0.33 -> times 33% */
     MULTIPLY_TOTAL(false, false) {
         override val defaultFormatter: DecimalFormat = dot0digit
@@ -54,6 +54,7 @@ enum class AttributeOperator(
             return l
         }
     },
+
     /**
      * Force an attribute to become an invariable value,
      * will ignore other operations.
@@ -70,6 +71,9 @@ enum class AttributeOperator(
         }
     },
 
+    /**
+     * coerce an attribute make it smaller than the given cap
+     * */
     CAP_AT(false, true) {
         override val defaultFormatter: DecimalFormat = dot1digit
         override val defaultValue = Double.MAX_VALUE
@@ -93,8 +97,6 @@ enum class AttributeOperator(
     override fun toString() = super.toString().lowercase(getDefault())
 
     companion object {
-
-        typealias OperatorMap = EnumMap<AttributeOperator, Double>
         /**
          * calculate attribute value in vanilla style
          * @param opMap contains pre-computed values for each [AttributeOperator],
@@ -113,51 +115,9 @@ enum class AttributeOperator(
             return ((base + a) * (m1 + 1) * m2).coerceAtMost(cap)
         }
 
-        typealias AttributeMap = MutableMap<CypherAttribute, Double>
-        /**
-         * cumulate attributes from a shot-state to a single cypher-entity.
-         * @param [AttributeMap] where `Attribute`s will cumulate to.
-         * Despite the specification of the broad `MutableMap` type,
-         * [Reference2ObjectOpenHashMap] should be preferred over a standard `HashMap` for performance reasons.
-         * */
-        fun AttributeMap.initFromShotState(state: ShotStateChunk, cypher: AbstractProjectileCypher<*>) {
-            state.attr2opMap.forEach { (attr, opMap) ->
-                if (!attr.isCEAttribute) return@forEach
-//            if (haveFlag(CypherFlags.CONSTANT_EXISTING) && CypherAttributes.EXISTING.`is`(attr.resource)) return@forEach
-                // TODO prune cumulation, some of attributes will not be used, depends on cypher implementation
-
-                this.compute(attr) { a, v ->
-                    val base = cypher.getAttrBaseOrDefault(attr)
-                    val final = this@Companion.attributeCalculator(base, opMap)
-                    attr.restrictRange(final)
-                }
-            }
-        }
-
-
         fun string2operator(string: String) : AttributeOperator {
-            return when(string) {
-                "add" -> ADD
-                "multiply_base" -> MULTIPLY_BASE
-                "multiply_total" -> MULTIPLY_TOTAL
-                "set_all" -> SET_ALL
-                "cap_at" -> CAP_AT
-                else -> throw IllegalArgumentException("$string is not a valid operator, valid operators are: ${entries.toList().map{ operation -> "$operation" }}")
-            }
+            return entries.firstOrNull { it.toString() == string } ?:
+            throw IllegalArgumentException("$string is not a valid operator, valid operators are: ${entries.toList().map{ "$it" }}")
         }
-
-        // Given a string codec to convert to a integer
-        // Not all strings can become integers (A is not fully equivalent to B)
-        // All integers can become strings (B is fully equivalent to A)
-        val CODEC_OPERATION: Codec<AttributeOperator> = Codec.STRING.comapFlatMap(
-            { s ->
-                try {
-                    return@comapFlatMap DataResult.success(string2operator(s))
-                } catch (e: IllegalArgumentException) {
-                    return@comapFlatMap DataResult.error { "$s is not a valid operator" }
-                }
-            },
-            AttributeOperator::toString
-        )
     }
 }

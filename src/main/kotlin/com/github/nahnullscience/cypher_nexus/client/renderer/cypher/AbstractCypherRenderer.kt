@@ -1,14 +1,13 @@
-package com.github.nahnullscience.cypher_nexus.client.cypher.renderer
+package com.github.nahnullscience.cypher_nexus.client.renderer.cypher
 
-import com.github.nahnullscience.cypher_nexus.client.cypher.state.component.ICypherEntityRenderState
+import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.component.ICypherEntityRenderState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.entity.EntityRenderer
-import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.entity.EntityRendererProvider.Context
 import net.minecraft.client.renderer.entity.state.EntityRenderState
-import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.client.renderer.rendertype.RenderTypes
 import net.minecraft.client.renderer.state.level.CameraRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
@@ -16,11 +15,9 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f
 import org.joml.Vector3f
-import kotlin.math.cos
-import kotlin.math.sin
 
 abstract class AbstractCypherRenderer <CE, State> (
-    context: EntityRendererProvider.Context
+    context: Context
 ) : EntityRenderer<CE, State>(context)
         where CE : Entity, CE : ICypherEntity,
               State : EntityRenderState, State : ICypherEntityRenderState
@@ -49,34 +46,16 @@ abstract class AbstractCypherRenderer <CE, State> (
 //    protected fun PoseStack.submitCypher(state: State, submitNodeCollector: SubmitNodeCollector, camera: CameraRenderState) =
 //        submitCypher(state, this, submitNodeCollector, camera)
 
+    override fun extractRenderState(entity: CE, state: State, partialTicks: Float) {
+        super.extractRenderState(entity, state, partialTicks)
+        state.extractFrom(entity, state)
+    }
+
     /**
      *
      * */
     protected fun PoseStack.cypherSetup(state: State, submitNodeCollector: SubmitNodeCollector, camera: CameraRenderState) {
         scale(state.effectRadius, state.effectRadius, state.effectRadius)
-
-        // Invert the velocity vector so the trail stretches backwards from local origin (0,0,0)
-        val velocity = state.deltaMove
-        val trailX = -velocity.x
-        val trailY = -velocity.y
-        val trailZ = -velocity.z
-        // Generate a simple perpendicular vector for the ribbon's thickness half-width (0.15 blocks)
-        val upVec = Vec3.Y_AXIS
-        val side = velocity.cross(upVec).normalize().scale(0.15)
-
-        // Grab a translucent blending consumer from the multi-buffer pipeline
-        submitNodeCollector.submitCustomGeometry(this, RenderTypes.lightning()) { pose, buffer ->
-            val matrix = pose.pose()
-            // Draw an unbroken quad trail scaling perfectly with the projectile's velocity
-            // Vertex 1: Front-Left (Local Origin Offset)
-            addTrailVertex(buffer, matrix, side.x, side.y, side.z, 0f, 0f, 255, state.lightCoords)
-            // Vertex 2: Front-Right (Local Origin Offset)
-            addTrailVertex(buffer, matrix, -side.x, -side.y, -side.z, 1f, 0f, 255, state.lightCoords)
-            // Vertex 3: Back-Right (Stretched along vector direction)
-            addTrailVertex(buffer, matrix, trailX - side.x, trailY - side.y, trailZ - side.z, 1f, 1f, 0, state.lightCoords) // Alpha 0 = Fade out!
-            // Vertex 4: Back-Left (Stretched along vector direction)
-            addTrailVertex(buffer, matrix, trailX + side.x, trailY + side.y, trailZ + side.z, 0f, 1f, 0, state.lightCoords)  // Alpha 0 = Fade out!
-        }
 
 //        submitNodeCollector.submitParticleGroup() {  }
 
@@ -103,9 +82,29 @@ abstract class AbstractCypherRenderer <CE, State> (
 //        }
     }
 
-    override fun extractRenderState(entity: CE, state: State, partialTicks: Float) {
-        super.extractRenderState(entity, state, partialTicks)
-        state.extractFrom(entity, state)
+    protected fun PoseStack.addTrailEffect(state: State, submitNodeCollector: SubmitNodeCollector, camera: CameraRenderState) {
+        // Invert the velocity vector so the trail stretches backwards from local origin (0,0,0)
+        val velocity = state.deltaMove
+        val trailX = -velocity.x
+        val trailY = -velocity.y
+        val trailZ = -velocity.z
+        // Generate a simple perpendicular vector for the ribbon's thickness half-width (0.15 blocks)
+        val upVec = Vec3.Y_AXIS
+        val side = velocity.cross(upVec).normalize().scale(0.15)
+
+        // Grab a translucent blending consumer from the multi-buffer pipeline
+        submitNodeCollector.submitCustomGeometry(this, RenderTypes.lightning()) { pose, buffer ->
+            val matrix = pose.pose()
+            // Draw an unbroken quad trail scaling perfectly with the projectile's velocity
+            // Vertex 1: Front-Left (Local Origin Offset)
+            addTrailVertex(buffer, matrix, side.x, side.y, side.z, 0f, 0f, 255, state.lightCoords)
+            // Vertex 2: Front-Right (Local Origin Offset)
+            addTrailVertex(buffer, matrix, -side.x, -side.y, -side.z, 1f, 0f, 255, state.lightCoords)
+            // Vertex 3: Back-Right (Stretched along vector direction)
+            addTrailVertex(buffer, matrix, trailX - side.x, trailY - side.y, trailZ - side.z, 1f, 1f, 0, state.lightCoords) // Alpha 0 = Fade out!
+            // Vertex 4: Back-Left (Stretched along vector direction)
+            addTrailVertex(buffer, matrix, trailX + side.x, trailY + side.y, trailZ + side.z, 0f, 1f, 0, state.lightCoords)  // Alpha 0 = Fade out!
+        }
     }
 
     // Direct helper method to pack vertex arrays neatly into the buffer stream
@@ -128,6 +127,6 @@ abstract class AbstractCypherRenderer <CE, State> (
 
 
     companion object {
-        fun PoseStack.translate(offset: Vector3f) = translate(offset.x, offset.y, offset.z)
+
     }
 }

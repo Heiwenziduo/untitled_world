@@ -195,8 +195,11 @@ abstract class AbstractDedicatedCypherProjectile(
     override fun handleEntityEvent(id: Byte) {
         // trigger on client
         super.handleEntityEvent(id)
-        if (id.toInt() == 3) {
-            discardVisualEffect()
+
+        if (level().isClientSide) {
+            if (id.toInt() == 3) {
+                discardVisualEffect()
+            }
         }
     }
 

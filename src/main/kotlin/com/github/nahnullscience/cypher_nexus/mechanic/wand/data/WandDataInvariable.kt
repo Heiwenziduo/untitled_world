@@ -6,10 +6,16 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import io.netty.buffer.ByteBuf
+import net.minecraft.core.component.DataComponentGetter
 import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.chat.Component
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
+import net.minecraft.world.item.Item.TooltipContext
+import net.minecraft.world.item.TooltipFlag
+import net.minecraft.world.item.component.TooltipProvider
 import java.util.UUID
+import java.util.function.Consumer
 
 
 /**
@@ -20,7 +26,17 @@ data class WandDataInvariable(
     val chunkF: WandDataChunkF,
     val chunkI: WandDataChunkI,
     val chunkL: WandDataChunkL = WandDataChunkL(listOf()),
-) {
+) : TooltipProvider {
+
+    override fun addToTooltip(
+        context: TooltipContext,
+        consumer: Consumer<Component>,
+        flag: TooltipFlag,
+        components: DataComponentGetter
+    ) {
+        consumer.accept(Component.literal("this is a wand..."))
+    }
+
     data class WandDataChunkF(val manaMax: Float, val manaRegen: Float, val spread: Float)
     data class WandDataChunkI(val draw: Int, val castDelay: Int, val rechargeTime: Int,)
     data class WandDataChunkL(val alwaysInvoke: List<AbstractCypher>)

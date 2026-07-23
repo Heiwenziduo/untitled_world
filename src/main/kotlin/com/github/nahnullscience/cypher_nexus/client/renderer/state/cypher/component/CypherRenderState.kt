@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.client.cypher.state.component
+package com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.component
 
 import com.github.nahnullscience.cypher_nexus.init.config.ModClientConfig
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes

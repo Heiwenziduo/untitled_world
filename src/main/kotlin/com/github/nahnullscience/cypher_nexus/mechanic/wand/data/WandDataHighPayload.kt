@@ -4,13 +4,29 @@ import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
+import net.minecraft.core.component.DataComponentGetter
 import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.chat.Component
 import net.minecraft.network.codec.StreamCodec
+import net.minecraft.world.item.Item.TooltipContext
+import net.minecraft.world.item.TooltipFlag
+import net.minecraft.world.item.component.TooltipProvider
+import java.util.function.Consumer
 
 /**
  * holds the cypher list
  * */
-data class WandDataHighPayload(val aoc: ArrayOfCyphers) {
+data class WandDataHighPayload(val aoc: ArrayOfCyphers) : TooltipProvider {
+
+    override fun addToTooltip(
+        context: TooltipContext,
+        consumer: Consumer<Component>,
+        flag: TooltipFlag,
+        components: DataComponentGetter
+    ) {
+        consumer.accept(Component.literal("$aoc"))
+    }
+
     companion object {
         fun of(capacity: Int) = WandDataHighPayload(ArrayOfCyphers(capacity))
 
