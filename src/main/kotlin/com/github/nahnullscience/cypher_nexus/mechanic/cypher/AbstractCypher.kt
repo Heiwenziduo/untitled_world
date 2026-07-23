@@ -238,10 +238,16 @@ sealed class AbstractCypher(
 
             var values: MutableComponent? = null
             AttributeOperator.entries.forEach enum@ { operator ->
-                val v = opMap.getOrElse(operator) { return@enum }
-                val t = operator.format(v)
-                val c = if (operator.needUnit) attribute.wrapWithUnit(t)
-                else Component.literal(t)
+                var v = opMap.getOrElse(operator) { return@enum }
+                val c: MutableComponent
+                if (operator.needUnit) {
+                    v = attribute.parseUnit(v)
+                    val t = operator.format(v, attribute.formatter ?: operator.defaultFormatter)
+                    c = attribute.wrapWithUnit(t)
+                } else {
+                    val t = operator.format(v)
+                    c = Component.literal(t)
+                }
 
                 if (values == null) values = c
                 else values.append(";  ").append(c)

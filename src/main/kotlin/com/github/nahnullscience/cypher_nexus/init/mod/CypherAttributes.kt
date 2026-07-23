@@ -3,6 +3,8 @@ package com.github.nahnullscience.cypher_nexus.init.mod
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute.AttributeApply
+import com.github.nahnullscience.cypher_nexus.utility.dot0digit
+import com.github.nahnullscience.cypher_nexus.utility.dot1digit
 import com.github.nahnullscience.cypher_nexus.utility.exception.VanillaMisuseException
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
@@ -43,22 +45,23 @@ object CypherAttributes {
     { builder -> builder.max(720.0).applyOn(AttributeApply.INVOKING) }
     val RECOIL = registerAttribute("recoil")
     { builder -> builder.max(1000.0).applyOn(AttributeApply.INVOKING).hide() }
+
     // ================================ projectile
     val DAMAGE = registerAttribute("damage")
     { builder -> builder.min(-Double.MAX_VALUE).noSync() }
     /** 1.00 <-> 100% */
     val CRIT_CHANCE = registerAttribute("crit_chance")
-    { builder -> builder.noSync() }
+    { builder -> builder.noSync().parse { it * 100 }.format(dot0digit) }
     val KNOCKBACK = registerAttribute("knockback")
     { builder -> builder.max(1000.0).noSync().hide() }
     val FORTUNE_LEVEL = registerAttribute("fortune")
     { builder -> builder.min(-1.0).max(32.0).noSync().hide() }
     /** initial speed, in unit block per tick, will show block/sec to player */
     val SPEED = registerAttribute("speed")
-    { builder -> builder.max(8.0) }
+    { builder -> builder.max(8.0).parse { it * 20 }.format(dot1digit) }
     /** tick, 200 by default */
     val EXISTING = registerAttribute("existing")
-    { builder -> builder.default(200.0) }
+    { builder -> builder.default(200.0).parse { it / 20 }.format(dot1digit) }
     /** default 1.0 */
     val EFFECT_RADIUS = registerAttribute("effect_radius")
     { builder -> builder.default(1.0).min(0.25).max(16.0) }

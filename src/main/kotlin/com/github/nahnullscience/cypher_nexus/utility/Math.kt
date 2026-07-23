@@ -17,7 +17,9 @@ fun Double.toSameSymbol(t: Double): Double {
 val dot0digit = DecimalFormat("#").apply {
     roundingMode = RoundingMode.CEILING
 }
-
+val dot1digit = DecimalFormat("#.#").apply {
+    roundingMode = RoundingMode.CEILING
+}
 val dot2digit = DecimalFormat("#.##").apply {
     roundingMode = RoundingMode.CEILING
 }

@@ -193,7 +193,7 @@
   "gui.cypher_nexus.cypher.property.recoil": "Recoil: %s",
   "gui.cypher_nexus.cypher.property.damage": "Damage: %s",
   "gui.cypher_nexus.cypher.property.crit_chance": "Crit: %s",
-  "gui.cypher_nexus.cypher.property.crit_chance.unit": "%s%",
+  "gui.cypher_nexus.cypher.property.crit_chance.unit": "%s%%",
   "gui.cypher_nexus.cypher.property.speed": "Speed: %s",
   "gui.cypher_nexus.cypher.property.speed.unit": "%sblock/sec",
   "gui.cypher_nexus.cypher.property.existing": "Existing: %s",

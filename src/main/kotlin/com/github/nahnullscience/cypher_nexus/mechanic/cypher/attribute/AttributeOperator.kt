@@ -3,16 +3,14 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.dot0digit
+import com.github.nahnullscience.cypher_nexus.utility.dot1digit
 import com.github.nahnullscience.cypher_nexus.utility.dot2digit
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
-import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.MutableComponent
 import java.text.DecimalFormat
 import java.util.*
 import java.util.Locale.getDefault
-import kotlin.math.min
 import kotlin.math.pow
 
 
@@ -22,7 +20,7 @@ enum class AttributeOperator(
 ) {
     /** 1.0 -> add 1.0 */
     ADD(false, true) {
-        override val defaultFormatter: DecimalFormat = dot2digit
+        override val defaultFormatter: DecimalFormat = dot1digit
         override val defaultValue = 0.0
         override fun cumulate(last: Double, new: Double): Double = last + new
         override fun cumulate(last: Double, new: Double, times: Int): Double = last + new * times
@@ -61,7 +59,7 @@ enum class AttributeOperator(
      * will ignore other operations.
      * */
     SET_ALL(true, true) {
-        override val defaultFormatter: DecimalFormat = dot2digit
+        override val defaultFormatter: DecimalFormat = dot1digit
         override val defaultValue = 0.0
         override fun cumulate(last: Double, new: Double): Double = new
         override fun cumulate(last: Double, new: Double, times: Int): Double = new
@@ -73,7 +71,7 @@ enum class AttributeOperator(
     },
 
     CAP_AT(false, true) {
-        override val defaultFormatter: DecimalFormat = dot2digit
+        override val defaultFormatter: DecimalFormat = dot1digit
         override val defaultValue = Double.MAX_VALUE
         override fun cumulate(last: Double, new: Double): Double = last.coerceAtMost(new)
         override fun cumulate(last: Double, new: Double, times: Int): Double = last.coerceAtMost(new)
@@ -124,7 +122,7 @@ enum class AttributeOperator(
          * */
         fun AttributeMap.initFromShotState(state: ShotStateChunk, cypher: AbstractProjectileCypher<*>) {
             state.attr2opMap.forEach { (attr, opMap) ->
-                if (!attr.isEntityAttribute) return@forEach
+                if (!attr.isCEAttribute) return@forEach
 //            if (haveFlag(CypherFlags.CONSTANT_EXISTING) && CypherAttributes.EXISTING.`is`(attr.resource)) return@forEach
                 // TODO prune cumulation, some of attributes will not be used, depends on cypher implementation
 
