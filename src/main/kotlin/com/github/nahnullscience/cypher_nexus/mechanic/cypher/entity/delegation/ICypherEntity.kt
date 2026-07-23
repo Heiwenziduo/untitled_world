@@ -12,9 +12,9 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.EntityUtil.rotateTowardSpeed
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
+import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastMap
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
-import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.server.level.ServerLevel
@@ -101,7 +101,7 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherEntityBeforeIn
     override fun getOwner(): Entity?
     fun setOwner(owner: Entity?)
 
-    fun attributeMap(): Reference2DoubleMap<CypherAttribute>
+    fun attributeMap(): AttributeFastMap
     fun hooks(): HookContainer?
     val hooksSharedData: HooksSharedData<*>
     fun hooksSharedData(): HooksSharedData<*>

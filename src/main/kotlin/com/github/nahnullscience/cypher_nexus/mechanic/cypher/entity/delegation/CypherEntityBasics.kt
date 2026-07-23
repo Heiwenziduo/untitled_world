@@ -23,7 +23,6 @@ import com.github.nahnullscience.cypher_nexus.utility.exception.CypherEntityExce
 import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastMap
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
-import it.unimi.dsi.fastutil.objects.Reference2DoubleMap
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.core.registries.Registries
@@ -64,7 +63,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     override fun ccMap(): MapOfCypherCounts? = ccMap
 
     protected val attributeMap by lazy { AttributeFastMap() }
-    override fun attributeMap(): Reference2DoubleMap<CypherAttribute> = attributeMap
+    override fun attributeMap(): AttributeFastMap = attributeMap
 
     protected var hooks: HookContainer? = null
     override fun hooks(): HookContainer? = hooks
@@ -81,9 +80,9 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     override fun getDirectionInitial(): Vec3 = _initDirection ?: Vec3.ZERO
     override fun getPositionInitial(): Vec3  = _initPosition ?: cyEntity.owner?.position() ?: Vec3.ZERO
 
-    override fun getAttribute(attr: CypherAttribute): Double? = attributeMap.getAttrOrNull(attr)
+    override fun getAttribute(attr: CypherAttribute): Double? = attributeMap[attr]
     override fun getAttribute(holer: Holder<CypherAttribute>): Double? = getAttribute(holer.value())
-    override fun getAttributeOrDefault(attr: CypherAttribute) = attributeMap.getAttrOrNull(attr) ?: cypher.getAttrBaseOrDefault(attr)
+    override fun getAttributeOrDefault(attr: CypherAttribute) = attributeMap[attr] ?: cypher.getAttrBaseOrDefault(attr)
     override fun getAttributeOrDefault(holer: Holder<CypherAttribute>) = getAttributeOrDefault(holer.value())
     override fun getAttrBaseOrNull(holder: Holder<CypherAttribute>) = getAttrBaseOrNull(holder.value())
     override fun getAttrBaseOrNull(attr: CypherAttribute) = cypher.getAttrBaseOrNull(attr)

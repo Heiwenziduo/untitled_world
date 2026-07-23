@@ -188,7 +188,7 @@ class ShotStateChunk private constructor (
             if (isRoot) delay += cypher.delay * counts
             recharge += cypher.recharge * counts
 
-            cypher.attributes().shotState.forEach { (attribute, cyMap) ->
+            cypher.attributes().shotState.forEach { (attribute, cyShotStateModifier) ->
                 var targetChunk = this
 
                 // FIXME cumulate from children
@@ -201,11 +201,11 @@ class ShotStateChunk private constructor (
 
                 val chunkMap = targetChunk.attr2opMap.getOrPut(attribute) { EnumMap(AttributeOperator::class.java) }
                 // prune: if set, skip
-                if (chunkMap[AttributeOperator.SET_ALL] != null && cyMap[AttributeOperator.SET_ALL] == null) return@forEach
+                if (chunkMap[AttributeOperator.SET_ALL] != null && cyShotStateModifier[AttributeOperator.SET_ALL] == null) return@forEach
 
-                cyMap.forEach { (operator, value) ->
-                    chunkMap.compute(operator) { op, v ->
-                        operator.cumulate(v ?: operator.defaultValue, value, counts)
+                cyShotStateModifier.forEach { (operator, value) ->
+                    chunkMap.compute(operator) { key, old ->
+                        operator.cumulate(old ?: operator.defaultValue, value, counts)
                     }
                 }
             }

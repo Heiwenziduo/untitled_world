@@ -34,15 +34,7 @@ object CNCodecs {
     val MOCC_CODEC: Codec<MapOfCypherCounts> =
         Codec.unboundedMap(CYPHER, Codec.INT).xmap(
             { map -> MapOfCypherCounts(map) },
-            { mocc -> mocc.getMap() }
-        )
-    val MOCC_STREAM__: StreamCodec<RegistryFriendlyByteBuf, MapOfCypherCounts> =
-        ByteBufCodecs.map(
-            { HashMap<AbstractCypher, Int>() as MutableMap<AbstractCypher, Int> },
-            CYPHER_STREAM, ByteBufCodecs.VAR_INT
-        ).map(
-            { map -> MapOfCypherCounts(map) },
-            { mocc -> mocc.getMutableMap() }
+            { mocc -> mocc }
         )
     val MOCC_STREAM: StreamCodec<RegistryFriendlyByteBuf, MapOfCypherCounts> =
         ByteBufCodecs.map(
