@@ -320,11 +320,6 @@ object Cyphers {
         draw(4)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 40.0)
     }
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // wand module
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    val PRIMARY_INVOKING = registerCypher(PrimaryInvokingCypher)
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // utility //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -360,10 +355,36 @@ object Cyphers {
     val D4 = registerCypher(AbstractDivideBy.D4)
     val D10 = registerCypher(AbstractDivideBy.D10)
 
-    val ALPHA = registerCypher(AbstractGreekLetter.Alpha)
-    val GAMMA = registerCypher(AbstractGreekLetter.Gamma)
-    val OMEGA = registerCypher(AbstractGreekLetter.Omega)
-    val TAU = registerCypher(AbstractGreekLetter.Tau)
+    val ALPHA = registerCypher(AbstractGreekLetter::Alpha) {
+        manaDrain(40f)
+        delay(5)
+    }
+    val GAMMA = registerCypher(AbstractGreekLetter::Gamma) {
+        manaDrain(40f)
+        delay(5)
+    }
+    val OMEGA = registerCypher(AbstractGreekLetter::Omega) {
+        manaDrain(320f)
+        delay(25)
+    }
+    val TAU = registerCypher(AbstractGreekLetter::Tau) {
+        manaDrain(90f)
+        delay(10)
+    }
+    val MU = registerCypher(AbstractGreekLetter::Mu) {
+        manaDrain(120f)
+        delay(15)
+        draw(1)
+    }
+    val PHI = registerCypher(AbstractGreekLetter::Phi) {
+        manaDrain(120f)
+        delay(15)
+    }
+    val SIGMA = registerCypher(AbstractGreekLetter::Sigma) {
+        manaDrain(120f)
+        delay(15)
+        draw(1)
+    }
 
     val REQUIREMENT_HP = registerCypher(RequirementLowHP)
     val REQUIREMENT_NOT_PLAYER = registerCypher(RequirementNotPlayer)
@@ -371,7 +392,18 @@ object Cyphers {
     val REQUIREMENT_OTHERWISE = registerCypher(AbstractRequirement.RequirementOtherwise)
     val REQUIREMENT_ENDPOINT = registerCypher(AbstractRequirement.RequirementEndpoint)
 
-    val CYPHER_DUPLICATION = registerCypher(CypherDuplicationCypher)
+    val CYPHER_DUPLICATION = registerCypher(::CypherDuplicationCypher) {
+        manaDrain(300f)
+        draw(1)
+        delay(7)
+        recharge(7)
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // wand module
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    val PRIMARY_INVOKING = registerCypher(PrimaryInvokingCypher)
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

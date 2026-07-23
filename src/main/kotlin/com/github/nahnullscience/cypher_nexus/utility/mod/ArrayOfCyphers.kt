@@ -95,7 +95,7 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
     fun getInvokableOrNull(index: Int): AbstractCypher? {
         if (index >= capacity) return null
         val cy = this[index]
-        return if (cy.isModule() || cy.isEmpty()) null else cy
+        return if (cy.isInvokable) cy else null
     }
     // this allows for-loop
     override fun iterator(): Iterator<AbstractCypher> = cyphers.iterator()

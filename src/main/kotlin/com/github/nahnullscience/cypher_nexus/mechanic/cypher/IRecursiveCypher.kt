@@ -5,11 +5,13 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingH
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import org.apache.logging.log4j.Level
 
 /**
  * mark a cypher that has the ability to copy others or itself
  * */
 interface IRecursiveCypher {
+    // TODO a copy won't add delay / recharge or consume mana
     companion object {
         const val RECURSION_LIMIT = 2
 
@@ -49,5 +51,25 @@ interface IRecursiveCypher {
             } else
                 target.traceInvoke(helper, shotState, data, paras, targetIndex, true)
         }
+    }
+
+    /**
+     * copy cypher in given [index], call [copyCypher] internally
+     * */
+    fun copyCypherIndexed(
+        index: Int,
+        helper: InvokingHelper,
+        shotState: ShotStateChunk,
+        data: HelperDataBundle,
+        paras: InvokingParameterBundle,
+        targetIndex: Int,
+    ) {
+        val cy = helper.aoc.getInvokableOrNull(index)
+        if (cy == null) {
+            CypherNexus.debugCypher(Level.WARN)
+            { "get uninvokable cypher on [index $index], copy failed." }
+            return
+        }
+        copyCypher(cy, helper, shotState, data, paras, targetIndex)
     }
 }

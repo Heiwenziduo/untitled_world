@@ -99,6 +99,7 @@ abstract class AbstractDivideBy(
             return super.defaultAttributes()
                 .manaDrain(320f)
                 .delay(15)
+                .recharge(10)
                 .shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -10.0)
                 .shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -1.0)
         }

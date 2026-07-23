@@ -10,18 +10,12 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingH
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 
-object CypherDuplicationCypher : AbstractNonProjectileCypher(), IRecursiveCypher {
+class CypherDuplicationCypher(
+    defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder
+) : AbstractNonProjectileCypher(defaultAttribute), IRecursiveCypher {
     override val resource = CypherNexus.modResource("cypher_duplication")
     override val category = CypherCategories.OTHER
     override val isRecursive = true
-
-    override fun defaultAttributes(): CypherDataMap.Builder {
-        return super.defaultAttributes()
-            .manaDrain(300f)
-            .draw(1)
-            .delay(7)
-            .recharge(7)
-    }
 
     override fun invoke(
         helper: InvokingHelper,

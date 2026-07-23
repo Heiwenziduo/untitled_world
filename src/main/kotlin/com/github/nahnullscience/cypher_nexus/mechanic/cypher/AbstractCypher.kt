@@ -153,7 +153,7 @@ sealed class AbstractCypher(
 
 
     /**
-     * if drawEnabled, draw [draw] times, then invoke drawn cyphers one by one
+     * if draw-enabled, draw [draw] times, then invoke drawn cyphers one by one
      * */
     protected fun handleDraws(
         helper: InvokingHelper,
@@ -168,7 +168,7 @@ sealed class AbstractCypher(
     }
 
     /**
-     * bare draw logic, should prefer [handleDraws] in most case
+     * bare draw logic, execute [consumer] when drawn non-null. should prefer [handleDraws] in most case
      * */
     protected inline fun drawXForEach(
         helper: InvokingHelper,

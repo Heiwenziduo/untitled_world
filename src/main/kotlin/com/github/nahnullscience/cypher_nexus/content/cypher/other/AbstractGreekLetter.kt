@@ -4,7 +4,12 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.RefresherRingCypher
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.IRecursiveCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.StaticProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
@@ -16,12 +21,11 @@ import org.apache.logging.log4j.Level
  * */
 abstract class AbstractGreekLetter(
     path: String,
-    private val mana: Float
-) : AbstractNonProjectileCypher(), IRecursiveCypher {
+    defaultAttribute: Builder.() -> Builder,
+) : AbstractNonProjectileCypher(defaultAttribute), IRecursiveCypher {
     override val resource = CypherNexus.modResource(path)
     override val category = CypherCategories.OTHER
     override val isRecursive = true
-    override fun defaultAttributes() = super.defaultAttributes().manaDrain(mana)
 
     override fun invoke(
         helper: InvokingHelper,
@@ -37,8 +41,7 @@ abstract class AbstractGreekLetter(
 
     /** the first */
     // reduce some mana cost since we don't have limited-charge cyphers
-    object Alpha : AbstractGreekLetter("alpha", 30f) {
-        override fun defaultAttributes() = super.defaultAttributes().delay(5)
+    class Alpha(defaultAttribute: Builder.() -> Builder) : AbstractGreekLetter("alpha", defaultAttribute) {
         override fun invoke(
             helper: InvokingHelper,
             shotState: ShotStateChunk,
@@ -58,24 +61,14 @@ abstract class AbstractGreekLetter(
             ).firstOrNull { it != 0L }
 
             if (target != null) {
-                target.countTrailingZeroBits().let { index ->
-                    val cy = helper.aoc.getInvokableOrNull(index)
-                    if (cy == null) {
-                        CypherNexus.debugCypher(Level.ERROR)
-                        { "get uninvokable cypher on [index $index], this should never happen!" }
-                        return@let
-                    }
-
-                    copyCypher(cy, helper, shotState, data, paras, relativeIndex)
-                }
+                copyCypherIndexed(target.countTrailingZeroBits(), helper, shotState, data, paras, relativeIndex)
             } else
                 CypherNexus.debugCypher { "[$this $relativeIndex] didn't find a valid target" }
         }
     }
 
     /** the last */
-    object Gamma : AbstractGreekLetter("gamma", 30f) {
-        override fun defaultAttributes() = super.defaultAttributes().delay(5)
+    class Gamma(defaultAttribute: Builder.() -> Builder) : AbstractGreekLetter("gamma", defaultAttribute) {
         override fun invoke(
             helper: InvokingHelper,
             shotState: ShotStateChunk,
@@ -85,7 +78,7 @@ abstract class AbstractGreekLetter(
             isCopy: Boolean
         ) {
             super.invoke(helper, shotState, data, paras, relativeIndex, isCopy)
-            // find first through: deck -> hand -> discard
+            // find last through: deck -> hand -> discard
             val target = sequenceOf(
                 helper.data.deck,
                 helper.data.hand,
@@ -93,24 +86,14 @@ abstract class AbstractGreekLetter(
             ).firstOrNull { it != 0L }
 
             if (target != null) {
-                (63 - target.countLeadingZeroBits()).let { index ->
-                    val cy = helper.aoc.getInvokableOrNull(index)
-                    if (cy == null) {
-                        CypherNexus.debugCypher(Level.ERROR)
-                        { "get uninvokable cypher on [index $index], this should never happen!" }
-                        return@let
-                    }
-
-                    copyCypher(cy, helper, shotState, data, paras, relativeIndex)
-                }
+                copyCypherIndexed((63 - target.countLeadingZeroBits()), helper, shotState, data, paras, relativeIndex)
             } else
                 CypherNexus.debugCypher { "[$this $relativeIndex] didn't find a valid target" }
         }
     }
 
     /** every thing */
-    object Omega : AbstractGreekLetter("omega", 300f) {
-        override fun defaultAttributes() = super.defaultAttributes().delay(15)
+    class Omega(defaultAttribute: Builder.() -> Builder) : AbstractGreekLetter("omega", defaultAttribute) {
         override fun invoke(
             helper: InvokingHelper,
             shotState: ShotStateChunk,
@@ -120,7 +103,7 @@ abstract class AbstractGreekLetter(
             isCopy: Boolean
         ) {
             super.invoke(helper, shotState, data, paras, relativeIndex, isCopy)
-            helper.aoc.invokableForEach() { index, cypher ->
+            helper.aoc.invokableForEach { index, cypher ->
                 if (helper.isIndexInHand(index) && cypher is IRecursiveCypher && cypher.isRecursive) {
                     // CypherNexus.debugCypher { "" }
                     // recursive cyphers in hand will be skipped
@@ -130,6 +113,7 @@ abstract class AbstractGreekLetter(
                 // RefresherRing will be skipped
                 if (cypher is RefresherRingCypher) return@invokableForEach
 
+                // disable draw for every cypher, in case copied cypher turns draw on
                 paras.disableDraw()
                 copyCypher(cypher, helper, shotState, data, paras, relativeIndex)
                 paras.enableDraw()
@@ -138,8 +122,7 @@ abstract class AbstractGreekLetter(
     }
 
     /** next two */
-    object Tau : AbstractGreekLetter("tau", 70f) {
-        override fun defaultAttributes() = super.defaultAttributes().delay(10)
+    class Tau(defaultAttribute: Builder.() -> Builder) : AbstractGreekLetter("tau", defaultAttribute) {
         override fun invoke(
             helper: InvokingHelper,
             shotState: ShotStateChunk,
@@ -158,6 +141,77 @@ abstract class AbstractGreekLetter(
                     copyCypher(cypher, helper, shotState, data, paras, relativeIndex)
                     if (count >= 2) return@run
                 }
+            }
+        }
+    }
+
+    /** copy all modifier */
+    class Mu(defaultAttribute: Builder.() -> Builder) : AbstractGreekLetter("mu", defaultAttribute) {
+        override fun invoke(
+            helper: InvokingHelper,
+            shotState: ShotStateChunk,
+            data: HelperDataBundle,
+            paras: InvokingParameterBundle,
+            relativeIndex: Int,
+            isCopy: Boolean
+        ) {
+            super.invoke(helper, shotState, data, paras, relativeIndex, isCopy)
+            helper.aoc.invokableForEach { index, cypher ->
+                if (cypher is ModifierCypher) {
+                    paras.disableDraw()
+                    copyCypher(cypher, helper, shotState, data, paras, relativeIndex)
+                    paras.enableDraw()
+                }
+            }
+            // draw one time unconditionally
+            drawXForEach(helper, draw) { index, cypher ->
+                cypher.invokeInHand(helper, shotState, data, paras)
+            }
+        }
+    }
+
+    /** all projectile */
+    class Phi(defaultAttribute: Builder.() -> Builder) : AbstractGreekLetter("phi", defaultAttribute) {
+        override fun invoke(
+            helper: InvokingHelper,
+            shotState: ShotStateChunk,
+            data: HelperDataBundle,
+            paras: InvokingParameterBundle,
+            relativeIndex: Int,
+            isCopy: Boolean
+        ) {
+            super.invoke(helper, shotState, data, paras, relativeIndex, isCopy)
+            helper.aoc.invokableForEach { index, cypher ->
+                if (cypher is ProjectileCypher<*>) {
+                    paras.disableDraw()
+                    copyCypher(cypher, helper, shotState, data, paras, relativeIndex)
+                    paras.enableDraw()
+                }
+            }
+        }
+    }
+
+    /** all static */
+    class Sigma(defaultAttribute: Builder.() -> Builder) : AbstractGreekLetter("sigma", defaultAttribute) {
+        override fun invoke(
+            helper: InvokingHelper,
+            shotState: ShotStateChunk,
+            data: HelperDataBundle,
+            paras: InvokingParameterBundle,
+            relativeIndex: Int,
+            isCopy: Boolean
+        ) {
+            super.invoke(helper, shotState, data, paras, relativeIndex, isCopy)
+            helper.aoc.invokableForEach { index, cypher ->
+                if (cypher is StaticProjectileCypher<*>) {
+                    paras.disableDraw()
+                    copyCypher(cypher, helper, shotState, data, paras, relativeIndex)
+                    paras.enableDraw()
+                }
+            }
+            // draw one time unconditionally
+            drawXForEach(helper, draw) { index, cypher ->
+                cypher.invokeInHand(helper, shotState, data, paras)
             }
         }
     }
