@@ -3,11 +3,9 @@ package com.github.nahnullscience.cypher_nexus.client
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.client.devtools.WebServiceManager
 import com.github.nahnullscience.cypher_nexus.client.gui.WandDataOverlay
-import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.ArrowCypherRenderer
-import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.LlamaSpitCypherRenderer
-import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.SimpleItemProjectileRenderer
-import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.SimpleParticleProjectileRenderer
-import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.SimpleSummonerRenderer
+import com.github.nahnullscience.cypher_nexus.client.particle.CypherTrailParticleGroup
+import com.github.nahnullscience.cypher_nexus.client.particle.CypherTrailParticleGroup.Companion.CYPHER_TRAIL
+import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.*
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import net.minecraft.client.renderer.entity.EntityRendererProvider
@@ -23,10 +21,14 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent
 import net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent
+import net.neoforged.neoforge.client.event.RegisterParticleGroupsEvent
 import net.neoforged.neoforge.client.gui.ConfigurationScreen
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers.CONTEXTUAL_INFO_BAR
+import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent
+import java.util.function.Function
 import java.util.function.Supplier
+
 
 @EventBusSubscriber(modid = CypherNexus.MOD_ID, value = [Dist.CLIENT])
 object ClientSetup {
@@ -78,6 +80,8 @@ object ClientSetup {
         event.registerItemProjectile(ModEntities.CYPHER_SPAWN_EGG)
 
         event.registerParticleProjectile(ModEntities.CYPHER_BUBBLE_COLUMN)
+        event.registerParticleProjectile(ModEntities.CYPHER_DRILLING_BOLT)
+        event.registerParticleProjectile(ModEntities.CYPHER_DRILLING_BLAST)
 
         //////////////////////////////////////////////////////////////////////////////
         // static
@@ -86,9 +90,10 @@ object ClientSetup {
         event.registerEntityRenderer(ModEntities.CYPHER_LIGHTING, ::SimpleSummonerRenderer)
     }
 
-//    @SubscribeEvent
-//    fun registerRenderStateModifiers(event: RegisterRenderStateModifiersEvent) {
-//    }
+    @SubscribeEvent
+    fun registerRenderStateModifiers(event: RegisterRenderStateModifiersEvent) {
+
+    }
 
     @SubscribeEvent
     private fun registerLayerDefinitions(event: EntityRenderersEvent.RegisterLayerDefinitions) {
@@ -96,9 +101,29 @@ object ClientSetup {
     }
 
     @SubscribeEvent
+    fun registerParticleProviders(event: RegisterParticleGroupsEvent) {
+        event.register(CYPHER_TRAIL, ::CypherTrailParticleGroup)
+    }
+
+    @SubscribeEvent
     private fun registerGuiLayersEvent(event: RegisterGuiLayersEvent) {
         event.registerBelow(CONTEXTUAL_INFO_BAR, CypherNexus.modResource("wand_data"), WandDataOverlay)
     }
+
+
+    @SubscribeEvent
+    private fun registerClientCommands(event: RegisterClientCommandsEvent) {
+        val dispatcher = event.dispatcher
+        val buildContext = event.buildContext
+
+        dispatcher.register(
+            Commands.literal("cypher_nexus")
+                .then(WebServiceManager.command)
+        )
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private fun <CY> RegisterRenderers.registerItemProjectile (
         cypherEntity: Supplier<out EntityType<out CY>>,
@@ -114,19 +139,4 @@ object ClientSetup {
         cypherEntity: Supplier<out EntityType<out T>>,
         factory: EntityRendererProvider<T>
     ) = registerEntityRenderer(cypherEntity.get(), factory)
-
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    @SubscribeEvent
-    private fun registerClientCommands(event: RegisterClientCommandsEvent) {
-        val dispatcher = event.dispatcher
-        val buildContext = event.buildContext
-
-        dispatcher.register(
-            Commands.literal("cypher_nexus")
-                .then(WebServiceManager.command)
-        )
-    }
 }

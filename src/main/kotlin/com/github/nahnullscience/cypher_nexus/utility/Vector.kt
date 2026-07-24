@@ -1,6 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.utility
 
 import net.minecraft.core.Direction
+import net.minecraft.core.Direction.Axis
 import net.minecraft.core.Vec3i
 import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.Entity
@@ -24,11 +25,25 @@ operator fun Vec3.unaryMinus() = Vec3(-x, -y, -z)
 operator fun Vec3.times(v: Double) = multiply(v, v, v)
 operator fun Vec3.times(v: Float) = v.toDouble().let { multiply(it, it, it) }
 operator fun Vec3.plus(v: Vec3) = Vec3(x + v.x, y + v.y, z + v.z)
+operator fun Vec3.plus(v: Vector3f) = Vec3(x + v.x, y + v.y, z + v.z)
+
+operator fun Vec3.component1() = x
+operator fun Vec3.component2() = y
+operator fun Vec3.component3() = z
 
 operator fun Vector3f.unaryMinus() = Vector3f(-x, -y, -z)
 operator fun Vector3f.times(v: Double) = times(v.toFloat())
 operator fun Vector3f.times(v: Float) = Vector3f(x * v, y * v, z * v)
 operator fun Vector3f.plus(v: Vector3f) = Vector3f(x + v.x, y + v.y, z + v.z)
+
+fun Vec3.coerceMaxLength(length: Double): Vec3 {
+    val lengthSqr = x * x + y * y + z * z
+    val maxLenSqr = length * length
+    if (lengthSqr <= maxLenSqr) return this
+
+    val ratio = sqrt(maxLenSqr / lengthSqr)
+    return Vec3(x * ratio, y * ratio, z * ratio)
+}
 
 /**
  * @return the surface of AABB the vector lies, null if they don't overlap
@@ -47,13 +62,63 @@ fun Vec3.getSurfaceOf(aabb: AABB): Direction? {
 }
 
 /**
+ * get Direction through plain value comparison
+ * @return [Direction] that the max value of 3 in the vector representing, null if at least 2 values are equal
+ * @see [Direction.getApproximateNearest]
+ * */
+fun Vec3.mostAlignedDirectionExact(): Direction? {
+    val axis: Axis
+    val positive: Boolean
+    val ax = abs(x)
+    val ay = abs(y)
+    val az = abs(z)
+    axis = if (ax > ay && ax > az) {
+        positive = ax == x
+        Axis.X
+    }
+    else if (ay > ax && ay > az) {
+        positive = ay == y
+        Axis.Y
+    }
+    else if (az > ax && az > ay) {
+        positive = az == z
+        Axis.Z
+    }
+    else return null
+    return if (positive) axis.positive else axis.negative
+}
+
+/**
+ * more tolerant version of [mostAlignedDirectionExact], which will flow X -> Y -> Z order when values are equal
+ * */
+fun Vec3.mostAlignedDirection(): Direction {
+    val axis: Axis
+    val positive: Boolean
+    val ax = abs(x)
+    val ay = abs(y)
+    val az = abs(z)
+    axis = if (ax >= ay && ax >= az) {
+        positive = ax == x
+        Axis.X
+    }
+    else if (ay >= ax && ay >= az) {
+        positive = ay == y
+        Axis.Y
+    }
+    else {
+        positive = az == z
+        Axis.Z
+    }
+    return if (positive) axis.positive else axis.negative
+}
+/**
  *
  * */
-fun Vec3.flipByDirection(dir: Direction, factor: Double = 1.0): Vec3 {
-    return when(dir) {
-        Direction.DOWN, Direction.UP -> multiply(1.0, -factor, 1.0)
-        Direction.NORTH, Direction.SOUTH -> multiply(1.0, 1.0, -factor)
-        Direction.WEST, Direction.EAST -> multiply(-factor, 1.0, 1.0)
+fun Vec3.flipByAxis(axis: Axis, factor: Double = 1.0): Vec3 {
+    return when(axis) {
+        Axis.X -> Vec3(-x * factor, y, z)
+        Axis.Y -> Vec3(x, -y * factor, z)
+        Axis.Z -> Vec3(x, y, -z * factor)
     }
 }
 
@@ -161,44 +226,6 @@ fun Vector3f.randomInCone(maxAngle: Double, random: RandomSource): Vector3f {
     localRandomDir.rotate(rotationQuat)
 
     return localRandomDir
-}
-
-
-/**
- * custom projectile hit check function exactly same as [net.minecraft.world.entity.projectile.ProjectileUtil.getHitResult],
- * but avoid magic number "0.3" (margin)
- * */
-fun getProjectileHitResult(
-    start: Vec3,
-    projectile: Entity,
-    filter: Predicate<Entity>,
-    deltaMovement: Vec3,
-    level: Level,
-    margin: Float,
-    clipContext: ClipContext.Block = ClipContext.Block.COLLIDER
-) : HitResult {
-    var end = start.add(deltaMovement)
-    var hitresult: HitResult = level.clip(
-        ClipContext(start, end, clipContext, ClipContext.Fluid.NONE, projectile)
-    )
-    if (hitresult.type != HitResult.Type.MISS) {
-        end = hitresult.getLocation()
-    }
-
-    val hitresult1: HitResult? = ProjectileUtil.getEntityHitResult(
-        level,
-        projectile,
-        start,
-        end,
-        projectile.boundingBox.expandTowards(deltaMovement).inflate(1.0),
-        filter,
-        margin
-    )
-    if (hitresult1 != null) {
-        hitresult = hitresult1
-    }
-
-    return hitresult
 }
 
 /**

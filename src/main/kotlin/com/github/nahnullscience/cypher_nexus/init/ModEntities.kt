@@ -55,6 +55,8 @@ object ModEntities {
     val CYPHER_SPAWN_EGG = registerDedicated("cypher_spawn_egg", ::SpawnEgg)
     val CYPHER_BUBBLE_COLUMN = registerDedicated("cypher_bubble_column", ::BubbleColumn)
     val CYPHER_LLAMA_SPIT = registerDedicated("cypher_llama_spit", ::LlamaSpit)
+    val CYPHER_DRILLING_BOLT = registerDedicated("cypher_drilling_bolt", ::DrillingBolt)
+    val CYPHER_DRILLING_BLAST = registerDedicated("cypher_drilling_blast", ::DrillingBlast)
 
     // static-projectile //////////////////////////////////////////////////////////////////////////////////
     val CYPHER_EXPLOSION = registerDedicated("cypher_explosion", ::SummonedExplosion)

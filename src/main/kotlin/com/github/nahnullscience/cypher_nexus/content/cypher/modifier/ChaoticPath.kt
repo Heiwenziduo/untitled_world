@@ -32,9 +32,9 @@ class ChaoticPath(
              * so the solution here is do sync immediately
              * */
             val random = cyEntity.random
-            cyEntity.hooksSharedData.chaoticPathTick = random.nextInt(30) + 10 + cyEntity.tickCount
-            val ang = random.nextDouble() * 180.0
-            val spe = random.nextDouble() * 0.5 + 0.5
+            cyEntity.hooksSharedData.chaoticPathTick = random.nextInt(27) + 7 + cyEntity.tickCount
+            val ang = random.nextDouble() * 135.0
+            val spe = random.nextDouble() * 0.8 + 0.3
             cyEntity.deltaMovement = cyEntity.deltaMovement.randomInCone(ang, random) * spe
             cyEntity.needsSync = true
         }

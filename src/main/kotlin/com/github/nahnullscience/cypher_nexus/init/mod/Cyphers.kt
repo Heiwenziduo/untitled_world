@@ -118,6 +118,24 @@ object Cyphers {
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
     }
+    val DRILLING_BOLT = registerProjectile(ModEntities.CYPHER_DRILLING_BOLT) {
+        manaDrain(5f)
+        delay(-3)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 6.0)
+        projectileAttr(CypherAttributes.DAMAGE, 1.0)
+        projectileAttr(CypherAttributes.SPEED, 0.3)
+        projectileAttr(CypherAttributes.EXISTING, 2.0)
+        projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.02)
+    }
+    val DRILLING_BLAST = registerProjectile(ModEntities.CYPHER_DRILLING_BLAST) {
+        manaDrain(10f)
+        delay(-2)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 6.0)
+        projectileAttr(CypherAttributes.DAMAGE, 1.0)
+        projectileAttr(CypherAttributes.SPEED, 0.3)
+        projectileAttr(CypherAttributes.EXISTING, 2.0)
+        projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.02)
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // static projectile
@@ -283,8 +301,25 @@ object Cyphers {
         manaDrain(0f)
         shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 2.0)
     }
+    val PLANE_ORBIT = registerCypher(AbstractPathModifier::PlaneOrbit) {
+        manaDrain(3f)
+        delay(-5)
+        flags(CypherFlags.IGNORE_BLOCK, CypherFlags.MOTION_FOLLOWS_OWNER)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 36.0)
+    }
+    val TRUE_ORBIT = registerCypher(AbstractPathModifier::TrueOrbit) {
+        manaDrain(3f)
+        delay(-2)
+        flags(CypherFlags.IGNORE_BLOCK, CypherFlags.MOTION_FOLLOWS_OWNER)
+        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 0.5)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 32.0)
+    }
 
-    const val COLOR_MULTI_INVOKE = 0xFFADEEC5.toInt()
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // multi invoking
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     val DOUBLE_INVOKING = registerCypher("double_invoking", CypherCategories.MULTI_INVOKING) {
         manaDrain(1f)
         draw(2)

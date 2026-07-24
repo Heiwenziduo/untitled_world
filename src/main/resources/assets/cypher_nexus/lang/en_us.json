@@ -6,6 +6,8 @@
 
   "block.cypher_nexus.cypher_index": "Cypher Index",
 
+  "cypher_nexus.config.engine_max_fps": "Engine Max Fps",
+  "cypher_nexus.config.max_trail_particle_count": "Max Trail Particle Count",
   "cypher_nexus.config.bounce_points_interpolate": "Bounce Points Interpolate",
   "cypher_nexus.config.circular_interpolate": "Circular Interpolate",
 

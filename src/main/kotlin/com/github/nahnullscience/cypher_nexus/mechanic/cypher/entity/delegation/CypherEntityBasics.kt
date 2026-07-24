@@ -18,7 +18,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.StateChunkPool
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.*
-import com.github.nahnullscience.cypher_nexus.utility.EntityUtil.rotateTowardSpeed
 import com.github.nahnullscience.cypher_nexus.utility.exception.CypherEntityException
 import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastMap
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
@@ -485,8 +484,8 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
                     bouncePoints.add(bouncePoint)
 
                     stepPosition = bouncePoint.add(bounceDirection.unitVec3.scale(1E-7)) // avoid "diving into blocks" bug
-                    stepMovement = stepDestination0.subtract(destination).flipByDirection(
-                        bounceDirection,
+                    stepMovement = stepDestination0.subtract(destination).flipByAxis(
+                        bounceDirection.axis,
                         cyEntity.getBounceSpeedPenalty()
                     )
                     cyEntity.setPos(stepPosition)

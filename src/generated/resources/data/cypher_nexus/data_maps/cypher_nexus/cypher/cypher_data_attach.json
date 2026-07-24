@@ -393,6 +393,42 @@
         }
       }
     },
+    "cypher_nexus:drilling_blast": {
+      "delay": -2,
+      "draw": 0,
+      "flags": 0,
+      "manaDrain": 10.0,
+      "projectile": {
+        "cypher_nexus:damage": 1.0,
+        "cypher_nexus:existing": 2.0,
+        "cypher_nexus:gravity_factor": 0.02,
+        "cypher_nexus:speed": 0.3
+      },
+      "recharge": 0,
+      "shotState": {
+        "cypher_nexus:spread": {
+          "add": 6.0
+        }
+      }
+    },
+    "cypher_nexus:drilling_bolt": {
+      "delay": -3,
+      "draw": 0,
+      "flags": 0,
+      "manaDrain": 5.0,
+      "projectile": {
+        "cypher_nexus:damage": 1.0,
+        "cypher_nexus:existing": 2.0,
+        "cypher_nexus:gravity_factor": 0.02,
+        "cypher_nexus:speed": 0.3
+      },
+      "recharge": 0,
+      "shotState": {
+        "cypher_nexus:spread": {
+          "add": 6.0
+        }
+      }
+    },
     "cypher_nexus:effective_radius": {
       "delay": 0,
       "draw": 1,
@@ -705,6 +741,19 @@
         }
       }
     },
+    "cypher_nexus:plane_orbit": {
+      "delay": -5,
+      "draw": 1,
+      "flags": 516,
+      "manaDrain": 3.0,
+      "projectile": {},
+      "recharge": 0,
+      "shotState": {
+        "cypher_nexus:existing": {
+          "add": 36.0
+        }
+      }
+    },
     "cypher_nexus:power": {
       "delay": 1,
       "draw": 1,
@@ -1004,6 +1053,22 @@
       "shotState": {
         "cypher_nexus:spread": {
           "add": 30.0
+        }
+      }
+    },
+    "cypher_nexus:true_orbit": {
+      "delay": -2,
+      "draw": 1,
+      "flags": 516,
+      "manaDrain": 3.0,
+      "projectile": {},
+      "recharge": 0,
+      "shotState": {
+        "cypher_nexus:damage": {
+          "add": 0.5
+        },
+        "cypher_nexus:existing": {
+          "add": 32.0
         }
       }
     },

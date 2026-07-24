@@ -10,7 +10,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedDa
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
-import com.github.nahnullscience.cypher_nexus.utility.EntityUtil.rotateTowardSpeed
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastMap
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
@@ -132,7 +131,7 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherEntityBeforeIn
     fun getSpeedFactor(): Double
     fun getEffectRadius(): Float
     /**
-     * used as a factor inside [rotateTowardSpeed],
+     * used as a factor inside `Entity.rotateTowardSpeed`,
      * the higher the faster the entity will rotate, to face the direction the deltaMovement is pointed at
      * */
     fun getRotationSpeed(): Float

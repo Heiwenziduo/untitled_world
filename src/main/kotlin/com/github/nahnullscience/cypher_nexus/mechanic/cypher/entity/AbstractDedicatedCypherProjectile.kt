@@ -141,7 +141,7 @@ abstract class AbstractDedicatedCypherProjectile(
     override fun getOwner(): Entity? = super<Projectile>.getOwner()
     override fun setOwner(owner: Entity?) = super<Projectile>.setOwner(owner)
     override fun onHit(result: HitResult) {
-        super<Projectile>.onHit(result)
+//        super<Projectile>.onHit(result)
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

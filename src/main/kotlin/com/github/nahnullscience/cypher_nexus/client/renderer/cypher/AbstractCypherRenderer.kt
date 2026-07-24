@@ -5,6 +5,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.renderer.SubmitNodeCollector
+import net.minecraft.client.renderer.culling.Frustum
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context
 import net.minecraft.client.renderer.entity.state.EntityRenderState
@@ -45,6 +46,11 @@ abstract class AbstractCypherRenderer <CE, State> (
 //    ) { }
 //    protected fun PoseStack.submitCypher(state: State, submitNodeCollector: SubmitNodeCollector, camera: CameraRenderState) =
 //        submitCypher(state, this, submitNodeCollector, camera)
+
+    override fun shouldRender(entity: CE, culler: Frustum, camX: Double, camY: Double, camZ: Double): Boolean {
+        // FIXME Arrow with large radius culled un-expectedly
+        return super.shouldRender(entity, culler, camX, camY, camZ)
+    }
 
     override fun extractRenderState(entity: CE, state: State, partialTicks: Float) {
         super.extractRenderState(entity, state, partialTicks)
@@ -117,16 +123,14 @@ abstract class AbstractCypherRenderer <CE, State> (
             .setNormal(0f, 1f, 0f)
     }
 
-    protected fun drawParticleQuad(consumer: VertexConsumer, matrix: Matrix4f, cx: Double, cy: Double, cz: Double, size: Float, light: Int) {
-        // Flat placeholder camera alignment layout around a local offset coordinate point (cx, cy, cz)
-        consumer.addVertex(matrix, (cx - size).toFloat(), (cy - size).toFloat(), cz.toFloat()).setColor(255, 255, 255, 200).setUv(0f, 0f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(0f, 1f, 0f)
-        consumer.addVertex(matrix, (cx + size).toFloat(), (cy - size).toFloat(), cz.toFloat()).setColor(255, 255, 255, 200).setUv(1f, 0f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(0f, 1f, 0f)
-        consumer.addVertex(matrix, (cx + size).toFloat(), (cy + size).toFloat(), cz.toFloat()).setColor(255, 255, 255, 200).setUv(1f, 1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(0f, 1f, 0f)
-        consumer.addVertex(matrix, (cx - size).toFloat(), (cy + size).toFloat(), cz.toFloat()).setColor(255, 255, 255, 200).setUv(0f, 1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(0f, 1f, 0f)
-    }
-
 
     companion object {
-
+        fun VertexConsumer.drawParticleQuad(matrix: Matrix4f, cx: Double, cy: Double, cz: Double, size: Float, light: Int) {
+            // Flat placeholder camera alignment layout around a local offset coordinate point (cx, cy, cz)
+            addVertex(matrix, (cx - size).toFloat(), (cy - size).toFloat(), cz.toFloat()).setColor(255, 255, 255, 200).setUv(0f, 0f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(0f, 1f, 0f)
+            addVertex(matrix, (cx + size).toFloat(), (cy - size).toFloat(), cz.toFloat()).setColor(255, 255, 255, 200).setUv(1f, 0f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(0f, 1f, 0f)
+            addVertex(matrix, (cx + size).toFloat(), (cy + size).toFloat(), cz.toFloat()).setColor(255, 255, 255, 200).setUv(1f, 1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(0f, 1f, 0f)
+            addVertex(matrix, (cx - size).toFloat(), (cy + size).toFloat(), cz.toFloat()).setColor(255, 255, 255, 200).setUv(0f, 1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(0f, 1f, 0f)
+        }
     }
 }

@@ -2,16 +2,17 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity.Companion.CAPTURE_SIZE_SQR
-import net.minecraft.core.Direction
+import com.github.nahnullscience.cypher_nexus.utility.mod.CircleDefinition
 import net.minecraft.world.entity.Entity
 
-class HooksSharedData <CY> where CY : Entity, CY : ICypherEntity {
+class HooksSharedData <CE> where CE : Entity, CE : ICypherEntity {
     var homingTarget: Entity? = null
-    var pathDirection0: Direction? = null
-    var pathDirection: Direction? = null
+//    var pathDirection0: Direction? = null
+//    var pathDirection: Direction? = null
     var chaoticPathTick: Int = 7
+    var orbitingCircle: CircleDefinition? = null
 
-    fun tick(entity: CY) {
+    fun tick(entity: CE) {
 
         // clear target if too far
         homingTarget?.let {
@@ -19,7 +20,7 @@ class HooksSharedData <CY> where CY : Entity, CY : ICypherEntity {
                 homingTarget = null
         }
 
-        pathDirection0 = pathDirection
-        pathDirection = null
+//        pathDirection0 = pathDirection
+//        pathDirection = null
     }
 }
