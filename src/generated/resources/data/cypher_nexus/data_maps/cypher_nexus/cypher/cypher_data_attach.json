@@ -256,7 +256,7 @@
       "recharge": 0,
       "shotState": {
         "cypher_nexus:existing": {
-          "add": -28.0
+          "add": -30.0
         }
       }
     },
@@ -498,7 +498,7 @@
       "recharge": 0,
       "shotState": {
         "cypher_nexus:existing": {
-          "add": 42.0
+          "add": 70.0
         }
       }
     },
@@ -512,12 +512,12 @@
       "shotState": {}
     },
     "cypher_nexus:fortune": {
-      "delay": 16,
+      "delay": 12,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 180.0,
+      "manaDrain": 120.0,
       "projectile": {},
-      "recharge": 10,
+      "recharge": 12,
       "shotState": {
         "cypher_nexus:fortune": {
           "add": 1.0
@@ -737,7 +737,7 @@
       "recharge": 0,
       "shotState": {
         "cypher_nexus:existing": {
-          "add": 24.0
+          "add": 32.0
         }
       }
     },
@@ -749,8 +749,11 @@
       "projectile": {},
       "recharge": 0,
       "shotState": {
+        "cypher_nexus:bounce": {
+          "set_all": 0.0
+        },
         "cypher_nexus:existing": {
-          "add": 36.0
+          "add": 40.0
         }
       }
     },
@@ -1057,18 +1060,18 @@
       }
     },
     "cypher_nexus:true_orbit": {
-      "delay": -2,
+      "delay": -4,
       "draw": 1,
       "flags": 516,
-      "manaDrain": 3.0,
+      "manaDrain": 5.0,
       "projectile": {},
       "recharge": 0,
       "shotState": {
-        "cypher_nexus:damage": {
-          "add": 0.5
+        "cypher_nexus:bounce": {
+          "set_all": 0.0
         },
         "cypher_nexus:existing": {
-          "add": 32.0
+          "add": 40.0
         }
       }
     },

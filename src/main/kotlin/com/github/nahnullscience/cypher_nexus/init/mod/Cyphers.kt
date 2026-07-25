@@ -228,11 +228,11 @@ object Cyphers {
     }
     val EXTEND_EXISTING = registerModifier("extend_existing", 40f) {
         delay(5)
-        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 42.0)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 70.0)
     }
     val CURTAIL_EXISTING = registerModifier("curtail_existing", 10f) {
         delay(-3)
-        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, -28.0)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, -30.0)
     }
     val REDUCE_SPREAD = registerModifier("reduce_spread", 1f) {
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -60.0)
@@ -280,9 +280,9 @@ object Cyphers {
         recharge(-4)
         shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.SET_ALL, 1.0)
     }
-    val FORTUNE = registerModifier("fortune", 180f) {
-        delay(16)
-        recharge(10)
+    val FORTUNE = registerModifier("fortune", 120f) {
+        delay(12)
+        recharge(12)
         shotStateAttr(CypherAttributes.FORTUNE_LEVEL, AttributeOperator.ADD, 1.0)
     }
     val HORIZONTAL_PATH = registerCypher(AbstractPathModifier::HorizontalPath) {
@@ -295,7 +295,7 @@ object Cyphers {
     }
     val PING_PONG_PATH = registerCypher(::PingPongPath) {
         manaDrain(0f)
-        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 24.0)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 32.0)
     }
     val CHAOTIC_PATH = registerCypher(::ChaoticPath) {
         manaDrain(0f)
@@ -305,14 +305,15 @@ object Cyphers {
         manaDrain(3f)
         delay(-5)
         flags(CypherFlags.IGNORE_BLOCK, CypherFlags.MOTION_FOLLOWS_OWNER)
-        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 36.0)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 40.0)
+        shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.SET_ALL, 0.0)
     }
     val TRUE_ORBIT = registerCypher(AbstractPathModifier::TrueOrbit) {
-        manaDrain(3f)
-        delay(-2)
+        manaDrain(5f)
+        delay(-4)
         flags(CypherFlags.IGNORE_BLOCK, CypherFlags.MOTION_FOLLOWS_OWNER)
-        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 0.5)
-        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 32.0)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 40.0)
+        shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.SET_ALL, 0.0)
     }
 
 

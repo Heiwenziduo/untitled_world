@@ -124,9 +124,9 @@
 
   "cypher.cypher_nexus.other.add_trigger": "Add Trigger",
   "cypher.cypher_nexus.other.add_trigger.description": "",
-  "cypher.cypher_nexus.other.add_trigger_timer": "Add Trigger Timer",
+  "cypher.cypher_nexus.other.add_trigger_timer": "Add Timer",
   "cypher.cypher_nexus.other.add_trigger_timer.description": "",
-  "cypher.cypher_nexus.other.add_trigger_death": "Add Trigger Death",
+  "cypher.cypher_nexus.other.add_trigger_death": "Add Death Trigger",
   "cypher.cypher_nexus.other.add_trigger_death.description": "",
   "cypher.cypher_nexus.other.requirement_low_hp": "Requirement: Low HP",
   "cypher.cypher_nexus.other.requirement_low_hp.description": "",

@@ -4,16 +4,10 @@ import net.minecraft.core.Direction
 import net.minecraft.core.Direction.Axis
 import net.minecraft.core.Vec3i
 import net.minecraft.util.RandomSource
-import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.projectile.ProjectileUtil
-import net.minecraft.world.level.ClipContext
-import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
-import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
 import org.joml.Vector3f
-import java.util.function.Predicate
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.*
 
@@ -26,6 +20,8 @@ operator fun Vec3.times(v: Double) = multiply(v, v, v)
 operator fun Vec3.times(v: Float) = v.toDouble().let { multiply(it, it, it) }
 operator fun Vec3.plus(v: Vec3) = Vec3(x + v.x, y + v.y, z + v.z)
 operator fun Vec3.plus(v: Vector3f) = Vec3(x + v.x, y + v.y, z + v.z)
+operator fun Vec3.minus(v: Vec3) = Vec3(x - v.x, y - v.y, z - v.z)
+operator fun Vec3.minus(v: Vector3f) = Vec3(x - v.x, y - v.y, z - v.z)
 
 operator fun Vec3.component1() = x
 operator fun Vec3.component2() = y

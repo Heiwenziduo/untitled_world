@@ -7,6 +7,9 @@ import org.joml.Vector3f
 
 /**
  * rotation of the circle follows right-hand screw law
+ * @param center
+ * @param radius start from `ZERO`
+ * @param normal surface normal, should be `normalized`
  * */
 data class CircleDefinition(
     val center: Vec3,
@@ -14,10 +17,10 @@ data class CircleDefinition(
     val normal: Vector3f
 ) {
     companion object {
-        fun fromEntityEye(entity: Entity, endpoint: Vec3, normal: Vector3f, maxRadius: Double = -1.0): CircleDefinition {
+        fun fromEntityEye(entity: Entity, endpoint: Vec3, normal: Vector3f, maxRadiusLength: Double = -1.0): CircleDefinition {
             val center = entity.eyePosition
             var radius = center.vectorTo(endpoint)
-            if (maxRadius > 0) radius = radius.coerceMaxLength(maxRadius)
+            if (maxRadiusLength > 0) radius = radius.coerceMaxLength(maxRadiusLength)
             return CircleDefinition(center, radius, normal)
         }
     }

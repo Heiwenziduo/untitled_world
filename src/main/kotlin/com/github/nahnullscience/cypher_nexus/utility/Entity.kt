@@ -48,16 +48,15 @@ private fun lerpRotation(from: Float, to: Float, factor: Float): Float {
 }
 
 /**
- * get `normalized` vector pointing upward from the top of the entity cranium
+ * @return `normalized` vector pointing upward from the top of the entity cranium.
+ * utilize `Quaternions` to avoid gimbal-lock
  * */
 fun Entity.headUpVector(partialTick: Float = 1.0f): Vec3 {
     val pitchRad = Math.toRadians(getViewXRot(partialTick).toDouble()).toFloat()
     val yawRad = Math.toRadians(getViewYRot(partialTick).toDouble()).toFloat()
 
     val rotation = Quaternionf().rotationYXZ(-yawRad, pitchRad, 0.0f)
-
     val localUp = Vector3f(0.0f, 1.0f, 0.0f).rotate(rotation)
-
     return Vec3(localUp.x().toDouble(), localUp.y().toDouble(), localUp.z().toDouble())
 }
 
@@ -69,8 +68,33 @@ fun Entity.headUpVectorF(partialTick: Float = 1.0f): Vector3f {
     val yawRad = Math.toRadians(getViewYRot(partialTick).toDouble()).toFloat()
 
     val rotation = Quaternionf().rotationYXZ(-yawRad, pitchRad, 0.0f)
-
     val localUp = Vector3f(0.0f, 1.0f, 0.0f).rotate(rotation)
-
     return localUp
+}
+
+/**
+ * @return `normalized` vector pointing leftward from the perspective of the entity
+ * @see headUpVector
+ * */
+fun Entity.headLeftVector(partialTick: Float = 1.0f): Vec3 {
+    val yawRad = getViewYRot(partialTick) * Mth.DEG_TO_RAD
+
+    return Vec3(
+        Mth.cos(yawRad.toDouble()).toDouble(),
+        0.0,
+        Mth.sin(yawRad.toDouble()).toDouble()
+    )
+}
+
+/**
+ * v3f version of [headLeftVector]
+ * */
+fun Entity.headLeftVectorF(partialTick: Float = 1.0f): Vector3f {
+    val yawRad = getViewYRot(partialTick) * Mth.DEG_TO_RAD
+
+    return Vector3f(
+        Mth.cos(yawRad.toDouble()),
+        0f,
+        Mth.sin(yawRad.toDouble())
+    )
 }
