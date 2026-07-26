@@ -1,5 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.client.renderer.cypher
 
+import com.github.nahnullscience.cypher_nexus.client.particle.CypherTrailParticleGroup.Companion.addCypherTrailParticle
 import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.ParticleProjectileRenderState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.mojang.blaze3d.vertex.PoseStack
@@ -59,10 +60,17 @@ class SimpleParticleProjectileRenderer  <CE : AbstractDedicatedCypherProjectile>
 //            state.outlineColor,
 //            null
 //        )
-        Minecraft.getInstance().level?.let { level ->
-            level.addParticle(ParticleTypes.BUBBLE, state.x, state.y, state.z, 1.0, 1.0, 1.0)
-            level.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, state.x, state.y, state.z, 0.0, 0.0, 0.0)
+
+//        Minecraft.getInstance().level?.let { level ->
+//            level.addParticle(ParticleTypes.BUBBLE, state.x, state.y, state.z, 1.0, 1.0, 1.0)
+//            level.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, state.x, state.y, state.z, 0.0, 0.0, 0.0)
+//        }
+
+        addCypherTrailParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, state.x, state.y, state.z, 0.0, 0.0, 0.0) {
+            setColor(0.5f, 1.0f, 0.6f)
+            setAlpha(0.6f)
         }
+
         super.submit(state, poseStack, submitNodeCollector, camera)
     }
 

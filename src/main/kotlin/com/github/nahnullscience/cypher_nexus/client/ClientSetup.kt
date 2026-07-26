@@ -16,7 +16,6 @@ import net.minecraft.commands.Commands
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
@@ -104,6 +103,7 @@ object ClientSetup {
 
     @SubscribeEvent
     private fun registerParticleProviders(event: RegisterParticleGroupsEvent) {
+        // for particleEngine #particleRenderOrder and #particleGroupFactories
         event.register(CYPHER_TRAIL_RENDER_TYPE, ::CypherTrailParticleGroup)
     }
 

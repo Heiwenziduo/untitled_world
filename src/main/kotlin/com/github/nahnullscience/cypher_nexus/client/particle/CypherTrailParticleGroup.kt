@@ -1,49 +1,91 @@
 package com.github.nahnullscience.cypher_nexus.client.particle
 
+import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.CypherNexus.MOD_ID
-import com.github.nahnullscience.cypher_nexus.client.renderer.state.CypherTrailParticleRenderState
 import com.github.nahnullscience.cypher_nexus.init.config.ModClientConfig
-import net.minecraft.CrashReport
-import net.minecraft.CrashReportDetail
-import net.minecraft.ReportedException
-import net.minecraft.client.Camera
+import com.google.common.collect.EvictingQueue
+import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.ParticleEngine
-import net.minecraft.client.particle.ParticleGroup
 import net.minecraft.client.particle.ParticleRenderType
-import net.minecraft.client.renderer.culling.Frustum
-import net.minecraft.client.renderer.state.level.ParticleGroupRenderState
+import net.minecraft.client.particle.QuadParticleGroup
+import net.minecraft.client.particle.SingleQuadParticle
+import net.minecraft.core.particles.ParticleOptions
+import net.neoforged.api.distmarker.Dist
+import net.neoforged.bus.api.SubscribeEvent
+import net.neoforged.fml.common.EventBusSubscriber
+import net.neoforged.neoforge.event.tick.LevelTickEvent
+import java.util.*
 
 class CypherTrailParticleGroup(
     engine: ParticleEngine
-) : ParticleGroup<CypherTrailParticle>(engine) {
+) : QuadParticleGroup(engine, CYPHER_TRAIL_RENDER_TYPE) {
+
+    @EventBusSubscriber(modid = CypherNexus.MOD_ID, value = [Dist.CLIENT])
     companion object {
         val CYPHER_TRAIL_RENDER_TYPE: ParticleRenderType = ParticleRenderType("$MOD_ID:cypher_trail")
-    }
 
-    val maxParticles = ModClientConfig.CONFIG.maxTrailParticleCount.asInt
+        private var INSTANCE: CypherTrailParticleGroup? = null
 
-    val renderType: ParticleRenderType? = null
-    val renderState = CypherTrailParticleRenderState()
+        @SubscribeEvent
+        private fun makeSureGroupInEngine(event: LevelTickEvent.Pre) {
+            // for we don't know the timing engine calls #clear
+            // loop this and make sure our instance is not stale
+            updateInstance()
+        }
 
-
-    override fun extractRenderState(
-        frustum: Frustum,
-        camera: Camera,
-        partialTickTime: Float
-    ): ParticleGroupRenderState {
-        for (p in particles) {
-            if (frustum.pointInFrustum(p.getX(), p.getY(), p.getZ())) {
-                try {
-                    p.extract(renderState, camera, partialTickTime)
-                } catch (var9: Throwable) {
-                    val report = CrashReport.forThrowable(var9, "Rendering Particle")
-                    val category = report.addCategory("Particle being rendered")
-                    category.setDetail("Particle", CrashReportDetail { p.toString() })
-                    category.setDetail("Particle Type", CrashReportDetail { renderType.toString() })
-                    throw ReportedException(report)
-                }
+        private fun updateInstance(): CypherTrailParticleGroup {
+            Minecraft.getInstance().particleEngine.let { engine ->
+                return (engine.particles.computeIfAbsent(CYPHER_TRAIL_RENDER_TYPE) { type ->
+                    CypherTrailParticleGroup(engine)
+                } as CypherTrailParticleGroup).also { INSTANCE = it }
             }
         }
-        return renderState
+
+        /**
+         *
+         * */
+        // now we can ntr vanilla quad to our render layer
+        fun <T : ParticleOptions> addCypherTrailParticle(
+            options: T,
+            x: Double, y: Double, z: Double,
+            xa: Double, ya: Double, za: Double
+        ) {
+            val particle = Minecraft.getInstance().particleEngine.makeParticle(options, x, y, z, xa, ya, za)
+            if (particle is SingleQuadParticle) {
+                (INSTANCE ?: updateInstance()).particlesToAdd.add(particle)
+            }
+        }
+        /**
+         *
+         * */
+        fun <T : ParticleOptions> addCypherTrailParticle(
+            options: T,
+            x: Double, y: Double, z: Double,
+            xa: Double, ya: Double, za: Double,
+            config: SingleQuadParticle.() -> Unit
+        ) {
+            val particle = Minecraft.getInstance().particleEngine.makeParticle(options, x, y, z, xa, ya, za)
+            if (particle is SingleQuadParticle) {
+                particle.config()
+                (INSTANCE ?: updateInstance()).particlesToAdd.add(particle)
+            }
+        }
+    }
+
+    val maxCount = ModClientConfig.CONFIG.maxTrailParticleCount.asInt
+    private val particlesToAdd: Queue<SingleQuadParticle> = EvictingQueue.create(maxCount)
+    init {
+        particles = EvictingQueue.create(maxCount)
+    }
+
+    override fun tickParticles() {
+        super.tickParticles()
+        if (particlesToAdd.isNotEmpty()) {
+            var v = particlesToAdd.poll()
+            while (v != null) {
+                particles.add(v)
+                v = particlesToAdd.poll()
+            }
+        }
     }
 }

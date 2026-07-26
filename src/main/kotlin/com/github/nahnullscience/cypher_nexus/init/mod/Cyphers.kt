@@ -224,8 +224,12 @@ object Cyphers {
         delay(-3)
         recharge(-6)
     }
-    val PEACEFUL = registerModifier("peaceful", 5f) {
+    val PEACEFUL = registerModifier("peaceful_mode", 5f) {
+        delay(-2)
         flags(CypherFlags.SKIP_DAMAGE_CHECK)
+        shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, -1.0)
+        shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.SET_ALL, 0.0)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 120.0)
     }
     val BOUNCY = registerModifier("bouncy", 5f) {
         shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.ADD, 10.0)

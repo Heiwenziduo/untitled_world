@@ -19,7 +19,7 @@ interface IFlagExtension {
     fun haveFlagsAll(vararg flags: IFlagEnum) =
         flags.firstOrNull { flag -> noFlag(flag) } ?.let { false } ?: true
 
-    fun noFlag(flag0: IFlagEnum) = !haveFlag(flag0)
+    fun noFlag(flag0: IFlagEnum) = enabledFlags and flag0.value == 0
     /**
      * NONE of given flags are present
      * */

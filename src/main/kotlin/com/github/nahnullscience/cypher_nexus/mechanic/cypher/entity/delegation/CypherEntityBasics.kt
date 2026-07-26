@@ -107,7 +107,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
         )
     }
 
-    protected var capturedInitialSpeed: Double = 0.0
+    protected var capturedInitialSpeedSqr: Double = 0.0
     protected var bounceCount = 0
     override val canBounce: Boolean get() = bounceCount < cyEntity.getBounce()
     override val bouncePoints = ArrayList<Vec3>()
@@ -331,7 +331,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
         if (count < 7) return
 
         // this means the projectile is decelerated to low speed
-        if (capturedInitialSpeed > LOW_SPEED_THRESHOLD_SQR) {
+        if (capturedInitialSpeedSqr > LOW_SPEED_THRESHOLD_SQR && noFlag(CypherFlags.MOTION_FOLLOWS_OWNER)) {
             discardCypher(DiscardReason.LOW_SPEED)
         }
     }
@@ -355,7 +355,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
         }
 
         if (cyEntity.tickCount == 3) {
-            capturedInitialSpeed = cyEntity.deltaMovement.lengthSqr()
+            capturedInitialSpeedSqr = cyEntity.deltaMovement.lengthSqr()
         }
 
         hooksSharedData.tick(cyEntity)

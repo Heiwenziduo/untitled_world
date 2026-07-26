@@ -21,10 +21,10 @@ class ModClientConfig private constructor (builder: Builder) {
         private fun key(k: String): String = "$MOD_ID.config.$k"
     }
 
-    val engineMaxFPS: IntValue = builder
-        .comment("")
-        .translation(key("engine_max_fps"))
-        .defineInRange("engine_max_fps", 60, 20, Int.MAX_VALUE)
+//    val engineMaxFPS: IntValue = builder
+//        .comment("")
+//        .translation(key("engine_max_fps"))
+//        .defineInRange("engine_max_fps", 60, 20, Int.MAX_VALUE)
 
     val maxTrailParticleCount: IntValue = builder
         .comment("the max number of cypher-entity trail particles")
@@ -35,9 +35,9 @@ class ModClientConfig private constructor (builder: Builder) {
         .comment("whether show bounce trajectory instead of moving to destination directly")
         .translation(key("bounce_points_interpolate"))
         .define("bounce_points_interpolate", true)
-    val circularInterpolate: BooleanValue = builder
-        .comment("whether interpolate more smoothly when projectile goes a circular way // TODO")
-        .translation(key("circular_interpolate"))
-        .define("circular_interpolate", true)
+//    val circularInterpolate: BooleanValue = builder
+//        .comment("whether interpolate more smoothly when projectile goes a circular way // TODO")
+//        .translation(key("circular_interpolate"))
+//        .define("circular_interpolate", true)
 
 }
