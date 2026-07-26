@@ -4,29 +4,31 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.client.devtools.WebServiceManager
 import com.github.nahnullscience.cypher_nexus.client.gui.WandDataOverlay
 import com.github.nahnullscience.cypher_nexus.client.particle.CypherTrailParticleGroup
-import com.github.nahnullscience.cypher_nexus.client.particle.CypherTrailParticleGroup.Companion.CYPHER_TRAIL
+import com.github.nahnullscience.cypher_nexus.client.particle.CypherTrailParticleGroup.Companion.CYPHER_TRAIL_RENDER_TYPE
+import com.github.nahnullscience.cypher_nexus.client.particle.DistanceInvokeTrail
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.*
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
+import com.github.nahnullscience.cypher_nexus.init.ModParticleTypes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.commands.Commands
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.projectile.ItemSupplier
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.ModLoadingContext
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent
-import net.neoforged.neoforge.client.event.EntityRenderersEvent
+import net.neoforged.neoforge.client.event.*
 import net.neoforged.neoforge.client.event.EntityRenderersEvent.RegisterRenderers
-import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent
-import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent
-import net.neoforged.neoforge.client.event.RegisterParticleGroupsEvent
 import net.neoforged.neoforge.client.gui.ConfigurationScreen
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers.CONTEXTUAL_INFO_BAR
 import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent
-import java.util.function.Function
 import java.util.function.Supplier
 
 
@@ -74,10 +76,10 @@ object ClientSetup {
         event.registerEntityRenderer(ModEntities.CYPHER_ARROW, ::ArrowCypherRenderer)
         event.registerEntityRenderer(ModEntities.CYPHER_LLAMA_SPIT, ::LlamaSpitCypherRenderer)
 
-        event.registerItemProjectile(ModEntities.CYPHER_SNOWBALL)
-        event.registerItemProjectile(ModEntities.CYPHER_ENDER_RECALL)
-        event.registerItemProjectile(ModEntities.CYPHER_ENDER_TELEPORTATION)
-        event.registerItemProjectile(ModEntities.CYPHER_SPAWN_EGG)
+        event.registerItemProjectile(ModEntities.CYPHER_SNOWBALL, Items.SNOWBALL)
+        event.registerItemProjectile(ModEntities.CYPHER_ENDER_RECALL, Items.ENDER_PEARL)
+        event.registerItemProjectile(ModEntities.CYPHER_ENDER_TELEPORTATION, Items.ENDER_PEARL)
+        event.registerItemProjectile(ModEntities.CYPHER_SPAWN_EGG, Items.EGG)
 
         event.registerParticleProjectile(ModEntities.CYPHER_BUBBLE_COLUMN)
         event.registerParticleProjectile(ModEntities.CYPHER_DRILLING_BOLT)
@@ -91,7 +93,7 @@ object ClientSetup {
     }
 
     @SubscribeEvent
-    fun registerRenderStateModifiers(event: RegisterRenderStateModifiersEvent) {
+    private fun registerRenderStateModifiers(event: RegisterRenderStateModifiersEvent) {
 
     }
 
@@ -101,8 +103,22 @@ object ClientSetup {
     }
 
     @SubscribeEvent
-    fun registerParticleProviders(event: RegisterParticleGroupsEvent) {
-        event.register(CYPHER_TRAIL, ::CypherTrailParticleGroup)
+    private fun registerParticleProviders(event: RegisterParticleGroupsEvent) {
+        event.register(CYPHER_TRAIL_RENDER_TYPE, ::CypherTrailParticleGroup)
+    }
+
+    @SubscribeEvent
+    private fun registerParticleProviders(event: RegisterParticleProvidersEvent) {
+        // There are multiple ways to register providers, all differing in the functional type they provide in the
+        // second parameter. For example, #registerSpriteSet represents a Function<SpriteSet, ParticleProvider<?>>:
+        // #registerSpecial, on the other hand, maps to a ParticleProvider<?>.
+        // This should be used if the sprite is not obtained from the particle description.
+
+//        event.registerSpriteSet(
+//            ModParticleTypes.CYPHER_TRAIL.get(),
+//            SpriteParticleRegistration { spriteSet ->  ModelParticle.TrailProvider(spriteSet) })
+
+        event.registerSpriteSet(ModParticleTypes.DISTANCE_INVOKE_TRAIL.get()) { spriteSet -> DistanceInvokeTrail.TrailProvider(spriteSet) }
     }
 
     @SubscribeEvent
@@ -125,18 +141,27 @@ object ClientSetup {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private fun <CY> RegisterRenderers.registerItemProjectile (
-        cypherEntity: Supplier<out EntityType<out CY>>,
-    ) where CY : AbstractDedicatedCypherProjectile, CY : ItemSupplier
-            = registerEntityRenderer(cypherEntity.get()) { context -> SimpleItemProjectileRenderer(context) }
+    private fun <CE> RegisterRenderers.registerItemProjectile (
+        ceSupplier: Supplier<out EntityType<out CE>>,
+        item: Item
+    ) where CE : AbstractDedicatedCypherProjectile {
+        registerEntityRenderer(ceSupplier.get()) { context ->
+            SimpleItemProjectileRenderer(context, item)
+        }
+    }
 
-    private fun <CY> RegisterRenderers.registerParticleProjectile (
-        cypherEntity: Supplier<out EntityType<out CY>>,
-    ) where CY : AbstractDedicatedCypherProjectile
-            = registerEntityRenderer(cypherEntity.get()) { context -> SimpleParticleProjectileRenderer(context) }
+    private fun <CE> RegisterRenderers.registerParticleProjectile (
+        ceSupplier: Supplier<out EntityType<out CE>>,
+    ) where CE : AbstractDedicatedCypherProjectile {
+        registerEntityRenderer(ceSupplier.get()) { context ->
+            SimpleParticleProjectileRenderer(context)
+        }
+    }
 
-    private fun <T : AbstractDedicatedCypherProjectile> RegisterRenderers.registerEntityRenderer(
-        cypherEntity: Supplier<out EntityType<out T>>,
-        factory: EntityRendererProvider<T>
-    ) = registerEntityRenderer(cypherEntity.get(), factory)
+    private fun <CE> RegisterRenderers.registerEntityRenderer(
+        ceSupplier: Supplier<out EntityType<out CE>>,
+        factory: EntityRendererProvider<CE>
+    ) where CE : Entity, CE : ICypherEntity {
+        registerEntityRenderer(ceSupplier.get(), factory)
+    }
 }

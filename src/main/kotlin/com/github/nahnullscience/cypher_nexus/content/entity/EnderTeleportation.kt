@@ -18,14 +18,13 @@ import net.minecraft.world.level.portal.TeleportTransition
 open class EnderTeleportation(
     entityType: EntityType<out AbstractDedicatedCypherProjectile>,
     level: Level
-) : AbstractDedicatedCypherProjectile(entityType, level), ItemSupplier {
+) : AbstractDedicatedCypherProjectile(entityType, level) {
     companion object {
         // teleportation utils
 
     }
 
     override val cypherHolder = ENDER_TELEPORTATION
-    override fun getItem() = ItemStack(Items.ENDER_PEARL)
 
     override fun discardVisualEffect() {
 //        for (i in 0..7) {

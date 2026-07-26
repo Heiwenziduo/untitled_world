@@ -2,6 +2,7 @@ package com.github.nahnullscience.cypher_nexus.datagen
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.datagen.client.CNModelProvider
+import com.github.nahnullscience.cypher_nexus.datagen.client.CNParticleDescriptionProvider
 import com.github.nahnullscience.cypher_nexus.datagen.server.CNAdvancementProviders
 import com.github.nahnullscience.cypher_nexus.datagen.server.CNDataMapProvider
 import com.github.nahnullscience.cypher_nexus.datagen.server.CNLootTableProviders
@@ -34,6 +35,7 @@ object ModData {
 
         // client
         event.createProvider(::CNModelProvider)
+        event.createProvider(::CNParticleDescriptionProvider)
 
         // server
         event.createProvider(::CNDataMapProvider)

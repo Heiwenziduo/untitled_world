@@ -9,17 +9,24 @@ import net.minecraft.client.renderer.item.ItemModelResolver
 import net.minecraft.client.renderer.state.level.CameraRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.world.entity.projectile.ItemSupplier
+import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemDisplayContext
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.Items
 
 class SimpleItemProjectileRenderer <CE> (
     context: Context,
-) : AbstractCypherRenderer<CE, ItemProjectileRenderState>(context) where CE : AbstractDedicatedCypherProjectile, CE : ItemSupplier {
+    val item: Item
+) : AbstractCypherRenderer<CE, ItemProjectileRenderState>(context) where CE : AbstractDedicatedCypherProjectile {
+    constructor(context: Context) : this(context, Items.AIR)
 
     companion object {
         const val DEFAULT_SCALE = 0.5f
     }
 
     private val itemModelResolver: ItemModelResolver = context.itemModelResolver
+
+    private val stack by lazy { item.defaultInstance }
 
     init {
         // println("SimpleItemProjectileRenderer init") // called when load into main menu
@@ -51,6 +58,6 @@ class SimpleItemProjectileRenderer <CE> (
 
     override fun extractRenderState(entity: CE, state: ItemProjectileRenderState, partialTicks: Float) {
         super.extractRenderState(entity, state, partialTicks)
-        itemModelResolver.updateForNonLiving(state.item, entity.item, ItemDisplayContext.GROUND, entity)
+        itemModelResolver.updateForNonLiving(state.item, stack, ItemDisplayContext.GROUND, entity)
     }
 }

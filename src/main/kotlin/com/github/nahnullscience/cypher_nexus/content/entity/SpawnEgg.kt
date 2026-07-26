@@ -13,9 +13,8 @@ import net.minecraft.world.level.Level
 class SpawnEgg(
     entityType: EntityType<out AbstractDedicatedCypherProjectile>,
     level: Level
-) : AbstractDedicatedCypherProjectile(entityType, level), ItemSupplier {
+) : AbstractDedicatedCypherProjectile(entityType, level) {
     override val cypherHolder = SPAWN_EGG
-    override fun getItem() = ItemStack(Items.EGG)
 
     override fun discardVisualEffect() {
         for (i in 0 until radiusFriendlyParticleCount(8, 32)) {

@@ -17,13 +17,14 @@ class CypherTrailParticleGroup(
     engine: ParticleEngine
 ) : ParticleGroup<CypherTrailParticle>(engine) {
     companion object {
-        val CYPHER_TRAIL: ParticleRenderType = ParticleRenderType("$MOD_ID:cypher_trail")
+        val CYPHER_TRAIL_RENDER_TYPE: ParticleRenderType = ParticleRenderType("$MOD_ID:cypher_trail")
     }
 
     val maxParticles = ModClientConfig.CONFIG.maxTrailParticleCount.asInt
 
     val renderType: ParticleRenderType? = null
     val renderState = CypherTrailParticleRenderState()
+
 
     override fun extractRenderState(
         frustum: Frustum,

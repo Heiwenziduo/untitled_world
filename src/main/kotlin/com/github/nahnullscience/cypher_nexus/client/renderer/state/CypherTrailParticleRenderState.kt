@@ -18,7 +18,8 @@ class CypherTrailParticleRenderState : ParticleGroupRenderState, ParticleGroupRe
         camera: CameraRenderState
     ) {
         if (this.particleCount > 0) {
-            submitNodeCollector.submitParticleGroup(this)
+//            submitNodeCollector.submitParticleGroup(this)
+            submitNodeCollector
         }
     }
 

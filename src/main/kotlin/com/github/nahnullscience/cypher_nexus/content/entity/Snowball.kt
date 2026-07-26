@@ -11,9 +11,8 @@ import net.minecraft.world.level.Level
 class Snowball(
     entityType: EntityType<out AbstractDedicatedCypherProjectile>,
     level: Level
-) : AbstractDedicatedCypherProjectile(entityType, level), ItemSupplier {
+) : AbstractDedicatedCypherProjectile(entityType, level) {
     override val cypherHolder = SNOWBALL
-    override fun getItem() = Items.SNOWBALL.defaultInstance
 
     override fun discardVisualEffect() {
         for (i in 0 until radiusFriendlyParticleCount(8, 64)) {

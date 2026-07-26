@@ -86,10 +86,10 @@ object Cyphers {
         projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.0)
     }
     val ENDER_RECALL = registerProjectile(ModEntities.CYPHER_ENDER_RECALL) {
-        manaDrain(25f)
+        manaDrain(20f)
         flags(CypherFlags.SKIP_DAMAGE_CHECK, CypherFlags.WITH_ENDER_POWER)
-        projectileAttr(CypherAttributes.SPEED, 1.6)
-        projectileAttr(CypherAttributes.EXISTING, 15.0)
+        projectileAttr(CypherAttributes.SPEED, 0.0)
+        projectileAttr(CypherAttributes.EXISTING, 100.0)
         projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.0)
     }
     val BUBBLE_COLUMN = registerProjectile(ModEntities.CYPHER_BUBBLE_COLUMN) {
@@ -135,6 +135,16 @@ object Cyphers {
         projectileAttr(CypherAttributes.SPEED, 0.3)
         projectileAttr(CypherAttributes.EXISTING, 2.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.02)
+    }
+    val SMOKE_BOMB = registerProjectile(ModEntities.CYPHER_SMOKE_BOMB) {
+        manaDrain(20f)
+        flags(CypherFlags.LINGER, CypherFlags.EXPLOSIVE)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 3.0)
+        projectileAttr(CypherAttributes.DAMAGE, 1.0)
+        projectileAttr(CypherAttributes.CRIT_CHANCE, 0.05)
+        projectileAttr(CypherAttributes.SPEED, 0.7)
+        projectileAttr(CypherAttributes.EXISTING, 300.0)
+        projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

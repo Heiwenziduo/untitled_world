@@ -36,6 +36,7 @@ import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn
 import java.util.*
 import java.util.function.Consumer
+import java.util.function.Supplier
 
 abstract class AbstractDedicatedCypherProjectile(
     entityType: EntityType<out AbstractDedicatedCypherProjectile>,
@@ -69,6 +70,11 @@ abstract class AbstractDedicatedCypherProjectile(
             proj.setOwner(owner)
             return proj
         }
+        fun <CE> createRaw(
+            type: Supplier<EntityType<CE>>,
+            level: ServerLevel,
+            owner: Entity?
+        ) : CE where CE : Entity, CE : ICypherEntity = createRaw(type.get(), level, owner)
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

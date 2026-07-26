@@ -73,6 +73,7 @@ object CypherNexus {
         ModBlocks.register()
         ModItems.register()
         ModEntities.register()
+        ModParticleTypes.register()
         ModDataComponents.register()
         ModDataSerializers.register()
 //        ModDataLootFunctions.register()
