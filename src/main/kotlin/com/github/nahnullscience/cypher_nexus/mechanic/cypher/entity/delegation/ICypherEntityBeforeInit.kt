@@ -16,7 +16,7 @@ interface ICypherEntityBeforeInit {
      * [MapOfCypherCounts] serves as the token of [ShotStateChunk],
      * this field initialized in server and will be shipped to client to sync shot-data
      * */
-    fun ccMap(): MapOfCypherCounts?
+    val ccMap: MapOfCypherCounts?
     /**
      * initialize from [MapOfCypherCounts]
      * */

@@ -26,7 +26,14 @@ class SimpleItemProjectileRenderer <CE> (
 
     private val itemModelResolver: ItemModelResolver = context.itemModelResolver
 
-    private val stack by lazy { item.defaultInstance }
+//    @Volatile // assume renders remain single threaded in production environment
+    private var _cachedStack: ItemStack? = null
+    val stack: ItemStack
+        get() {
+            val local = _cachedStack
+            return local ?: item.defaultInstance.also { _cachedStack = it }
+        }
+
 
     init {
         // println("SimpleItemProjectileRenderer init") // called when load into main menu

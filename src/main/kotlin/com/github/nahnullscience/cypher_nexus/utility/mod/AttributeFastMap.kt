@@ -4,7 +4,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
-import it.unimi.dsi.fastutil.objects.Reference2DoubleArrayMap
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
 import kotlin.collections.MutableMap.MutableEntry
 
@@ -30,8 +29,8 @@ class AttributeFastMap(
     }
 
     fun initFromShotState(state: ShotStateChunk, cypher: AbstractProjectileCypher<*>) {
-        state.attr2opMap.forEach { (attr, opMap) ->
-            if (!attr.isCEAttribute) return@forEach
+        state.attributes.forEach { (attr, opMap) ->
+            if (!attr.isAttributeForCE) return@forEach
 //            if (haveFlag(CypherFlags.CONSTANT_EXISTING) && CypherAttributes.EXISTING.`is`(attr.resource)) return@forEach
             // TODO prune cumulation, some of attributes will not be used, depends on cypher implementation
 

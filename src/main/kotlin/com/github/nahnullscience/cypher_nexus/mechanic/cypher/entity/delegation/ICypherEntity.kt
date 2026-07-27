@@ -38,47 +38,16 @@ import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent
  * overriding other method have no effect.
  * */
 interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherEntityBeforeInit {
-    @EventBusSubscriber(modid = CypherNexus.MOD_ID)
-    companion object {
-        const val CLIP_MARGIN = 0.2f
-        const val CAPTURE_SIZE = 8.0
-        const val CAPTURE_SIZE_SQR = CAPTURE_SIZE * CAPTURE_SIZE
-        const val LOW_SPEED_THRESHOLD = 0.02
-        const val LOW_SPEED_THRESHOLD_SQR = LOW_SPEED_THRESHOLD * LOW_SPEED_THRESHOLD
-        const val HIT_BB_INFLATION = 0.25
-
-        @SubscribeEvent(priority = EventPriority.NORMAL)
-        private fun initCypherEntity(event: EntityJoinLevelEvent) {
-            val entity = event.entity
-            if (entity is ICypherEntity) {
-                entity.initEntity(entity)
-            }
-        }
-
-        fun ICypherEntity.exertDamage(level: ServerLevel, target: Entity) {
-            var damage = getAttributeOrDefault(CypherAttributes.DAMAGE)
-            var crit = getAttributeOrDefault(CypherAttributes.CRIT_CHANCE)
-            var critMulti = (owner as? LivingEntity)?.let { 1.5 } ?: 1.5 // there is no CritMultiplier Attribute, why
-            var t = 1
-            while (crit > 1 && t++ < Int.MAX_VALUE) {
-                crit -= 1
-                critMulti *= 1.5
-            }
-            if (t > 1 || target.random.nextFloat() < crit) {
-                damage *= critMulti
-            }
-            target.hurtServer(level, getDamageSource(), damage.toFloat())
-        }
-    }
-
     val cypherHolder: Holder<out AbstractProjectileCypher<*>>
     val cypher get() = cypherHolder.value()
 
     /**
      * [MapOfCypherCounts] serves as the token of [ShotStateChunk],
      * this field initialized in server and will be shipped to client to sync shot-data
+     *
+     * this field directly forwards to the backing [ShotStateChunk] and should be treated as `immutable`
      * */
-    override fun ccMap(): MapOfCypherCounts?
+    override val ccMap: MapOfCypherCounts?
 
     /**
      * init from [ShotStateChunk]
@@ -97,16 +66,20 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherEntityBeforeIn
      * */
     override fun initDirection(pair: PosDirePair)
 
+    val attributeMap: AttributeFastMap
+    /** this field directly forwards to the backing [ShotStateChunk] and should be treated as `immutable` */
+    val hooks: HookContainer?
+    val hooksSharedData: HooksSharedData<*>
+
+    val triggerType: TriggerType
+    val payload: ShotStateChunk?
+    /** tint from dyes */
+    val hue: Int?
+    /** 0f~1f float representation of [hue], in order of r0 g1 b2 a3 */
+    val hueFloatArray: FloatArray?
+
     override fun getOwner(): Entity?
     fun setOwner(owner: Entity?)
-
-    fun attributeMap(): AttributeFastMap
-    fun hooks(): HookContainer?
-    val hooksSharedData: HooksSharedData<*>
-    fun hooksSharedData(): HooksSharedData<*>
-
-    fun triggerType(): TriggerType
-    fun payload(): ShotStateChunk?
 
     fun getDirectionInitial(): Vec3
     fun getPositionInitial(): Vec3
@@ -203,4 +176,39 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherEntityBeforeIn
      *
      * */
     fun whileHomeTarget(target: Entity)
+
+
+    ///////////////////////////// helpers /////////////////////////////////
+    @EventBusSubscriber(modid = CypherNexus.MOD_ID)
+    companion object {
+        const val CLIP_MARGIN = 0.2f
+        const val CAPTURE_SIZE = 8.0
+        const val CAPTURE_SIZE_SQR = CAPTURE_SIZE * CAPTURE_SIZE
+        const val LOW_SPEED_THRESHOLD = 0.02
+        const val LOW_SPEED_THRESHOLD_SQR = LOW_SPEED_THRESHOLD * LOW_SPEED_THRESHOLD
+        const val HIT_BB_INFLATION = 0.25
+
+        @SubscribeEvent(priority = EventPriority.NORMAL)
+        private fun initCypherEntity(event: EntityJoinLevelEvent) {
+            val entity = event.entity
+            if (entity is ICypherEntity) {
+                entity.initEntity(entity)
+            }
+        }
+
+        fun ICypherEntity.exertDamage(level: ServerLevel, target: Entity) {
+            var damage = getAttributeOrDefault(CypherAttributes.DAMAGE)
+            var crit = getAttributeOrDefault(CypherAttributes.CRIT_CHANCE)
+            var critMulti = (owner as? LivingEntity)?.let { 1.5 } ?: 1.5 // there is no CritMultiplier Attribute, why
+            var t = 1
+            while (crit > 1 && t++ < Int.MAX_VALUE) {
+                crit -= 1
+                critMulti *= 1.5
+            }
+            if (t > 1 || target.random.nextFloat() < crit) {
+                damage *= critMulti
+            }
+            target.hurtServer(level, getDamageSource(), damage.toFloat())
+        }
+    }
 }

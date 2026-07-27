@@ -41,25 +41,29 @@ sealed class AbstractCypher(
     val recharge: Int get() = attributes().recharge
     val flags: Int get() = attributes().flags
 
+    /** override colors from category */
+    open val borderColor: Int? = null
     /** whether the cypher shows in the index(left side) */
     open val hide: Boolean = false
-    /** override colors from category */
-    open val color: Int? = null
+
+    @Volatile // for future threaded access
+    private var _implementHooksBacking: List<HookModule<*>>? = null
+    /** auto-detect hooks */
+    val implementedHooks: List<HookModule<*>>
+        get() {
+            val local = _implementHooksBacking
+            return local ?:
+            CypherHooks.REGISTRY.filter { module ->
+                val c1 = module.hook.isInstance(this)
+                val c2 = (this is AbstractProjectileCypher<*> && module.type == HookType.BEHAVIOR)
+                    .also { if (it) CypherNexus.LOGGER.warn("Don't register [behavior] hook [{}] on [projectile-cypher] [{}], instead implement them on related cypher-entity directly.", module.hook, this) }
+
+                return@filter c1 && !c2
+            }.also { _implementHooksBacking = it }
+        }
 
     open val isInvokable: Boolean = true
 
-    /** auto-detect hooks */
-    val implementedHooks: List<HookModule<*>> by lazy {
-        CypherHooks.REGISTRY.filter { module ->
-            val c1 = module.hook.isInstance(this)
-            val c2 = (this is AbstractProjectileCypher<*> && module.type == HookType.BEHAVIOR)
-                .also { if (it) CypherNexus.LOGGER.warn("Don't register [behavior] hook [{}] on [{}], instead implement them on related entity directly.", module.hook, this) }
-
-            return@filter c1 && !c2
-        }
-    }
-//    /** if a cypher may call itself, set this to true to avoid infinite loop */
-//    open val isRecursive: Boolean = false
     fun isEmpty() = this is EmptyCypher
     fun isNotEmpty() = !isEmpty()
     /** use for AddTrigger series */

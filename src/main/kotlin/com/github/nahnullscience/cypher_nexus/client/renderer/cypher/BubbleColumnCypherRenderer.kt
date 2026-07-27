@@ -26,9 +26,12 @@ class BubbleColumnCypherRenderer(context: Context) : SimpleParticleProjectileRen
     ) {
         linearInterpolateGaps(xo, yo, zo, x, y, z, 0.25) { step, x, y, z ->
             addCypherTrailParticle(ParticleTypes.BUBBLE, x, y, z, 0.0, 0.0, 0.0) {
-//                setColor(0.8f, 0.4f, 1.0f)
-                lifetime += 30
+                entity.hueFloatArray?.let {
+                    setColor(it[0], it[1], it[2])
+                    setAlpha(it[3])
+                }
                 scale(entity.getEffectRadius().coerceIn(0.5f, 4.0f))
+                lifetime += 30
             }
         }
     }

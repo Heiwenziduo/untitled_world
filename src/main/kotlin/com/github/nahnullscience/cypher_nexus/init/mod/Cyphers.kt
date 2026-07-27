@@ -29,6 +29,7 @@ import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister
 import net.neoforged.neoforge.registries.RegistryBuilder
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
+import java.awt.Color
 
 /**
  *
@@ -227,7 +228,7 @@ object Cyphers {
         delay(-3)
         recharge(-6)
     }
-    val PEACEFUL = registerModifier("peaceful_mode", 5f) {
+    val PEACEFUL_MODE = registerModifier("peaceful_mode", 5f) {
         delay(-2)
         flags(CypherFlags.SKIP_DAMAGE_CHECK)
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, -1.0)
@@ -331,6 +332,34 @@ object Cyphers {
         flags(CypherFlags.IGNORE_BLOCK, CypherFlags.MOTION_FOLLOWS_OWNER)
         shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 40.0)
         shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.SET_ALL, 0.0)
+    }
+    val RED_TINT = registerModifier("red_tint", 0f) {
+        delay(-1)
+        dyeColor(Color.red)
+    }
+    val ORANGE_TINT = registerModifier("orange_tint", 0f) {
+        delay(-1)
+        dyeColor(Color.orange)
+    }
+    val YELLOW_TINT = registerModifier("yellow_tint", 0f) {
+        delay(-1)
+        dyeColor(Color.yellow)
+    }
+    val LIME_TINT = registerModifier("lime_tint", 0f) {
+        delay(-1)
+        dyeColor(Color.green)
+    }
+    val CYAN_TINT = registerModifier("cyan_tint", 0f) {
+        delay(-1)
+        dyeColor(Color.cyan)
+    }
+    val BLUE_TINT = registerModifier("blue_tint", 0f) {
+        delay(-1)
+        dyeColor(Color.blue)
+    }
+    val PURPLE_TINT = registerModifier("purple_tint", 0f) {
+        delay(-1)
+        dyeColor(8073150)
     }
 
 

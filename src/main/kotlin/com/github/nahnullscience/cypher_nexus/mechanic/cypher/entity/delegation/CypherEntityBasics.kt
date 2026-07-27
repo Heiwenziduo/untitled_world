@@ -51,30 +51,24 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     private var _cyEntity: CE? = null
     protected val cyEntity: CE get() = _cyEntity ?:
     throw CypherEntityException("CypherEntityDelegation failed to initialize! make sure call #initEntity before it's adding to world!")
-    protected val level get() = cyEntity.level()
-    protected val random get() = cyEntity.random
     override val cypherHolder: Holder<out AbstractProjectileCypher<*>> get() = cyEntity.cypherHolder // FIXME this may lead to infinite loop
 
     /** no flag by default */
     override var enabledFlags = CypherFlags.fromFlags()
 
-    protected var ccMap: MapOfCypherCounts? = null
-    override fun ccMap(): MapOfCypherCounts? = ccMap
-
-    protected val attributeMap by lazy { AttributeFastMap() }
-    override fun attributeMap(): AttributeFastMap = attributeMap
-
-    protected var hooks: HookContainer? = null
-    override fun hooks(): HookContainer? = hooks
-
+    override var ccMap: MapOfCypherCounts? = null
+    override val attributeMap = AttributeFastMap()
+    override var hooks: HookContainer? = null
     override val hooksSharedData = HooksSharedData<CE>()
-    override fun hooksSharedData(): HooksSharedData<CE> = hooksSharedData
 
-    protected var trigger = TriggerType.NONE
-    override fun triggerType(): TriggerType = trigger
+    override var triggerType = TriggerType.NONE
+    override var payload: ShotStateChunk? = null
 
-    protected var payload: ShotStateChunk? = null
-    override fun payload(): ShotStateChunk? = payload
+    override var hue: Int? = null
+    override var hueFloatArray: FloatArray? = null
+
+    protected val level get() = cyEntity.level()
+    protected val random get() = cyEntity.random
 
     override fun getDirectionInitial(): Vec3 = _initDirection ?: Vec3.ZERO
     override fun getPositionInitial(): Vec3  = _initPosition ?: cyEntity.owner?.position() ?: Vec3.ZERO
@@ -133,8 +127,10 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
         enabledFlags = shotState.enabledFlags or cypher.flags
         hooks = shotState.hooks
         ccMap = shotState.ccMap
+        hue = shotState.dyeAccumulator.color
+        hueFloatArray = shotState.dyeAccumulator.colorArray
         if (node != null) {
-            trigger = node.trigger
+            triggerType = node.trigger
             payload = node.payload
         }
 
@@ -286,7 +282,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     }
 
     override fun trigger(type: TriggerType, releaseTo: PosDirePair) {
-        if (trigger == TriggerType.NONE || type != trigger || payload == null) return
+        if (triggerType == TriggerType.NONE || type != triggerType || payload == null) return
         payload!!.release(level, cyEntity, cyEntity.owner, releaseTo, null)
     }
     protected fun trigger(type: TriggerType, releasePoint: Vec3) {

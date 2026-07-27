@@ -83,6 +83,7 @@ object ClientSetup {
         event.registerEntityRenderer(ModEntities.CYPHER_BUBBLE_COLUMN, ::BubbleColumnCypherRenderer)
         event.registerParticleProjectile(ModEntities.CYPHER_DRILLING_BOLT)
         event.registerParticleProjectile(ModEntities.CYPHER_DRILLING_BLAST)
+        event.registerEntityRenderer(ModEntities.CYPHER_SMOKE_BOMB, ::SmokeBombCypherRenderer)
 
         //////////////////////////////////////////////////////////////////////////////
         // static

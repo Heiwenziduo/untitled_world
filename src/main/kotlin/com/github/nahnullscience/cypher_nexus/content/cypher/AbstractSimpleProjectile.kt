@@ -30,7 +30,7 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
         private set
     var triggerCount: Int = 1
         private set
-    var color: Int? = null
+    var borderColor: Int? = null
         private set
 
     private val projectileAttrHolder: HashMap<Holder<CypherAttribute>, Double> = HashMap()
@@ -41,7 +41,7 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
     override fun delay(int: Int) = apply { super.delay(int) }
     override fun recharge(int: Int) = apply { super.recharge(int) }
     override fun flags(vararg flag: CypherFlags) = apply { super.flags(*flag) }
-    fun color(int: Int) = apply { color = int }
+    fun borderColor(int: Int) = apply { borderColor = int }
     fun trigger(type: TriggerType, count: Int = 1) = apply { trigger = type; triggerCount = count }
 
     override fun projectileAttr(holder: Holder<CypherAttribute>, value: Double) = apply { projectileAttrHolder[holder] = value }
@@ -74,7 +74,7 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
         override fun createProjectile() = object : ProjectileCypher<AbstractDedicatedCypherProjectile>() {
             override val resource = CypherNexus.modResource(path)
             override val projectileType = type
-            override val color = this@SimpleProjectile.color
+            override val borderColor = this@SimpleProjectile.borderColor
             override val builtinTrigger = this@SimpleProjectile.trigger
             override val builtinTriggerCharge = this@SimpleProjectile.triggerCount
             override fun defaultAttributes() = this@SimpleProjectile
@@ -88,7 +88,7 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
         override fun createProjectile() = object : StaticProjectileCypher<AbstractDedicatedCypherProjectile>() {
             override val resource = CypherNexus.modResource(path)
             override val projectileType = type
-            override val color = this@SimpleStaticProjectile.color
+            override val borderColor = this@SimpleStaticProjectile.borderColor
             override val builtinTrigger = this@SimpleStaticProjectile.trigger
             override val builtinTriggerCharge = this@SimpleStaticProjectile.triggerCount
             override fun defaultAttributes() = this@SimpleStaticProjectile

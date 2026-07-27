@@ -17,12 +17,18 @@ class CypherTrailParticleGroup(
     companion object {
         val CYPHER_TRAIL_RENDER_TYPE: ParticleRenderType = ParticleRenderType("$MOD_ID:cypher_trail")
 
+        const val MAX_PARTICLE_TRACKING_DISTANCE_SQR = 128.0 * 128.0
+
+        val particleEngine get() = Minecraft.getInstance().particleEngine
+
+        val mainCamera get() = Minecraft.getInstance().gameRenderer.mainCamera
+
         @PublishedApi
         internal var INSTANCE: CypherTrailParticleGroup? = null
 
         @PublishedApi
         internal fun updateInstance(): CypherTrailParticleGroup {
-            Minecraft.getInstance().particleEngine.let { engine ->
+            particleEngine.let { engine ->
                 return (engine.particles.computeIfAbsent(CYPHER_TRAIL_RENDER_TYPE) { type ->
                     CypherTrailParticleGroup(engine)
                 } as CypherTrailParticleGroup).also { INSTANCE = it }
@@ -38,7 +44,8 @@ class CypherTrailParticleGroup(
             x: Double, y: Double, z: Double,
             xa: Double, ya: Double, za: Double
         ) {
-            val particle = Minecraft.getInstance().particleEngine.makeParticle(options, x, y, z, xa, ya, za)
+            if (mainCamera.position().distanceToSqr(x, y, z) > MAX_PARTICLE_TRACKING_DISTANCE_SQR) return
+            val particle = particleEngine.makeParticle(options, x, y, z, xa, ya, za)
             if (particle is SingleQuadParticle) {
                 (INSTANCE ?: updateInstance()).particlesToAdd.add(particle)
             }
@@ -52,6 +59,7 @@ class CypherTrailParticleGroup(
             xa: Double, ya: Double, za: Double,
             config: SingleQuadParticle.() -> Unit
         ) {
+            if (mainCamera.position().distanceToSqr(x, y, z) > MAX_PARTICLE_TRACKING_DISTANCE_SQR) return
             val particle = Minecraft.getInstance().particleEngine.makeParticle(options, x, y, z, xa, ya, za)
             if (particle is SingleQuadParticle) {
                 particle.config()

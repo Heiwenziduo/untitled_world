@@ -165,6 +165,15 @@
         }
       }
     },
+    "cypher_nexus:blue_tint": {
+      "delay": -1,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 0.0,
+      "projectile": {},
+      "recharge": 0,
+      "shotState": {}
+    },
     "cypher_nexus:boomerang": {
       "delay": 0,
       "draw": 1,
@@ -269,6 +278,15 @@
           "add": -30.0
         }
       }
+    },
+    "cypher_nexus:cyan_tint": {
+      "delay": -1,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 0.0,
+      "projectile": {},
+      "recharge": 0,
+      "shotState": {}
     },
     "cypher_nexus:cypher_duplication": {
       "delay": 7,
@@ -640,6 +658,15 @@
       "recharge": 10,
       "shotState": {}
     },
+    "cypher_nexus:lime_tint": {
+      "delay": -1,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 0.0,
+      "projectile": {},
+      "recharge": 0,
+      "shotState": {}
+    },
     "cypher_nexus:llama_spit": {
       "delay": 0,
       "draw": 0,
@@ -703,6 +730,15 @@
       "draw": 0,
       "flags": 0,
       "manaDrain": 320.0,
+      "projectile": {},
+      "recharge": 0,
+      "shotState": {}
+    },
+    "cypher_nexus:orange_tint": {
+      "delay": -1,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 0.0,
       "projectile": {},
       "recharge": 0,
       "shotState": {}
@@ -811,6 +847,15 @@
       "recharge": 0,
       "shotState": {}
     },
+    "cypher_nexus:purple_tint": {
+      "delay": -1,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 0.0,
+      "projectile": {},
+      "recharge": 0,
+      "shotState": {}
+    },
     "cypher_nexus:quadruple_invoking": {
       "delay": 0,
       "draw": 4,
@@ -880,6 +925,15 @@
           "add": -20.0
         }
       }
+    },
+    "cypher_nexus:red_tint": {
+      "delay": -1,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 0.0,
+      "projectile": {},
+      "recharge": 0,
+      "shotState": {}
     },
     "cypher_nexus:reduce_spread": {
       "delay": 0,
@@ -1119,6 +1173,15 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 30.0,
+      "projectile": {},
+      "recharge": 0,
+      "shotState": {}
+    },
+    "cypher_nexus:yellow_tint": {
+      "delay": -1,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 0.0,
       "projectile": {},
       "recharge": 0,
       "shotState": {}

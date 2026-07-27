@@ -1,15 +1,16 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.SimpleModifier
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
+import com.github.nahnullscience.cypher_nexus.utility.toRGB
 import net.minecraft.core.Holder
 import net.minecraft.resources.Identifier
+import java.awt.Color
 import java.util.EnumMap
 import kotlin.collections.set
 
@@ -18,8 +19,10 @@ open class SimpleNonProjectileCypher(
     val category: Holder<CypherCategory>
 ) : CypherDataMap.Builder() {
 
-    var color: Int? = null
-        private set
+    protected var borderColor: Int? = null
+    protected var rgb: Int? = null
+    protected var alpha: Float? = null
+    protected var brightness: Float? = null
 
     // register timing can't unpack holder, so use holder directly here
     private val shotStateAttrHolder: HashMap<Holder<CypherAttribute>, EnumMap<AttributeOperator, Double>> = HashMap()
@@ -29,7 +32,14 @@ open class SimpleNonProjectileCypher(
     override fun delay(int: Int) = apply { super.delay(int) }
     override fun recharge(int: Int) = apply { super.recharge(int) }
     override fun flags(vararg flag: CypherFlags) = apply { super.flags(*flag) }
-    open fun color(int: Int) = apply { color = int }
+    open fun borderColor(color: Int) = apply { borderColor = color }
+    open fun dyeColor(rgb: Int) = apply { this.rgb = rgb }
+    open fun dyeColor(color: Color) = apply {
+        this.rgb = color.rgb
+        if (color.alpha != 0xff) alpha = color.alpha.toFloat() / 255
+    }
+    open fun dyeColor(rgb: Int, a: Float) = apply { this.rgb = rgb; alpha = a }
+    open fun brightness(l: Float) = apply { brightness = l }
 
     // do nothing since this is non-projectile
     override fun projectileAttr(holder: Holder<CypherAttribute>, value: Double) = this as CypherDataMap.Builder
@@ -51,7 +61,10 @@ open class SimpleNonProjectileCypher(
     open fun createCypher() : AbstractNonProjectileCypher = object : AbstractNonProjectileCypher() {
         override val category = this@SimpleNonProjectileCypher.category
         override val resource: Identifier = CypherNexus.modResource(path)
-        override val color: Int? = this@SimpleNonProjectileCypher.color
+        override val borderColor: Int? = this@SimpleNonProjectileCypher.borderColor
+        override val rgb: Color? = this@SimpleNonProjectileCypher.rgb?.toRGB()
+        override val alpha: Float? = this@SimpleNonProjectileCypher.alpha
+        override val brightness: Float? = this@SimpleNonProjectileCypher.brightness
         override fun defaultAttributes() = this@SimpleNonProjectileCypher
     }
 }

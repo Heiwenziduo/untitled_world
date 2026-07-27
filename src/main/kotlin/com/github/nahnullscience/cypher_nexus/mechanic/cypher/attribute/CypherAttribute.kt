@@ -1,7 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute
 
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
-import com.github.nahnullscience.cypher_nexus.utility.dot0digit
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.core.Holder
 import net.minecraft.network.chat.Component
@@ -28,7 +27,7 @@ open class CypherAttribute(
         private val self: (Double) -> Double = { it }
     }
 
-    val isCEAttribute = applyOn == AttributeApply.ENTITY
+    val isAttributeForCE = applyOn == AttributeApply.ENTITY
 
     fun restrictRange(v: Double) = v.coerceIn(min, max)
 

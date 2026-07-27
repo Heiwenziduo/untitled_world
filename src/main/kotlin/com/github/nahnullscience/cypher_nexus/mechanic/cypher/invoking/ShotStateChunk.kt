@@ -32,7 +32,7 @@ class ShotStateChunk private constructor (
 ) : IFlagExtension {
     /** normal chunk can only release once */
     constructor(charge: Int = 1): this(charge, null)
-    constructor(ccMap: MapOfCypherCounts): this() { dirty = true; _ccMap = ccMap }
+    constructor(ccMap: MapOfCypherCounts): this() { dirty = true; _ccMapBacking = ccMap }
 
     companion object {
         private const val CAPTURE_RADIUS = 8.0
@@ -44,19 +44,23 @@ class ShotStateChunk private constructor (
     val isRoot: Boolean by lazy { helper != null && helper.shotRoot == this }
     val accessor: ShotStateAccessor by lazy { ShotStateAccessor() }
 
-    val attr2opMap: AttributeFastOpMap by lazy { AttributeFastOpMap() }
+    val attributes: AttributeFastOpMap by lazy { AttributeFastOpMap() }
 
     val hooks: HookContainer by lazy { HookContainer() }
 
-    private val simpleProjectiles: Reference2IntOpenHashMap<AbstractProjectileCypher<*>> by
-    lazy { Reference2IntOpenHashMap() } // projectiles with no trigger
+    private var _dyeAccBacking: DyeAccumulator? = null
+    val dyeAccumulator: DyeAccumulator get() {
+        return _dyeAccBacking ?: DyeAccumulator().also { _dyeAccBacking = it }
+    }
+
+    private var _ccMapBacking: MapOfCypherCounts? = null
+    val ccMap: MapOfCypherCounts get() = _ccMapBacking ?: MapOfCypherCounts().also { _ccMapBacking = it }
+
+    private val simpleProjectiles: Reference2IntOpenHashMap<AbstractProjectileCypher<*>> by lazy { Reference2IntOpenHashMap() } // projectiles with no trigger
     val simpleProjectilesView get() = simpleProjectiles.toMap()
 
     private val triggeredProjectiles = mutableListOf<ProjectileNode>()
     val triggeredProjectilesView get() = triggeredProjectiles.toList()
-
-    private var _ccMap: MapOfCypherCounts? = null
-    val ccMap: MapOfCypherCounts get() = _ccMap ?: MapOfCypherCounts().also { _ccMap = it }
 
 
     private var dirty = false
@@ -79,7 +83,7 @@ class ShotStateChunk private constructor (
         var dire = hookedPosDire.direction
         run spread@ {
             val random = owner?.random ?: directInvoker?.random ?: return@spread
-            val spreadMap = attr2opMap[CypherAttributes.SPREAD.value()] ?: return@spread
+            val spreadMap = attributes[CypherAttributes.SPREAD.value()] ?: return@spread
 
             val spread = AttributeOperator.attributeCalculator(CypherAttributes.SPREAD.value().defaultValue, spreadMap).let {
                 CypherAttributes.SPREAD.value().restrictRange(it)
@@ -100,13 +104,13 @@ class ShotStateChunk private constructor (
 
         Profiler.get().push { "cypherEntityCreation" }
         if (dirty) compute()
-        CypherNexus.debugCypher { "${level.isClientSide} client ccMap: $_ccMap" }
+        CypherNexus.debugCypher { "${level.isClientSide} client ccMap: $_ccMapBacking" }
 
         // do recoil only on root
         run recoil@ {
             itemWand ?: return@recoil
             directInvoker ?: return@recoil
-            val recoilMap = attr2opMap[CypherAttributes.RECOIL.value()] ?: return@recoil
+            val recoilMap = attributes[CypherAttributes.RECOIL.value()] ?: return@recoil
             val recoilModule = itemWand.module(RECOIL) ?: return@recoil
 
             val recoil = AttributeOperator.attributeCalculator(CypherAttributes.RECOIL.value().defaultValue, recoilMap).let {
@@ -165,9 +169,9 @@ class ShotStateChunk private constructor (
         simpleProjectiles.addTo(cypher, 1)
     }
 
-    fun attachHooks(cypher: AbstractNonProjectileCypher): ShotStateChunk = apply { hooks.add(cypher) }
+//    fun attachHooks(cypher: AbstractNonProjectileCypher): ShotStateChunk = apply { hooks.add(cypher) }
 
-    fun enableFlags(flag: Int): ShotStateChunk = apply { enableFlag(flag) }
+//    fun enableFlags(flag: Int): ShotStateChunk = apply { enableFlag(flag) }
 
     fun record(cy: AbstractCypher): ShotStateChunk = apply {
         dirty = true
@@ -177,38 +181,49 @@ class ShotStateChunk private constructor (
     fun compute(): ShotStateChunk {
         if (!dirty) return this
 
-        _ccMap?.forEach { (cypher, counts) ->
+        _ccMapBacking?.let { ccMap ->
+            ccMap.forEach { (cypher, counts) ->
 
-            if (cypher is AbstractNonProjectileCypher) {
-                enableFlag(cypher.flags)
                 hooks.add(cypher, counts)
-            }
+                if (cypher is AbstractNonProjectileCypher) {
+                    enableFlag(cypher.flags)
 
-            // TODO cumulate from children
-            if (isRoot) delay += cypher.delay * counts
-            recharge += cypher.recharge * counts
-
-            cypher.attributes().shotState.forEach { (attribute, cyShotStateModifier) ->
-                var targetChunk = this
-
-                // FIXME cumulate from children
-                if (isRoot &&
-                    CypherAttributes.RECOIL.`is`(attribute.resource)
-                    ) {
-                    targetChunk = helper!!.shotRoot
+                    run color@ {
+                        cypher.rgb?.let { dyeAccumulator.addDye(it, counts) }
+                        cypher.alpha?.let { dyeAccumulator.multiplyAlpha(it, counts) }
+                        cypher.brightness?.let { dyeAccumulator.adjustBrightness(it, counts) }
+                    }
                 }
 
 
-                val chunkMap = targetChunk.attr2opMap.getOrPut(attribute) { EnumMap(AttributeOperator::class.java) }
-                // prune: if set, skip
-                if (chunkMap[AttributeOperator.SET_ALL] != null && cyShotStateModifier[AttributeOperator.SET_ALL] == null) return@forEach
+                // TODO cumulate from children
+                if (isRoot) delay += cypher.delay * counts
+                recharge += cypher.recharge * counts
 
-                cyShotStateModifier.forEach { (operator, value) ->
-                    chunkMap.compute(operator) { key, old ->
-                        operator.cumulate(old ?: operator.defaultValue, value, counts)
+                cypher.attributes().shotState.forEach { (attribute, cyShotStateModifier) ->
+                    var targetChunk = this
+
+                    // FIXME cumulate from children
+                    if (isRoot &&
+                        CypherAttributes.RECOIL.`is`(attribute.resource)
+                    ) {
+                        targetChunk = helper!!.shotRoot
+                    }
+
+
+                    val chunkMap = targetChunk.attributes.getOrPut(attribute) { EnumMap(AttributeOperator::class.java) }
+                    // prune: if set, skip
+                    if (chunkMap[AttributeOperator.SET_ALL] != null && cyShotStateModifier[AttributeOperator.SET_ALL] == null) return@forEach
+
+                    cyShotStateModifier.forEach { (operator, value) ->
+                        chunkMap.compute(operator) { key, old ->
+                            operator.cumulate(old ?: operator.defaultValue, value, counts)
+                        }
                     }
                 }
             }
+
+            dyeAccumulator.resolveColor()
         }
 
         dirty = false
@@ -217,7 +232,7 @@ class ShotStateChunk private constructor (
 
     /***/
     abstract inner class ShotStateViewer {
-        fun getOpMap(attr: Holder<CypherAttribute>) = attr2opMap[attr.value()]
+        fun getOpMap(attr: Holder<CypherAttribute>) = attributes[attr.value()]
 
     }
 
@@ -228,7 +243,7 @@ class ShotStateChunk private constructor (
          *
          * */
         fun addRaw(attr: Holder<CypherAttribute>, operator: AttributeOperator, value: Double) {
-            val opMap = attr2opMap.getOrPut(attr.value()) { EnumMap(AttributeOperator::class.java) }
+            val opMap = attributes.getOrPut(attr.value()) { EnumMap(AttributeOperator::class.java) }
             opMap.compute(operator) { op, v ->
                 operator.cumulate(v ?: operator.defaultValue, value)
             }

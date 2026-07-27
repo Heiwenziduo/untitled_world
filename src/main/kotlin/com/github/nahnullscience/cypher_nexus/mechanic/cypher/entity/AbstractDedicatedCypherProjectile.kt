@@ -89,9 +89,9 @@ abstract class AbstractDedicatedCypherProjectile(
 
     override fun writeSpawnData(buffer: RegistryFriendlyByteBuf) {
         // send when entity added to level
-        buffer.writeBoolean(ccMap() != null) // write & read relay strictly on order, use a marker to tell client if a map follows
-        if (ccMap() != null) {
-            MOCC_STREAM.encode(buffer, ccMap()!!)
+        buffer.writeBoolean(ccMap != null) // write & read relay strictly on order, use a marker to tell client if a map follows
+        if (ccMap != null) {
+            MOCC_STREAM.encode(buffer, ccMap!!)
         }
     }
 
@@ -252,10 +252,10 @@ abstract class AbstractDedicatedCypherProjectile(
         CypherFlags.printFlag(enabledFlags)
 
         // modified AttrMap
-        attributeMap().forEach { (a, v) ->
+        attributeMap.forEach { (a, v) ->
             println("$a: $v")
         }
-        if (attributeMap().isEmpty()) println("projectile $cypher has no modified attributes")
+        if (attributeMap.isEmpty()) println("projectile $cypher has no modified attributes")
     }
 
     override fun hashCode() = super.hashCode()
