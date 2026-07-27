@@ -1,17 +1,6 @@
-package com.github.nahnullscience.cypher_nexus.client.renderer.utility
+package com.github.nahnullscience.cypher_nexus.client.util
 
-import com.mojang.blaze3d.vertex.PoseStack.Pose
-import com.mojang.blaze3d.vertex.QuadInstance
 import com.mojang.blaze3d.vertex.VertexConsumer
-import com.mojang.blaze3d.vertex.VertexFormatElement
-import net.minecraft.client.resources.model.geometry.BakedQuad
-import net.neoforged.neoforge.client.model.quad.BakedNormals
-import net.neoforged.neoforge.client.model.quad.MutableQuad
-import org.joml.Matrix3f
-import org.joml.Matrix3x2fc
-import org.joml.Matrix4fc
-import org.joml.Vector3f
-import org.joml.Vector3fc
 
 class TintedVertexConsumer(
     private val delegate: VertexConsumer,

@@ -80,7 +80,7 @@ object ClientSetup {
         event.registerItemProjectile(ModEntities.CYPHER_ENDER_TELEPORTATION, Items.ENDER_PEARL)
         event.registerItemProjectile(ModEntities.CYPHER_SPAWN_EGG, Items.EGG)
 
-        event.registerParticleProjectile(ModEntities.CYPHER_BUBBLE_COLUMN)
+        event.registerEntityRenderer(ModEntities.CYPHER_BUBBLE_COLUMN, ::BubbleColumnCypherRenderer)
         event.registerParticleProjectile(ModEntities.CYPHER_DRILLING_BOLT)
         event.registerParticleProjectile(ModEntities.CYPHER_DRILLING_BLAST)
 
@@ -113,11 +113,6 @@ object ClientSetup {
         // second parameter. For example, #registerSpriteSet represents a Function<SpriteSet, ParticleProvider<?>>:
         // #registerSpecial, on the other hand, maps to a ParticleProvider<?>.
         // This should be used if the sprite is not obtained from the particle description.
-
-//        event.registerSpriteSet(
-//            ModParticleTypes.CYPHER_TRAIL.get(),
-//            SpriteParticleRegistration { spriteSet ->  ModelParticle.TrailProvider(spriteSet) })
-
         event.registerSpriteSet(ModParticleTypes.DISTANCE_INVOKE_TRAIL.get()) { spriteSet -> DistanceInvokeTrail.TrailProvider(spriteSet) }
     }
 

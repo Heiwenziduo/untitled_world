@@ -336,6 +336,8 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
         }
     }
 
+//    override fun onDealDamage(damage: Double) {}
+
     override fun doTick() {
         Profiler.get().push { "cypherEntityTick" }
 
@@ -516,49 +518,54 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
         return true
     }
 
+    override fun whenHit(result: HitResult, direction: Direction) = Unit
+    override fun whenHitEntity(result: EntityHitResult, direction: Direction) = Unit
+    override fun whenHitBlock(result: BlockHitResult, direction: Direction) = Unit
     // in case subclasses want to override whenHit
     // if implementing it here, any subclass of ICypherEntity can't call super.whenHit since its abstract
     // if implementing it inside ICypherEntity as a default function, there will be one more step to link to the function
     // cyEntity.whenHit -> Delegation.whenHit -> interface default
-    protected fun whenHitDelegate(result: HitResult, direction: Direction) = cyEntity.whenHit(result, direction)
-    override fun whenHit(result: HitResult, direction: Direction) {
+    protected open fun whenHitDelegate(result: HitResult, direction: Direction) {
+        cyEntity.whenHit(result, direction)
         delegateOnHit(result)
         if (level.isClientSide || result.type == Type.MISS) return
         trigger(TriggerType.COLLISION, result.location)
 
         if (result is EntityHitResult) {
-            cyEntity.whenHitEntity(result, direction)
+            whenHitEntityDelegate(result, direction)
 
             if (!canBounce && noFlag(CypherFlags.PIERCE_ENTITY))
                 discardCypher(DiscardReason.HIT_ENTITY)
         }
         else if (result is BlockHitResult) {
-            cyEntity.whenHitBlock(result, direction)
+            whenHitBlockDelegate(result, direction)
 
             if (!canBounce)
                 discardCypher(DiscardReason.HIT_BLOCK)
         }
     }
 
-    override fun whenHitEntity(
+    protected open fun whenHitEntityDelegate(
         result: EntityHitResult,
         direction: Direction
     ) {
+        cyEntity.whenHitEntity(result, direction)
         val target = result.entity
         if (level.isClientSide) {
             if (noFlag(CypherFlags.SKIP_DAMAGE_CHECK))
-            target.hurtClient(cyEntity.getDamageSource())
+                target.hurtClient(cyEntity.getDamageSource())
         }
         else {
             if (noFlag(CypherFlags.SKIP_DAMAGE_CHECK))
-            cyEntity.exertDamage(level as ServerLevel, target)
+                cyEntity.exertDamage(level as ServerLevel, target)
         }
     }
 
-    override fun whenHitBlock(
+    protected open fun whenHitBlockDelegate(
         result: BlockHitResult,
         direction: Direction
     ) {
+        cyEntity.whenHitBlock(result, direction)
         val blockPos = result.blockPos
         if (noFlag(CypherFlags.SILENT))
         this.level.gameEvent(GameEvent.PROJECTILE_LAND, blockPos, Context.of(cyEntity, level.getBlockState(blockPos)))

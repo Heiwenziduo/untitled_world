@@ -11,7 +11,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
 
 
-class CypherRenderState : ICypherEntityRenderState {
+class CypherRenderStateDelegate : ICypherEntityRenderState {
     override var flags: Int = 0
         private set
     override var effectRadius: Float = CypherAttributes.EFFECT_RADIUS.value().defaultValue.toFloat()

@@ -4,6 +4,7 @@ import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.compo
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.culling.Frustum
 import net.minecraft.client.renderer.entity.EntityRenderer
@@ -15,7 +16,6 @@ import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f
-import org.joml.Vector3f
 
 abstract class AbstractCypherRenderer <CE, State> (
     context: Context
@@ -56,6 +56,11 @@ abstract class AbstractCypherRenderer <CE, State> (
         super.extractRenderState(entity, state, partialTicks)
         state.extractFrom(entity, state)
     }
+
+    /**
+     * good timing to add trail particle to the projectile, called after tick-logic has applied
+     * */
+    open fun clientTickPost(level: ClientLevel, entity: CE, x: Double, y: Double, z: Double, xo: Double, yo: Double, zo: Double) {}
 
     /**
      *

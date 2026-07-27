@@ -65,7 +65,8 @@ object Cyphers {
     val ARROW = registerProjectile(ModEntities.CYPHER_ARROW, TriggerType.COLLISION, TriggerType.TIMER_10) {
         manaDrain(15f)
         delay(3)
-        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -10.0)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -16.0)
+        shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 1.0)
         projectileAttr(CypherAttributes.DAMAGE, 3.0)
         projectileAttr(CypherAttributes.SPEED, 1.3)
         projectileAttr(CypherAttributes.EXISTING, 300.0)
@@ -94,11 +95,13 @@ object Cyphers {
     }
     val BUBBLE_COLUMN = registerProjectile(ModEntities.CYPHER_BUBBLE_COLUMN) {
         manaDrain(15f)
-        recharge(-2)
-        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 23.0)
+        delay(-1)
+        recharge(-1)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 20.0)
         projectileAttr(CypherAttributes.DAMAGE, 2.0)
-        projectileAttr(CypherAttributes.SPEED, 1.3)
-        projectileAttr(CypherAttributes.EXISTING, 160.0)
+        projectileAttr(CypherAttributes.SPEED, 1.5)
+        projectileAttr(CypherAttributes.EXISTING, 180.0)
+        projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.2)
     }
     val LLAMA_SPIT = registerProjectile(ModEntities.CYPHER_LLAMA_SPIT) {
         manaDrain(10f)

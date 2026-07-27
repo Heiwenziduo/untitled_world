@@ -5,5 +5,5 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState
 /**
  * mark those projectiles that are invisible
  * */
-class EmptyRenderState : EntityRenderState(), ICypherEntityRenderState by CypherRenderState() {
+class EmptyRenderState : EntityRenderState(), ICypherEntityRenderState by CypherRenderStateDelegate() {
 }

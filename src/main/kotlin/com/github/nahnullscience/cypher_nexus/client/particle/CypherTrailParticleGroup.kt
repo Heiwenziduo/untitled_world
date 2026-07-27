@@ -1,6 +1,5 @@
 package com.github.nahnullscience.cypher_nexus.client.particle
 
-import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.CypherNexus.MOD_ID
 import com.github.nahnullscience.cypher_nexus.init.config.ModClientConfig
 import com.google.common.collect.EvictingQueue
@@ -10,30 +9,19 @@ import net.minecraft.client.particle.ParticleRenderType
 import net.minecraft.client.particle.QuadParticleGroup
 import net.minecraft.client.particle.SingleQuadParticle
 import net.minecraft.core.particles.ParticleOptions
-import net.neoforged.api.distmarker.Dist
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.event.tick.LevelTickEvent
 import java.util.*
 
 class CypherTrailParticleGroup(
     engine: ParticleEngine
 ) : QuadParticleGroup(engine, CYPHER_TRAIL_RENDER_TYPE) {
-
-    @EventBusSubscriber(modid = CypherNexus.MOD_ID, value = [Dist.CLIENT])
     companion object {
         val CYPHER_TRAIL_RENDER_TYPE: ParticleRenderType = ParticleRenderType("$MOD_ID:cypher_trail")
 
-        private var INSTANCE: CypherTrailParticleGroup? = null
+        @PublishedApi
+        internal var INSTANCE: CypherTrailParticleGroup? = null
 
-        @SubscribeEvent
-        private fun makeSureGroupInEngine(event: LevelTickEvent.Pre) {
-            // for we don't know the timing engine calls #clear
-            // loop this and make sure our instance is not stale
-            updateInstance()
-        }
-
-        private fun updateInstance(): CypherTrailParticleGroup {
+        @PublishedApi
+        internal fun updateInstance(): CypherTrailParticleGroup {
             Minecraft.getInstance().particleEngine.let { engine ->
                 return (engine.particles.computeIfAbsent(CYPHER_TRAIL_RENDER_TYPE) { type ->
                     CypherTrailParticleGroup(engine)
@@ -58,7 +46,7 @@ class CypherTrailParticleGroup(
         /**
          *
          * */
-        fun <T : ParticleOptions> addCypherTrailParticle(
+        inline fun <T : ParticleOptions> addCypherTrailParticle(
             options: T,
             x: Double, y: Double, z: Double,
             xa: Double, ya: Double, za: Double,
@@ -70,10 +58,16 @@ class CypherTrailParticleGroup(
                 (INSTANCE ?: updateInstance()).particlesToAdd.add(particle)
             }
         }
+
+        fun SingleQuadParticle.setARGB(a: Float, r: Float, g: Float, b: Float) {
+            setColor(r, g, b)
+            setAlpha(a)
+        }
     }
 
     val maxCount = ModClientConfig.CONFIG.maxTrailParticleCount.asInt
-    private val particlesToAdd: Queue<SingleQuadParticle> = EvictingQueue.create(maxCount)
+    @PublishedApi
+    internal val particlesToAdd: Queue<SingleQuadParticle> = EvictingQueue.create(maxCount)
     init {
         particles = EvictingQueue.create(maxCount)
     }

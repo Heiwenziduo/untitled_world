@@ -174,6 +174,8 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherEntityBeforeIn
     fun forEntityCaptured(captured: Entity)
     /** call on both sides, override friendly */
     fun onLowSpeed(count: Int)
+//    /** only on Server */
+//    fun onDealDamage(damage: Double)
 
     /**
      * should call inside Entity#tick, this handles all cypher-related logic
