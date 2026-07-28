@@ -96,8 +96,8 @@ object Cyphers {
     }
     val BUBBLE_COLUMN = registerProjectile(ModEntities.CYPHER_BUBBLE_COLUMN) {
         manaDrain(15f)
-        delay(-1)
-        recharge(-1)
+        delay(-3)
+        recharge(-3)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 20.0)
         projectileAttr(CypherAttributes.DAMAGE, 2.0)
         projectileAttr(CypherAttributes.SPEED, 1.5)
@@ -141,10 +141,11 @@ object Cyphers {
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.02)
     }
     val SMOKE_BOMB = registerProjectile(ModEntities.CYPHER_SMOKE_BOMB) {
-        manaDrain(20f)
+        manaDrain(40f)
+        delay(6)
         flags(CypherFlags.LINGER, CypherFlags.EXPLOSIVE)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 3.0)
-        projectileAttr(CypherAttributes.DAMAGE, 1.0)
+        projectileAttr(CypherAttributes.DAMAGE, 2.0)
         projectileAttr(CypherAttributes.CRIT_CHANCE, 0.05)
         projectileAttr(CypherAttributes.SPEED, 0.7)
         projectileAttr(CypherAttributes.EXISTING, 300.0)
@@ -191,13 +192,15 @@ object Cyphers {
         shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 4.0)
         shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 0.5)
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 4.0)
-        shotStateAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 1.0)
+        shotStateAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 10.0)
+        shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, 0.2)
     }
     val CRIT_STRIKE = registerModifier("critical_strike", 10f) {
         shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.25)
     }
     val EFFECTIVE_RADIUS = registerModifier("effective_radius", 30f) {
         shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 1.5)
+        shotStateAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 5.0)
         shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, 0.5)
     }
     val BRISK = registerModifier("brisk", 5f) {
@@ -222,10 +225,10 @@ object Cyphers {
         shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.02)
     }
     val MANA_SURGE = registerModifier("mana_surge", -40f) {
-        delay(5)
+        delay(4)
     }
     val QUICK_LOAD = registerModifier("quick_load", 15f) {
-        delay(-3)
+        delay(-4)
         recharge(-6)
     }
     val PEACEFUL_MODE = registerModifier("peaceful_mode", 5f) {
@@ -267,12 +270,12 @@ object Cyphers {
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, -20.0)
     }
     val KNOCKBACK = registerModifier("knockback", 5f) {
-        shotStateAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 10.0)
+        shotStateAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 20.0)
     }
     val HOMING = registerCypher(AbstractTargetHoming::Homing) {
         manaDrain(60f)
     }
-    val TURN_TO_TARGET = registerCypher(AbstractTargetHoming::TurnToTarget) {
+    val TURN_TOWARD_TARGET = registerCypher(AbstractTargetHoming::TurnTowardTarget) {
         manaDrain(30f)
     }
     val BOOMERANG = registerCypher(::BoomerangCypher) {
@@ -288,9 +291,10 @@ object Cyphers {
     }
     val DAEDALUS = registerCypher(::DaedalusCypher) {
         manaDrain(24f)
+        delay(-3)
         shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 1.25)
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.MULTIPLY_TOTAL, 0.0)
-        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 20.0)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 25.0)
         shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.03)
     }
     val NULL_EXISTING = registerModifier("null_existing", 14f) {
@@ -408,8 +412,14 @@ object Cyphers {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     val INNER_FORCE = registerCypher(InnerForceCypher)
-    val REFRESHER_RING = registerCypher(RefresherRingCypher)
-    val PROTEUS = registerCypher(ProteusCypher)
+    val REFRESHER_RING = registerCypher(::RefresherRingCypher) {
+        manaDrain(20f)
+        recharge(-10)
+    }
+    val PROTEUS = registerCypher(::ProteusCypher) {
+        manaDrain(10f)
+        draw(1)
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // other

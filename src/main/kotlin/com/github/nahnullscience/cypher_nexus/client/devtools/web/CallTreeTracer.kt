@@ -1,6 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.client.devtools.web
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingTracer
@@ -25,6 +26,17 @@ class CallTreeTracer : InvokingTracer {
         (stack.lastOrNull()?.children ?: roots).add(node)
         stack.addLast(node)
     }
+
+    override fun modify(
+        helper: InvokingHelper,
+        shotState: ShotStateChunk,
+        data: HelperDataBundle,
+        paras: InvokingParameterBundle,
+        isCopy: Boolean
+    ) {
+
+    }
+
     override fun exit(
         cypher: AbstractCypher,
         shotState: ShotStateChunk,

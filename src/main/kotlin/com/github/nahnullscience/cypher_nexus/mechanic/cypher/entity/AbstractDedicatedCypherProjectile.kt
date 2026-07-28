@@ -6,8 +6,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.CypherEntityBasics
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.MOCC_STREAM
@@ -21,7 +19,6 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityDimensions
-import net.minecraft.world.entity.EntitySpawnReason
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.Pose
 import net.minecraft.world.entity.projectile.Projectile
@@ -36,7 +33,6 @@ import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn
 import java.util.*
 import java.util.function.Consumer
-import java.util.function.Supplier
 
 abstract class AbstractDedicatedCypherProjectile(
     entityType: EntityType<out AbstractDedicatedCypherProjectile>,
@@ -44,41 +40,8 @@ abstract class AbstractDedicatedCypherProjectile(
 ) : Projectile(entityType, level), IEntityWithComplexSpawn,
     IFlagExtension, ICypherEntity by CypherEntityBasics<AbstractDedicatedCypherProjectile>() {
     companion object {
-        /** generate projectile with attributes initialized */
-        fun <CE> create(
-            cypher: AbstractProjectileCypher<*>,
-            entityType: EntityType<CE>,
-            level: ServerLevel,
-            invoker: Entity?,
-            shotState: ShotStateChunk,
-            node: ProjectileNode?,
-        ) : CE where CE : Entity, CE : ICypherEntity {
-            val proj = entityType.create(level, EntitySpawnReason.SPAWN_ITEM_USE) ?:
-            throw IllegalStateException("Failed to create projectile [$entityType].")
-            proj.setOwner(invoker)
-            proj.initCypher(cypher, shotState, node)
-            return proj
-        }
 
-        fun <CE> createRaw(
-            entityType: EntityType<CE>,
-            level: ServerLevel,
-            owner: Entity?
-        ) : CE where CE : Entity, CE : ICypherEntity {
-            val proj = entityType.create(level, EntitySpawnReason.SPAWN_ITEM_USE) ?:
-            throw IllegalStateException("Failed to create projectile [$entityType].")
-            proj.setOwner(owner)
-            return proj
-        }
-        fun <CE> createRaw(
-            type: Supplier<EntityType<CE>>,
-            level: ServerLevel,
-            owner: Entity?
-        ) : CE where CE : Entity, CE : ICypherEntity = createRaw(type.get(), level, owner)
     }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     override fun defineSynchedData(builder: SynchedEntityData.Builder) { }
     override fun onSyncedDataUpdated(key: EntityDataAccessor<*>) {

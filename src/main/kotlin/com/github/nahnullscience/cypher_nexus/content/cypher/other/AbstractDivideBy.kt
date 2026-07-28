@@ -33,7 +33,7 @@ abstract class AbstractDivideBy(
         isCopy: Boolean
     ) {
         CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
-        modifyShotState(helper, data, shotState)
+        modifyShotState(helper, shotState, data, paras, isCopy)
 
         // TODO targetIndex should be handled specially to achieve consistence with Noita (especially with Greek letters)
         val targetIndex = helper.peekNextIndex(relativeIndex + 1)

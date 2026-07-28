@@ -13,8 +13,10 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
     override val category = CypherCategories.OTHER
     override fun modifyShotState(
         helper: InvokingHelper,
+        shotState: ShotStateChunk,
         data: HelperDataBundle,
-        shotState: ShotStateChunk
+        paras: InvokingParameterBundle,
+        isCopy: Boolean
     ) = Unit
     override fun defaultAttributes() = super.defaultAttributes().manaDrain(0f).draw(1)
 

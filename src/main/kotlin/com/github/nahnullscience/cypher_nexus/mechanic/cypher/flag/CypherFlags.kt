@@ -29,12 +29,12 @@ enum class CypherFlags : IFlagExtension.IFlagEnum {
     HURT_OWNER,
 
     /**
-     *
+     * allow CE pierce through entities, also enables infinite(practically) triggers
      * */
     PIERCE_ENTITY,
 
     /**
-     *
+     * allow CE ignore block collision
      * */
     IGNORE_BLOCK,
 

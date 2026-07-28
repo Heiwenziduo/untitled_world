@@ -16,6 +16,13 @@ interface InvokingTracer {
         relativeIndex: Int,
         isCopy: Boolean
     )
+    fun modify(
+        helper: InvokingHelper,
+        shotState: ShotStateChunk,
+        data: HelperDataBundle,
+        paras: InvokingParameterBundle,
+        isCopy: Boolean
+    )
     fun exit(
         cypher: AbstractCypher,
         shotState: ShotStateChunk,
@@ -33,6 +40,15 @@ interface InvokingTracer {
                 relativeIndex: Int,
                 isCopy: Boolean
             ) = Unit
+
+            override fun modify(
+                helper: InvokingHelper,
+                shotState: ShotStateChunk,
+                data: HelperDataBundle,
+                paras: InvokingParameterBundle,
+                isCopy: Boolean
+            ) = Unit
+
             override fun exit(
                 cypher: AbstractCypher,
                 shotState: ShotStateChunk,

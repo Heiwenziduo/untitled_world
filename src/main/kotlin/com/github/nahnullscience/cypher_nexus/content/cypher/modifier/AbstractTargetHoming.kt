@@ -78,7 +78,7 @@ abstract class AbstractTargetHoming(
         }
     }
 
-    class TurnToTarget(defaultAttribute: Builder.() -> Builder) : AbstractTargetHoming("turn_toward_target", defaultAttribute) {
+    class TurnTowardTarget(defaultAttribute: Builder.() -> Builder) : AbstractTargetHoming("turn_toward_target", defaultAttribute) {
         override fun <CE> onTick(
             index: Int,
             count: Int,

@@ -7,8 +7,8 @@ import kotlin.collections.MutableMap.MutableEntry
 /**
  * ccMap or MoCC,
  * serve as a token to ship across network and rebuild the `ShotStateChunk` on the other side
- * (payload info not included)
- *
+ * (this only includes shot-state attributes that shares among all CE of that state,
+ * CE themselves and payload info are not included)
  * */
 open class MapOfCypherCounts(
     private val fastMap: Reference2IntOpenHashMap<AbstractCypher> = Reference2IntOpenHashMap(32),

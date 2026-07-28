@@ -10,18 +10,15 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingH
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 
-object RefresherRingCypher : AbstractNonProjectileCypher(), IRecursiveCypher {
+class RefresherRingCypher(
+    defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder
+) : AbstractNonProjectileCypher(defaultAttribute), IRecursiveCypher {
     override val resource = CypherNexus.modResource("refresher_ring")
     override val category = CypherCategories.UTILITY
     override val isRecursive = true
 
-    override fun defaultAttributes(): CypherDataMap.Builder {
-        return super.defaultAttributes()
-            .manaDrain(20f)
-            .recharge(-8)
-    }
-
     override fun triggerInterplay() = true
+
     override fun invoke(
         helper: InvokingHelper,
         shotState: ShotStateChunk,
@@ -31,7 +28,7 @@ object RefresherRingCypher : AbstractNonProjectileCypher(), IRecursiveCypher {
         isCopy: Boolean
     ) {
         CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
-        modifyShotState(helper, data, shotState)
+        modifyShotState(helper, shotState, data, paras, isCopy)
 
         if (paras.alreadyRefreshed) {
             // terminate invoking process if meet again

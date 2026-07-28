@@ -11,5 +11,5 @@ abstract class AbstractDistanceInvoke(
 ) : AbstractProjectileCypher<AbstractDedicatedCypherProjectile>() {
     override val category = CypherCategories.UTILITY
 
-    override val builtinTrigger: TriggerType = TriggerType.DEATH
+    override val innateTrigger: TriggerType = TriggerType.DEATH
 }

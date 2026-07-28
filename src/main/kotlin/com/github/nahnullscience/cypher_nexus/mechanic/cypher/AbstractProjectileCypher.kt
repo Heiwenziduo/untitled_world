@@ -1,15 +1,16 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 
+import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags.Companion.containsFlag
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import net.minecraft.core.Holder
-import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import java.util.function.Supplier
@@ -23,59 +24,60 @@ abstract class AbstractProjectileCypher <CE> (
     }
 
     abstract val projectileType: Supplier<out EntityType<out CE>>
+    open val projectileCount: Int = 1
 
-    protected open val builtinTrigger: TriggerType = TriggerType.NONE
-    protected open val builtinTriggerCharge: Int = 1
+    protected open val innateTrigger: TriggerType = TriggerType.NONE
+    protected open val innateTriggerCharge: Int = 1
+
+//    init {
+//        require(innateTriggerCharge > 0)
+//        require(projectileCount > 0)
+//    }
+
+    override fun triggerInterplay() = true
+
+    override fun invoke(
+        helper: InvokingHelper,
+        shotState: ShotStateChunk,
+        data: HelperDataBundle,
+        paras: InvokingParameterBundle,
+        relativeIndex: Int,
+        isCopy: Boolean
+    ) {
+        CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
+        modifyShotState(helper, shotState, data, paras, isCopy)
+
+        if (innateTrigger != TriggerType.NONE && paras.drawEnabled && draw > 0) {
+            // create substate conditionally // this will save plenty of memory when copy thousands of trigger-cypher with draw-disabled
+            // TODO when pierce, collide trigger is infinite, but flag hasn't been ready at this stage
+            val subState = ShotStateChunk(innateTriggerCharge) // or innateTriggerCharge * projectileCount ?
+            for (i in 0 until projectileCount) {
+                shotState.addProjectileNode(this, subState, innateTrigger)
+            }
+            handleDraws(helper, shotState, data, paras)
+        } else {
+            // if no trigger or no payload
+            addProjectileAlone(shotState)
+            handleDraws(helper, shotState, data, paras)
+        }
+    }
+
+    open fun addProjectileAlone(shotState: ShotStateChunk, count: Int = projectileCount) {
+        shotState.addProjectileNode(this, count)
+    }
 
     /**
-     * register cypher-entity(s) to [ShotStateChunk]
-     * @param trigger externally forced `TriggerType` override. use [builtinTrigger] if null.
-     * @param charge only consulted when [trigger] is non-null; builtin path uses [builtinTriggerCharge].
-     * @return the shot-state subsequent draws in this invocation should populate.
-     *
-     * Note there should be at least one [draw] to make trigger function.
-     */
-    open fun addToShotState(
-        shotState: ShotStateChunk,
-        trigger: TriggerType? = null,
-        charge: Int = TRIGGER_CHARGE_MAX,
-    ): ShotStateChunk {
-        val t = trigger ?: builtinTrigger
-        if (t == TriggerType.NONE) {
-            shotState.addProjectileNode(this)
-            return shotState
-        }
-        val charge =
-            if (trigger != null) charge
-            else if ((flags and shotState.enabledFlags).containsFlag(CypherFlags.PIERCE_ENTITY)) TRIGGER_CHARGE_MAX
-            else builtinTriggerCharge
+     * @return the newly created payload-state
+     * */
+    open fun addProjectileWithTrigger(
+        old: ShotStateChunk,
+        trigger: TriggerType,
+        charge: Int = TRIGGER_CHARGE_MAX
+    ): ShotStateChunk = ShotStateChunk(charge).also { old.addProjectileNode(this, it, trigger) }
 
-        val subState = ShotStateChunk(charge)
-        shotState.addProjectileNode(this, subState, t)
-        return subState
-    }
-
-    open fun createProjectile(
-        level: ServerLevel,
-        invoker: Entity?,
-        shootState: ShotStateChunk,
-        node: ProjectileNode?,
-    ): CE {
-        val proj = AbstractDedicatedCypherProjectile.create(
-            this,
-            projectileType.get(),
-            level,
-            invoker,
-            shootState,
-            node,
-        )
-        return proj
-    }
 
     fun getAttrBaseOrDefault(holder: Holder<CypherAttribute>) = getAttrBaseOrDefault(holder.value())
     fun getAttrBaseOrDefault(attr: CypherAttribute): Double = attributes().projectile.getAttrOrDefault(attr)
     fun getAttrBaseOrNull(holder: Holder<CypherAttribute>) = getAttrBaseOrNull(holder.value())
     fun getAttrBaseOrNull(attr: CypherAttribute): Double? = attributes().projectile[attr]
-
-    override fun triggerInterplay() = true
 }

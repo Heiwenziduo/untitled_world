@@ -23,27 +23,27 @@ sealed class CypherProperties <T : Any> (
     }
     object ManaDrainRow : CypherProperties<Float>("mana_drain") {
         override fun row(v: Float): MutableComponent {
-            val com = Component.literal(v.toInt().toString()).withStyle(ChatFormatting.YELLOW)
+            val com = Component.literal(v.toInt().toString()).withStyle(ChatFormatting.BLUE)
             return Component.translatable(text, com)
         }
     }
     object CastDelayRow : CypherProperties<Int>("cast_delay") {
         override fun row(v: Int): MutableComponent {
             val withSymbol = if (v > 0) "+${v.tick2second()}" else v.tick2second()
-            val com = Component.literal(withSymbol).withStyle(ChatFormatting.YELLOW)
+            val com = Component.literal(withSymbol).withStyle(ChatFormatting.GRAY)
             return Component.translatable(text, com)
         }
     }
     object RechargeTimeRow : CypherProperties<Int>("recharge_time") {
         override fun row(v: Int): MutableComponent {
             val withSymbol = if (v > 0) "+${v.tick2second()}" else v.tick2second()
-            val com = Component.literal(withSymbol).withStyle(ChatFormatting.YELLOW)
+            val com = Component.literal(withSymbol).withStyle(ChatFormatting.GRAY)
             return Component.translatable(text, com)
         }
     }
     object DrawRow : CypherProperties<Int>("draw") {
         override fun row(v: Int): MutableComponent {
-            val com = Component.literal(v.toString()).withStyle(ChatFormatting.YELLOW)
+            val com = Component.literal(v.toString()).withStyle(ChatFormatting.GRAY)
             return Component.translatable(text, com)
         }
     }

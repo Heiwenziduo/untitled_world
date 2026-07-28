@@ -93,7 +93,9 @@ sealed class AbstractCypher(
     }
 
     // ============================================================================================================
-    /** when invoke from helper#draw */
+    /**
+     * invoke a cypher when it is in hand, should be paired with [InvokingHelper.draw] or [InvokingHelper.drawNext]
+     * */
     fun invokeInHand(
         helper: InvokingHelper,
         shotState: ShotStateChunk,
@@ -145,14 +147,8 @@ sealed class AbstractCypher(
         isCopy: Boolean,
     ) {
         CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
-        modifyShotState(helper, data, shotState)
-
-        var nextState = shotState
-        if (this is AbstractProjectileCypher<*>) {
-            nextState = addToShotState(shotState)
-        }
-
-        handleDraws(helper, nextState, data, paras)
+        modifyShotState(helper, shotState, data, paras, isCopy)
+        handleDraws(helper, shotState, data, paras)
     }
 
 
@@ -165,7 +161,7 @@ sealed class AbstractCypher(
         data: HelperDataBundle,
         paras: InvokingParameterBundle,
     ) {
-        if (paras.drawEnabled)
+        if (paras.drawEnabled && draw > 0)
         drawXForEach(helper, draw) { index, cypher ->
             cypher.invokeInHand(helper, shotState, data, paras)
         }
@@ -194,12 +190,24 @@ sealed class AbstractCypher(
         }
     }
 
-    open fun modifyShotState(helper: InvokingHelper, data: HelperDataBundle, shotState: ShotStateChunk) {
-
+    /**
+     * record this cypher on `ccMap`
+     * */
+    open fun modifyShotState(
+        helper: InvokingHelper,
+        shotState: ShotStateChunk,
+        data: HelperDataBundle,
+        paras: InvokingParameterBundle,
+        isCopy: Boolean
+    ) {
         shotState.record(this)
 
-        if (shotState.isRoot) data.delay += delay
-        data.recharge += recharge
+        if (!isCopy) { // a copy should not affect mana / delay / recharge
+            if (shotState.isRoot) data.delay += delay
+            data.recharge += recharge
+        }
+
+        helper.tracer.modify(helper, shotState, data, paras, isCopy)
     }
 
     // ============================================================================================================

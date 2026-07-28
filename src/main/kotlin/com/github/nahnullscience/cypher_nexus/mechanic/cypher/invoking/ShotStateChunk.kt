@@ -9,6 +9,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProject
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.createProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
@@ -164,27 +165,38 @@ class ShotStateChunk private constructor (
         dirty = true
         triggeredProjectiles.add(ProjectileNode(cypher, payload, trigger))
     }
-    fun addProjectileNode(cypher: AbstractProjectileCypher<*>): ShotStateChunk = apply {
+    fun addProjectileNode(cypher: AbstractProjectileCypher<*>, count: Int = 1): ShotStateChunk = apply {
         dirty = true
-        simpleProjectiles.addTo(cypher, 1)
+        simpleProjectiles.addTo(cypher, count.coerceAtLeast(0))
     }
 
-//    fun attachHooks(cypher: AbstractNonProjectileCypher): ShotStateChunk = apply { hooks.add(cypher) }
+    @Deprecated("state changes affected by this method won't be synced, use ccMap-friendly method instead")
+    fun attachHooks(cypher: AbstractNonProjectileCypher): ShotStateChunk = apply { hooks.add(cypher) }
 
-//    fun enableFlags(flag: Int): ShotStateChunk = apply { enableFlag(flag) }
+    @Deprecated("state changes affected by this method won't be synced, use ccMap-friendly method instead")
+    fun enableFlags(flag: Int): ShotStateChunk = apply { enableFlag(flag) }
 
-    fun record(cy: AbstractCypher): ShotStateChunk = apply {
+    /**
+     * register cypher to [MapOfCypherCounts], this will make all shot-state attribute of the cypher into count.
+     * this won't affect the projectile count.
+     * @see addProjectileNode
+     * */
+    fun record(cy: AbstractCypher, count: Int = 1): ShotStateChunk = apply {
         dirty = true
-        ccMap.count(cy)
+        ccMap.count(cy, count.coerceAtLeast(0))
     }
 
+    /** compute and lock the state */
     fun compute(): ShotStateChunk {
         if (!dirty) return this
 
         _ccMapBacking?.let { ccMap ->
             ccMap.forEach { (cypher, counts) ->
 
+                // hook
                 hooks.add(cypher, counts)
+
+                // flag & color (non-proj exclusive)
                 if (cypher is AbstractNonProjectileCypher) {
                     enableFlag(cypher.flags)
 
@@ -195,11 +207,7 @@ class ShotStateChunk private constructor (
                     }
                 }
 
-
-                // TODO cumulate from children
-                if (isRoot) delay += cypher.delay * counts
-                recharge += cypher.recharge * counts
-
+                // state-attributes
                 cypher.attributes().shotState.forEach { (attribute, cyShotStateModifier) ->
                     var targetChunk = this
 

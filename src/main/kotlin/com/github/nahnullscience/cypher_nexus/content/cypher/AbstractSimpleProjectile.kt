@@ -75,8 +75,8 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
             override val resource = CypherNexus.modResource(path)
             override val projectileType = type
             override val borderColor = this@SimpleProjectile.borderColor
-            override val builtinTrigger = this@SimpleProjectile.trigger
-            override val builtinTriggerCharge = this@SimpleProjectile.triggerCount
+            override val innateTrigger = this@SimpleProjectile.trigger
+            override val innateTriggerCharge = this@SimpleProjectile.triggerCount
             override fun defaultAttributes() = this@SimpleProjectile
         }
     }
@@ -89,8 +89,8 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
             override val resource = CypherNexus.modResource(path)
             override val projectileType = type
             override val borderColor = this@SimpleStaticProjectile.borderColor
-            override val builtinTrigger = this@SimpleStaticProjectile.trigger
-            override val builtinTriggerCharge = this@SimpleStaticProjectile.triggerCount
+            override val innateTrigger = this@SimpleStaticProjectile.trigger
+            override val innateTriggerCharge = this@SimpleStaticProjectile.triggerCount
             override fun defaultAttributes() = this@SimpleStaticProjectile
         }
     }

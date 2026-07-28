@@ -11,7 +11,6 @@ import org.apache.logging.log4j.Level
  * mark a cypher that has the ability to copy others or itself
  * */
 interface IRecursiveCypher {
-    // TODO a copy won't add delay / recharge or consume mana
     companion object {
         const val RECURSION_LIMIT = 2
 
@@ -54,7 +53,7 @@ interface IRecursiveCypher {
     }
 
     /**
-     * copy cypher in given [index], call [copyCypher] internally
+     * copy the cypher at given [index], call [copyCypher] internally
      * */
     fun copyCypherIndexed(
         index: Int,

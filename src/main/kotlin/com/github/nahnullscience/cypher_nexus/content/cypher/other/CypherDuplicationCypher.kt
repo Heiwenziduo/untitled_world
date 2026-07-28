@@ -27,7 +27,7 @@ class CypherDuplicationCypher(
     ) {
         CypherNexus.debugCypher { "[$this $relativeIndex] is invoked and modifies the state" }
 
-        modifyShotState(helper, data, shotState)
+        modifyShotState(helper, shotState, data, paras, isCopy)
 
         duplicate(helper, shotState, data, paras, relativeIndex)
 
