@@ -7,11 +7,10 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickBehaviorHook
 import com.github.nahnullscience.cypher_nexus.utility.randomInCone
 import com.github.nahnullscience.cypher_nexus.utility.times
-import com.github.nahnullscience.cypher_nexus.utility.unaryMinus
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 
-class ChaoticPath(
+class ChaoticPathCypher(
     defaultAttribute: Builder.() -> Builder
 ) : ModifierCypher(defaultAttribute), TickBehaviorHook {
     override val resource = CypherNexus.modResource("chaotic_path")

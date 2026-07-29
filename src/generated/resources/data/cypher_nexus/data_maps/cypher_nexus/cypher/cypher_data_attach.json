@@ -595,6 +595,19 @@
         }
       }
     },
+    "cypher_nexus:haywire": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 2.0,
+      "projectile": {},
+      "recharge": -8,
+      "shotState": {
+        "cypher_nexus:speed": {
+          "multiply_total": 1.2
+        }
+      }
+    },
     "cypher_nexus:heavy_shot": {
       "delay": 4,
       "draw": 1,

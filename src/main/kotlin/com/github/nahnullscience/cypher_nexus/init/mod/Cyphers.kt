@@ -242,6 +242,11 @@ object Cyphers {
         delay(-4)
         recharge(-6)
     }
+    val HAYWIRE = registerCypher(::HaywireCypher) {
+        manaDrain(2f)
+        recharge(-8)
+        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 1.2)
+    }
     val BOUNCY = registerModifier("bouncy", 5f) {
         shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.ADD, 10.0)
     }
@@ -325,11 +330,11 @@ object Cyphers {
         manaDrain(0f)
         shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 0.5)
     }
-    val PING_PONG_PATH = registerCypher(::PingPongPath) {
+    val PING_PONG_PATH = registerCypher(::PingPongPathCypher) {
         manaDrain(0f)
         shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 32.0)
     }
-    val CHAOTIC_PATH = registerCypher(::ChaoticPath) {
+    val CHAOTIC_PATH = registerCypher(::ChaoticPathCypher) {
         manaDrain(0f)
         shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 2.0)
     }

@@ -12,6 +12,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAt
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute.AttributeApply
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.createProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeAbortReleaseHook.ReleaseAbort
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
@@ -138,6 +139,14 @@ class ShotStateChunk private constructor (
         // handle entities only on server
         if (level !is ServerLevel) return
 
+        // let hooks determine if this release should be aborted
+        hooks[CypherHooks.INVOKE_ABORT_RELEASE]?.let {
+            hooks.playHooks(CypherHooks.INVOKE_ABORT_RELEASE) { index, hook, count ->
+                val result = hook.abortRelease(index, count, level, owner, accessor)
+                if (result == ReleaseAbort.ABORT) return
+            }
+        }
+
         // apply invoking redirection if hooked
         var hookedPosDire = posDire
         hooks[CypherHooks.INVOKE_POS_REDIRECTION_SERVER]?.let {
@@ -162,7 +171,9 @@ class ShotStateChunk private constructor (
 
         // generate bullets
         simpleProjectiles.reference2IntEntrySet().forEach { (cypher, count) ->
-            repeat(count) { spawnProjectile(cypher, null, hookedPosDire, level, owner, directInvoker) }
+            repeat(count) {
+                spawnProjectile(cypher, null, hookedPosDire, level, owner, directInvoker)
+            }
         }
         triggeredProjectiles.forEach { node ->
             spawnProjectile(node.instance, node, hookedPosDire, level, owner, directInvoker)
@@ -244,6 +255,7 @@ class ShotStateChunk private constructor (
         dirty = false
         return this
     }
+
 
     /***/
     abstract inner class ShotStateViewer {

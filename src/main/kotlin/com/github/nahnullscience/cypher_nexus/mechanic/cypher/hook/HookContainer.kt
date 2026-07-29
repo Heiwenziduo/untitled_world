@@ -3,11 +3,9 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import it.unimi.dsi.fastutil.ints.IntArrayList
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
+import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList
-import java.util.Optional
 import java.util.function.Supplier
-import kotlin.collections.iterator
 
 class HookContainer (
 //    /**
@@ -22,7 +20,7 @@ class HookContainer (
     }
 
     @PublishedApi
-    internal val hooks = Reference2ObjectOpenHashMap<HookModule<*>, OrderedCypherCounts>()
+    internal val hooks = Reference2ReferenceOpenHashMap<HookModule<*>, OrderedCypherCounts>()
 
     override fun toString() = hooks.toString()
 

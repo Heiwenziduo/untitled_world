@@ -9,7 +9,7 @@ import com.github.nahnullscience.cypher_nexus.utility.unaryMinus
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 
-class PingPongPath(
+class PingPongPathCypher(
     defaultAttribute: Builder.() -> Builder
 ) : ModifierCypher(defaultAttribute), TickBehaviorHook {
     override val resource = CypherNexus.modResource("ping_pong_path")
