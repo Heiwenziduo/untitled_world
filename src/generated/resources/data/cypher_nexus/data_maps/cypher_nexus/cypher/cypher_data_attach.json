@@ -52,6 +52,15 @@
       "recharge": 0,
       "shotState": {}
     },
+    "cypher_nexus:aiming_return": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 60.0,
+      "projectile": {},
+      "recharge": 0,
+      "shotState": {}
+    },
     "cypher_nexus:all_invoking": {
       "delay": 0,
       "draw": 99,

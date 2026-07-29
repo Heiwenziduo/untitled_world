@@ -18,6 +18,7 @@ fun Vec3.toVec3i() = Vec3i(x.toInt(), y.toInt(), z.toInt())
 operator fun Vec3.unaryMinus() = Vec3(-x, -y, -z)
 operator fun Vec3.times(v: Double) = multiply(v, v, v)
 operator fun Vec3.times(v: Float) = v.toDouble().let { multiply(it, it, it) }
+//operator fun Vec3.plus(v: Vec3?) = if (v == null) this else Vec3(x + v.x, y + v.y, z + v.z)
 operator fun Vec3.plus(v: Vec3) = Vec3(x + v.x, y + v.y, z + v.z)
 operator fun Vec3.plus(v: Vector3f) = Vec3(x + v.x, y + v.y, z + v.z)
 operator fun Vec3.minus(v: Vec3) = Vec3(x - v.x, y - v.y, z - v.z)

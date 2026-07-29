@@ -10,7 +10,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstanc
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
-import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import net.minecraft.world.entity.Entity

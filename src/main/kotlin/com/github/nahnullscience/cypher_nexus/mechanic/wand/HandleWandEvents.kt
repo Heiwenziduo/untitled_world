@@ -132,8 +132,9 @@ object HandleWandEvents {
     @SubscribeEvent(priority = EventPriority.NORMAL)
     private fun tickWandDataMap(event: EntityTickEvent.Post) {
         // fired on both sides
-        if (event.entity.hasData(ModDataAttachments.WAND_DATA_MAP)) {
-            event.entity.getData(ModDataAttachments.WAND_DATA_MAP).tick(event.entity)
+        val entity = event.entity
+        if (entity.hasData(ModDataAttachments.WAND_DATA_MAP)) {
+            entity.getData(ModDataAttachments.WAND_DATA_MAP).tick(entity)
         }
     }
 

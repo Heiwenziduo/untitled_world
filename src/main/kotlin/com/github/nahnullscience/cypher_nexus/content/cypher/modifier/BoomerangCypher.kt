@@ -18,12 +18,12 @@ class BoomerangCypher(
     }
     override val resource = CypherNexus.modResource("boomerang")
 
-    override fun <CY> onTick(
+    override fun <CE> onTick(
         index: Int,
         count: Int,
         level: Level,
-        cyEntity: CY
-    ) where CY : Entity, CY : ICypherEntity {
+        cyEntity: CE
+    ) where CE : Entity, CE : ICypherEntity {
         val target = cyEntity.owner ?: return
         if (!target.boundingBox.contains(cyEntity.position())) {
             val dir = cyEntity.position().vectorTo(target.eyePosition)

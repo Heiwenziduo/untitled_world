@@ -4,7 +4,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
-import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
 
 /**
  * a safeguard interface,

@@ -13,7 +13,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerTy
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastMap
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
-import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.server.level.ServerLevel

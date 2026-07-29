@@ -8,6 +8,9 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 
+/**
+ * exist on both sides. this data can be found through [Entity.getData] on any Entity who had used a wand once.
+ * */
 class ItemWandInstanceMap {
     companion object {
         const val RESET_TICK_COUNT = 1200

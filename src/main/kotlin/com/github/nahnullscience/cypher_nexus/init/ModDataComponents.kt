@@ -9,7 +9,7 @@ import net.neoforged.neoforge.registries.DeferredRegister
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 import java.util.function.Supplier
 
-
+/** item data components */
 object ModDataComponents {
     val DEFERRED_REGISTER: DeferredRegister.DataComponents =
         DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, CypherNexus.MOD_ID)

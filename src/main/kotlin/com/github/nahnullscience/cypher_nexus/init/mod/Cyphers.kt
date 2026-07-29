@@ -288,8 +288,11 @@ object Cyphers {
         manaDrain(10f)
         flags(CypherFlags.MOTION_FOLLOWS_OWNER)
     }
-    val AIMING_ARC = registerCypher(::AimingArc) {
+    val AIMING_ARC = registerCypher(AbstractAiming::AimingArc) {
         manaDrain(30f)
+    }
+    val AIMING_RETURN = registerCypher(AbstractAiming::AimingReturn) {
+        manaDrain(60f)
     }
     val PIERCE_ENTITY = registerModifier("pierce_entity", 110f) {
         flags(CypherFlags.HURT_OWNER, CypherFlags.PIERCE_ENTITY)

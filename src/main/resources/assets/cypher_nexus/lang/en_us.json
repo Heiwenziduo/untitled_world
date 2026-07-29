@@ -96,6 +96,8 @@
   "cypher.cypher_nexus.modifier.boomerang.description": "Boomerang",
   "cypher.cypher_nexus.modifier.aiming_arc": "Aiming Arc",
   "cypher.cypher_nexus.modifier.aiming_arc.description": "Aiming Arc",
+  "cypher.cypher_nexus.modifier.aiming_return": "Aiming Return",
+  "cypher.cypher_nexus.modifier.aiming_return.description": "",
   "cypher.cypher_nexus.modifier.fortune": "Fortune",
   "cypher.cypher_nexus.modifier.fortune.description": "Fortune",
   "cypher.cypher_nexus.modifier.pierce_entity": "Pierce Entity",

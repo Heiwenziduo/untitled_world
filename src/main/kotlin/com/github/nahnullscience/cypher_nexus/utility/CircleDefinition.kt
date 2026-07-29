@@ -1,6 +1,5 @@
-package com.github.nahnullscience.cypher_nexus.utility.mod
+package com.github.nahnullscience.cypher_nexus.utility
 
-import com.github.nahnullscience.cypher_nexus.utility.coerceMaxLength
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
 import org.joml.Vector3f

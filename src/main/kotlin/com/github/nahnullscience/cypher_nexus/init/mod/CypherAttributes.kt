@@ -5,6 +5,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAt
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute.AttributeApply
 import com.github.nahnullscience.cypher_nexus.utility.dot0digit
 import com.github.nahnullscience.cypher_nexus.utility.dot1digit
+import com.github.nahnullscience.cypher_nexus.utility.dot2digit
 import com.github.nahnullscience.cypher_nexus.utility.exception.VanillaMisuseException
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
@@ -61,7 +62,7 @@ object CypherAttributes {
     { builder -> builder.max(8.0).parse { it * 20 }.format(dot1digit) }
     /** tick, 200 by default */
     val EXISTING = registerAttribute("existing")
-    { builder -> builder.default(200.0).parse { it / 20 }.format(dot1digit) }
+    { builder -> builder.default(200.0).parse { it / 20 }.format(dot2digit) }
     /** default 1.0 */
     val EFFECT_RADIUS = registerAttribute("effect_radius")
     { builder -> builder.default(1.0).min(0.25).max(16.0) }

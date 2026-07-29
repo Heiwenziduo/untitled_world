@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.utility.mod
+package com.github.nahnullscience.cypher_nexus.utility
 
 import net.minecraft.world.phys.Vec3
 

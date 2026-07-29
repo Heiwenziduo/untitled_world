@@ -8,13 +8,9 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedDa
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickMovementFinalizeHook
 import com.github.nahnullscience.cypher_nexus.utility.coerceMaxLength
 import com.github.nahnullscience.cypher_nexus.utility.headLeftVectorF
-import com.github.nahnullscience.cypher_nexus.utility.headUpVectorF
-import com.github.nahnullscience.cypher_nexus.utility.minus
-import com.github.nahnullscience.cypher_nexus.utility.mod.CircleDefinition
+import com.github.nahnullscience.cypher_nexus.utility.CircleDefinition
 import com.github.nahnullscience.cypher_nexus.utility.mostAlignedDirection
 import com.github.nahnullscience.cypher_nexus.utility.plus
-import net.minecraft.core.Direction
-import net.minecraft.core.Direction.Axis
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import org.joml.Quaternionf
@@ -27,6 +23,30 @@ abstract class AbstractPathModifier(
 ): ModifierCypher(defaultAttribute), TickMovementFinalizeHook {
     companion object {
         private const val ORBIT_RAD = (PI / 16).toFloat()
+
+        private fun <CE> HooksSharedData<*>.initOrbitCircle(
+            cyEntity: CE,
+            target: Entity
+        ): CircleDefinition where CE : Entity, CE : ICypherEntity {
+            return orbitingCircle ?: run {
+                val center = target.eyePosition
+                val targetPos = cyEntity.position() + cyEntity.deltaMovement
+                val radius = center.vectorTo(targetPos).coerceMaxLength(32.0)
+
+                val radF = radius.toVector3f()
+                val normal = Vector3f()
+
+                radF.cross(0f, 1f, 0f, normal)
+
+                if (normal.lengthSquared() > 1e-12f) {
+                    normal.cross(radF).normalize()
+                } else {
+                    normal.set(target.headLeftVectorF())
+                }
+
+                CircleDefinition(center, radius, normal).also { orbitingCircle = it }
+            }
+        }
     }
 
     override val resource = CypherNexus.modResource(path)
@@ -99,29 +119,5 @@ abstract class AbstractPathModifier(
                 cyEntity.deltaMovement = cyEntity.position().vectorTo(target)
             }
         }
-    }
-}
-
-private fun <CE> HooksSharedData<*>.initOrbitCircle(
-    cyEntity: CE,
-    target: Entity
-): CircleDefinition where CE : Entity, CE : ICypherEntity {
-    return orbitingCircle ?: run {
-        val center = target.eyePosition
-        val targetPos = cyEntity.position() + cyEntity.deltaMovement
-        val radius = center.vectorTo(targetPos).coerceMaxLength(32.0)
-
-        val radF = radius.toVector3f()
-        val normal = Vector3f()
-
-        radF.cross(0f, 1f, 0f, normal)
-
-        if (normal.lengthSquared() > 1e-12f) {
-            normal.cross(radF).normalize()
-        } else {
-            normal.set(target.headLeftVectorF())
-        }
-
-        CircleDefinition(center, radius, normal).also { orbitingCircle = it }
     }
 }

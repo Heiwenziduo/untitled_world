@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand.module
 
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
-import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
 

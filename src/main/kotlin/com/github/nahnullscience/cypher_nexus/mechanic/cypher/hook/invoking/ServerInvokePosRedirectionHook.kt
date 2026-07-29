@@ -3,7 +3,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.IHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk.ShotStateViewer
-import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 

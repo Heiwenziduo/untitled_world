@@ -12,13 +12,10 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.Map
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.WandModuleType
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
-import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.neoforged.neoforge.network.PacketDistributor
-import org.apache.logging.log4j.Level.ERROR
 import java.util.function.Supplier
 import kotlin.math.abs
 

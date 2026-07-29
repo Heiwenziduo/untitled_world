@@ -17,7 +17,7 @@ import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastOpMap
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
-import com.github.nahnullscience.cypher_nexus.utility.mod.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.randomInCone
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
 import net.minecraft.core.Holder
