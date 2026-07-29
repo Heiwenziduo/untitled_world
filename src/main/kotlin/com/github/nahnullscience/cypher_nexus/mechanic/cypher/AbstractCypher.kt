@@ -35,11 +35,11 @@ sealed class AbstractCypher(
 
     abstract val category: Holder<CypherCategory>
 
-    val manaDrain: Float get() = attributes().manaDrain
-    val draw: Int get() = attributes().draw
-    val delay: Int get() = attributes().delay
-    val recharge: Int get() = attributes().recharge
-    val flags: Int get() = attributes().flags
+    val manaDrain: Float get() = dataMap().manaDrain
+    val draw: Int get() = dataMap().draw
+    val delay: Int get() = dataMap().delay
+    val recharge: Int get() = dataMap().recharge
+    val flags: Int get() = dataMap().flags
 
     /** override colors from category */
     open val borderColor: Int? = null
@@ -83,11 +83,11 @@ sealed class AbstractCypher(
 
     fun holder(): Holder<AbstractCypher> = Cyphers.REGISTRY.wrapAsHolder(this)
 
-    private fun attributesData() = holder().getData(CYPHER_DATA_ATTACH)
+    private fun getDataMap() = holder().getData(CYPHER_DATA_ATTACH)
 
     open fun defaultAttributes(): Builder = CypherDataMap.builder().defaultAttribute()
 
-    fun attributes() = attributesData() ?: run {
+    fun dataMap() = getDataMap() ?: run {
         CypherNexus.LOGGER.warn("cypher $this missing attributes data, this may cause lag")
         defaultAttributes().build()
     }
@@ -262,7 +262,7 @@ sealed class AbstractCypher(
             // keep the order attrs registered
             CypherAttributes.REGISTRY.forEach registry@ { attribute ->
                 if (attribute.hide) return@registry
-                val opMap = attributes().shotState.getOrElse(attribute) { return@registry }
+                val opMap = dataMap().shotState.getOrElse(attribute) { return@registry }
 
                 var values: MutableComponent? = null
                 AttributeOperator.entries.forEach enum@ { operator ->

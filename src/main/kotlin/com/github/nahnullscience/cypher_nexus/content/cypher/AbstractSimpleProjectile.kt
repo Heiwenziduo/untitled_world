@@ -1,6 +1,5 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher
 
-import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
@@ -11,15 +10,16 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDed
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import net.minecraft.core.Holder
+import net.minecraft.resources.Identifier
 import net.minecraft.world.entity.EntityType
-import java.util.EnumMap
+import java.util.*
 import java.util.function.Supplier
 
 /**
  * the idea is, put entity-specific logics inside those Entity [com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile] classes, and leave the cypher simple
  * */
 abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<AbstractDedicatedCypherProjectile>> (
-    protected val path: String,
+    protected val path: Identifier,
     protected val type: Supplier<out EntityType<out AbstractDedicatedCypherProjectile>>
 ) : CypherDataMap.Builder() {
     init {
@@ -68,12 +68,12 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
 
 
     class SimpleProjectile(
-        path: String,
+        path: Identifier,
         type: Supplier<out EntityType<out AbstractDedicatedCypherProjectile>>
     ) : AbstractSimpleProjectile <ProjectileCypher<AbstractDedicatedCypherProjectile>> (path, type) {
         override fun createProjectile() = object : ProjectileCypher<AbstractDedicatedCypherProjectile>() {
-            override val resource = CypherNexus.modResource(path)
-            override val projectileType = type
+            override val resource = this@SimpleProjectile.path
+            override val projectileType = this@SimpleProjectile.type
             override val borderColor = this@SimpleProjectile.borderColor
             override val innateTrigger = this@SimpleProjectile.trigger
             override val innateTriggerCharge = this@SimpleProjectile.triggerCount
@@ -82,12 +82,12 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
     }
 
     class SimpleStaticProjectile(
-        path: String,
+        path: Identifier,
         type: Supplier<out EntityType<out AbstractDedicatedCypherProjectile>>
     ) : AbstractSimpleProjectile <StaticProjectileCypher<AbstractDedicatedCypherProjectile>> (path, type) {
         override fun createProjectile() = object : StaticProjectileCypher<AbstractDedicatedCypherProjectile>() {
-            override val resource = CypherNexus.modResource(path)
-            override val projectileType = type
+            override val resource = this@SimpleStaticProjectile.path
+            override val projectileType = this@SimpleStaticProjectile.type
             override val borderColor = this@SimpleStaticProjectile.borderColor
             override val innateTrigger = this@SimpleStaticProjectile.trigger
             override val innateTriggerCharge = this@SimpleStaticProjectile.triggerCount

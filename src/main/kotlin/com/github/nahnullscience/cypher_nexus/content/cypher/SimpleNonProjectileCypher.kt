@@ -1,6 +1,5 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher
 
-import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
@@ -11,11 +10,10 @@ import com.github.nahnullscience.cypher_nexus.utility.toRGB
 import net.minecraft.core.Holder
 import net.minecraft.resources.Identifier
 import java.awt.Color
-import java.util.EnumMap
-import kotlin.collections.set
+import java.util.*
 
 open class SimpleNonProjectileCypher(
-    val path: String,
+    val path: Identifier,
     val category: Holder<CypherCategory>
 ) : CypherDataMap.Builder() {
 
@@ -60,7 +58,7 @@ open class SimpleNonProjectileCypher(
 
     open fun createCypher() : AbstractNonProjectileCypher = object : AbstractNonProjectileCypher() {
         override val category = this@SimpleNonProjectileCypher.category
-        override val resource: Identifier = CypherNexus.modResource(path)
+        override val resource: Identifier = this@SimpleNonProjectileCypher.path
         override val borderColor: Int? = this@SimpleNonProjectileCypher.borderColor
         override val rgb: Color? = this@SimpleNonProjectileCypher.rgb?.toRGB()
         override val alpha: Float? = this@SimpleNonProjectileCypher.alpha

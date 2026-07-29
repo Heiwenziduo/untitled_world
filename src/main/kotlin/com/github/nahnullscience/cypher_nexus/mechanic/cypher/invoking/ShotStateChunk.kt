@@ -222,7 +222,7 @@ class ShotStateChunk private constructor (
                 }
 
                 // state-attributes
-                cypher.attributes().shotState.forEach cypherEach@ { (attribute, cyShotStateModifiers) ->
+                cypher.dataMap().shotState.forEach cypherEach@ { (attribute, cyShotStateModifiers) ->
 
                     if (attribute.applyOn == AttributeApply.INVOKING_ROOT && !isRoot) return@cypherEach
 

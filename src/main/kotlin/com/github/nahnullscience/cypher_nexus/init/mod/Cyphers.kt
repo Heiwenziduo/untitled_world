@@ -509,7 +509,7 @@ object Cyphers {
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Suppress("UNCHECKED_CAST")
-    fun <CY: AbstractCypher> registerCypher(cypher: CY): Holder<CY> {
+    private fun <CY: AbstractCypher> registerCypher(cypher: CY): Holder<CY> {
         return DEFERRED_REGISTER.register(cypher.resource.path) { -> cypher } as Holder<CY>
     }
 
@@ -517,7 +517,7 @@ object Cyphers {
      * builder friendly reload
      * */
     @Suppress("UNCHECKED_CAST")
-    fun <CY: AbstractCypher> registerCypher(
+    private fun <CY: AbstractCypher> registerCypher(
         constructor: (builder: CypherDataMap.Builder.() -> CypherDataMap.Builder) -> CY,
         defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE_ATTR
     ): Holder<CY> = registerCypher(constructor(defaultAttribute))
@@ -536,7 +536,7 @@ object Cyphers {
      */
     private inline fun <C : AbstractProjectileCypher<AbstractDedicatedCypherProjectile>, reified B : AbstractSimpleProjectile<C>> registerGenericProjectile(
         projectileHolder: CypherProjectileHolder,
-        crossinline builderFactory: (String, CypherProjectileHolder) -> B,
+        crossinline builderFactory: (Identifier, CypherProjectileHolder) -> B,
         crossinline config: B.() -> Unit,
         vararg triggerOverride: TriggerType
     ): Holder<C> {
@@ -544,14 +544,14 @@ object Cyphers {
         // but the cypher-projectile doesn't care who creates it.
         // this is a helper method utilizing the relation to directly tie one entity to a cypher and save boilerplate code
         val name = projectileHolder.id.path.removePrefix("cypher_")
-        val simple = builderFactory(name, projectileHolder)
+        val simple = builderFactory(name.identifier(), projectileHolder)
         simple.config()
         val base = registerCypher(simple.createProjectile())
 
         for (t in triggerOverride) {
             if (t != simple.trigger) {
                 val n = name + "_${t.simpleName}"
-                val triggered = builderFactory(n, projectileHolder)
+                val triggered = builderFactory(n.identifier(), projectileHolder)
                 triggered.config()
 
                 if (t == TriggerType.NONE) triggered.draw(0)
@@ -566,31 +566,35 @@ object Cyphers {
         return base
     }
 
-    fun registerProjectile(
+    private fun registerProjectile(
         projectileHolder: CypherProjectileHolder,
         vararg triggerOverride: TriggerType,
         config: SimpleProjectile.() -> Unit,
     ): Holder<ProjectileCypher<AbstractDedicatedCypherProjectile>> =
         registerGenericProjectile(projectileHolder, ::SimpleProjectile, config, *triggerOverride)
 
-    fun registerStaticProjectile(
+    private fun registerStaticProjectile(
         projectileHolder: CypherProjectileHolder,
         vararg triggerOverride: TriggerType,
         config: SimpleStaticProjectile.() -> Unit,
     ): Holder<StaticProjectileCypher<AbstractDedicatedCypherProjectile>> =
         registerGenericProjectile(projectileHolder, ::SimpleStaticProjectile, config, *triggerOverride)
 
-    fun registerModifier(path: String, manaDrain: Float, config: SimpleModifier.() -> Unit): Holder<ModifierCypher> {
-        val simple = SimpleModifier(path, manaDrain).also { it.config() }
+    private fun registerModifier(path: String, manaDrain: Float, config: SimpleModifier.() -> Unit): Holder<ModifierCypher> {
+        val simple = SimpleModifier(path.identifier(), manaDrain).also { it.config() }
         return registerCypher(simple.createModifier())
     }
 
-    fun registerCypher(
+    private fun registerCypher(
         path: String,
         category: Holder<CypherCategory>,
         config: SimpleNonProjectileCypher.() -> Unit
     ): Holder<AbstractNonProjectileCypher> {
-        val s = SimpleNonProjectileCypher(path, category).also { it.config() }
+        val s = SimpleNonProjectileCypher(path.identifier(), category).also { it.config() }
         return registerCypher(s.createCypher())
+    }
+
+    private fun String.identifier(): Identifier {
+        return CypherNexus.modResource(this@identifier)
     }
 }

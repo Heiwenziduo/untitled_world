@@ -1,6 +1,5 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 
-import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.cypher.SimpleNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
@@ -14,7 +13,7 @@ import java.awt.Color
 
 /** easy way to create lots of simple modifiers */
 class SimpleModifier(
-    path: String,
+    path: Identifier,
     manaDrain: Float,
 ) : SimpleNonProjectileCypher(path, CypherCategories.MODIFIER) {
     init {
@@ -40,7 +39,7 @@ class SimpleModifier(
     ): SimpleModifier = apply { super.shotStateAttr(holder, operator, value) }
 
     override fun createCypher(): ModifierCypher = object : ModifierCypher(NONE_ATTR) {
-        override val resource: Identifier = CypherNexus.modResource(path)
+        override val resource: Identifier = this@SimpleModifier.path
         override val borderColor: Int? = this@SimpleModifier.borderColor
         override val rgb: Color? = this@SimpleModifier.rgb?.toRGB()
         override val alpha: Float? = this@SimpleModifier.alpha

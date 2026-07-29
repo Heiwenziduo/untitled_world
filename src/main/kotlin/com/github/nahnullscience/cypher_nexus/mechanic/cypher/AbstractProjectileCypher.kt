@@ -3,8 +3,6 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags.Companion.containsFlag
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
@@ -77,7 +75,7 @@ abstract class AbstractProjectileCypher <CE> (
 
 
     fun getAttrBaseOrDefault(holder: Holder<CypherAttribute>) = getAttrBaseOrDefault(holder.value())
-    fun getAttrBaseOrDefault(attr: CypherAttribute): Double = attributes().projectile.getAttrOrDefault(attr)
+    fun getAttrBaseOrDefault(attr: CypherAttribute): Double = dataMap().projectile.getAttrOrDefault(attr)
     fun getAttrBaseOrNull(holder: Holder<CypherAttribute>) = getAttrBaseOrNull(holder.value())
-    fun getAttrBaseOrNull(attr: CypherAttribute): Double? = attributes().projectile[attr]
+    fun getAttrBaseOrNull(attr: CypherAttribute): Double? = dataMap().projectile[attr]
 }

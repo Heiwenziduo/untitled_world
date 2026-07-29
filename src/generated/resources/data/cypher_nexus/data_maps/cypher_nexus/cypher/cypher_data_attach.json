@@ -1113,19 +1113,6 @@
       "recharge": 0,
       "shotState": {}
     },
-    "cypher_nexus:snowball_death": {
-      "delay": 0,
-      "draw": 1,
-      "flags": 0,
-      "manaDrain": 25.0,
-      "projectile": {
-        "cypher_nexus:existing": 300.0,
-        "cypher_nexus:gravity_factor": 0.03,
-        "cypher_nexus:speed": 1.2
-      },
-      "recharge": 0,
-      "shotState": {}
-    },
     "cypher_nexus:snowball_timer_20": {
       "delay": 0,
       "draw": 1,
