@@ -55,13 +55,13 @@ class DaedalusCypher(
                     ClipContext(hitDestination, hitDestination.add(upward), Block.COLLIDER, Fluid.NONE, directInvoker)
                 )
                 val posFinal =
-                    if (blockResult2.type != Type.MISS) blockResult2.location.subtract(0.0, 0.1, 0.0)
+                    if (blockResult2.type != Type.MISS) blockResult2.location.subtract(0.0, 0.25, 0.0)
                     else hitDestination.add(upward)
                 return PosDirePair(posFinal, posFinal.vectorTo(hitDestination))
 //                .also { println("DaedalusCypher before $pair, after $it") }
             } else {
                 // if targeting a ceiling, fire projectiles like a shower
-                hitDestination = hitDestination.subtract(0.0, 0.1, 0.0)
+                hitDestination = hitDestination.subtract(0.0, 0.25, 0.0)
                 val downward = Vec3(0.0, -1.0, 0.0).randomInCone(angle, directInvoker.random)
                 return PosDirePair(hitDestination, downward)
             }

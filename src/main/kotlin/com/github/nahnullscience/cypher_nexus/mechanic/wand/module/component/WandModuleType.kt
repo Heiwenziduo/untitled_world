@@ -15,8 +15,7 @@ class WandModuleType <out Module : IWandModule> (
         return "[module type: ${resource.path}]"
     }
 
-    private val translationKey by lazy { "wand.module.${resource.namespace}.${resource.path}" }
-
     /** lang-JSON key: wand.module.{MOD_ID}.{module_name} */
     override fun translation(): MutableComponent = Component.translatable(translationKey)
+    private val translationKey = "wand.module.${resource.namespace}.${resource.path}"
 }

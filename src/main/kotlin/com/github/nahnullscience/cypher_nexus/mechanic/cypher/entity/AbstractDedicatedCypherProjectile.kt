@@ -132,9 +132,10 @@ abstract class AbstractDedicatedCypherProjectile(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // assume effectRadius won't change over time
-    val storedDimension by lazy { type.dimensions.scale(getEffectRadius()) }
+    private var _storedDimensionBacking: EntityDimensions? = null
     override fun getDimensions(pose: Pose): EntityDimensions {
-        return storedDimension
+        return _storedDimensionBacking ?:
+        type.dimensions.scale(getEffectRadius()).also { _storedDimensionBacking = it }
 //            .also { println("side: ${level().isClientSide}"); println(getEffectRadius()); println(it); }
     }
 

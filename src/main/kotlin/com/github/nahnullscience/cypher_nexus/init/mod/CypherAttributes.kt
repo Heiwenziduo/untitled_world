@@ -44,7 +44,7 @@ object CypherAttributes {
     val SPREAD = registerAttribute("spread")
     { builder -> builder.max(720.0).applyOn(AttributeApply.INVOKING) }
     val RECOIL = registerAttribute("recoil")
-    { builder -> builder.max(1000.0).applyOn(AttributeApply.INVOKING).hide() }
+    { builder -> builder.max(1000.0).applyOn(AttributeApply.INVOKING_ROOT).hide() }
 
     // ================================ projectile
     val DAMAGE = registerAttribute("damage")
@@ -71,7 +71,7 @@ object CypherAttributes {
     /** how much it falls each tick, 0.0 by default */
     val GRAVITY_FACTOR = registerAttribute("gravity_factor")
     { builder -> builder.min(-1.0).max(1.0).hide() }
-    /** deltaMovement * (1 - Friction) each tick, 0.03 by default */
+    /** deltaMovement * (1 - Friction) each tick, 0.02 by default */
     val FRICTION_FACTOR = registerAttribute("friction_factor")
-    { builder -> builder.default(0.03).min(-9.0).max(1.0).hide() }
+    { builder -> builder.default(0.02).min(-1.0).max(1.0).hide() }
 }

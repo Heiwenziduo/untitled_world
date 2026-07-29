@@ -9,6 +9,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProject
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute.AttributeApply
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.createProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
@@ -42,12 +43,20 @@ class ShotStateChunk private constructor (
         fun root(helper: InvokingHelper) = ShotStateChunk(1, helper)
     }
 
-    val isRoot: Boolean by lazy { helper != null && helper.shotRoot == this }
-    val accessor: ShotStateAccessor by lazy { ShotStateAccessor() }
+    private var _accessorBacking: ShotStateAccessor? = null
+    val accessor: ShotStateAccessor get() {
+        return _accessorBacking ?: ShotStateAccessor().also { _accessorBacking = it }
+    }
 
-    val attributes: AttributeFastOpMap by lazy { AttributeFastOpMap() }
+    private var _attrBacking: AttributeFastOpMap? = null
+    val attributes: AttributeFastOpMap get() {
+        return _attrBacking ?: AttributeFastOpMap().also { _attrBacking = it }
+    }
 
-    val hooks: HookContainer by lazy { HookContainer() }
+    private var _hooksBacking: HookContainer? = null
+    val hooks: HookContainer get() {
+        return _hooksBacking ?: HookContainer().also { _hooksBacking = it }
+    }
 
     private var _dyeAccBacking: DyeAccumulator? = null
     val dyeAccumulator: DyeAccumulator get() {
@@ -55,16 +64,21 @@ class ShotStateChunk private constructor (
     }
 
     private var _ccMapBacking: MapOfCypherCounts? = null
-    val ccMap: MapOfCypherCounts get() = _ccMapBacking ?: MapOfCypherCounts().also { _ccMapBacking = it }
+    val ccMap: MapOfCypherCounts get() {
+        return _ccMapBacking ?: MapOfCypherCounts().also { _ccMapBacking = it }
+    }
 
-    private val simpleProjectiles: Reference2IntOpenHashMap<AbstractProjectileCypher<*>> by lazy { Reference2IntOpenHashMap() } // projectiles with no trigger
+    // projectiles with & without trigger
+    private val simpleProjectiles: Reference2IntOpenHashMap<AbstractProjectileCypher<*>> = Reference2IntOpenHashMap(8)
     val simpleProjectilesView get() = simpleProjectiles.toMap()
 
     private val triggeredProjectiles = mutableListOf<ProjectileNode>()
     val triggeredProjectilesView get() = triggeredProjectiles.toList()
 
 
+    val isRoot: Boolean get() = helper != null && helper.shotRoot == this
     private var dirty = false
+
     override var enabledFlags: Int = 0
 
     var delay: Int = 0
@@ -108,7 +122,7 @@ class ShotStateChunk private constructor (
         CypherNexus.debugCypher { "${level.isClientSide} client ccMap: $_ccMapBacking" }
 
         // do recoil only on root
-        run recoil@ {
+        if (isRoot) run recoil@ {
             itemWand ?: return@recoil
             directInvoker ?: return@recoil
             val recoilMap = attributes[CypherAttributes.RECOIL.value()] ?: return@recoil
@@ -191,7 +205,7 @@ class ShotStateChunk private constructor (
         if (!dirty) return this
 
         _ccMapBacking?.let { ccMap ->
-            ccMap.forEach { (cypher, counts) ->
+            ccMap.forEach ccMap@ { (cypher, counts) ->
 
                 // hook
                 hooks.add(cypher, counts)
@@ -208,22 +222,15 @@ class ShotStateChunk private constructor (
                 }
 
                 // state-attributes
-                cypher.attributes().shotState.forEach { (attribute, cyShotStateModifier) ->
-                    var targetChunk = this
+                cypher.attributes().shotState.forEach cypherEach@ { (attribute, cyShotStateModifiers) ->
 
-                    // FIXME cumulate from children
-                    if (isRoot &&
-                        CypherAttributes.RECOIL.`is`(attribute.resource)
-                    ) {
-                        targetChunk = helper!!.shotRoot
-                    }
+                    if (attribute.applyOn == AttributeApply.INVOKING_ROOT && !isRoot) return@cypherEach
 
-
-                    val chunkMap = targetChunk.attributes.getOrPut(attribute) { EnumMap(AttributeOperator::class.java) }
+                    val chunkMap = attributes.getOrPut(attribute) { EnumMap(AttributeOperator::class.java) }
                     // prune: if set, skip
-                    if (chunkMap[AttributeOperator.SET_ALL] != null && cyShotStateModifier[AttributeOperator.SET_ALL] == null) return@forEach
+                    if (chunkMap[AttributeOperator.SET_ALL] != null && cyShotStateModifiers[AttributeOperator.SET_ALL] == null) return@cypherEach
 
-                    cyShotStateModifier.forEach { (operator, value) ->
+                    cyShotStateModifiers.forEach opMap@ { (operator, value) ->
                         chunkMap.compute(operator) { key, old ->
                             operator.cumulate(old ?: operator.defaultValue, value, counts)
                         }

@@ -42,22 +42,35 @@ open class CypherAttribute(
     override fun toString(): String = "attribute_${resource.path}"
 
     /** lang-JSON key: cypher.attribute.{MOD_ID}.{attribute_name} */
-    private val translationKey by lazy { "cypher.attribute.${resource.namespace}.${resource.path}" }
     override fun translation(): MutableComponent = Component.translatable(translationKey)
+    private val translationKey = "cypher.attribute.${resource.namespace}.${resource.path}"
 
-    private val unitKey by lazy { "gui.${resource.namespace}.cypher.property.${resource.path}.unit" }
+    private val unitKey = "gui.${resource.namespace}.cypher.property.${resource.path}.unit"
     fun parseUnit(value: Double) = parser(value)
     /** wrap a given value with the unit of this attribute, for example, `seconds`. not all attributes require a unit */
     fun wrapWithUnit(value: String) = Component.translatableWithFallback(unitKey, value, value)
 
     /** gui.{MOD_ID}.cypher.property.{attribute_name} */
-    private val displayKey by lazy { "gui.${resource.namespace}.cypher.property.${resource.path}" }
     fun displayRow(value: MutableComponent): MutableComponent = Component.translatable(displayKey, value)
+    private val displayKey = "gui.${resource.namespace}.cypher.property.${resource.path}"
 
 
     enum class AttributeApply {
-        /** Invoking attributes will not cumulate on projectile-entity */
+        /**
+         * Invoking attributes will not cumulate on cypher-entity,
+         * an invoking-attribute indicates some effects only affect how the cypher-entity would spawn,
+         * and will not affect how the entity behavior afterward, like `Spread`
+         * */
         INVOKING,
+        /**
+         * only cumulate on the ROOT shot state,
+         * a root-attribute indicates instantly inflict some effects to the invoker, like `Recoil`
+         * */
+        INVOKING_ROOT,
+        /**
+         * most attribute is an entity-attribute, this indicates the behavior of the entity is somehow affected
+         * by its value, like `Gravity`
+         * */
         ENTITY
     }
 

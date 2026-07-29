@@ -25,7 +25,7 @@ class SmokeBombCypherRenderer(context: Context) : SimpleParticleProjectileRender
                     setColor(it[0], it[1], it[2])
                     setAlpha(it[3])
                 }
-                scale(entity.getEffectRadius().coerceIn(0.5f, 4.0f))
+                scale(entity.getEffectRadius().coerceIn(0.25f, 4.0f))
                 lifetime += 60
             }
         }

@@ -219,57 +219,75 @@ sealed class AbstractCypher(
     /**
      * lang-JSON key: cypher.{MOD_ID}.{cypher_category}.{cypher_name}
      * */
-    private val translationKey by lazy { "cypher.${resource.namespace}.${category.value().registryName()}.${resource.path}" }
-    private val descriptionKey by lazy { "cypher.${resource.namespace}.${category.value().registryName()}.${resource.path}.description" }
-    override fun translation(): MutableComponent = Component.translatable(translationKey)
-    open fun description(): MutableComponent = Component.translatable(descriptionKey)
+    override fun translation(): MutableComponent = Component.translatable(
+            _translationKeyBacking ?:
+            "cypher.${resource.namespace}.${category.value().registryName()}.${resource.path}".also { _translationKeyBacking = it }
+    )
+    private var _translationKeyBacking: String? = null
 
-    /** icons: {MOD_ID}/textures/cypher/{cypher_category}/{cypher_name}.png */
-    open val texture by lazy {
-        Identifier.fromNamespaceAndPath(
+    /**
+     * lang-JSON key: cypher.{MOD_ID}.{cypher_category}.{cypher_name}.description
+     * */
+    open fun description(): MutableComponent = Component.translatable(
+        _descriptionKeyBacking ?:
+        "cypher.${resource.namespace}.${category.value().registryName()}.${resource.path}.description".also { _descriptionKeyBacking = it }
+    )
+    private var _descriptionKeyBacking: String? = null
+
+    /**
+     * icons: {MOD_ID}/textures/cypher/{cypher_category}/{cypher_name}.png
+     * */
+    open val texture: Identifier get() {
+        return _textureBacking ?: Identifier.fromNamespaceAndPath(
             resource.namespace,
             "textures/cypher/${category.value().registryName()}/${resource.path}.png"
-        )
+        ).also { _textureBacking = it }
     }
+    private var _textureBacking: Identifier? = null
 
-    /** detailed tooltip in index-screen */
-    open val attributesTooltip: List<Component> by lazy {
-        // since attributes won't change once initialized
-        val components = mutableListOf<Component>()
+    /**
+     * detailed tooltip in index-screen
+     * */
+    open val attributesTooltip: List<Component> get() {
+        return _attrTooltipBacking ?: run {
+            // since attributes won't change once initialized
+            val components = mutableListOf<Component>()
 
-        components.add(CategoryRow.row(category.value()))
-        if (manaDrain != 0f) components.add(ManaDrainRow.row(manaDrain))
-        if (draw > 1) components.add(DrawRow.row(draw))
-        if (delay != 0) components.add(CastDelayRow.row(delay))
-        if (recharge != 0) components.add(RechargeTimeRow.row(recharge))
+            components.add(CategoryRow.row(category.value()))
+            if (manaDrain != 0f) components.add(ManaDrainRow.row(manaDrain))
+            if (draw > 1) components.add(DrawRow.row(draw))
+            if (delay != 0) components.add(CastDelayRow.row(delay))
+            if (recharge != 0) components.add(RechargeTimeRow.row(recharge))
 
-        // keep the order attrs registered
-        CypherAttributes.REGISTRY.forEach registry@ { attribute ->
-            if (attribute.hide) return@registry
-            val opMap = attributes().shotState.getOrElse(attribute) { return@registry }
+            // keep the order attrs registered
+            CypherAttributes.REGISTRY.forEach registry@ { attribute ->
+                if (attribute.hide) return@registry
+                val opMap = attributes().shotState.getOrElse(attribute) { return@registry }
 
-            var values: MutableComponent? = null
-            AttributeOperator.entries.forEach enum@ { operator ->
-                var v = opMap.getOrElse(operator) { return@enum }
-                val c: MutableComponent
-                if (operator.needUnit) {
-                    v = attribute.parseUnit(v)
-                    val t = operator.format(v, attribute.formatter ?: operator.defaultFormatter)
-                    c = attribute.wrapWithUnit(t)
-                } else {
-                    val t = operator.format(v)
-                    c = Component.literal(t)
+                var values: MutableComponent? = null
+                AttributeOperator.entries.forEach enum@ { operator ->
+                    var v = opMap.getOrElse(operator) { return@enum }
+                    val c: MutableComponent
+                    if (operator.needUnit) {
+                        v = attribute.parseUnit(v)
+                        val t = operator.format(v, attribute.formatter ?: operator.defaultFormatter)
+                        c = attribute.wrapWithUnit(t)
+                    } else {
+                        val t = operator.format(v)
+                        c = Component.literal(t)
+                    }
+
+                    if (values == null) values = c
+                    else values.append(";  ").append(c)
                 }
 
-                if (values == null) values = c
-                else values.append(";  ").append(c)
+                values?.let {
+                    components.add(attribute.displayRow(it.withStyle(ChatFormatting.GOLD)))
+                }
             }
 
-            values?.let {
-                components.add(attribute.displayRow(it.withStyle(ChatFormatting.GOLD)))
-            }
-        }
-
-        return@lazy components
+            return@run components
+        }.also { _attrTooltipBacking = it }
     }
+    private var _attrTooltipBacking: List<Component>? = null
 }

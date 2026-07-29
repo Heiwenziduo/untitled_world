@@ -29,7 +29,7 @@ class ModClientConfig private constructor (builder: Builder) {
     val maxTrailParticleCount: IntValue = builder
         .comment(" the max number of cypher-entity trail particles")
         .translation(key("max_trail_particle_count"))
-        .defineInRange("max_trail_particle_count", 8000, 0, Int.MAX_VALUE)
+        .defineInRange("max_trail_particle_count", 12000, 0, Int.MAX_VALUE)
 
     val bouncePointsInterpolate: BooleanValue = builder
         .comment(" whether show bounce trajectory instead of moving to destination directly")

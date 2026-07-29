@@ -29,7 +29,6 @@ import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister
 import net.neoforged.neoforge.registries.RegistryBuilder
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
-import java.awt.Color
 
 /**
  *
@@ -74,7 +73,7 @@ object Cyphers {
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.01)
         projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.01)
     }
-    val SNOWBALL = registerProjectile(ModEntities.CYPHER_SNOWBALL, TriggerType.COLLISION, TriggerType.TIMER_20, TriggerType.DEATH) {
+    val SNOWBALL = registerProjectile(ModEntities.CYPHER_SNOWBALL, TriggerType.COLLISION, TriggerType.TIMER_20) {
         manaDrain(5f)
         projectileAttr(CypherAttributes.SPEED, 1.2)
         projectileAttr(CypherAttributes.EXISTING, 300.0)
@@ -173,8 +172,19 @@ object Cyphers {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // modifier
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    val LIGHT = registerModifier("light", 1f) {
+    val GLOWING = registerModifier("glowing", 1f) {
         flags(CypherFlags.GLOWING)
+    }
+    val BRISK = registerModifier("brisk", 5f) {
+        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 2.5)
+    }
+    val ACCELERATING = registerModifier("accelerating", 5f) {
+        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 0.375)
+        shotStateAttr(CypherAttributes.FRICTION_FACTOR, AttributeOperator.ADD, -0.04)
+    }
+    val DECELERATION = registerModifier("decelerating", 5f) {
+        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 1.625)
+        shotStateAttr(CypherAttributes.FRICTION_FACTOR, AttributeOperator.ADD, 0.03)
     }
     val POWER = registerModifier("power", 10f) {
         delay(1)
@@ -195,34 +205,35 @@ object Cyphers {
         shotStateAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 10.0)
         shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, 0.2)
     }
-    val CRIT_STRIKE = registerModifier("critical_strike", 10f) {
-        shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.25)
+    val LIGHT_SHOT = registerModifier("light_shot", 15f) {
+        delay(-3)
+        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -4.0)
+        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 5.0)
+        shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, -4.0)
+        shotStateAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, -10.0)
+        shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.35)
     }
     val EFFECTIVE_RADIUS = registerModifier("effective_radius", 30f) {
         shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 1.5)
         shotStateAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 5.0)
         shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, 0.5)
     }
-    val BRISK = registerModifier("brisk", 5f) {
-        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 2.5)
+    val REMOVE_DAMAGE = registerModifier("remove_damage", 0f) {
+        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.SET_ALL, 0.0)
+        shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.SET_ALL, 0.0)
     }
-    val ACCELERATING = registerModifier("accelerating", 5f) {
-        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 0.375)
-        shotStateAttr(CypherAttributes.FRICTION_FACTOR, AttributeOperator.ADD, -0.06)
+    val PEACEFUL_MODE = registerModifier("peaceful_mode", 5f) {
+        delay(-2)
+        flags(CypherFlags.SKIP_DAMAGE_CHECK)
+        shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, -1.0)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 100.0)
     }
-    val DECELERATION = registerModifier("decelerating", 5f) {
-        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 1.625)
-        shotStateAttr(CypherAttributes.FRICTION_FACTOR, AttributeOperator.ADD, 0.03)
+    val CRIT_PLUS = registerModifier("critical_plus", 10f) {
+        shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.25)
     }
     val FIERY = registerCypher(::FieryCypher) {
         manaDrain(5f)
         flags(CypherFlags.WITH_FIRE)
-    }
-    val ANTIGRAVITY = registerModifier("antigravity", 2f) {
-        shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, -0.03)
-    }
-    val GRAVITY = registerModifier("gravity", 2f) {
-        shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.02)
     }
     val MANA_SURGE = registerModifier("mana_surge", -40f) {
         delay(4)
@@ -231,21 +242,11 @@ object Cyphers {
         delay(-4)
         recharge(-6)
     }
-    val PEACEFUL_MODE = registerModifier("peaceful_mode", 5f) {
-        delay(-2)
-        flags(CypherFlags.SKIP_DAMAGE_CHECK)
-        shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, -1.0)
-        shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.SET_ALL, 0.0)
-        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 120.0)
-    }
     val BOUNCY = registerModifier("bouncy", 5f) {
         shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.ADD, 10.0)
     }
     val REMOVE_BOUNCE = registerModifier("remove_bounce", 0f) {
         shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.SET_ALL, 0.0)
-    }
-    val REMOVE_DAMAGE = registerModifier("remove_damage", 0f) {
-        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.SET_ALL, 0.0)
     }
     val EXTEND_EXISTING = registerModifier("extend_existing", 40f) {
         delay(5)
@@ -254,6 +255,11 @@ object Cyphers {
     val CURTAIL_EXISTING = registerModifier("curtail_existing", 10f) {
         delay(-3)
         shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, -30.0)
+    }
+    val NULL_EXISTING = registerModifier("null_existing", 14f) {
+        delay(-4)
+        recharge(-4)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.SET_ALL, 1.0)
     }
     val REDUCE_SPREAD = registerModifier("reduce_spread", 1f) {
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -60.0)
@@ -297,15 +303,16 @@ object Cyphers {
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 25.0)
         shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.03)
     }
-    val NULL_EXISTING = registerModifier("null_existing", 14f) {
-        delay(-4)
-        recharge(-4)
-        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.SET_ALL, 1.0)
-    }
     val FORTUNE = registerModifier("fortune", 120f) {
         delay(12)
         recharge(12)
         shotStateAttr(CypherAttributes.FORTUNE_LEVEL, AttributeOperator.ADD, 1.0)
+    }
+    val ANTIGRAVITY = registerModifier("antigravity", 2f) {
+        shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, -0.03)
+    }
+    val GRAVITY = registerModifier("gravity", 2f) {
+        shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.02)
     }
     val HORIZONTAL_PATH = registerCypher(AbstractPathModifier::HorizontalPath) {
         manaDrain(0f)
@@ -339,27 +346,27 @@ object Cyphers {
     }
     val RED_TINT = registerModifier("red_tint", 0f) {
         delay(-1)
-        dyeColor(Color.red)
+        dyeColor(11743532)
     }
     val ORANGE_TINT = registerModifier("orange_tint", 0f) {
         delay(-1)
-        dyeColor(Color.orange)
+        dyeColor(15435844)
     }
     val YELLOW_TINT = registerModifier("yellow_tint", 0f) {
         delay(-1)
-        dyeColor(Color.yellow)
+        dyeColor(14602026)
     }
     val LIME_TINT = registerModifier("lime_tint", 0f) {
         delay(-1)
-        dyeColor(Color.green)
+        dyeColor(4312372)
     }
     val CYAN_TINT = registerModifier("cyan_tint", 0f) {
         delay(-1)
-        dyeColor(Color.cyan)
+        dyeColor(2651799)
     }
     val BLUE_TINT = registerModifier("blue_tint", 0f) {
         delay(-1)
-        dyeColor(Color.blue)
+        dyeColor(2437522)
     }
     val PURPLE_TINT = registerModifier("purple_tint", 0f) {
         delay(-1)
