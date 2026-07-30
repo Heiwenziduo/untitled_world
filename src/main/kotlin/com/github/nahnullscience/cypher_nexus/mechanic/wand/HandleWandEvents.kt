@@ -2,6 +2,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.wand
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments
+import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_MODULE_STATE_TRACKER
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.inputModules
 import com.github.nahnullscience.cypher_nexus.mechanic.entity.WandModuleStateTracker.Companion.getModulePerformingHand
@@ -9,6 +10,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.entity.WandModuleStateTra
 import com.github.nahnullscience.cypher_nexus.mechanic.event.CNCommonEvents
 import com.github.nahnullscience.cypher_nexus.mechanic.event.WandModulePerformStateChangeEvent
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.InputModule
+import com.github.nahnullscience.cypher_nexus.utility.sideString
 import net.minecraft.world.entity.LivingEntity
 import net.neoforged.bus.api.EventPriority
 import net.neoforged.bus.api.SubscribeEvent
@@ -25,15 +27,19 @@ object HandleWandEvents {
      * */
     @SubscribeEvent(priority = EventPriority.NORMAL)
     private fun wandModuleTick(event: EntityTickEvent.Pre) { // didn't find LivingTick, strange
+        if (!event.entity.hasData(WAND_MODULE_STATE_TRACKER)) return
         val living = event.entity as? LivingEntity ?: return
         val inputs = inputModules.toMutableList()
         inputs.removeIf { type -> !living.isPerformingModule(type) } // pre-filter
+
+        println("${living.level().sideString()} tick performing: $inputs")
 
         if (inputs.isNotEmpty())
         CNCommonEvents.livingGatherWandsActive(living).wandsSequence().forEach { stack ->
             val instance = (stack.item as IWandLike).itemWandInstance(living.level(), living, stack)!!
             inputs.removeIf { type ->
                 val module = instance.module(type) ?: return@removeIf false
+                println("tick holding $module")
                 module.onHoldingTick(living.level(), living, stack, 0)
                 module.consumeInput
             }
@@ -43,13 +49,14 @@ object HandleWandEvents {
 
 
     /**
-     *
+     * on both sides
      * */
     @SubscribeEvent(priority = EventPriority.LOWEST)
     private fun onModuleStart(event: WandModulePerformStateChangeEvent.Start) {
         val living = event.entity
         val type = event.module
 
+        println("onModuleStart")
         // "handy" modules search hand and are consumed by hand
         if (
             type.resource == WandModuleTypes.PRIMARY_RESOURCE ||
@@ -59,10 +66,11 @@ object HandleWandEvents {
             val hand = living.getModulePerformingHand(event.module).also {
                 if (it == null) {
                     CypherNexus.debugWand(Level.ERROR)
-                    { "$type does not exist on $living both hands, this should not happen!" }
+                    { "onModuleStart: $type does not exist on $living both hands, this should not happen!" }
                     return
                 }
             }
+            println("-----?")
             val stack = living.getItemInHand(hand!!)
             val instance = (stack.item as IWandLike).itemWandInstance(living.level(), living, stack)!!
             (instance.module(type) as InputModule).onHoldingStart(living.level(), living, stack)
@@ -85,13 +93,14 @@ object HandleWandEvents {
 
 
     /**
-     *
+     * on both sides
      * */
     @SubscribeEvent(priority = EventPriority.LOWEST)
     private fun onModuleEnd(event: WandModulePerformStateChangeEvent.End) {
         val living = event.entity
         val type = event.module
 
+        println("onModuleEnd")
         // "handy" modules search hand and are consumed by hand
         if (
             type.resource == WandModuleTypes.PRIMARY_RESOURCE ||
@@ -100,7 +109,7 @@ object HandleWandEvents {
             val hand = living.getModulePerformingHand(event.module).also {
                 if (it == null) {
                     CypherNexus.debugWand(Level.ERROR)
-                    { "$type does not exist on $living both hands, this should not happen!" }
+                    { "onModuleEnd: $type does not exist on $living both hands, this should not happen!" }
                     return
                 }
             }

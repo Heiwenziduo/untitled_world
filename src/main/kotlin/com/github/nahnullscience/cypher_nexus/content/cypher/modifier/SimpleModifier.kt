@@ -30,6 +30,7 @@ class SimpleModifier(
     override fun dyeColor(rgb: Int) = apply { super.dyeColor(rgb) }
     override fun dyeColor(color: Color) = apply { super.dyeColor(color) }
     override fun dyeColor(rgb: Int, a: Float) = apply { super.dyeColor(rgb, a) }
+    override fun dyeColor(alpha: Float) = apply { super.dyeColor(alpha) }
     override fun brightness(l: Float) = apply { super.brightness(l) }
 
     override fun shotStateAttr(

@@ -94,7 +94,7 @@ class ItemWandInstance(
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    fun <T : IWandModule> module(type: WandModuleType<T>): T? = modules[type]
+    fun <T : IWandModule> module(type: WandModuleType<T>): T? = modules[type].also { println("get module: $it") }
     fun <T : IWandModule> module(holder: Supplier<out WandModuleType<T>>): T? = modules[holder]
 
     private fun computeModules() {

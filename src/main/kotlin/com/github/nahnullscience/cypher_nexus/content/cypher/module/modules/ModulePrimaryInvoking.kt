@@ -23,7 +23,7 @@ class ModulePrimaryInvoking(
     }
 
     override fun onHoldingTick(level: Level, invoker: LivingEntity, stack: ItemStack?, tickCount: Int) {
-//        println("${level.isClientSide} side onHoldingTick: $invoker")
+        println("${level.isClientSide} side onHoldingTick: $invoker")
         ModuleSharedLogic.invoking(level, invoker, stack)
     }
 

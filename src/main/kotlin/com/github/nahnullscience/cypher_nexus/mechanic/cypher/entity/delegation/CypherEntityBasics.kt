@@ -384,14 +384,15 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
         delegateOnTick()
 
         cyEntity.rotateTowardSpeed(cyEntity.getRotationSpeed())
-        applyFriction()
-        applyGravity()
         delegateFinalizeTickMovement()
 
         if (cyEntity.deltaMovement.lengthSqr() <= LOW_SPEED_THRESHOLD_SQR) delegateOnLowSpeed(lowSpeedTickCount++)
         else lowSpeedTickCount = 0
 
         loopHitAndBounce()
+
+        applyFriction()
+        applyGravity()
     }
 
     protected fun loopHitAndBounce() {

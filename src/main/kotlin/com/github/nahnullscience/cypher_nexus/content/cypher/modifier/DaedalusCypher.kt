@@ -41,7 +41,7 @@ class DaedalusCypher(
         val lengthMax = (16.0 + 8.0 * count).coerceAtMost(128.0)
         val (start, direction) = pair
         if (direction != Vec3.ZERO) {
-            val angle = 20.0 // TODO use SPREAD as factor
+            val angle = 24.0
             val routeDefault = direction.normalize().scale(lengthMax)
             var hitDestination = start.add(routeDefault)
             var hitDir = Direction.UP

@@ -45,14 +45,14 @@ interface InputModule : IWandModule {
      * call both sides
      * */
     fun onHoldingStart(level: Level, invoker: LivingEntity, stack: ItemStack?) {
-        invoker.getData(WAND_MODULE_STATE_TRACKER).printCurrentPerforming()
+        invoker.getData(WAND_MODULE_STATE_TRACKER).printCurrentPerforming(level)
     }
 
     /**
      * call both sides
      * */
     fun onHoldingStop(level: Level, invoker: LivingEntity, stack: ItemStack?, tickCount: Int) {
-        invoker.getData(WAND_MODULE_STATE_TRACKER).printCurrentPerforming()
+        invoker.getData(WAND_MODULE_STATE_TRACKER).printCurrentPerforming(level)
     }
 
     /**

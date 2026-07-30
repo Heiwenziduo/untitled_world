@@ -18,7 +18,7 @@ private object LevelUtil {
     const val SERVER = "server"
 }
 
-fun Level.side(): String = if (isClientSide) CLIENT else SERVER
+fun Level.sideString(): String = if (isClientSide) CLIENT else SERVER
 
 /**
  * an optimized entity searching function.

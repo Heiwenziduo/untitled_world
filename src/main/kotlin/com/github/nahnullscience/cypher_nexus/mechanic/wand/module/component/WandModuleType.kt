@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
 
 class WandModuleType <out Module : IWandModule> (
     override val resource: Identifier,
-//    val module: KClass<out Module>,
+    val module: KClass<out Module>,
 ): IRegisterable {
 
     override fun toString(): String {

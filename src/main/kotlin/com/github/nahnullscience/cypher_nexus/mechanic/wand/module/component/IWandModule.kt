@@ -16,4 +16,7 @@ interface IWandModule {
      * instance reference
      * */
     val instance: ItemWandInstance
+
+
+    fun isTypeOf(type: Supplier<out WandModuleType<*>>) = type == typeHolder
 }

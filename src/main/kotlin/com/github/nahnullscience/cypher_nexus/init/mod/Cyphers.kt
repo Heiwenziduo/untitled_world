@@ -175,6 +175,7 @@ object Cyphers {
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     val GLOWING = registerModifier("glowing", 1f) {
         flags(CypherFlags.GLOWING)
+        brightness(0.2f)
     }
     val BRISK = registerModifier("brisk", 5f) {
         shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 2.5)
@@ -307,10 +308,10 @@ object Cyphers {
     val DAEDALUS = registerCypher(::DaedalusCypher) {
         manaDrain(24f)
         delay(-3)
-        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 1.25)
+        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 1.24)
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.MULTIPLY_TOTAL, 0.0)
-        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 25.0)
-        shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.03)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 24.0)
+        shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.04)
     }
     val FORTUNE = registerModifier("fortune", 120f) {
         delay(12)
@@ -341,10 +342,12 @@ object Cyphers {
     }
     val PLANE_ORBIT = registerCypher(AbstractPathModifier::PlaneOrbit) {
         manaDrain(3f)
-        delay(-5)
+        delay(-4)
         flags(CypherFlags.IGNORE_BLOCK, CypherFlags.MOTION_FOLLOWS_OWNER)
         shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 40.0)
         shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.SET_ALL, 0.0)
+        shotStateAttr(CypherAttributes.FRICTION_FACTOR, AttributeOperator.SET_ALL, 0.0)
+        shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.SET_ALL, 0.0)
     }
     val TRUE_ORBIT = registerCypher(AbstractPathModifier::TrueOrbit) {
         manaDrain(5f)
@@ -352,6 +355,8 @@ object Cyphers {
         flags(CypherFlags.IGNORE_BLOCK, CypherFlags.MOTION_FOLLOWS_OWNER)
         shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 40.0)
         shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.SET_ALL, 0.0)
+        shotStateAttr(CypherAttributes.FRICTION_FACTOR, AttributeOperator.SET_ALL, 0.0)
+        shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.SET_ALL, 0.0)
     }
     val RED_TINT = registerModifier("red_tint", 0f) {
         delay(-1)
@@ -380,6 +385,14 @@ object Cyphers {
     val PURPLE_TINT = registerModifier("purple_tint", 0f) {
         delay(-1)
         dyeColor(8073150)
+    }
+    val DARK_TINT = registerModifier("dark_tint", 0f) {
+        delay(-1)
+        brightness(-0.5f)
+    }
+    val PHANTOM_DYE = registerModifier("phantom_dye", 0f) {
+        delay(-1)
+        dyeColor(0.2f)
     }
 
 

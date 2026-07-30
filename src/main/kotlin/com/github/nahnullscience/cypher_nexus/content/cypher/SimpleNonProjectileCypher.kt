@@ -40,6 +40,7 @@ open class SimpleNonProjectileCypher(
         if (color.alpha != 0xff) alpha = color.alpha.toFloat() / 255
     }
     open fun dyeColor(rgb: Int, a: Float) = apply { this.rgb = rgb; alpha = a }
+    open fun dyeColor(alpha: Float) = apply { this.alpha = alpha }
     open fun brightness(l: Float) = apply { brightness = l }
     open fun pattern(p: Holder<AbstractInvokingPattern>) = apply { pattern = p }
 

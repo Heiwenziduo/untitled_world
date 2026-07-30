@@ -15,7 +15,7 @@ import java.util.function.Supplier
  *
  * */
 object ClientWandModuleStateManager {
-    val mc = Minecraft.getInstance()
+    val mc get() = Minecraft.getInstance()
 
     fun startModule(type: Supplier<out WandModuleType<*>>, module: InputModule) {
         val player = mc.player ?: return

@@ -7,11 +7,15 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.Inp
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.WandModuleType
 import com.github.nahnullscience.cypher_nexus.utility.exception.VanillaMisuseException
 import net.minecraft.core.Registry
+import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
 import net.neoforged.neoforge.registries.DeferredRegister
 import net.neoforged.neoforge.registries.RegistryBuilder
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 import java.util.function.Supplier
+import kotlin.reflect.KClass
+import kotlin.reflect.full.isSubclassOf
+import kotlin.streams.toList
 
 object WandModuleTypes {
     const val MODULE_ID_CAP = 31
@@ -36,6 +40,10 @@ object WandModuleTypes {
         return DEFERRED_REGISTER.register(module.resource.path) { resource -> module }
     }
 
+    fun <T : IWandModule> registerModule(resource: Identifier, module: KClass<T>): Supplier<out WandModuleType<T>> {
+        return registerModule(WandModuleType(resource, module))
+    }
+
 
     val PRIMARY_RESOURCE = CypherNexus.modResource("primary")
     val SECONDARY_RESOURCE = CypherNexus.modResource("secondary")
@@ -46,20 +54,23 @@ object WandModuleTypes {
     val ATTRIBUTE_RESOURCE = CypherNexus.modResource("attribute")
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    val PRIMARY = registerModule(WandModuleType<AbstractPrimaryModule>(PRIMARY_RESOURCE))
-    val SECONDARY = registerModule(WandModuleType<AbstractSecondaryModule>(SECONDARY_RESOURCE))
-    val SPECIAL = registerModule(WandModuleType<AbstractSpecialModule>(SPECIAL_RESOURCE))
+    val PRIMARY = registerModule(PRIMARY_RESOURCE, AbstractPrimaryModule::class)
+    val SECONDARY = registerModule(SECONDARY_RESOURCE, AbstractSecondaryModule::class)
+    val SPECIAL = registerModule(SPECIAL_RESOURCE, AbstractSpecialModule::class)
 
-    val RECOIL = registerModule(WandModuleType<AbstractRecoilModule>(RECOIL_RESOURCE))
-    val MANA_SHIELD = registerModule(WandModuleType<AbstractManaShieldModule>(MANA_SHIELD_RESOURCE))
+    val RECOIL = registerModule(RECOIL_RESOURCE, AbstractRecoilModule::class)
+    val MANA_SHIELD = registerModule(MANA_SHIELD_RESOURCE, AbstractManaShieldModule::class)
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    // TODO should be a better way to handle this
-    val inputModules = mutableSetOf<Supplier<out WandModuleType<InputModule>>>()
-    init {
-        inputModules.add(PRIMARY)
-        inputModules.add(SECONDARY)
-        inputModules.add(SPECIAL)
+    private var _inputModuleBacking: List<Supplier<out WandModuleType<InputModule>>>? = null
+    val inputModules: List<Supplier<out WandModuleType<InputModule>>> get() {
+        return _inputModuleBacking ?: run {
+            REGISTRY.filter { type ->
+                type.module.isSubclassOf(InputModule::class)
+            }.map {
+                Supplier { -> it } as Supplier<WandModuleType<InputModule>>
+            }.toList().also { _inputModuleBacking = it }
+        }
     }
 }

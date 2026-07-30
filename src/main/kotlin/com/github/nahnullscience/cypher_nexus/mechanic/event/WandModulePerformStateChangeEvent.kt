@@ -10,6 +10,7 @@ import net.neoforged.neoforge.event.entity.living.LivingEvent
  * fired when a living start / stop perform specific modules. fired on both sides.
  * this event is cancellable, if canceled, module state change won't apply.
  * the cancellation of the event won't prevent sending state to server
+ *
  * Note: the cancellation should be consistent on both sides
  * @param module the module
  * @param state whether the module is going to perform or stop
@@ -28,15 +29,11 @@ sealed class WandModulePerformStateChangeEvent (
         entity: LivingEntity,
         instance: ItemWandInstance?,
         module: WandModuleType<*>,
-    ) : WandModulePerformStateChangeEvent(
-        entity, instance, module, true
-    )
+    ) : WandModulePerformStateChangeEvent(entity, instance, module, true)
 
     class End(
         entity: LivingEntity,
         instance: ItemWandInstance?,
         module: WandModuleType<*>,
-    ) : WandModulePerformStateChangeEvent(
-        entity, instance, module, false
-    )
+    ) : WandModulePerformStateChangeEvent(entity, instance, module, false)
 }
