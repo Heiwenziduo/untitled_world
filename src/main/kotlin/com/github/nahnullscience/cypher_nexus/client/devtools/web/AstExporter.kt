@@ -124,6 +124,6 @@ object AstExporter {
             )
         }
 
-        return AstChunk(delay = delay, recharge = recharge, contributors = contributors, projectiles = simpleEdges + triggeredEdges)
+        return AstChunk(delay = 0, recharge = 0, contributors = contributors, projectiles = simpleEdges + triggeredEdges)
     }
 }

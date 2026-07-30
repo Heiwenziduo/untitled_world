@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
+import com.github.nahnullscience.cypher_nexus.init.mod.InvokingPatterns.NO_PATTERN
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.RECOIL
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
@@ -79,42 +80,16 @@ class ShotStateChunk private constructor (
 
 
     val isRoot: Boolean get() = helper != null && helper.shotRoot == this
-    private var dirty = false
+
+    var dirty = false
+        private set
+    var totalProjectiles: Int = 0
+        private set
 
     override var enabledFlags: Int = 0
 
-    var delay: Int = 0
-    private set
-    var recharge: Int = 0
-    private set
+    private var shotPattern: Holder<AbstractInvokingPattern> = NO_PATTERN
 
-    private fun spawnProjectile(
-        cypher: AbstractProjectileCypher<*>,
-        node: ProjectileNode?,
-        hookedPosDire: PosDirePair,
-        level: ServerLevel,
-        owner: Entity?,
-        directInvoker: Entity?
-    ) {
-        val proj = cypher.createProjectile(level, owner, this, node)
-        var dire = hookedPosDire.direction
-        run spread@ {
-            val random = owner?.random ?: directInvoker?.random ?: return@spread
-            val spreadMap = attributes[CypherAttributes.SPREAD.value()] ?: return@spread
-
-            val spread = AttributeOperator.attributeCalculator(CypherAttributes.SPREAD.value().defaultValue, spreadMap).let {
-                CypherAttributes.SPREAD.value().restrictRange(it)
-            }
-
-            if (spread > 0.01)
-                dire = hookedPosDire.direction.randomInCone(spread / 2, random)
-//                        .also { println("dire: $dire -> $it, " +
-//                                "actual scatter: ${Math.toDegrees(acos(dire.normalize().dot(it.normalize())))}, " +
-//                                "spread: $spread") }
-        }
-        proj.initDirection(PosDirePair(hookedPosDire.position, dire))
-        level.addFreshEntity(proj)
-    }
 
     fun release(
         level: Level,
@@ -180,14 +155,58 @@ class ShotStateChunk private constructor (
         // generate bullets
         simpleProjectiles.reference2IntEntrySet().forEach { (cypher, count) ->
             repeat(count) {
-                spawnProjectile(cypher, null, hookedPosDire, level, owner, directInvoker)
+                spawnOne(cypher, null, coordinate, hookedPosDire, level, owner, directInvoker)
             }
         }
         triggeredProjectiles.forEach { node ->
-            spawnProjectile(node.instance, node, hookedPosDire, level, owner, directInvoker)
+            spawnOne(node.instance, node, coordinate, hookedPosDire, level, owner, directInvoker)
         }
 
         Profiler.get().pop()
+    }
+
+    private var indexP = 0
+    /**
+     * wrap [spawnProjectile] for pattern & chain effect supports
+     * */
+    private fun spawnOne(
+        cypher: AbstractProjectileCypher<*>,
+        node: ProjectileNode?,
+        coordinate: CoordinateDefinition,
+        hookedPosDire: PosDirePair,
+        level: ServerLevel,
+        owner: Entity?,
+        directInvoker: Entity?
+    ) {
+        val patternPosDire = shotPattern.value().layout(indexP, totalProjectiles, coordinate, hookedPosDire)
+        spawnProjectile(indexP, cypher, node, patternPosDire, level, owner, directInvoker)
+        indexP++
+    }
+
+    private fun spawnProjectile(
+        index: Int,
+        cypher: AbstractProjectileCypher<*>,
+        node: ProjectileNode?,
+        posDire: PosDirePair,
+        level: ServerLevel,
+        owner: Entity?,
+        directInvoker: Entity?
+    ) {
+        val proj = cypher.createProjectile(level, owner, this, node)
+        var dire = posDire.direction
+        run spread@ {
+            val random = owner?.random ?: directInvoker?.random ?: return@spread
+            val spreadMap = attributes[CypherAttributes.SPREAD.value()] ?: return@spread
+
+            val spread = AttributeOperator.attributeCalculator(CypherAttributes.SPREAD.value().defaultValue, spreadMap).let {
+                CypherAttributes.SPREAD.value().restrictRange(it)
+            }
+
+            if (spread > 0.01)
+                dire = posDire.direction.randomInCone(spread / 2, random)
+        }
+        proj.initDirection(PosDirePair(posDire.position, dire))
+        level.addFreshEntity(proj)
     }
 
     fun addProjectileNode(
@@ -226,6 +245,9 @@ class ShotStateChunk private constructor (
         _ccMapBacking?.let { ccMap ->
             ccMap.forEach ccMap@ { (cypher, counts) ->
 
+                // pattern
+                cypher.pattern.let { if (it != NO_PATTERN) shotPattern = it }
+
                 // hook
                 hooks.add(cypher, counts)
 
@@ -258,6 +280,7 @@ class ShotStateChunk private constructor (
             }
 
             dyeAccumulator.resolveColor()
+            totalProjectiles = simpleProjectiles.values.sum() + triggeredProjectiles.size
         }
 
         dirty = false

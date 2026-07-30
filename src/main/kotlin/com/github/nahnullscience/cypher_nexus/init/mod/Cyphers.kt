@@ -12,6 +12,7 @@ import com.github.nahnullscience.cypher_nexus.content.cypher.utility.InnerForceC
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.ProteusCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.RefresherRingCypher
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
+import com.github.nahnullscience.cypher_nexus.init.mod.InvokingPatterns.PLANE_TRIFURCATED_PATTERN
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.*
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.NONE_ATTR
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
@@ -420,6 +421,12 @@ object Cyphers {
         manaDrain(5f)
         draw(4)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 40.0)
+    }
+    val FORMATION_PLANE_TRIFURCATED = registerCypher("formation_plane_trifurcated", CypherCategories.MULTI_INVOKING) {
+        manaDrain(3f)
+        draw(3)
+        pattern(PLANE_TRIFURCATED_PATTERN)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -15.0)
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

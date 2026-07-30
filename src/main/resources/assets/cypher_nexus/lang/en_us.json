@@ -127,6 +127,8 @@
   "cypher.cypher_nexus.multi_invoking.treble_scatter.description": "Treble Invoking Scatter",
   "cypher.cypher_nexus.multi_invoking.quadruple_scatter": "Quadruple Invoking Scatter",
   "cypher.cypher_nexus.multi_invoking.quadruple_scatter.description": "Quadruple Invoking Scatter",
+  "cypher.cypher_nexus.multi_invoking.formation_plane_trifurcated": "Formation: Plane Trifurcated",
+  "cypher.cypher_nexus.multi_invoking.formation_plane_trifurcated.description": "",
 
   "cypher.cypher_nexus.other.add_trigger": "Add Trigger",
   "cypher.cypher_nexus.other.add_trigger.description": "",
@@ -190,11 +192,12 @@
   "cypher.cypher_nexus.utility.proteus": "Proteus",
   "cypher.cypher_nexus.utility.proteus.description": "",
 
-  "gui.cypher_nexus.cypher.property.category":      "Category: %s",
-  "gui.cypher_nexus.cypher.property.mana_drain":    "Mana Drain: %s",
-  "gui.cypher_nexus.cypher.property.draw":          "Draw: %s",
-  "gui.cypher_nexus.cypher.property.cast_delay":    "Delay: %ss",
-  "gui.cypher_nexus.cypher.property.recharge_time": "Recharge: %ss",
+  "gui.cypher_nexus.cypher.property.category":          "Category: %s",
+  "gui.cypher_nexus.cypher.property.invoking_pattern":  "Pattern: %s",
+  "gui.cypher_nexus.cypher.property.mana_drain":        "Mana Drain: %s",
+  "gui.cypher_nexus.cypher.property.draw":              "Draw: %s",
+  "gui.cypher_nexus.cypher.property.cast_delay":        "Delay: %ss",
+  "gui.cypher_nexus.cypher.property.recharge_time":     "Recharge: %ss",
 
   "gui.cypher_nexus.cypher.property.spread": "Spread: %s",
   "gui.cypher_nexus.cypher.property.spread.unit": "%s°",
@@ -222,6 +225,10 @@
   "gui.cypher_nexus.wand.draw":                     "Invoke: %s",
   "gui.cypher_nexus.wand.capacity":                 "Capacity: %s",
   "gui.cypher_nexus.wand.etch":                     "Etch: %s",
+
+
+  "invoking.cypher_nexus.pattern.no_pattern": "No Pattern",
+  "invoking.cypher_nexus.pattern.plane_trifurcated": "Plane Trifurcated",
 
   "item_group.cypher_nexus": "Cypher Nexus",
 

@@ -15,4 +15,8 @@ data class CoordinateDefinition(
     init {
 
     }
+
+    val x get() = left
+    val y get() = top
+    val z get() = front
 }

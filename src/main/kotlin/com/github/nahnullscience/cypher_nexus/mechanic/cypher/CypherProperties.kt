@@ -2,6 +2,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractInvokingPattern
 import com.github.nahnullscience.cypher_nexus.utility.tick2second
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
@@ -18,6 +19,12 @@ sealed class CypherProperties <T : Any> (
     object CategoryRow : CypherProperties<CypherCategory>("category") {
         override fun row(v: CypherCategory): MutableComponent {
             val com = v.translation().withStyle(ChatFormatting.YELLOW)
+            return Component.translatable(text, com)
+        }
+    }
+    object PatternRow : CypherProperties<AbstractInvokingPattern>("invoking_pattern") {
+        override fun row(v: AbstractInvokingPattern): MutableComponent {
+            val com = v.translation().withStyle(ChatFormatting.DARK_AQUA)
             return Component.translatable(text, com)
         }
     }

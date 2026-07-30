@@ -1,11 +1,13 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher
 
+import com.github.nahnullscience.cypher_nexus.init.mod.InvokingPatterns.NO_PATTERN
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractInvokingPattern
 import com.github.nahnullscience.cypher_nexus.utility.toRGB
 import net.minecraft.core.Holder
 import net.minecraft.resources.Identifier
@@ -21,6 +23,7 @@ open class SimpleNonProjectileCypher(
     protected var rgb: Int? = null
     protected var alpha: Float? = null
     protected var brightness: Float? = null
+    protected var pattern: Holder<AbstractInvokingPattern> = NO_PATTERN
 
     // register timing can't unpack holder, so use holder directly here
     private val shotStateAttrHolder: HashMap<Holder<CypherAttribute>, EnumMap<AttributeOperator, Double>> = HashMap()
@@ -38,6 +41,7 @@ open class SimpleNonProjectileCypher(
     }
     open fun dyeColor(rgb: Int, a: Float) = apply { this.rgb = rgb; alpha = a }
     open fun brightness(l: Float) = apply { brightness = l }
+    open fun pattern(p: Holder<AbstractInvokingPattern>) = apply { pattern = p }
 
     // do nothing since this is non-projectile
     override fun projectileAttr(holder: Holder<CypherAttribute>, value: Double) = this as CypherDataMap.Builder
@@ -63,6 +67,7 @@ open class SimpleNonProjectileCypher(
         override val rgb: Color? = this@SimpleNonProjectileCypher.rgb?.toRGB()
         override val alpha: Float? = this@SimpleNonProjectileCypher.alpha
         override val brightness: Float? = this@SimpleNonProjectileCypher.brightness
+        override val pattern: Holder<AbstractInvokingPattern> = this@SimpleNonProjectileCypher.pattern
         override fun defaultAttributes() = this@SimpleNonProjectileCypher
     }
 }

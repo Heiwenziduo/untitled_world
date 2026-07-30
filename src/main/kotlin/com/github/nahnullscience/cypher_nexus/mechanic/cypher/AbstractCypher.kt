@@ -5,12 +5,14 @@ import com.github.nahnullscience.cypher_nexus.init.data_driven.ModDataMaps.CYPHE
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
+import com.github.nahnullscience.cypher_nexus.init.mod.InvokingPatterns.NO_PATTERN
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherProperties.*
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule.HookType
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractInvokingPattern
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
@@ -40,6 +42,8 @@ sealed class AbstractCypher(
     val delay: Int get() = dataMap().delay
     val recharge: Int get() = dataMap().recharge
     val flags: Int get() = dataMap().flags
+
+    open val pattern: Holder<AbstractInvokingPattern> = NO_PATTERN
 
     /** override colors from category */
     open val borderColor: Int? = null
@@ -254,6 +258,7 @@ sealed class AbstractCypher(
             val components = mutableListOf<Component>()
 
             components.add(CategoryRow.row(category.value()))
+            if (pattern != NO_PATTERN) components.add(PatternRow.row(pattern.value()))
             if (manaDrain != 0f) components.add(ManaDrainRow.row(manaDrain))
             if (draw > 1) components.add(DrawRow.row(draw))
             if (delay != 0) components.add(CastDelayRow.row(delay))
