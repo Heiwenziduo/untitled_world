@@ -98,3 +98,14 @@ fun Entity.headLeftVectorF(partialTick: Float = 1.0f): Vector3f {
         Mth.sin(yawRad.toDouble())
     )
 }
+
+/**
+ * create a coordinate by someone's perspective
+ *
+ * front : entity's head view vector. [Entity.getHeadLookAngle]
+ *
+ * left : entity's head left vector. [headLeftVector]
+ * */
+fun Entity.perspectiveCoordinate(): CoordinateDefinition {
+    return CoordinateDefinition(headLookAngle, headLeftVector())
+}

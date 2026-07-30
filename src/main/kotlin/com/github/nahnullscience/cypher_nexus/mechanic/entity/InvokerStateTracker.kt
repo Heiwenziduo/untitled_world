@@ -15,11 +15,10 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent
  * this class is used to store and update data used by `cypher-entities`.
  * */
 class InvokerStateTracker {
-    private lateinit var owner: Entity
-    private lateinit var viewPlane: PlaneDefinition
+    var viewPlane: PlaneDefinition? = null
+        private set
 
     fun tick(entity: Entity) {
-        owner = entity
 
         val looking = entity.headLookAngle
         viewPlane = PlaneDefinition(
@@ -28,14 +27,17 @@ class InvokerStateTracker {
             )
     }
 
-    fun getViewPlane(): PlaneDefinition? {
-        return if (::viewPlane.isInitialized) viewPlane else null
+    fun getViewPlane(e: Entity): PlaneDefinition {
+        return viewPlane ?: run {
+            val looking = e.headLookAngle
+            PlaneDefinition(looking, looking + e.eyePosition).also { viewPlane = it }
+        }
     }
 
     @EventBusSubscriber(modid = CypherNexus.MOD_ID)
     companion object {
         @SubscribeEvent(priority = EventPriority.NORMAL)
-        private fun updateTracker(event: EntityTickEvent.Post) {
+        private fun updateTracker(event: EntityTickEvent.Pre) {
             val entity = event.entity
             if (entity.hasData(ModDataAttachments.INVOKER_STATE_TRACKER)) {
                 entity.getData(ModDataAttachments.INVOKER_STATE_TRACKER).tick(entity)

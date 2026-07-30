@@ -14,6 +14,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.createProje
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeAbortReleaseHook.ReleaseAbort
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
+import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastOpMap
@@ -115,7 +116,14 @@ class ShotStateChunk private constructor (
         level.addFreshEntity(proj)
     }
 
-    fun release(level: Level, directInvoker: Entity?, owner: Entity?, posDire: PosDirePair, itemWand: ItemWandInstance?) {
+    fun release(
+        level: Level,
+        coordinate: CoordinateDefinition,
+        posDire: PosDirePair,
+        directInvoker: Entity?,
+        owner: Entity?,
+        itemWand: ItemWandInstance?
+    ) {
         if (charge-- <= 0) return
 
         Profiler.get().push { "cypherEntityCreation" }

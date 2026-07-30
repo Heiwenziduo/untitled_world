@@ -2,6 +2,7 @@ package com.github.nahnullscience.cypher_nexus.init
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.entity.InvokerStateTracker
+import com.github.nahnullscience.cypher_nexus.mechanic.entity.VictimStateTracker
 import com.github.nahnullscience.cypher_nexus.mechanic.entity.WandModuleStateTracker
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataSyncHandler
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstanceMap
@@ -36,4 +37,9 @@ object ModDataAttachments {
         DEFERRED_REGISTER.register("invoker_state_tracker") { ->
         AttachmentType.builder { -> InvokerStateTracker() }.build()
     }
+
+    val VICTIM_STATE_TRACKER =
+        DEFERRED_REGISTER.register("victim_state_tracker") { ->
+            AttachmentType.builder { -> VictimStateTracker() }.build()
+        }
 }

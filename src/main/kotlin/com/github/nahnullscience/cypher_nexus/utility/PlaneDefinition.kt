@@ -9,8 +9,8 @@ import kotlin.math.sign
  * define the direction the [normal] is pointing at is the `positive`, the invert direction is `negative`.
  * */
 data class PlaneDefinition(
-    var normal: Vec3,
-    var pos: Vec3
+    val normal: Vec3,
+    val pos: Vec3
 ) {
     val unit get() = normal
     companion object {

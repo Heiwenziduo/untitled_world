@@ -282,8 +282,14 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     }
 
     override fun trigger(type: TriggerType, releaseTo: PosDirePair) {
-        if (triggerType == TriggerType.NONE || type != triggerType || payload == null) return
-        payload!!.release(level, cyEntity, cyEntity.owner, releaseTo, null)
+        if (triggerType != TriggerType.NONE && type == triggerType) payload?.release(
+            level,
+            cyEntity.perspectiveCoordinate(),
+            releaseTo,
+            cyEntity,
+            cyEntity.owner,
+            null
+        )
     }
     protected fun trigger(type: TriggerType, releasePoint: Vec3) {
         if (level.isClientSide) return

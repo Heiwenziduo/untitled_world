@@ -9,10 +9,9 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
+import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
@@ -43,7 +42,7 @@ interface IWandLike {
      * will be further processed if hooks are present.
      * direction doesn't have to be normalized
      * */
-    fun getInvokePosDire(level: Level, invoker: Entity, stack: ItemStack?): PosDirePair
+    fun getInvokingCoordinate(level: Level, invoker: Entity, stack: ItemStack?): CoordinatePosPair
 
 
     /**  */
@@ -69,13 +68,15 @@ interface IWandLike {
 
         if (!checkInvokingPrerequisites(level, invoker, stack)) return InvokingState.LOADING
 
-        val entityWand = if (invoker is IWandLike) invoker else null
-        val wandData = getWandData(stack, entityWand) ?: return InvokingState.MISSING_DATA
+        val wandData: WandDataBundle
+        if (invoker is IWandLike) {
+            wandData = getWandData(stack, invoker) ?: return InvokingState.MISSING_DATA
+        } else return InvokingState.MISSING_DATA
 
         val data = getHelperDataBundle(level, invoker, stack)
         val helper = InvokingHelper(wandData.highPayload.aoc, data, invoker = invoker)
 
-
+        helper.processSync()
 //        scope.launch { // TODO if async #checkInvokingPrerequisites should handle "pending" state
 //            helper.process()
 //            helper.finalizeInvoking(
@@ -87,11 +88,12 @@ interface IWandLike {
 //            return InvokingState.HANG
 //        }
 
+        val (coordinate, posDire) = getInvokingCoordinate(level, invoker, stack)
 
-        helper.processSync()
         helper.finalizeInvoking(
             level,
-            getInvokePosDire(level, invoker, stack),
+            coordinate,
+            posDire,
             itemWandInstance(level, invoker, stack)
         )
         return afterInvoke(level, invoker, stack, data, helper.shotRoot)
@@ -102,7 +104,7 @@ interface IWandLike {
 
     companion object {
 //        private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-        private val scope = CoroutineScope(Dispatchers.Default)
+//        private val scope = CoroutineScope(Dispatchers.Default)
 
         /**
          * @return whether the item behind the stack is a decent [IWandLike]
@@ -117,4 +119,9 @@ interface IWandLike {
         }
 
     }
+
+    data class CoordinatePosPair(
+        val coordinate: CoordinateDefinition,
+        val posDire: PosDirePair
+    ) {}
 }

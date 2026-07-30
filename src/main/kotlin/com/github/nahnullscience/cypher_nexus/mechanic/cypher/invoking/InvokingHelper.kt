@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
+import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
 import net.minecraft.util.profiling.Profiler
@@ -70,10 +71,15 @@ class InvokingHelper (
     /**
      *
      * @param posDire location information of resultant projectiles, direction doesn't have to be normalized
-     * @param itemWand [ItemWandInstance], can be null if invoked from an EntityWand
+     * @param itemWand [ItemWandInstance], can be null if invoked from an `EntityWand`
      * */
-    fun finalizeInvoking(level: Level, posDire: PosDirePair, itemWand: ItemWandInstance?) {
-        shotRoot.release(level, invoker, invoker, posDire, itemWand)
+    fun finalizeInvoking(
+        level: Level,
+        coordinate: CoordinateDefinition,
+        posDire: PosDirePair,
+        itemWand: ItemWandInstance?
+    ) {
+        shotRoot.release(level, coordinate, posDire, invoker, invoker, itemWand)
     }
 
     private fun step(): Boolean {

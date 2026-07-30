@@ -127,19 +127,6 @@ object HandleWandEvents {
 
 
     /**
-     * tick the wand-data-map to perform GC
-     * */
-    @SubscribeEvent(priority = EventPriority.NORMAL)
-    private fun tickWandDataMap(event: EntityTickEvent.Post) {
-        // fired on both sides
-        val entity = event.entity
-        if (entity.hasData(ModDataAttachments.WAND_DATA_MAP)) {
-            entity.getData(ModDataAttachments.WAND_DATA_MAP).tick(entity)
-        }
-    }
-
-
-    /**
      * tick player tracking wands and perform basic logic, like generating mana.
      * other mobs counterpart are handled through [net.minecraft.world.item.Item.inventoryTick]
      * */

@@ -34,7 +34,7 @@ abstract class AbstractAiming(
             cyEntity: CE
         ) where CE : Entity, CE : ICypherEntity {
             if (cyEntity.tickCount < 5) return
-            cyEntity.owner?.getData(INVOKER_STATE_TRACKER)?.getViewPlane()?.let { plane ->
+            cyEntity.owner?.getData(INVOKER_STATE_TRACKER)?.viewPlane?.let { plane ->
                 val delta = cyEntity.deltaMovement
                 // if CE on the back side of the invoker, push it along the direction of invoker's view vector
                 val sideForce = delta
@@ -58,7 +58,7 @@ abstract class AbstractAiming(
             cyEntity: CE
         ) where CE : Entity, CE : ICypherEntity {
             if (cyEntity.tickCount < 5) return
-            cyEntity.owner?.getData(INVOKER_STATE_TRACKER)?.getViewPlane()?.let { plane ->
+            cyEntity.owner?.getData(INVOKER_STATE_TRACKER)?.viewPlane?.let { plane ->
                 val delta = cyEntity.deltaMovement
                 val sideForce = delta
                     .sideOf(plane)
