@@ -2,16 +2,13 @@ package com.github.nahnullscience.cypher_nexus.mechanic.wand
 
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
-import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.SECONDARY
+import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.SECONDARY_MODULE
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike.CoordinatePosPair
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataBundle
-import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
-import com.github.nahnullscience.cypher_nexus.utility.headLeftVector
 import com.github.nahnullscience.cypher_nexus.utility.nearestHitPoint
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.InteractionHand
@@ -38,37 +35,36 @@ abstract class AbstractItemWand(
 ), IWandLike  {
     abstract override val isEditableWand: Boolean
 
+    override fun getUseAnimation(stack: ItemStack) = ItemUseAnimation.EAT
+    override fun getUseDuration(stack: ItemStack, entity: LivingEntity) = 114_514
+
     override fun use(level: Level, player: Player, hand: InteractionHand): InteractionResult {
         val stack = player.getItemInHand(hand)
         val instance = itemWandInstance(level, player, stack)
 
-        val module = instance.module(SECONDARY) ?: return InteractionResult.PASS
+        val module = instance.getModule(SECONDARY_MODULE) ?: return InteractionResult.PASS
         // if not startUsingItem, further functions like onUseTick / onStopUsing will not perform
         // player.startUsingItem(hand)
-        return module.onVanillaUseStart(player.level(), player, stack, hand)
+        return module.onVanillaUseStart(player, stack, hand)
     }
-
-    override fun getUseAnimation(stack: ItemStack) = ItemUseAnimation.EAT
-    override fun getUseDuration(stack: ItemStack, entity: LivingEntity) = 114_514
 
     override fun onUseTick(level: Level, user: LivingEntity, stack: ItemStack, remainTicks: Int) {
         // call on both sides
         val instance = itemWandInstance(level, user, stack)
-        instance.module(SECONDARY)?.onVanillaUseTick(level, user, stack, remainTicks) // #getUseDuration - used ticks, resets to full if reach 0
+        instance.getModule(SECONDARY_MODULE)?.onVanillaUseTick(user, stack, remainTicks) // #getUseDuration - used ticks, resets to full if reach 0
     }
 
     override fun onStopUsing(stack: ItemStack, user: LivingEntity, remainTicks: Int) {
         // call on both sides
         val instance = itemWandInstance(user.level(), user, stack)
-        instance.module(SECONDARY)?.onVanillaStopUse(stack, user, remainTicks)
+        instance.getModule(SECONDARY_MODULE)?.onVanillaUseStop(user, stack, remainTicks)
     }
 
     override fun inventoryTick(stack: ItemStack, level: ServerLevel, entity: Entity, slot: EquipmentSlot?) {
         // call through (living#aistep)EntityEquipment#tick / (player#aistep)Inventory#tick -> stack#tick -> item#tick
         // inventory 0-35, does not contain equipment-slots, so everything tick once per tick
 
-        // tick player hotbar through events, since that runs on both sides
-        if (entity is Player) return
+        if (entity is Player) return // tick player hotbar through events, since that runs on both sides
         if (slot == EquipmentSlot.MAINHAND || slot == EquipmentSlot.OFFHAND) {
             itemWandInstance(level, entity, stack).tick(entity)
         }
@@ -117,7 +113,7 @@ abstract class AbstractItemWand(
     open fun wandLength(data: WandDataBundle?): Float =
         data?.let { 0.4f + (it.highPayload.aoc.capacity.toFloat() / 16).coerceAtMost(3.0f) } ?: 0.4f
 
-    override fun getInvokingCoordinate(level: Level, invoker: Entity, stack: ItemStack?): CoordinatePosPair {
+    override fun getInvokingPosDire(level: Level, invoker: Entity, stack: ItemStack?): PosDirePair {
         // for an Item Wand, pos and dire just use the living's view vector
         val tip = wandLength(getWandData(stack))
         val eye = invoker.eyePosition
@@ -126,10 +122,7 @@ abstract class AbstractItemWand(
         val pos = eye.add(looking.scale(scale)).let {
             level.nearestHitPoint(eye, it, invoker, 0.3)
         }
-
-        val posDire = PosDirePair(pos, looking)
-        val coordinate = CoordinateDefinition(looking, invoker.headLeftVector())
-        return CoordinatePosPair(coordinate, posDire)
+        return PosDirePair(pos, looking)
     }
 
 

@@ -6,8 +6,8 @@ import com.github.nahnullscience.cypher_nexus.network.client.ClientboundEditWand
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundOpenIndexScreen
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
 import com.github.nahnullscience.cypher_nexus.network.server.ServerboundEditWandCyphers
-import com.github.nahnullscience.cypher_nexus.network.server.ServerboundPerformModuleEnd
-import com.github.nahnullscience.cypher_nexus.network.server.ServerboundPerformModuleStart
+import com.github.nahnullscience.cypher_nexus.network.server.ServerboundWandModuleEnd
+import com.github.nahnullscience.cypher_nexus.network.server.ServerboundWandModuleStart
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
@@ -59,15 +59,15 @@ object InitNetwork {
         )
 
         registrar.playToServer(
-            ServerboundPerformModuleStart.TYPE,
-            ServerboundPerformModuleStart.STREAM,
-            ServerboundPerformModuleStart::handler
+            ServerboundWandModuleStart.TYPE,
+            ServerboundWandModuleStart.STREAM,
+            ServerboundWandModuleStart::handler
         )
 
         registrar.playToServer(
-            ServerboundPerformModuleEnd.TYPE,
-            ServerboundPerformModuleEnd.STREAM,
-            ServerboundPerformModuleEnd::handler
+            ServerboundWandModuleEnd.TYPE,
+            ServerboundWandModuleEnd.STREAM,
+            ServerboundWandModuleEnd::handler
         )
     }
 }

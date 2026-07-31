@@ -1,15 +1,10 @@
 package com.github.nahnullscience.cypher_nexus.utility.mod
 
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
-import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.InputModule
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.WandModuleType
 import net.minecraft.server.level.ServerPlayer
-import java.util.function.Supplier
 
-// prevent from instantiating
 object CNData {
 
     private val _enabledList: List<AbstractCypher> by lazy {
@@ -25,10 +20,6 @@ object CNData {
     private val _cyphersUnhide: List<AbstractCypher> by lazy {
         _enabledList.filter { !it.hide }
     }
-
-//    private val _allInputModules: List<WandModuleType<InputModule>> by lazy {
-//        val list = WandModuleTypes.REGISTRY.toList().filter { it }
-//    }
 
     val cyphersEnabled // guess these should not be called on logical client
         get() = _enabledList

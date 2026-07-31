@@ -1,10 +1,10 @@
 package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.*
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.IWandModule
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.InputModule
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.WandModuleType
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.WandModuleType
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.AbstractInputModule
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.AbstractWandModule
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.types.*
 import com.github.nahnullscience.cypher_nexus.utility.exception.VanillaMisuseException
 import net.minecraft.core.Registry
 import net.minecraft.resources.Identifier
@@ -15,7 +15,6 @@ import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 import java.util.function.Supplier
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
-import kotlin.streams.toList
 
 object WandModuleTypes {
     const val MODULE_ID_CAP = 31
@@ -36,41 +35,54 @@ object WandModuleTypes {
         DEFERRED_REGISTER.register(MOD_BUS)
     }
 
-    fun <T : IWandModule> registerModule(module: WandModuleType<T>): Supplier<out WandModuleType<T>> {
+    fun <T : AbstractWandModule> registerModule(module: WandModuleType<T>): Supplier<out WandModuleType<T>> {
         return DEFERRED_REGISTER.register(module.resource.path) { resource -> module }
     }
 
-    fun <T : IWandModule> registerModule(resource: Identifier, module: KClass<T>): Supplier<out WandModuleType<T>> {
+    fun <T : AbstractWandModule> registerModule(resource: Identifier, module: KClass<T>): Supplier<out WandModuleType<T>> {
         return registerModule(WandModuleType(resource, module))
     }
 
-
-    val PRIMARY_RESOURCE = CypherNexus.modResource("primary")
-    val SECONDARY_RESOURCE = CypherNexus.modResource("secondary")
-    val SPECIAL_RESOURCE = CypherNexus.modResource("special")
-
-    val RECOIL_RESOURCE = CypherNexus.modResource("recoil")
-    val MANA_SHIELD_RESOURCE = CypherNexus.modResource("mana_shield")
-    val ATTRIBUTE_RESOURCE = CypherNexus.modResource("attribute")
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    val PRIMARY = registerModule(PRIMARY_RESOURCE, AbstractPrimaryModule::class)
-    val SECONDARY = registerModule(SECONDARY_RESOURCE, AbstractSecondaryModule::class)
-    val SPECIAL = registerModule(SPECIAL_RESOURCE, AbstractSpecialModule::class)
-
-    val RECOIL = registerModule(RECOIL_RESOURCE, AbstractRecoilModule::class)
-    val MANA_SHIELD = registerModule(MANA_SHIELD_RESOURCE, AbstractManaShieldModule::class)
-
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////
-    private var _inputModuleBacking: List<Supplier<out WandModuleType<InputModule>>>? = null
-    val inputModules: List<Supplier<out WandModuleType<InputModule>>> get() {
+    /**
+     *
+     * */
+    @Suppress("UNCHECKED_CAST")
+    val inputModules: List<WandModuleType<AbstractInputModule>> get() {
         return _inputModuleBacking ?: run {
             REGISTRY.filter { type ->
-                type.module.isSubclassOf(InputModule::class)
+                type.module.isSubclassOf(AbstractInputModule::class)
             }.map {
-                Supplier { -> it } as Supplier<WandModuleType<InputModule>>
+                // is there a way to get the same holder reference as we registered below?
+                it as WandModuleType<AbstractInputModule>
             }.toList().also { _inputModuleBacking = it }
         }
     }
+    private var _inputModuleBacking: List<WandModuleType<AbstractInputModule>>? = null
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    val PRIMARY_RESOURCE = CypherNexus.modResource("input_primary")
+    val SECONDARY_RESOURCE = CypherNexus.modResource("input_secondary")
+    val SPECIAL_RESOURCE = CypherNexus.modResource("input_special")
+
+    val INVOKE_RESOURCE = CypherNexus.modResource("function_invoke")
+    val RECOIL_RESOURCE = CypherNexus.modResource("function_recoil")
+    val MANA_SHIELD_RESOURCE = CypherNexus.modResource("function_mana_shield")
+
+    val ATTRIBUTE_RESOURCE = CypherNexus.modResource("attribute")
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+    val PRIMARY_MODULE = registerModule(PRIMARY_RESOURCE, AbstractPrimaryInputModule::class)
+    val SECONDARY_MODULE = registerModule(SECONDARY_RESOURCE, AbstractSecondaryInputModule::class)
+    val SPECIAL_MODULE = registerModule(SPECIAL_RESOURCE, AbstractSpecialInputModule::class)
+
+    val INVOKE_MODULE = registerModule(INVOKE_RESOURCE, AbstractInvokeFunctionModule::class)
+    val RECOIL_MODULE = registerModule(RECOIL_RESOURCE, AbstractRecoilFunctionModule::class)
+    val MANA_SHIELD_MODULE = registerModule(MANA_SHIELD_RESOURCE, AbstractManaShieldFunctionModule::class)
+
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
 }

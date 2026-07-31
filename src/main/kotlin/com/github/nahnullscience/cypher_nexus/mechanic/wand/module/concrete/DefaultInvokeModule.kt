@@ -1,0 +1,26 @@
+package com.github.nahnullscience.cypher_nexus.mechanic.wand.module.concrete
+
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.types.AbstractInvokeFunctionModule
+import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.perspectiveCoordinate
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.item.ItemStack
+
+class DefaultInvokeModule(
+    override val instance: ItemWandInstance
+) : AbstractInvokeFunctionModule() {
+    override fun execute(
+        invoker: LivingEntity,
+        invokerCoordinate: CoordinateDefinition?,
+        indirectTarget: Entity?,
+        wand: ItemStack?,
+        performingTicks: Int?,
+        power: Double?
+    ): Boolean {
+        val coordinate = invokerCoordinate ?: invoker.perspectiveCoordinate()
+        instance.wand.tryInvoke(invoker.level(), invoker, coordinate, wand)
+        return true
+    }
+}

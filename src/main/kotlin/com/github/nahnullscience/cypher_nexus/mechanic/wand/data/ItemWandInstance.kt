@@ -1,19 +1,26 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.RECOIL
-import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.SECONDARY
+import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.INVOKE_MODULE
+import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.RECOIL_MODULE
+import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.SECONDARY_MODULE
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModuleDefaultRecoil
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModuleDefaultSecondary
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.IWandModule
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.MapOfModules
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.WandModuleType
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.MapOfModules
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.WandModuleType
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.AbstractFunctionalModule
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.AbstractWandModule
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.ITypeUniqueModule
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.concrete.DefaultInvokeModule
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.concrete.DefaultRecoilModule
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.concrete.DefaultSecondaryInput
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
+import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.neoforged.neoforge.network.PacketDistributor
 import java.util.function.Supplier
@@ -94,17 +101,35 @@ class ItemWandInstance(
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    fun <T : IWandModule> module(type: WandModuleType<T>): T? = modules[type].also { println("get module: $it") }
-    fun <T : IWandModule> module(holder: Supplier<out WandModuleType<T>>): T? = modules[holder]
+    fun <T> getModule(type: WandModuleType<T>): T? where T : AbstractWandModule, T : ITypeUniqueModule = modules[type].also { println("get module: $it") }
+    fun <T> getModule(holder: Supplier<out WandModuleType<T>>): T? where T : AbstractWandModule, T : ITypeUniqueModule = modules[holder]
 
     private fun computeModules() {
         modules.clear()
         aoc.modulesSequenceReverse().forEach { moduleCypher ->
             moduleCypher.apply(this, modules)
         }
-        modules.getOrPut(RECOIL) { ModuleDefaultRecoil(this) }
-        modules.getOrPut(SECONDARY) { ModuleDefaultSecondary(this) }
+        modules.getOrPut(INVOKE_MODULE) { DefaultInvokeModule(this) } // FIXME type check failed
+        modules.getOrPut(RECOIL_MODULE) { DefaultRecoilModule(this) }
+        modules.getOrPut(SECONDARY_MODULE) { DefaultSecondaryInput(this) }
         modules.finalizeInit()
+    }
+
+    /**
+     *
+     * */
+    fun <T> functionModule(
+        type: WandModuleType<T>,
+        invoker: LivingEntity,
+        invokerCoordinate: CoordinateDefinition? = null,
+        indirectTarget: Entity? = null,
+        wand: ItemStack? = null,
+        performingTicks: Int? = null,
+        power: Double? = null,
+    ): Boolean where T : AbstractFunctionalModule {
+        return getModule(type)?.run {
+            execute(invoker, invokerCoordinate, indirectTarget, wand, performingTicks, power)
+        } ?: false
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

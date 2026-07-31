@@ -1,7 +1,6 @@
-package com.github.nahnullscience.cypher_nexus.client.util.trail
+package com.github.nahnullscience.cypher_nexus.client.particle
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.client.particle.CypherTrailParticleGroup
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.AbstractCypherRenderer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
 import net.minecraft.client.Minecraft

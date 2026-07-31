@@ -1,12 +1,13 @@
-package com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component
+package com.github.nahnullscience.cypher_nexus.mechanic.wand.module
 
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.AbstractWandModule
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.Identifier
 import kotlin.reflect.KClass
 
-class WandModuleType <out Module : IWandModule> (
+class WandModuleType <out Module : AbstractWandModule> (
     override val resource: Identifier,
     val module: KClass<out Module>,
 ): IRegisterable {

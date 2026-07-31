@@ -4,7 +4,7 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.InvokingPatterns.NO_PATTERN
-import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.RECOIL
+import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.RECOIL_MODULE
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
@@ -27,6 +27,7 @@ import net.minecraft.core.Holder
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.level.Level
 import java.util.*
 
@@ -93,11 +94,11 @@ class ShotStateChunk private constructor (
 
     fun release(
         level: Level,
-        coordinate: CoordinateDefinition,
+        invokerCoordinate: CoordinateDefinition,
         posDire: PosDirePair,
         directInvoker: Entity?,
         owner: Entity?,
-        itemWand: ItemWandInstance?
+        wandInstance: ItemWandInstance?
     ) {
         if (charge-- <= 0) return
 
@@ -107,16 +108,13 @@ class ShotStateChunk private constructor (
 
         // do recoil only on root
         if (isRoot) run recoil@ {
-            itemWand ?: return@recoil
-            directInvoker ?: return@recoil
+            wandInstance ?: return@recoil
+            if (directInvoker !is LivingEntity) return@recoil
             val recoilMap = attributes[CypherAttributes.RECOIL.value()] ?: return@recoil
-            val recoilModule = itemWand.module(RECOIL) ?: return@recoil
-
             val recoil = AttributeOperator.attributeCalculator(CypherAttributes.RECOIL.value().defaultValue, recoilMap).let {
                 CypherAttributes.RECOIL.value().restrictRange(it)
             }
-
-            recoilModule.recoil(directInvoker, recoil, posDire)
+            wandInstance.functionModule(RECOIL_MODULE.get(), directInvoker, invokerCoordinate, power = recoil)
         }
 
         // handle entities only on server
@@ -155,11 +153,11 @@ class ShotStateChunk private constructor (
         // generate bullets
         simpleProjectiles.reference2IntEntrySet().forEach { (cypher, count) ->
             repeat(count) {
-                spawnOne(cypher, null, coordinate, hookedPosDire, level, owner, directInvoker)
+                spawnOne(cypher, null, invokerCoordinate, hookedPosDire, level, owner, directInvoker)
             }
         }
         triggeredProjectiles.forEach { node ->
-            spawnOne(node.instance, node, coordinate, hookedPosDire, level, owner, directInvoker)
+            spawnOne(node.instance, node, invokerCoordinate, hookedPosDire, level, owner, directInvoker)
         }
 
         Profiler.get().pop()

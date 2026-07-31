@@ -10,8 +10,8 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstanc
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
 import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
-import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
@@ -42,7 +42,7 @@ interface IWandLike {
      * will be further processed if hooks are present.
      * direction doesn't have to be normalized
      * */
-    fun getInvokingCoordinate(level: Level, invoker: Entity, stack: ItemStack?): CoordinatePosPair
+    fun getInvokingPosDire(level: Level, invoker: Entity, stack: ItemStack?): PosDirePair
 
 
     /**  */
@@ -64,7 +64,7 @@ interface IWandLike {
      * server side is responsible for projectile generation, authorise mana / deck / delay check.
      * client side is for user info overlay, and wand module functions.
      * */
-    fun tryInvoke(level: Level, invoker: Entity, stack: ItemStack?): InvokingState {
+    fun tryInvoke(level: Level, invoker: Entity, coordinate: CoordinateDefinition, stack: ItemStack?): InvokingState {
 
         if (!checkInvokingPrerequisites(level, invoker, stack)) return InvokingState.LOADING
         val wandData = if (invoker is IWandLike) getWandData(stack, invoker) ?: return InvokingState.MISSING_DATA
@@ -86,12 +86,10 @@ interface IWandLike {
 //            return InvokingState.HANG
 //        }
 
-        val (coordinate, posDire) = getInvokingCoordinate(level, invoker, stack)
-
         helper.finalizeInvoking(
             level,
             coordinate,
-            posDire,
+            getInvokingPosDire(level, invoker, stack),
             itemWandInstance(level, invoker, stack)
         )
         return afterInvoke(level, invoker, stack, data, helper.shotRoot)
@@ -109,6 +107,16 @@ interface IWandLike {
          * */
         fun validateItemWand(stack: ItemStack): Boolean = !stack.isEmpty && stack.item is IWandLike
 
+        /**
+         * kotlin sugar version of [validateItemWand]
+         * */
+        fun ItemStack.isItemWand(): Boolean = !isEmpty && item is IWandLike
+        fun ItemStack.isNotItemWand(): Boolean = !isItemWand()
+
+        fun ItemStack.wandInstanceOrNull(invoker: Entity): ItemWandInstance? =
+            (item as? IWandLike)?.itemWandInstance(invoker.level(), invoker, this)
+
+
         fun editItemWand(stack: ItemStack, list: List<AbstractCypher>) {
             println("editWand: $stack")
             if (validateItemWand(stack)) {
@@ -117,9 +125,4 @@ interface IWandLike {
         }
 
     }
-
-    data class CoordinatePosPair(
-        val coordinate: CoordinateDefinition,
-        val posDire: PosDirePair
-    ) {}
 }
