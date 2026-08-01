@@ -5,8 +5,7 @@ import com.github.nahnullscience.cypher_nexus.client.network.ClientInputModuleSt
 import com.github.nahnullscience.cypher_nexus.client.network.ClientInputModuleStateUpdater.endModule
 import com.github.nahnullscience.cypher_nexus.client.network.ClientInputModuleStateUpdater.startModule
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.AbstractItemWand.Companion.wandInstanceOrNull
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike.Companion.wandInstanceOrNull
 import net.minecraft.client.Minecraft
 import net.minecraft.world.InteractionHand
 import net.neoforged.api.distmarker.Dist

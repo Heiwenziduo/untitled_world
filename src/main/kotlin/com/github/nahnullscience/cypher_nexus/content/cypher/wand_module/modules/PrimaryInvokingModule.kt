@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.content.cypher.module.modules
+package com.github.nahnullscience.cypher_nexus.content.cypher.wand_module.modules
 
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.INVOKE_MODULE
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance

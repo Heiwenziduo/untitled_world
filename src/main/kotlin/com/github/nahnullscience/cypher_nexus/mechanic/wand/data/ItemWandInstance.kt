@@ -7,6 +7,9 @@ import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.SECONDARY
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.MapOfModules
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModuleSlot.Companion.DEFAULT_INVOKING
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModuleSlot.Companion.DEFAULT_RECOIL
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModuleSlot.Companion.DEFAULT_SECONDARY
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.WandModuleType
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.AbstractFunctionalModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.AbstractWandModule
@@ -107,11 +110,11 @@ class ItemWandInstance(
     private fun computeModules() {
         modules.clear()
         aoc.modulesSequenceReverse().forEach { moduleCypher ->
-            moduleCypher.apply(this, modules)
+            moduleCypher.moduleSlots.forEach { slot -> modules.registerSlot(slot) }
         }
-        modules.getOrPut(INVOKE_MODULE) { DefaultInvokeModule(this) } // FIXME type check failed
-        modules.getOrPut(RECOIL_MODULE) { DefaultRecoilModule(this) }
-        modules.getOrPut(SECONDARY_MODULE) { DefaultSecondaryInput(this) }
+        modules.registerSlot(DEFAULT_INVOKING)
+        modules.registerSlot(DEFAULT_RECOIL)
+        modules.registerSlot(DEFAULT_SECONDARY)
         modules.finalizeInit()
     }
 

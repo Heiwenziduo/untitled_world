@@ -6,7 +6,6 @@ import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.SECONDARY
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike.Companion.validateItemWand
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataBundle
 import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
@@ -149,23 +148,5 @@ abstract class AbstractItemWand(
         instance.updateFromHelperData(dataBundle)
         instance.invokeFinish(level)
         return InvokingState.SUCCESS
-    }
-
-    companion object {
-        /**
-         * kotlin sugar version of [validateItemWand]
-         * */
-        fun ItemStack.isItemWand(): Boolean = !isEmpty && item is IWandLike
-        fun ItemStack.isNotItemWand(): Boolean = !isItemWand()
-
-        fun ItemStack.wandInstanceOrNull(invoker: Entity): ItemWandInstance? =
-            if (isEmpty) null
-            else (item as? IWandLike)?.itemWandInstance(invoker.level(), invoker, this)
-
-        fun ItemStack.wandDataThen(): WandDataBundle? {
-            val invariable = get(ModDataComponents.WAND_INVARIABLE) ?: return null
-            val highPayload = get(ModDataComponents.WAND_HIGH_PAYLOAD) ?: return null
-            return WandDataBundle(invariable, highPayload)
-        }
     }
 }

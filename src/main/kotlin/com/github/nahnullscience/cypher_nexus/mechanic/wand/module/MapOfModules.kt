@@ -53,6 +53,7 @@ class MapOfModules(
      * execute the supplier and associate the result with the type, then return the result module.
      * otherwise return the present module.
      * */
+    @Deprecated("use registerSlot instead for better type check")
     inline fun <T> getOrPut(
         holder: Supplier<out WandModuleType<T>>,
         moduleSupplier: () -> T
@@ -62,17 +63,28 @@ class MapOfModules(
      * execute the supplier and associate the result with the type, then return the result module.
      * otherwise return the present module.
      * */
-    @Suppress("UNCHECKED_CAST")
+    @Deprecated("use registerSlot instead for better type check")
     inline fun <T> getOrPut(
         key: WandModuleType<T>,
         moduleSupplier: () -> T
     ): T? where T : AbstractWandModule, T : ITypeUniqueModule {
         return if (uniqueModules.containsKey(key)) { this[key] } else {
-            init = false
             val module = moduleSupplier()
             addUniqueModule(key, module)
             module
         }
+    }
+
+    /**
+     * lazily install a module: [ModuleSlot.factory] only runs if [ModuleSlot.type]'s slot is free.
+     * returns whichever module now occupies the slot — the freshly-built one, or the one that beat it there.
+     * */
+    fun <T> registerSlot(slot: ModuleSlot<T>): T where T : AbstractWandModule, T : ITypeUniqueModule {
+        this[slot.type]?.let { return it }
+        init = false
+        val module = slot.factory(instance)
+        addUniqueModule(slot.type, module)
+        return module
     }
 
     fun finalizeInit() {
@@ -86,5 +98,5 @@ class MapOfModules(
         _stackableModulesBacking?.clear()
     }
 
-    override fun toString() = "$uniqueModules" + "$_stackableModulesBacking"
+    override fun toString() = "$uniqueModules" + "${_stackableModulesBacking ?: ""}"
 }

@@ -1,7 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand
 
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingState
@@ -104,15 +103,27 @@ interface IWandLike {
         /**
          * @return whether the item behind the stack is a decent [IWandLike]
          * */
-        fun validateItemWand(stack: ItemStack): Boolean = !stack.isEmpty && stack.item is IWandLike
-        fun ItemStack.isItemWand(): Boolean = !isEmpty && item is IWandLike
+        fun ItemStack.isWand(): Boolean = !isEmpty && item is IWandLike
 
+        /**
+         * @return true if edit success
+         * */
         fun ItemStack.editRecipeIfWand(aoc: ArrayOfCyphers): Boolean {
-            if (isItemWand()) {
+            if (isWand()) {
                 println("editWand: $this")
                 set(ModDataComponents.WAND_HIGH_PAYLOAD, WandDataHighPayload(aoc))
                 return true
             } else return false
+        }
+
+        fun ItemStack.wandInstanceOrNull(invoker: Entity): ItemWandInstance? =
+            if (isEmpty) null
+            else (item as? IWandLike)?.itemWandInstance(invoker.level(), invoker, this)
+
+        fun ItemStack.wandDataThen(): WandDataBundle? {
+            val invariable = get(ModDataComponents.WAND_INVARIABLE) ?: return null
+            val highPayload = get(ModDataComponents.WAND_HIGH_PAYLOAD) ?: return null
+            return WandDataBundle(invariable, highPayload)
         }
     }
 }

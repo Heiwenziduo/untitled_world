@@ -6,7 +6,7 @@ import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_MODUL
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.inputModules
 import com.github.nahnullscience.cypher_nexus.mechanic.event.CNCommonEvents
 import com.github.nahnullscience.cypher_nexus.mechanic.event.wand.WandPerformingStateChangeEvent
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.AbstractItemWand.Companion.wandInstanceOrNull
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike.Companion.wandInstanceOrNull
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.WandModuleType
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.AbstractInputModule
 import net.minecraft.world.entity.LivingEntity

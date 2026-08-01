@@ -6,7 +6,7 @@ import com.github.nahnullscience.cypher_nexus.content.cypher.AbstractSimpleProje
 import com.github.nahnullscience.cypher_nexus.content.cypher.AbstractSimpleProjectile.SimpleStaticProjectile
 import com.github.nahnullscience.cypher_nexus.content.cypher.SimpleNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.*
-import com.github.nahnullscience.cypher_nexus.content.cypher.module.PrimaryInvokingCypher
+import com.github.nahnullscience.cypher_nexus.content.cypher.wand_module.PrimaryInvokingCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.InnerForceCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.ProteusCypher

@@ -1,6 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.event
 
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike.Companion.isWand
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Inventory
@@ -13,9 +13,12 @@ sealed class LivingGatherWandsEvent(entity: LivingEntity) : LivingEvent(entity) 
     fun wands(): List<ItemStack> = list.toList()
     fun wandsSequence(): Sequence<ItemStack> = list.asSequence()
 
-    fun addWand(wand: ItemStack) {
+    /**
+     * contains wand valid check
+     * */
+    fun addIfWand(stack: ItemStack) {
         // TODO check uuid uniqueness
-        list.add(wand)
+        if (stack.isWand()) list.add(stack)
     }
 
     /**
@@ -24,19 +27,19 @@ sealed class LivingGatherWandsEvent(entity: LivingEntity) : LivingEvent(entity) 
      * */
     class Tracking(living: LivingEntity) : LivingGatherWandsEvent(living) {
         init {
-            if (living !is Player) {
-                InteractionHand.entries.forEach { hand ->
-                    val stack = living.getItemInHand(hand)
-                    if (IWandLike.validateItemWand(stack)) addWand(stack)
-                }
-            } else {
-                // collect wands in hotbar & offhand
+            if (living is Player) {
+                // collect wands in hotbar & offhand if player
                 val offHand = living.inventory.getItem(Inventory.SLOT_OFFHAND)
-                if (IWandLike.validateItemWand(offHand)) addWand(offHand)
+                addIfWand(offHand)
 
                 for (i in 0 until 9) {
                     val stack = living.inventory.getItem(i)
-                    if (IWandLike.validateItemWand(stack)) addWand(stack)
+                    addIfWand(stack)
+                }
+            } else {
+                // otherwise only on both hands
+                InteractionHand.entries.forEach { hand ->
+                    addIfWand(living.getItemInHand(hand))
                 }
             }
         }
@@ -49,8 +52,7 @@ sealed class LivingGatherWandsEvent(entity: LivingEntity) : LivingEvent(entity) 
     class Active(living: LivingEntity) : LivingGatherWandsEvent(living) {
         init {
             InteractionHand.entries.forEach { hand ->
-                val stack = living.getItemInHand(hand)
-                if (IWandLike.validateItemWand(stack)) addWand(stack)
+                addIfWand(living.getItemInHand(hand))
             }
         }
     }

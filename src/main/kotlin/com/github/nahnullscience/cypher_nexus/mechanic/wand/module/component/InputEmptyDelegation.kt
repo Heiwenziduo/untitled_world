@@ -7,7 +7,7 @@ import net.minecraft.world.level.Level
 /**
  * do nothing on itself and forward input instruction
  * */
-object InputEmpty : IInputModule {
+object InputEmptyDelegation : IInputModule {
 
     override val consumeVanillaInput: Boolean = false
     override val stopBubble: Boolean = false
