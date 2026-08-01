@@ -6,6 +6,7 @@ import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.SECONDARY
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike.Companion.validateItemWand
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataBundle
 import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
@@ -84,7 +85,7 @@ abstract class AbstractItemWand(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    protected fun getWandData(stack: ItemStack?) = stack?.let { getWandData(stack, null) }
+    protected open fun getWandData(stack: ItemStack?) = stack?.let { getWandData(stack, null) }
     override fun <EntityWand> getWandData(
         stack: ItemStack?,
         entityWand: EntityWand?
@@ -110,7 +111,7 @@ abstract class AbstractItemWand(
         return itemWandInstance(level, invoker, stack).canInvoke()
     }
 
-    open fun wandLength(data: WandDataBundle?): Float =
+    protected open fun wandLength(data: WandDataBundle?): Float =
         data?.let { 0.4f + (it.highPayload.aoc.capacity.toFloat() / 16).coerceAtMost(3.0f) } ?: 0.4f
 
     override fun getInvokingPosDire(level: Level, invoker: Entity, stack: ItemStack?): PosDirePair {
@@ -148,5 +149,23 @@ abstract class AbstractItemWand(
         instance.updateFromHelperData(dataBundle)
         instance.invokeFinish(level)
         return InvokingState.SUCCESS
+    }
+
+    companion object {
+        /**
+         * kotlin sugar version of [validateItemWand]
+         * */
+        fun ItemStack.isItemWand(): Boolean = !isEmpty && item is IWandLike
+        fun ItemStack.isNotItemWand(): Boolean = !isItemWand()
+
+        fun ItemStack.wandInstanceOrNull(invoker: Entity): ItemWandInstance? =
+            if (isEmpty) null
+            else (item as? IWandLike)?.itemWandInstance(invoker.level(), invoker, this)
+
+        fun ItemStack.wandDataThen(): WandDataBundle? {
+            val invariable = get(ModDataComponents.WAND_INVARIABLE) ?: return null
+            val highPayload = get(ModDataComponents.WAND_HIGH_PAYLOAD) ?: return null
+            return WandDataBundle(invariable, highPayload)
+        }
     }
 }

@@ -15,8 +15,8 @@ object LivingModuleCommon {
         living.isPerformingModule(type).takeIf { !it }?.let {
             then()
             if (CNCommonEvents.canPerformInputModule(living, type)) {
-                CNCommonEvents.inputModuleStart(living, type)
                 living.startPerformingModule(type)
+                CNCommonEvents.inputModuleStart(living, type)  // order matters
             }
         }
     }

@@ -13,9 +13,9 @@ class DefaultRecoilModule(
 ) : AbstractRecoilFunctionModule() {
     override fun execute(
         invoker: LivingEntity,
+        wand: ItemStack?,
         invokerCoordinate: CoordinateDefinition?,
         indirectTarget: Entity?,
-        wand: ItemStack?,
         performingTicks: Int?,
         power: Double?
     ): Boolean {

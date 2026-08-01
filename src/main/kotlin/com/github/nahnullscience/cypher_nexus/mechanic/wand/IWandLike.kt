@@ -70,7 +70,6 @@ interface IWandLike {
         val wandData = if (invoker is IWandLike) getWandData(stack, invoker) ?: return InvokingState.MISSING_DATA
         else getWandData(stack, null) ?: return InvokingState.MISSING_DATA
 
-
         val data = getHelperDataBundle(level, invoker, stack)
         val helper = InvokingHelper(wandData.highPayload.aoc, data, invoker = invoker)
 
@@ -106,16 +105,6 @@ interface IWandLike {
          * @return whether the item behind the stack is a decent [IWandLike]
          * */
         fun validateItemWand(stack: ItemStack): Boolean = !stack.isEmpty && stack.item is IWandLike
-
-        /**
-         * kotlin sugar version of [validateItemWand]
-         * */
-        fun ItemStack.isItemWand(): Boolean = !isEmpty && item is IWandLike
-        fun ItemStack.isNotItemWand(): Boolean = !isItemWand()
-
-        fun ItemStack.wandInstanceOrNull(invoker: Entity): ItemWandInstance? =
-            (item as? IWandLike)?.itemWandInstance(invoker.level(), invoker, this)
-
 
         fun editItemWand(stack: ItemStack, list: List<AbstractCypher>) {
             println("editWand: $stack")

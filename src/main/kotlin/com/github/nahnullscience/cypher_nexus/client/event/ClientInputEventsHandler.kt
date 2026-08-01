@@ -5,8 +5,8 @@ import com.github.nahnullscience.cypher_nexus.client.network.ClientInputModuleSt
 import com.github.nahnullscience.cypher_nexus.client.network.ClientInputModuleStateUpdater.endModule
 import com.github.nahnullscience.cypher_nexus.client.network.ClientInputModuleStateUpdater.startModule
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.AbstractItemWand.Companion.wandInstanceOrNull
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike.Companion.wandInstanceOrNull
 import net.minecraft.client.Minecraft
 import net.minecraft.world.InteractionHand
 import net.neoforged.api.distmarker.Dist
@@ -29,8 +29,7 @@ object ClientInputEventsHandler {
         if (event.isAttack) {
 
             val wand = player.getItemInHand(InteractionHand.MAIN_HAND)
-            if (!IWandLike.validateItemWand(wand)) return
-            val instance = (wand.item as IWandLike).itemWandInstance(player.level(), player, wand) ?: return
+            val instance = wand.wandInstanceOrNull(player) ?: return
             val module = instance.getModule(WandModuleTypes.PRIMARY_MODULE) ?: return
 
             // cancel block-breaking effects
@@ -80,6 +79,7 @@ object ClientInputEventsHandler {
                     }
                 }.also { primaryIsPerforming = it }
 
+                // TODO when point something and not consumeVanillaInput, don't start
 
                 instance ?: continue
                 // wand in any hand has Secondary module && mouse button down -> Yes, otherwise No

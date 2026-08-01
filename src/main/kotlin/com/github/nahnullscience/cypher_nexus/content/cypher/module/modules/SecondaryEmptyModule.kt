@@ -13,15 +13,15 @@ class SecondaryEmptyModule(
 ) : AbstractSecondaryInputModule(), IInputModule by InputEmpty {
     override val maxHoldingTick: Int = 100
 
-    override fun onHoldingStart(level: Level, invoker: LivingEntity, stack: ItemStack?) {
+    override fun onHoldingStart(level: Level, invoker: LivingEntity, stack: ItemStack) {
         InputEmpty.onHoldingStart(level, invoker, stack)
     }
 
-    override fun onHoldingStop(level: Level, invoker: LivingEntity, stack: ItemStack?) {
+    override fun onHoldingStop(level: Level, invoker: LivingEntity, stack: ItemStack) {
         InputEmpty.onHoldingStop(level, invoker, stack)
     }
 
-    override fun onHoldingTick(level: Level, invoker: LivingEntity, stack: ItemStack?) {
+    override fun onHoldingTick(level: Level, invoker: LivingEntity, stack: ItemStack) {
         InputEmpty.onHoldingTick(level, invoker, stack)
     }
 }

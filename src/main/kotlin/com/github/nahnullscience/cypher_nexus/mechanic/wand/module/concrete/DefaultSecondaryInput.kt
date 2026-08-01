@@ -16,12 +16,12 @@ class DefaultSecondaryInput(
     override val isHoldingInput: Boolean = true
     override val maxHoldingTick: Int = 72_000
 
-    override fun onHoldingTick(level: Level, invoker: LivingEntity, stack: ItemStack?) {
+    override fun onHoldingTick(level: Level, invoker: LivingEntity, stack: ItemStack) {
         super.onHoldingTick(level, invoker, stack)
-        instance.functionModule(INVOKE_MODULE.get(), invoker)
+        instance.functionModule(INVOKE_MODULE.get(), invoker, wand = stack)
     }
 
-    override fun onHoldingStop(level: Level, invoker: LivingEntity, stack: ItemStack?) {
+    override fun onHoldingStop(level: Level, invoker: LivingEntity, stack: ItemStack) {
         super.onHoldingStop(level, invoker, stack)
 
         if (invoker is ServerPlayer) {

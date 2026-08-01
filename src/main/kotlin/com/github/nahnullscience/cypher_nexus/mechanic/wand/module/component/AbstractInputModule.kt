@@ -16,15 +16,15 @@ abstract class AbstractInputModule : AbstractWandModule(), ITypeUniqueModule, II
     var holdingTicks: Int = 0
         private set
 
-    override fun onHoldingTick(level: Level, invoker: LivingEntity, stack: ItemStack?) {
+    override fun onHoldingTick(level: Level, invoker: LivingEntity, stack: ItemStack) {
         holdingTicks ++
     }
 
-    override fun onHoldingStart(level: Level, invoker: LivingEntity, stack: ItemStack?) {
+    override fun onHoldingStart(level: Level, invoker: LivingEntity, stack: ItemStack) {
         invoker.getData(WAND_MODULE_STATE_TRACKER).printCurrentPerforming(level)
     }
 
-    override fun onHoldingStop(level: Level, invoker: LivingEntity, stack: ItemStack?) {
+    override fun onHoldingStop(level: Level, invoker: LivingEntity, stack: ItemStack) {
         invoker.getData(WAND_MODULE_STATE_TRACKER).printCurrentPerforming(level)
         holdingTicks = 0
     }

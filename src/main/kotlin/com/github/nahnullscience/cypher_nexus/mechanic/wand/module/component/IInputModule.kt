@@ -30,17 +30,17 @@ interface IInputModule {
     /**
      * call both sides
      * */
-    abstract fun onHoldingTick(level: Level, invoker: LivingEntity, stack: ItemStack?)
+    abstract fun onHoldingTick(level: Level, invoker: LivingEntity, stack: ItemStack)
 
     /**
      * call both sides
      * */
-    abstract fun onHoldingStart(level: Level, invoker: LivingEntity, stack: ItemStack?)
+    abstract fun onHoldingStart(level: Level, invoker: LivingEntity, stack: ItemStack)
 
     /**
      * call both sides
      * */
-    abstract fun onHoldingStop(level: Level, invoker: LivingEntity, stack: ItemStack?)
+    abstract fun onHoldingStop(level: Level, invoker: LivingEntity, stack: ItemStack)
 
     /**
      * in the future...

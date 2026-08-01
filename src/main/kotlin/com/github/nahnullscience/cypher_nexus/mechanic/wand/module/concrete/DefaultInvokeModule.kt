@@ -11,16 +11,18 @@ import net.minecraft.world.item.ItemStack
 class DefaultInvokeModule(
     override val instance: ItemWandInstance
 ) : AbstractInvokeFunctionModule() {
+    /**
+     *
+     * */
     override fun execute(
         invoker: LivingEntity,
+        wand: ItemStack?,
         invokerCoordinate: CoordinateDefinition?,
         indirectTarget: Entity?,
-        wand: ItemStack?,
         performingTicks: Int?,
         power: Double?
     ): Boolean {
         val coordinate = invokerCoordinate ?: invoker.perspectiveCoordinate()
-        instance.wand.tryInvoke(invoker.level(), invoker, coordinate, wand)
-        return true
+        return instance.wand.tryInvoke(invoker.level(), invoker, coordinate, wand).state
     }
 }

@@ -5,7 +5,7 @@ import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 
 data class WandDataBundle(val invariable: WandDataInvariable, val highPayload: WandDataHighPayload) {
     companion object {
-        fun missingData(msg: () -> String) = WandDataBundle(
+        inline fun missingData(msg: () -> String) = WandDataBundle(
             WandDataInvariable.FALL_BACK,
             WandDataHighPayload(ArrayOfCyphers(1))
             ) .also { CypherNexus.debugWand(supplier = msg) }

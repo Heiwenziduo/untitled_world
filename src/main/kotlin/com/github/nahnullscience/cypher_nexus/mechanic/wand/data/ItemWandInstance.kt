@@ -37,7 +37,7 @@ class ItemWandInstance(
     val wand: IWandLike
 ) {
     companion object {
-        const val DATA_TOLERANCE_TICK = 2
+        private const val SYNC_TOLERANCE_TICK = 2
     }
 
     val uuid = invariable.uuid
@@ -101,7 +101,7 @@ class ItemWandInstance(
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    fun <T> getModule(type: WandModuleType<T>): T? where T : AbstractWandModule, T : ITypeUniqueModule = modules[type].also { println("get module: $it") }
+    fun <T> getModule(type: WandModuleType<T>): T? where T : AbstractWandModule, T : ITypeUniqueModule = modules[type]
     fun <T> getModule(holder: Supplier<out WandModuleType<T>>): T? where T : AbstractWandModule, T : ITypeUniqueModule = modules[holder]
 
     private fun computeModules() {
@@ -121,14 +121,14 @@ class ItemWandInstance(
     fun <T> functionModule(
         type: WandModuleType<T>,
         invoker: LivingEntity,
+        wand: ItemStack? = null,
         invokerCoordinate: CoordinateDefinition? = null,
         indirectTarget: Entity? = null,
-        wand: ItemStack? = null,
         performingTicks: Int? = null,
         power: Double? = null,
     ): Boolean where T : AbstractFunctionalModule {
         return getModule(type)?.run {
-            execute(invoker, invokerCoordinate, indirectTarget, wand, performingTicks, power)
+            execute(invoker, wand, invokerCoordinate, indirectTarget, performingTicks, power)
         } ?: false
     }
 
@@ -165,9 +165,9 @@ class ItemWandInstance(
 
         // give a 2 ticks tolerance to prevent bar-flash
         var badNetwork = false
-        if (abs(_manaCurrent - mana) > DATA_TOLERANCE_TICK * manaRegen) _manaCurrent = mana .also { badNetwork = true }
-        if (abs(_delayCurrent - delay) > DATA_TOLERANCE_TICK) _delayCurrent = delay .also { badNetwork = true }
-        if (abs(_rechargeCurrent - recharge) > DATA_TOLERANCE_TICK) _rechargeCurrent = recharge .also { badNetwork = true }
+        if (abs(_manaCurrent - mana) > SYNC_TOLERANCE_TICK * manaRegen) _manaCurrent = mana .also { badNetwork = true }
+        if (abs(_delayCurrent - delay) > SYNC_TOLERANCE_TICK) _delayCurrent = delay .also { badNetwork = true }
+        if (abs(_rechargeCurrent - recharge) > SYNC_TOLERANCE_TICK) _rechargeCurrent = recharge .also { badNetwork = true }
 
         _deck = deck
         if (badNetwork) {

@@ -1,5 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.utility.mod
 
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
@@ -13,7 +14,7 @@ object CNData {
         list
     }
     private val _categoryMap: Map<CypherCategory, List<AbstractCypher>> by lazy {
-        val map = CypherUtility.sortCyphersByCategory(_enabledList)
+        val map = sortCyphersByCategory(_enabledList)
         println("cypher _categoryMap init: $map")
         map
     }
@@ -38,4 +39,14 @@ object CNData {
     // Q: what about other mods modified the registry?
     // A: access it during game play only, this timing make sure all registry is settled
 
+
+    fun sortCyphersByCategory(list: List<AbstractCypher>): Map<CypherCategory, List<AbstractCypher>> {
+        val map = mutableMapOf<CypherCategory, MutableList<AbstractCypher>>()
+        CypherCategories.REGISTRY.toList().forEach { category -> map[category] = mutableListOf() } // this will keep map in category registry order
+        list.forEach { cypher ->
+            val list0 = map.getValue(cypher.category.value())
+            list0.add(cypher)
+        }
+        return map
+    }
 }

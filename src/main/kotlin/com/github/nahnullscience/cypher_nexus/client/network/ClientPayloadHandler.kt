@@ -7,7 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.event.CNCommonEvents
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundEditWandCyphersConfirm
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundOpenIndexScreen
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
-import com.github.nahnullscience.cypher_nexus.utility.mod.CypherUtility
+import com.github.nahnullscience.cypher_nexus.utility.mod.CNData
 import net.minecraft.client.Minecraft
 import net.neoforged.neoforge.network.handling.IPayloadContext
 
@@ -24,7 +24,7 @@ object ClientPayloadHandler {
 //        println("client receive package -> openIndexScreen: \n$data")
 
         val player = context.player()
-        val map = CypherUtility.sortCyphersByCategory(data.cyphersTotal)
+        val map = CNData.sortCyphersByCategory(data.cyphersTotal)
         val list = CNCommonEvents.livingGatherWandsTracking(player).wands()
 
         context.enqueueWork {

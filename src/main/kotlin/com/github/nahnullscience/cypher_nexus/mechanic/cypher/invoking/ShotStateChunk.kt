@@ -114,7 +114,7 @@ class ShotStateChunk private constructor (
             val recoil = AttributeOperator.attributeCalculator(CypherAttributes.RECOIL.value().defaultValue, recoilMap).let {
                 CypherAttributes.RECOIL.value().restrictRange(it)
             }
-            wandInstance.functionModule(RECOIL_MODULE.get(), directInvoker, invokerCoordinate, power = recoil)
+            wandInstance.functionModule(RECOIL_MODULE.get(), directInvoker, null, invokerCoordinate, power = recoil)
         }
 
         // handle entities only on server

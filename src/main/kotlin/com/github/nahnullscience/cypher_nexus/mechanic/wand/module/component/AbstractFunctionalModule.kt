@@ -17,9 +17,9 @@ abstract class AbstractFunctionalModule : AbstractWandModule(), ITypeUniqueModul
      * */
     abstract fun execute(
         invoker: LivingEntity,
+        wand: ItemStack? = null,
         invokerCoordinate: CoordinateDefinition? = null,
         indirectTarget: Entity? = null,
-        wand: ItemStack? = null,
         performingTicks: Int? = null,
         power: Double? = null,
     ): Boolean
