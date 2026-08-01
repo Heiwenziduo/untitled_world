@@ -446,7 +446,10 @@ object Cyphers {
     // utility //////////////////////////////////////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    val INNER_FORCE = registerCypher(InnerForceCypher)
+    val INNER_FORCE = registerCypher(::InnerForceCypher) {
+        manaDrain(10f)
+        draw(1)
+    }
     val REFRESHER_RING = registerCypher(::RefresherRingCypher) {
         manaDrain(20f)
         recharge(-10)

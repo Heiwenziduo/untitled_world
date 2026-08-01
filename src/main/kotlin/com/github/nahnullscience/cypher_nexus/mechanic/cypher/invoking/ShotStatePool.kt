@@ -2,10 +2,10 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 
-object StateChunkPool {
+object ShotStatePool {
     // TODO pool
 
-    fun getOrCreateStateChunk(ccMap: MapOfCypherCounts) : ShotStateChunk {
+    fun getOrCreateShotState(ccMap: MapOfCypherCounts) : ShotStateChunk {
         return ShotStateChunk(ccMap).compute()
     }
 }

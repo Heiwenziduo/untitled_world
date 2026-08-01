@@ -15,7 +15,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.StateChunkPool
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStatePool
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.*
 import com.github.nahnullscience.cypher_nexus.utility.exception.CypherEntityException
@@ -145,7 +145,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
 
     override fun initCypher(cypher: AbstractProjectileCypher<*>, ccMap: MapOfCypherCounts?) {
         if (ccMap == null) return
-        val state = StateChunkPool.getOrCreateStateChunk(ccMap)
+        val state = ShotStatePool.getOrCreateShotState(ccMap)
         initCypher(cypher, state, null)
     }
 
@@ -282,7 +282,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     }
 
     override fun trigger(type: TriggerType, releaseTo: PosDirePair) {
-        if (triggerType != TriggerType.NONE && type == triggerType) payload?.release(
+        payload?.release(
             level,
             cyEntity.perspectiveCoordinate(),
             releaseTo,
@@ -293,11 +293,12 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     }
     protected fun trigger(type: TriggerType, releasePoint: Vec3) {
         if (level.isClientSide) return
+        if (triggerType != TriggerType.NONE && type == triggerType)
         when (type) {
             TriggerType.COLLISION ->
-                trigger(type, PosDirePair(releasePoint, cyEntity.deltaMovement.reverse()))
+                cyEntity.trigger(type, PosDirePair(releasePoint, cyEntity.deltaMovement.reverse()))
             else ->
-                trigger(type, PosDirePair(releasePoint, cyEntity.deltaMovement))
+                cyEntity.trigger(type, PosDirePair(releasePoint, cyEntity.deltaMovement))
         }
     }
 
@@ -346,17 +347,9 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
         if (cyEntity.tickCount == 1) {
             delegateOnFirstTick()
         }
+        if (triggerType.timer == cyEntity.tickCount) trigger(triggerType, cyEntity.position())
 
         captureSurroundings()
-
-        when (cyEntity.tickCount) {
-            5 -> trigger(TriggerType.TIMER_5, cyEntity.position())
-            10 -> trigger(TriggerType.TIMER_10, cyEntity.position())
-            20 -> trigger(TriggerType.TIMER_20, cyEntity.position())
-            40 -> trigger(TriggerType.TIMER_40, cyEntity.position())
-            70 -> trigger(TriggerType.TIMER_70, cyEntity.position())
-            200 -> trigger(TriggerType.TIMER_200, cyEntity.position())
-        }
 
         if (cyEntity.tickCount == 3) {
             capturedInitialSpeedSqr = cyEntity.deltaMovement.lengthSqr()

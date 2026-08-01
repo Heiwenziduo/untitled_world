@@ -15,9 +15,8 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerTy
 
 abstract class AbstractAddTrigger(
     private val _manaDrain: Float
-) : AbstractNonProjectileCypher(), IRecursiveCypher {
+) : AbstractNonProjectileCypher() {
     override val category = CypherCategories.OTHER
-    override val isRecursive = false
     abstract val addTrigger: TriggerType
     init {
         require(addTrigger != TriggerType.NONE)

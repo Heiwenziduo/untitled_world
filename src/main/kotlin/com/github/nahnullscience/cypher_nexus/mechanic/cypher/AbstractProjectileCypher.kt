@@ -49,9 +49,8 @@ abstract class AbstractProjectileCypher <CE> (
             // create substate conditionally // this will save plenty of memory when copy thousands of trigger-cypher with draw-disabled
             // TODO when pierce, collide trigger is infinite, but flag hasn't been ready at this stage
             for (i in 0 until projectileCount) {
-                val subState = ShotStateChunk(innateTriggerCharge)
-                shotState.addProjectileNode(this, subState, innateTrigger)
-                handleDraws(helper, shotState, data, paras)
+                val subState = addProjectileWithTrigger(shotState, innateTrigger, innateTriggerCharge)
+                handleDraws(helper, subState, data, paras)
             }
         } else {
             // if no trigger or no payload

@@ -10,14 +10,11 @@ import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 
-object InnerForceCypher : AbstractNonProjectileCypher(), ServerInvokePosRedirectionHook {
+class InnerForceCypher(
+    defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder
+) : AbstractNonProjectileCypher(defaultAttribute), ServerInvokePosRedirectionHook {
     override val resource = CypherNexus.modResource("inner_force")
     override val category = CypherCategories.UTILITY
-    override fun defaultAttributes(): CypherDataMap.Builder {
-        return super.defaultAttributes()
-            .manaDrain(10f)
-            .draw(1)
-    }
 
     override fun redirectPosDireServer(
         index: Int,
