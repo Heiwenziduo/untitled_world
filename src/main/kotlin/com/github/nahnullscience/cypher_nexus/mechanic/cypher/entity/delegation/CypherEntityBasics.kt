@@ -172,7 +172,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     }
 
     protected open fun captureSurroundings() {
-        if (cyEntity.tickCount == 1 || cyEntity.tickCount and 3 == 3) { // trigger on 1, 3 and then every 4 tick
+        if (cyEntity.tickCount == 1 || (cyEntity.tickCount - 2) and 3 == 3) { // trigger on tick 1, and then every 4 ticks
             hooks?.get(CypherHooks.ENTITY_CAPTURE)?.let {
                 var need = cyEntity.needCaptureSurrounding()
                 if (!need) run {

@@ -6,13 +6,12 @@ import com.github.nahnullscience.cypher_nexus.content.cypher.AbstractSimpleProje
 import com.github.nahnullscience.cypher_nexus.content.cypher.AbstractSimpleProjectile.SimpleStaticProjectile
 import com.github.nahnullscience.cypher_nexus.content.cypher.SimpleNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.*
-import com.github.nahnullscience.cypher_nexus.content.cypher.wand_module.PrimaryInvokingCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.InnerForceCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.ProteusCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.RefresherRingCypher
+import com.github.nahnullscience.cypher_nexus.content.cypher.wand_module.PrimaryInvokingCypher
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
-import com.github.nahnullscience.cypher_nexus.init.mod.InvokingPatterns.PLANE_TRIFURCATED_PATTERN
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.*
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.NONE_ATTR
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
@@ -435,10 +434,16 @@ object Cyphers {
         draw(4)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 40.0)
     }
+    val FORMATION_PLANE_BIFURCATED = registerCypher("formation_plane_bifurcated", CypherCategories.MULTI_INVOKING) {
+        manaDrain(1f)
+        draw(2)
+        pattern(InvokingPatterns.PLANE_BIFURCATED_PATTERN)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -12.0)
+    }
     val FORMATION_PLANE_TRIFURCATED = registerCypher("formation_plane_trifurcated", CypherCategories.MULTI_INVOKING) {
         manaDrain(3f)
         draw(3)
-        pattern(PLANE_TRIFURCATED_PATTERN)
+        pattern(InvokingPatterns.PLANE_TRIFURCATED_PATTERN)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -15.0)
     }
 

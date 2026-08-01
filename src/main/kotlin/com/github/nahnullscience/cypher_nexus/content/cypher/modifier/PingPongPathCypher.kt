@@ -19,7 +19,7 @@ class PingPongPathCypher(
         level: Level,
         cyEntity: CE
     ) where CE : Entity, CE : ICypherEntity {
-        if (!level.isClientSide && cyEntity.tickCount and 15 == 15) {
+        if (!level.isClientSide && (cyEntity.tickCount - 1) and 15 == 15) {
             cyEntity.deltaMovement = -cyEntity.deltaMovement
             cyEntity.needsSync = true
         }

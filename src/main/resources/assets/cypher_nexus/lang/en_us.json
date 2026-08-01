@@ -127,6 +127,8 @@
   "cypher.cypher_nexus.multi_invoking.treble_scatter.description": "Treble Invoking Scatter",
   "cypher.cypher_nexus.multi_invoking.quadruple_scatter": "Quadruple Invoking Scatter",
   "cypher.cypher_nexus.multi_invoking.quadruple_scatter.description": "Quadruple Invoking Scatter",
+  "cypher.cypher_nexus.multi_invoking.formation_plane_bifurcated": "Formation: Plane Bifurcated",
+  "cypher.cypher_nexus.multi_invoking.formation_plane_bifurcated.description": "",
   "cypher.cypher_nexus.multi_invoking.formation_plane_trifurcated": "Formation: Plane Trifurcated",
   "cypher.cypher_nexus.multi_invoking.formation_plane_trifurcated.description": "",
 
@@ -228,6 +230,7 @@
 
 
   "invoking.cypher_nexus.pattern.no_pattern": "No Pattern",
+  "invoking.cypher_nexus.pattern.plane_bifurcated": "Plane Bifurcated",
   "invoking.cypher_nexus.pattern.plane_trifurcated": "Plane Trifurcated",
 
   "item_group.cypher_nexus": "Cypher Nexus",

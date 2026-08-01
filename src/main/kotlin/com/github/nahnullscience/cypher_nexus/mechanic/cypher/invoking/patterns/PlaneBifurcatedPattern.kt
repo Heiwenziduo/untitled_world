@@ -8,9 +8,9 @@ import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
 import kotlin.math.PI
 
-class PlaneTrifurcatedPattern(path: Identifier) : AbstractInvokingPattern(path) {
+class PlaneBifurcatedPattern(path: Identifier) : AbstractInvokingPattern(path) {
     companion object {
-        private const val RAD = (PI / 6).toFloat()
+        private const val RAD = (PI / 8).toFloat()
     }
     override fun layout(
         index: Int,
@@ -18,23 +18,22 @@ class PlaneTrifurcatedPattern(path: Identifier) : AbstractInvokingPattern(path) 
         coordinate: CoordinateDefinition,
         posDire: PosDirePair
     ): PosDirePair {
-        val i = index % 3
+        val i = index and 1
         return when (i) {
-            1 -> {
-                coordinate.getOrComputePatternCache(1) cache@ {
+            0 -> {
+                coordinate.getOrComputePatternCache(0) cache@ {
                     val r = Quaternionf().rotateAxis(RAD, coordinate.top.toVector3f())
                     val dire = posDire.direction.toVector3f().rotate(r)
                     return@cache PosDirePair(posDire.position, Vec3(dire))
                 }
             }
-            2 -> {
-                coordinate.getOrComputePatternCache(2) cache@ {
+            else -> {
+                coordinate.getOrComputePatternCache(1) cache@ {
                     val r = Quaternionf().rotateAxis(-RAD, coordinate.top.toVector3f())
                     val dire = posDire.direction.toVector3f().rotate(r)
                     return@cache PosDirePair(posDire.position, Vec3(dire))
                 }
             }
-            else -> posDire
         }
     }
 }

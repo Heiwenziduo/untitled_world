@@ -19,4 +19,12 @@ data class CoordinateDefinition(
     val x get() = left
     val y get() = top
     val z get() = front
+
+    @PublishedApi
+    internal var patternCache: Array<PosDirePair?>? = null
+    inline fun getOrComputePatternCache(number: Int, compute: () -> PosDirePair): PosDirePair {
+        val number = number and 0x0111 // cache 8 vector may be enough
+        val cache = patternCache ?: arrayOfNulls<PosDirePair>(8).also { patternCache = it }
+        return cache[number] ?: compute().also { cache[number] = it }
+    }
 }

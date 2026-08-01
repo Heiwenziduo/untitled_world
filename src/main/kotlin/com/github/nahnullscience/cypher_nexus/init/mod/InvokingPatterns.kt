@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.init.mod
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractInvokingPattern
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.NoPattern
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.PlaneBifurcatedPattern
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.PlaneTrifurcatedPattern
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
@@ -35,5 +36,7 @@ object InvokingPatterns {
     }
 
     val NO_PATTERN = registerPattern(NoPattern)
-    val PLANE_TRIFURCATED_PATTERN = registerPattern(PlaneTrifurcatedPattern)
+    val PLANE_BIFURCATED_PATTERN = registerPattern("plane_bifurcated", ::PlaneBifurcatedPattern)
+    val PLANE_TRIFURCATED_PATTERN = registerPattern("plane_trifurcated", ::PlaneTrifurcatedPattern)
+//    val PLANE_T_STYLE_PATTERN = registerPattern("plane_t_style", ::PlaneTStylePattern)
 }
