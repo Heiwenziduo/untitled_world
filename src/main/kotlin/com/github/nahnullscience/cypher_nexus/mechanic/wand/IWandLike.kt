@@ -105,13 +105,14 @@ interface IWandLike {
          * @return whether the item behind the stack is a decent [IWandLike]
          * */
         fun validateItemWand(stack: ItemStack): Boolean = !stack.isEmpty && stack.item is IWandLike
+        fun ItemStack.isItemWand(): Boolean = !isEmpty && item is IWandLike
 
-        fun editItemWand(stack: ItemStack, list: List<AbstractCypher>) {
-            println("editWand: $stack")
-            if (validateItemWand(stack)) {
-                stack.set(ModDataComponents.WAND_HIGH_PAYLOAD, WandDataHighPayload(ArrayOfCyphers(list)))
-            }
+        fun ItemStack.editRecipeIfWand(aoc: ArrayOfCyphers): Boolean {
+            if (isItemWand()) {
+                println("editWand: $this")
+                set(ModDataComponents.WAND_HIGH_PAYLOAD, WandDataHighPayload(aoc))
+                return true
+            } else return false
         }
-
     }
 }

@@ -1,6 +1,5 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component
 
-import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_MODULE_STATE_TRACKER
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
@@ -21,11 +20,9 @@ abstract class AbstractInputModule : AbstractWandModule(), ITypeUniqueModule, II
     }
 
     override fun onHoldingStart(level: Level, invoker: LivingEntity, stack: ItemStack) {
-        invoker.getData(WAND_MODULE_STATE_TRACKER).printCurrentPerforming(level)
     }
 
     override fun onHoldingStop(level: Level, invoker: LivingEntity, stack: ItemStack) {
-        invoker.getData(WAND_MODULE_STATE_TRACKER).printCurrentPerforming(level)
         holdingTicks = 0
     }
 }

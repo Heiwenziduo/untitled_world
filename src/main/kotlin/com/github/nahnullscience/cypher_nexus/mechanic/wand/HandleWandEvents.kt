@@ -4,7 +4,6 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_MODULE_STATE_TRACKER
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.inputModules
-import com.github.nahnullscience.cypher_nexus.mechanic.entity.WandModuleStateTracker.Companion.isPerformingModule
 import com.github.nahnullscience.cypher_nexus.mechanic.event.CNCommonEvents
 import com.github.nahnullscience.cypher_nexus.mechanic.event.wand.WandPerformingStateChangeEvent
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.AbstractItemWand.Companion.wandInstanceOrNull
@@ -28,8 +27,9 @@ object HandleWandEvents {
     private fun wandModuleTick(event: EntityTickEvent.Pre) { // didn't find `LivingTick`, strange
         if (!event.entity.hasData(WAND_MODULE_STATE_TRACKER)) return
         val living = event.entity as? LivingEntity ?: return
+        val tracker = living.getData(WAND_MODULE_STATE_TRACKER)
 
-        val inputs = inputModules.filter { living.isPerformingModule(it) }.toMutableList()
+        val inputs = inputModules.filter { tracker.isPerforming(it) }.toMutableList()
         if (inputs.isNotEmpty()) {
             CNCommonEvents.livingGatherWandsActive(living).wandsSequence().forEach { stack ->
                 val instance = stack.wandInstanceOrNull(living) ?: run {

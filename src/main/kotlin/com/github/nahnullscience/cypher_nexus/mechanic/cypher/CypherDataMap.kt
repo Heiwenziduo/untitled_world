@@ -1,20 +1,17 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastMap
 import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastOpMap
 import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastOpMap.Companion.OperatorMap
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.ATTR_FAST_MAP_CODEC
-import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.ATTR_OP_MAP_CODEC
-import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.CYPHER_ATTRIBUTE
-import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.CYPHER_OPERATION_MAP
+import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.ATTR_FAST_OP_MAP_CODEC
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import it.unimi.dsi.fastutil.objects.Reference2DoubleArrayMap
 import net.minecraft.core.Holder
-import java.util.EnumMap
+import java.util.*
 
 /** attributes JSON config */
 data class CypherDataMap(
@@ -37,7 +34,7 @@ data class CypherDataMap(
             ATTR_FAST_MAP_CODEC
                 .optionalFieldOf("projectile", AttributeFastMap())
                 .forGetter(CypherDataMap::projectile),
-            ATTR_OP_MAP_CODEC
+            ATTR_FAST_OP_MAP_CODEC
                 .optionalFieldOf("shotState", AttributeFastOpMap())
                 .forGetter(CypherDataMap::shotState),
         ).apply(it, ::CypherDataMap) }

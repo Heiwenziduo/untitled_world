@@ -26,7 +26,7 @@ class PrimaryInvokingModule(
 
         if (invoker is ServerPlayer) {
             if (invoker.level().gameTime - holdingTicks >= instance.lastInvokeTime) return  // don't sync if no conduction performed
-            instance.sendSyncStatePacket(invoker)
+            instance.sendSyncStatePacketServerOnly(invoker)
         }
     }
 }

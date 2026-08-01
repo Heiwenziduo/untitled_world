@@ -6,27 +6,29 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
 import com.github.nahnullscience.cypher_nexus.network.server.ServerboundEditWandCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers.MutableAoC
+import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap
 import net.minecraft.client.Minecraft
 import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.client.network.ClientPacketDistributor
+import java.util.UUID
 
 /**
  * owns wand-editing state: which wand is open, its working (possibly edited) cypher array,
  * and a queue of edits for wands the player switched away from without committing.
  *
- * knows nothing about pixels, mouse input, or GuiGraphics — [com.github.nahnullscience.cypher_nexus.client.gui.components.panels.WandEditorPanel] is the only
+ * knows nothing about pixels, mouse input, or GuiGraphics — `WandEditorPanel` is the only
  * thing that calls into this, and it's the only thing this class reports back to.
  * */
 class WandEditSession(private val wands: List<ItemStack>) {
 
     /** uuid -> edited cypher list, for wands touched this session but not yet flushed */
-    private val pendingEdits = HashMap<String, MutableAoC>()
+    private val pendingEdits = Object2ReferenceOpenHashMap<UUID, MutableAoC>(8).also { it.defaultReturnValue(null) }
 
     var selectedIndex = 0
         private set
 
     private var workingCopy: MutableAoC? = null
-    private var workingUuid: String? = null
+    private var workingUuid: UUID? = null
     private var dirty = false
 
     val wandCount get() = wands.size

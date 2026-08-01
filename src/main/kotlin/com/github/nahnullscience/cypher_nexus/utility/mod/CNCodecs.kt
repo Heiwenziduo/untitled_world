@@ -8,6 +8,8 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.Attribut
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
+import com.mojang.serialization.codecs.RecordCodecBuilder
+import io.netty.buffer.ByteBuf
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
@@ -15,12 +17,30 @@ import java.util.*
 
 object CNCodecs {
 
+    init {
+
+    }
+
+    val UUID_CODEC: Codec<UUID> = RecordCodecBuilder.create { it.group(
+        Codec.LONG.fieldOf("msb").forGetter(UUID::getMostSignificantBits),
+        Codec.LONG.fieldOf("lsb").forGetter(UUID::getLeastSignificantBits)
+    ).apply(it) { m, l -> UUID(m, l) } }
+    val UUID_STREAM: StreamCodec<ByteBuf, UUID> = StreamCodec.composite(
+        ByteBufCodecs.VAR_LONG, UUID::getMostSignificantBits,
+        ByteBufCodecs.VAR_LONG, UUID::getLeastSignificantBits,
+        ::UUID
+    )
+
     val CYPHER: Codec<AbstractCypher> = Cyphers.REGISTRY.byNameCodec()
-    val CYPHER_STREAM: StreamCodec<RegistryFriendlyByteBuf, AbstractCypher> = ByteBufCodecs.registry(Cyphers.RESOURCE_KEY)
+    val CYPHER_STREAM: StreamCodec<RegistryFriendlyByteBuf, AbstractCypher> =
+        ByteBufCodecs.registry(Cyphers.RESOURCE_KEY)
 
     val CYPHER_LIST: Codec<List<AbstractCypher>> = CYPHER.listOf()
-    val CYPHER_LIST_STREAM: StreamCodec<RegistryFriendlyByteBuf, List<AbstractCypher>> = CYPHER_STREAM.apply(
-        ByteBufCodecs.list())
+    val CYPHER_LIST_STREAM: StreamCodec<RegistryFriendlyByteBuf, List<AbstractCypher>> =
+        CYPHER_STREAM.apply(ByteBufCodecs.list())
+
+    val CYPHER_ATTRIBUTE: Codec<CypherAttribute> = CypherAttributes.REGISTRY.byNameCodec()
+
 
     val AOC_CODEC: Codec<ArrayOfCyphers> = CYPHER_LIST.xmap(
         { list -> ArrayOfCyphers(list) },
@@ -42,8 +62,6 @@ object CNCodecs {
             CYPHER_STREAM, ByteBufCodecs.VAR_INT
         )
 
-    val CYPHER_ATTRIBUTE: Codec<CypherAttribute> = CypherAttributes.REGISTRY.byNameCodec()
-
     val ATTR_OPERATOR_CODEC: Codec<AttributeOperator> = Codec.STRING.comapFlatMap(
         // Given a string codec to convert to a integer
         // Not all strings can become integers (A is not fully equivalent to B)
@@ -58,7 +76,7 @@ object CNCodecs {
         AttributeOperator::toString
     )
     /** represents a map that key is string-fied attribute-operator, and value is a double */
-    val CYPHER_OPERATION_MAP: Codec<EnumMap<AttributeOperator, Double>> =
+    val ATTR_OPERATOR_MAP_CODEC: Codec<EnumMap<AttributeOperator, Double>> =
         Codec.unboundedMap(ATTR_OPERATOR_CODEC, Codec.DOUBLE).comapFlatMap(
             { map ->
                 try {
@@ -76,8 +94,8 @@ object CNCodecs {
             { afm -> afm.toMap() }
         )
 
-    val ATTR_OP_MAP_CODEC: Codec<AttributeFastOpMap> =
-        Codec.unboundedMap(CYPHER_ATTRIBUTE, CYPHER_OPERATION_MAP).xmap(
+    val ATTR_FAST_OP_MAP_CODEC: Codec<AttributeFastOpMap> =
+        Codec.unboundedMap(CYPHER_ATTRIBUTE, ATTR_OPERATOR_MAP_CODEC).xmap(
             { map -> AttributeFastOpMap(map) },
             { fastOpMap -> fastOpMap.toMap() }
         )

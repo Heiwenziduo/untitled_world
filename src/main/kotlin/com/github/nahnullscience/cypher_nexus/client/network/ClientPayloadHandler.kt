@@ -45,7 +45,7 @@ object ClientPayloadHandler {
 
         context.enqueueWork {
             val player = context.player()
-            player.getData(WAND_DATA_MAP)[data.uuid]?.syncInvokingDataClient(
+            player.getData(WAND_DATA_MAP)[data.uuid]?.syncInvokingDataClientOnly(
                 data.mana,
                 data.delay,
                 data.recharge,

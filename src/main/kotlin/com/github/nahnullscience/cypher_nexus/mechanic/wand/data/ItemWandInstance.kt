@@ -141,8 +141,8 @@ class ItemWandInstance(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /** when cypher-list is edited */
-    fun updateWandStatsServer(bundle: WandDataBundle) {
-        if (isClient) CypherNexus.LOGGER.error("server method calls on client side: updateWandStatsServer")
+    fun updateWandStatsServerOnly(bundle: WandDataBundle) {
+        if (isClient) CypherNexus.LOGGER.error("server method calls on client side: updateWandStatsFromServer")
         _deck = 0
         _discard = 0
         _rechargeCurrent = 0
@@ -157,10 +157,10 @@ class ItemWandInstance(
     }
 
     /**
-     * when receive package from [sendSyncStatePacket],
+     * when receive package from [sendSyncStatePacketServerOnly],
      * sync mana / delay / recharge state after invoking
      * */
-    fun syncInvokingDataClient(mana: Float, delay: Int, recharge: Int, deck: Long) {
+    fun syncInvokingDataClientOnly(mana: Float, delay: Int, recharge: Int, deck: Long) {
         if (!isClient) CypherNexus.LOGGER.error("client method calls on server side: syncDataClient")
 
         // give a 2 ticks tolerance to prevent bar-flash
@@ -195,7 +195,7 @@ class ItemWandInstance(
         _discard            =   bundle.discard
     }
 
-    fun sendSyncStatePacket(player: ServerPlayer) {
+    fun sendSyncStatePacketServerOnly(player: ServerPlayer) {
         if (isClient) {
             CypherNexus.LOGGER.error("server method calls on client side: sendSyncStatePacket")
             return
@@ -210,6 +210,14 @@ class ItemWandInstance(
                 _deck
             )
         )
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * called when instance off-link from the map.
+     * */
+    fun discard() {
+        modules.clear()
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

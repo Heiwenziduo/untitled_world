@@ -4,12 +4,12 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs
 import net.minecraft.network.RegistryFriendlyByteBuf
-import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
+import java.util.*
 
 data class ClientboundEditWandCyphersConfirm(
-    val uuid: String,
+    val uuid: UUID,
     val cyphers : ArrayOfCyphers
 ) : CustomPacketPayload {
     override fun type() = TYPE
@@ -19,7 +19,7 @@ data class ClientboundEditWandCyphersConfirm(
             CustomPacketPayload.Type(CypherNexus.modResource("edit_wand_cyphers_confirm"))
 
         val STREAM: StreamCodec<RegistryFriendlyByteBuf, ClientboundEditWandCyphersConfirm> = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8, ClientboundEditWandCyphersConfirm::uuid,
+            CNCodecs.UUID_STREAM, ClientboundEditWandCyphersConfirm::uuid,
             CNCodecs.AOC_STREAM, ClientboundEditWandCyphersConfirm::cyphers,
             ::ClientboundEditWandCyphersConfirm
         )

@@ -1,10 +1,9 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.entity
 
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_MODULE_STATE_TRACKER
-import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes
+import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.MODULE_ID_CAP
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.id
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.inputModules
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.WandModuleType
 import com.github.nahnullscience.cypher_nexus.utility.sideString
 import net.minecraft.world.InteractionHand
@@ -19,25 +18,33 @@ import java.util.function.Supplier
 open class WandModuleStateTracker {
 
     init {
-        println("/// wand-module-state creation ///")
+//        println("/// wand-module-state creation ///")
     }
 
     private var flags = 0
+//    private val performingTicks = Array(MODULE_ID_CAP + 1) { -1 }
 
     fun isPerforming(module: Supplier<out WandModuleType<*>>) = isPerforming(module.get())
-    fun isPerforming(module: WandModuleType<*>) : Boolean {
-        return flags and (1 shl module.id()) != 0
-    }
+    fun isPerforming(module: WandModuleType<*>) = isPerforming(module.id())
+    private fun isPerforming(id: Int): Boolean = flags and (1 shl id) != 0
 
-    private fun setPerformingState(module: WandModuleType<*>, boo: Boolean) {
-        val mask = (1 shl module.id())
+    private fun setPerformingState(module: WandModuleType<*>, boo: Boolean, performer: LivingEntity) {
+        val id = module.id()
+        val mask = (1 shl id)
         flags = if (boo) flags or mask else flags and mask.inv()
+//        performingTicks[id] = if (boo) performer.tickCount else -1
     }
 
-    fun startModule(type: WandModuleType<*>) = setPerformingState(type, true)
-    fun startModule(type: Supplier<out WandModuleType<*>>) = setPerformingState(type.get(), true)
-    fun endModule(type: WandModuleType<*>) = setPerformingState(type, false)
-    fun endModule(type: Supplier<out WandModuleType<*>>) = setPerformingState(type.get(), false)
+//    fun getPerformingTick(module: WandModuleType<*>, performer: LivingEntity): Int {
+//        val id = module.id()
+//        return if (!isPerforming(id)) -1
+//        else performer.tickCount - performingTicks[id]
+//    }
+
+    fun startModule(type: WandModuleType<*>, performer: LivingEntity) = setPerformingState(type, true, performer)
+    fun startModule(type: Supplier<out WandModuleType<*>>, performer: LivingEntity) = setPerformingState(type.get(), true, performer)
+    fun endModule(type: WandModuleType<*>, performer: LivingEntity) = setPerformingState(type, false, performer)
+    fun endModule(type: Supplier<out WandModuleType<*>>, performer: LivingEntity) = setPerformingState(type.get(), false, performer)
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     fun printCurrentPerforming(level: Level) {
@@ -48,21 +55,21 @@ open class WandModuleStateTracker {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////
     companion object {
+
         fun LivingEntity.isPerformingModule(module: Supplier<out WandModuleType<*>>) = isPerformingModule(module.get())
         fun LivingEntity.isPerformingModule(module: WandModuleType<*>): Boolean {
-            return if (this.hasData(WAND_MODULE_STATE_TRACKER)) {
-                this.getData(WAND_MODULE_STATE_TRACKER).isPerforming(module)
-            } else false
+            return if (!this.hasData(WAND_MODULE_STATE_TRACKER)) false
+            else this.getData(WAND_MODULE_STATE_TRACKER).isPerforming(module)
         }
 
         fun LivingEntity.startPerformingModule(module: Supplier<out WandModuleType<*>>) = startPerformingModule(module.get())
         fun LivingEntity.startPerformingModule(module: WandModuleType<*>) {
-            this.getData(WAND_MODULE_STATE_TRACKER).setPerformingState(module, true)
+            this.getData(WAND_MODULE_STATE_TRACKER).setPerformingState(module, true, this)
         }
 
         fun LivingEntity.stopPerformingModule(module: Supplier<out WandModuleType<*>>) = stopPerformingModule(module.get())
         fun LivingEntity.stopPerformingModule(module: WandModuleType<*>) {
-            this.getData(WAND_MODULE_STATE_TRACKER).setPerformingState(module, false)
+            this.getData(WAND_MODULE_STATE_TRACKER).setPerformingState(module, false, this)
         }
 
         /**

@@ -1,8 +1,9 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
 
-import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
+import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.UUID_CODEC
+import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.UUID_STREAM
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import io.netty.buffer.ByteBuf
@@ -14,7 +15,7 @@ import net.minecraft.network.codec.StreamCodec
 import net.minecraft.world.item.Item.TooltipContext
 import net.minecraft.world.item.TooltipFlag
 import net.minecraft.world.item.component.TooltipProvider
-import java.util.UUID
+import java.util.*
 import java.util.function.Consumer
 
 
@@ -22,11 +23,12 @@ import java.util.function.Consumer
  * holds wand invariable data, separate into chunks
  * */
 data class WandDataInvariable(
-    val uuid: String,
+    val uuid: UUID,
     val chunkF: WandDataChunkF,
     val chunkI: WandDataChunkI,
     val chunkL: WandDataChunkL = WandDataChunkL(listOf()),
 ) : TooltipProvider {
+    constructor(chunkF: WandDataChunkF, chunkI: WandDataChunkI) : this(UUID.randomUUID(), chunkF, chunkI)
 
     override fun addToTooltip(
         context: TooltipContext,
@@ -62,7 +64,7 @@ data class WandDataInvariable(
 
         fun build() : WandDataInvariable {
             return WandDataInvariable(
-                UUID.randomUUID().toString(),
+                UUID.randomUUID(),
                 WandDataChunkF(manaMax, manaRegen, spread),
                 WandDataChunkI(draw, castDelay, rechargeTime),
                 WandDataChunkL(alwaysInvoke),
@@ -91,7 +93,7 @@ data class WandDataInvariable(
         ).apply(it, ::WandDataChunkL) }
 
         val INVARIABLE_DATA_CODEC: Codec<WandDataInvariable> = RecordCodecBuilder.create { it.group(
-            Codec.STRING.fieldOf("uuid").forGetter(WandDataInvariable::uuid),
+            UUID_CODEC.fieldOf("uuid").forGetter(WandDataInvariable::uuid),
             CHUNK0_CODEX.fieldOf("chunkF").forGetter(WandDataInvariable::chunkF),
             CHUNK1_CODEX.fieldOf("chunkI").forGetter(WandDataInvariable::chunkI),
             CHUNK2_CODEX.fieldOf("chunkL").forGetter(WandDataInvariable::chunkL),
@@ -113,7 +115,7 @@ data class WandDataInvariable(
                 .map(::WandDataChunkL, WandDataChunkL::alwaysInvoke)
 
         val INVARIABLE_DATA_STREAM: StreamCodec<RegistryFriendlyByteBuf, WandDataInvariable> = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8, WandDataInvariable::uuid,
+            UUID_STREAM, WandDataInvariable::uuid,
             CHUNK0_STREAM, WandDataInvariable::chunkF,
             CHUNK1_STREAM, WandDataInvariable::chunkI,
             CHUNK2_STREAM, WandDataInvariable::chunkL,
@@ -125,17 +127,13 @@ data class WandDataInvariable(
             // FIXME this only call once, can't gen random uuid
             get() {
                 val data = WandDataInvariable(
-                    UUID.randomUUID().toString(),
-                    WandDataChunkF(300f, 3f, 0f),
-                    WandDataChunkI(1, 12, 15),
-                    WandDataChunkL(listOf()),
-
+                    chunkF = WandDataChunkF(300f, 3f, 4.5f),
+                    chunkI = WandDataChunkI(1, 12, 15),
                 )
                 return data
             }
 
         val TEST_GOOD_WAND = WandDataInvariable(
-            uuid   = "mythical",
             chunkF = WandDataChunkF(3000f, 30f, 7f),
             chunkI = WandDataChunkI(1, 6, 10),
         )
@@ -147,9 +145,7 @@ data class WandDataInvariable(
 //            WandDataChunkU(UUID.randomUUID().toString())
 //        )
 
-        const val DATA_FAIL_UUID = "fall_back"
         val FALL_BACK = WandDataInvariable(
-            uuid   = DATA_FAIL_UUID,
             chunkF = WandDataChunkF(-Float.MAX_VALUE, 0f, 0f),
             chunkI = WandDataChunkI(0, 0, 0),
         )
