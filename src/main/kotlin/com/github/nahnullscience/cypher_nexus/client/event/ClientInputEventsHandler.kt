@@ -6,8 +6,13 @@ import com.github.nahnullscience.cypher_nexus.client.network.ClientInputModuleSt
 import com.github.nahnullscience.cypher_nexus.client.network.ClientInputModuleStateUpdater.startModule
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike.Companion.wandInstanceOrNull
+import com.github.nahnullscience.cypher_nexus.utility.minus
 import net.minecraft.client.Minecraft
 import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.EntityHitResult
+import net.minecraft.world.phys.HitResult
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.EventPriority
 import net.neoforged.bus.api.SubscribeEvent
@@ -42,16 +47,17 @@ object ClientInputEventsHandler {
 
     @SubscribeEvent
     private fun moduleKeysTracking(event: ClientTickEvent.Pre) {
-        if (mc.player != null && mc.level != null) {
+        val level = mc.level
+        val player = mc.player
+        if (player != null && level != null) {
 
             // if in screen, stop input-modules
-            if (mc.screen != null || mc.overlay != null) {
+            if (mc.screen != null || mc.overlay != null || player.isSpectator) {
                 ClientInputModuleStateUpdater.endAllInputModule()
                 return
             }
 
             // in the game, and not opening a screen
-            val player = mc.player!!
 
             var primaryIsPerforming = false
             var secondaryIsPerforming = false
@@ -60,21 +66,21 @@ object ClientInputEventsHandler {
                 val instance = stack.wandInstanceOrNull(player)
 
                 // main-hand-wand has Primary module && mouse button down -> Yes, otherwise No
-                if (hand == InteractionHand.MAIN_HAND) run Primary@ {
+                if (hand == InteractionHand.MAIN_HAND)
+                run Primary@ {
                     instance ?: return@Primary false
                     val module = instance.getModule(WandModuleTypes.PRIMARY_MODULE) ?: return@Primary false
 
-                    if (mc.options.keyAttack.isDown) {
-                        if (module.consumeVanillaInput) {
-                            // consume all to prevent further process,
-                            // this also naturally prevent wand in another hand to function the same module.
-                            // however, Minecraft#continueAttack should be handled one more step, see above
-                            while (mc.options.keyAttack.consumeClick()) { //
-                            }
+                    if (!mc.options.keyAttack.isDown) return@Primary false
+                    else if (module.consumeVanillaInput) {
+                        // consume all to prevent further process,
+                        // this also naturally prevent wand in another hand to function the same module.
+                        // however, Minecraft#continueAttack should be handled one more step, see above
+                        while (mc.options.keyAttack.consumeClick()) { //
                         }
                         return@Primary true
                     } else {
-                        return@Primary false
+                        return@Primary true
                     }
                 }.also { primaryIsPerforming = it }
 
@@ -85,16 +91,21 @@ object ClientInputEventsHandler {
                 run Secondary@ {
                     val module = instance.getModule(WandModuleTypes.SECONDARY_MODULE) ?: return@Secondary false
 
-                    if (mc.options.keyUse.isDown) {
-                        if (module.consumeVanillaInput) {
-                            while (mc.options.keyAttack.consumeClick()) {
-                                //
-                            }
+                    if (!mc.options.keyUse.isDown) return@Secondary false
+                    else if (module.consumeVanillaInput) {
+                        while (mc.options.keyAttack.consumeClick()) { //
                         }
                         return@Secondary true
                     } else {
-                        return@Secondary false
+                        // when vanilla input matters, don't fire when point at something interactable
+                        if (vanillaRightClickTargetCheck(hand)) {
+                            secondaryIsPerforming = false
+                            break
+                        }
+
+                        return@Secondary true
                     }
+
                 }.also {
                     secondaryIsPerforming = it
                     if (it) break
@@ -107,5 +118,28 @@ object ClientInputEventsHandler {
             if (secondaryIsPerforming) startModule(WandModuleTypes.SECONDARY_MODULE)
             else endModule(WandModuleTypes.SECONDARY_MODULE)
         }
+    }
+
+    /**
+     *
+     * @return true if point at something that interactable and the right-click module should not start
+     * @see [Minecraft.startUseItem]
+     * */
+    private fun vanillaRightClickTargetCheck(hand: InteractionHand): Boolean {
+        mc.player?.let { player ->
+            if (player.isUsingItem) return false // when has been using always ignore
+            when (val result = mc.hitResult) {
+                is EntityHitResult -> {
+                    val entity = result.entity
+                    val location = entity.position().vectorTo(result.location)
+                    val result = player.interactOn(entity, hand, location)
+                    if (result is InteractionResult.Success) return true
+                }
+                is BlockHitResult -> {
+
+                }
+            }
+        }
+        return false
     }
 }
