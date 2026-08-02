@@ -94,7 +94,7 @@ abstract class AbstractPathModifier(
                 val circle = cyEntity.hooksSharedData.initOrbitCircle(cyEntity, owner)
                 val phase = (cyEntity.tickCount - 1) and 31
                 val radius = circle.radius.yRot(ORBIT_RAD * phase)
-                val target = owner.eyePosition + radius
+                val target = owner.eyePosition + owner.knownMovement + radius
                 cyEntity.deltaMovement = cyEntity.position().vectorTo(target)
             }
         }
@@ -115,7 +115,7 @@ abstract class AbstractPathModifier(
                 val phase = (cyEntity.tickCount - 1) and 31
                 val rotate = Quaternionf().fromAxisAngleRad(circle.normal, ORBIT_RAD * phase)
                 val radius = circle.radius.toVector3f().rotate(rotate)
-                val target = owner.eyePosition + radius
+                val target = owner.eyePosition + owner.knownMovement + radius
                 cyEntity.deltaMovement = cyEntity.position().vectorTo(target)
             }
         }

@@ -1,6 +1,8 @@
 package com.github.nahnullscience.cypher_nexus.init
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.utility.exception.VanillaMisuseException
+import net.minecraft.core.Registry
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent
@@ -25,5 +27,11 @@ object LifeCycle {
         // Config.items.forEach(Consumer { item: Item? -> LOGGER.info("ITEM >> {}", item.toString()) })
 
         // CypherData.Companion.init()
+    }
+
+    fun <T : Any> Registry<T>.getIdOfBound(item: T, bounds: Int = Int.MAX_VALUE): Int {
+        return getId(item).also {
+            if (it > bounds) throw VanillaMisuseException("[${this}] registry id-$it is out of bound $bounds")
+        }
     }
 }

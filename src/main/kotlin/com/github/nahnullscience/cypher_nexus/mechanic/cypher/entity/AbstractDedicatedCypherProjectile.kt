@@ -8,6 +8,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
+import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.CYPHER_STEERER_STREAM
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.MOCC_STREAM
 import net.minecraft.core.Holder
 import net.minecraft.network.RegistryFriendlyByteBuf
@@ -56,17 +57,18 @@ abstract class AbstractDedicatedCypherProjectile(
         if (ccMap != null) {
             MOCC_STREAM.encode(buffer, ccMap!!)
         }
+        CYPHER_STEERER_STREAM.encode(buffer, steerer)
     }
 
     override fun readSpawnData(buffer: RegistryFriendlyByteBuf) {
         // only on client
         // should note this function is called after EntityJoinLevelEvent
-        // this result initEntity -> initCypher order on client side
-        if (buffer.readBoolean()) {
-            val ccMap = MOCC_STREAM.decode(buffer)
-            initCypher(cypher, ccMap)
-            refreshDimensions() // let BB fit effect-radius // server auto handles dimension when creation
-        }
+        // this results initEntity -> initCypher order on client side
+        val hasCC = buffer.readBoolean()
+        val ccMap = if (hasCC) MOCC_STREAM.decode(buffer) else null
+        val steerer = CYPHER_STEERER_STREAM.decode(buffer)
+        initCypher(cypher, ccMap, steerer)
+        refreshDimensions() // let BB fit effect-radius // server auto handles dimension when creation
     }
 
     override fun onAddedToLevel() {

@@ -1,6 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
@@ -20,11 +21,11 @@ interface ICypherEntityBeforeInit {
     /**
      * initialize from [MapOfCypherCounts]
      * */
-    fun initCypher(cypher: AbstractProjectileCypher<*>, ccMap: MapOfCypherCounts?)
+    fun initCypher(cypher: AbstractProjectileCypher<*>, ccMap: MapOfCypherCounts?, steerer: AbstractCypherSteerer)
     /**
      * init from [ShotStateChunk]
      * */
-    fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk, node: ProjectileNode?)
+    fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk, node: ProjectileNode?, steerer: AbstractCypherSteerer?)
     /**
      *
      * */

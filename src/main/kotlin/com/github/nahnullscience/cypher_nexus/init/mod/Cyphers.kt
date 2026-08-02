@@ -36,7 +36,8 @@ import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 object Cyphers {
     val RESOURCE_KEY: ResourceKey<Registry<AbstractCypher>> =
         ResourceKey.createRegistryKey(CypherNexus.modResource("cypher"))
-    val REGISTRY: Registry<AbstractCypher> = RegistryBuilder(RESOURCE_KEY).sync(true).defaultKey(EmptyCypher.resource).create()
+    val REGISTRY: Registry<AbstractCypher> =
+        RegistryBuilder(RESOURCE_KEY).sync(true).defaultKey(EmptyCypher.resource).create()
 
     val DEFERRED_REGISTER: DeferredRegister<AbstractCypher> =
         DeferredRegister.create(REGISTRY, CypherNexus.MOD_ID)
@@ -392,6 +393,9 @@ object Cyphers {
     val PHANTOM_DYE = registerModifier("phantom_dye", 0f) {
         delay(-1)
         dyeColor(0.2f)
+    }
+    val SNOWBALL_SURROUNDING = registerCypher(AbstractSurround::SnowballSurrounding) {
+        manaDrain(20f)
     }
 
 

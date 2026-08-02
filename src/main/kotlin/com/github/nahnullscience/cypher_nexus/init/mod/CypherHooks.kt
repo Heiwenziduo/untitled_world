@@ -1,14 +1,14 @@
 package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.init.LifeCycle.getIdOfBound
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule.HookBuilder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.IHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeAbortReleaseHook
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeSurroundingCaptureHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokePosRedirectionHook
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeSurroundingCaptureHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.*
-import com.github.nahnullscience.cypher_nexus.utility.exception.VanillaMisuseException
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceKey
 import net.neoforged.neoforge.registries.DeferredRegister
@@ -20,13 +20,10 @@ object CypherHooks {
     const val HOOK_ID_CAP = 31
     val RESOURCE_KEY: ResourceKey<Registry<HookModule<*>>> =
         ResourceKey.createRegistryKey(CypherNexus.modResource("cypher/hook"))
-    val REGISTRY: Registry<HookModule<*>> = RegistryBuilder(RESOURCE_KEY).sync(true).maxId(HOOK_ID_CAP).create()
+    val REGISTRY: Registry<HookModule<*>> =
+        RegistryBuilder(RESOURCE_KEY).sync(true).maxId(HOOK_ID_CAP).create()
 
-    fun HookModule<*>.id(): Int {
-        return REGISTRY.getId(this).also {
-            if (it > HOOK_ID_CAP) throw VanillaMisuseException("[${REGISTRY}] registry id-$it is out of bound $HOOK_ID_CAP")
-        }
-    }
+    fun HookModule<*>.id(): Int = REGISTRY.getIdOfBound(this, HOOK_ID_CAP)
 
     val DEFERRED_REGISTER: DeferredRegister<HookModule<*>> =
         DeferredRegister.create(REGISTRY, CypherNexus.MOD_ID)

@@ -5,6 +5,7 @@ import com.github.nahnullscience.cypher_nexus.init.config.ModClientConfig
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherSteerers
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.init.mod.InvokingPatterns
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes
@@ -86,6 +87,7 @@ object CypherNexus {
         CypherAttributes.register()
         CypherCategories.register()
         CypherHooks.register()
+        CypherSteerers.register()
         InvokingPatterns.register()
         WandModuleTypes.register()
 
@@ -135,6 +137,7 @@ object CypherNexus {
         event.register(CypherAttributes.REGISTRY)
         event.register(CypherCategories.REGISTRY)
         event.register(CypherHooks.REGISTRY)
+        event.register(CypherSteerers.REGISTRY)
         event.register(InvokingPatterns.REGISTRY)
         event.register(WandModuleTypes.REGISTRY)
     }

@@ -1,12 +1,12 @@
 package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.init.LifeCycle.getIdOfBound
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute.AttributeApply
 import com.github.nahnullscience.cypher_nexus.utility.dot0digit
 import com.github.nahnullscience.cypher_nexus.utility.dot1digit
 import com.github.nahnullscience.cypher_nexus.utility.dot2digit
-import com.github.nahnullscience.cypher_nexus.utility.exception.VanillaMisuseException
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
 import net.minecraft.resources.ResourceKey
@@ -23,11 +23,7 @@ object CypherAttributes {
         ResourceKey.createRegistryKey(CypherNexus.modResource("cypher/attribute"))
     val REGISTRY: Registry<CypherAttribute> = RegistryBuilder(RESOURCE_KEY).sync(true).maxId(ATTR_ID_CAP).create()
 
-    fun CypherAttribute.id(): Int {
-        return REGISTRY.getId(this).also {
-            if (it > ATTR_ID_CAP) throw VanillaMisuseException("[$REGISTRY] registry id-$it is out of bound $ATTR_ID_CAP")
-        }
-    }
+    fun CypherAttribute.id(): Int = REGISTRY.getIdOfBound(this, ATTR_ID_CAP)
 
     val DEFERRED_REGISTER: DeferredRegister<CypherAttribute> =
         DeferredRegister.create(REGISTRY, CypherNexus.MOD_ID)

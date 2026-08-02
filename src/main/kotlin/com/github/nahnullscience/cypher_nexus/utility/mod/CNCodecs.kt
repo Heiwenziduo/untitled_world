@@ -1,11 +1,13 @@
 package com.github.nahnullscience.cypher_nexus.utility.mod
 
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherSteerers
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator.Companion.string2operator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
 import com.mojang.serialization.Codec
 import com.mojang.serialization.DataResult
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -17,10 +19,6 @@ import java.util.*
 
 object CNCodecs {
 
-    init {
-
-    }
-
     val UUID_CODEC: Codec<UUID> = RecordCodecBuilder.create { it.group(
         Codec.LONG.fieldOf("msb").forGetter(UUID::getMostSignificantBits),
         Codec.LONG.fieldOf("lsb").forGetter(UUID::getLeastSignificantBits)
@@ -31,6 +29,7 @@ object CNCodecs {
         ::UUID
     )
 
+
     val CYPHER: Codec<AbstractCypher> = Cyphers.REGISTRY.byNameCodec()
     val CYPHER_STREAM: StreamCodec<RegistryFriendlyByteBuf, AbstractCypher> =
         ByteBufCodecs.registry(Cyphers.RESOURCE_KEY)
@@ -40,6 +39,10 @@ object CNCodecs {
         CYPHER_STREAM.apply(ByteBufCodecs.list())
 
     val CYPHER_ATTRIBUTE: Codec<CypherAttribute> = CypherAttributes.REGISTRY.byNameCodec()
+
+    val CYPHER_STEERER: Codec<AbstractCypherSteerer> = CypherSteerers.REGISTRY.byNameCodec()
+    val CYPHER_STEERER_STREAM: StreamCodec<RegistryFriendlyByteBuf, AbstractCypherSteerer> =
+        ByteBufCodecs.registry(CypherSteerers.RESOURCE_KEY)
 
 
     val AOC_CODEC: Codec<ArrayOfCyphers> = CYPHER_LIST.xmap(

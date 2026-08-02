@@ -1,11 +1,11 @@
 package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.init.LifeCycle.getIdOfBound
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.WandModuleType
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.AbstractInputModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.AbstractWandModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.types.*
-import com.github.nahnullscience.cypher_nexus.utility.exception.VanillaMisuseException
 import net.minecraft.core.Registry
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
@@ -22,11 +22,7 @@ object WandModuleTypes {
         ResourceKey.createRegistryKey(CypherNexus.modResource("wand/module_type"))
     val REGISTRY: Registry<WandModuleType<*>> = RegistryBuilder(RESOURCE_KEY).sync(true).maxId(MODULE_ID_CAP).create()
 
-    fun WandModuleType<*>.id(): Int {
-        return REGISTRY.getId(this).also {
-            if (it > MODULE_ID_CAP) throw VanillaMisuseException("[${REGISTRY}] registry id-$it is out of bound $MODULE_ID_CAP")
-        }
-    }
+    fun WandModuleType<*>.id(): Int = REGISTRY.getIdOfBound(this, MODULE_ID_CAP)
 
     val DEFERRED_REGISTER: DeferredRegister<WandModuleType<*>> =
         DeferredRegister.create(REGISTRY, CypherNexus.MOD_ID)

@@ -10,6 +10,8 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity.Companion.HIT_BB_INFLATION
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity.Companion.LOW_SPEED_THRESHOLD_SQR
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity.Companion.exertDamage
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.NoSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
@@ -61,6 +63,8 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     override var hooks: HookContainer? = null
     override val hooksSharedData = HooksSharedData<CE>()
 
+    override var steerer: AbstractCypherSteerer = NoSteerer
+
     override var triggerType = TriggerType.NONE
     override var payload: ShotStateChunk? = null
 
@@ -75,6 +79,16 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
 
     override fun getAttribute(attr: CypherAttribute): Double? = attributeMap[attr]
     override fun getAttribute(holer: Holder<CypherAttribute>): Double? = getAttribute(holer.value())
+    override fun setAttribute(
+        attr: CypherAttribute,
+        value: Double
+    ): Double? = attributeMap.put(attr, value) // return the old
+
+    override fun setAttribute(
+        holer: Holder<CypherAttribute>,
+        value: Double
+    ): Double? = setAttribute(holer.value(), value)
+
     override fun getAttributeOrDefault(attr: CypherAttribute) = attributeMap[attr] ?: cypher.getAttrBaseOrDefault(attr)
     override fun getAttributeOrDefault(holer: Holder<CypherAttribute>) = getAttributeOrDefault(holer.value())
     override fun getAttrBaseOrNull(holder: Holder<CypherAttribute>) = getAttrBaseOrNull(holder.value())
@@ -121,7 +135,12 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
     override fun getOwner(): Entity? = owner
     override fun setOwner(owner: Entity?) = let { this.owner = owner }
 
-    override fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk, node: ProjectileNode?) {
+    override fun initCypher(
+        cypher: AbstractProjectileCypher<*>,
+        shotState: ShotStateChunk,
+        node: ProjectileNode?,
+        steerer: AbstractCypherSteerer?
+    ) {
         if (isInit) return
         attributeMap.initFromShotState(shotState, cypher)
         enabledFlags = shotState.enabledFlags or cypher.flags
@@ -133,7 +152,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
             triggerType = node.trigger
             payload = node.payload
         }
-
+        steerer?.let { this.steerer = it }
         isInit = true
     }
 
@@ -143,10 +162,18 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
         initDirection()
     }
 
-    override fun initCypher(cypher: AbstractProjectileCypher<*>, ccMap: MapOfCypherCounts?) {
-        if (ccMap == null) return
+    override fun initCypher(
+        cypher: AbstractProjectileCypher<*>,
+        ccMap: MapOfCypherCounts?,
+        steerer: AbstractCypherSteerer
+    ) {
+        if (ccMap == null) {
+            this.steerer = steerer
+            isInit = true
+            return
+        }
         val state = ShotStatePool.getOrCreateShotState(ccMap)
-        initCypher(cypher, state, null)
+        initCypher(cypher, state, null, steerer)
     }
 
 
@@ -310,6 +337,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
             DiscardReason.ERASE -> {}
             else -> {
                 delegateBeforeDiscard(reason)
+                steerer.discard(cyEntity, reason)
             }
         }
         level.broadcastEntityEvent(cyEntity, 3)
@@ -346,6 +374,7 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
 
         if (cyEntity.tickCount == 1) {
             delegateOnFirstTick()
+            steerer.init(cyEntity)
         }
         if (triggerType.timer == cyEntity.tickCount) trigger(triggerType, cyEntity.position())
 
@@ -375,9 +404,11 @@ open class CypherEntityBasics <CE> : ICypherEntity where CE : Entity, CE : ICyph
          * an AABB check is used everyTick every vanilla projectile, sounds outrageous, but is ok in performance
          * */
         delegateOnTick()
+        steerer.tick(cyEntity)
 
         cyEntity.rotateTowardSpeed(cyEntity.getRotationSpeed())
         delegateFinalizeTickMovement()
+        steerer.tickSpeedOverride(cyEntity)
 
         if (cyEntity.deltaMovement.lengthSqr() <= LOW_SPEED_THRESHOLD_SQR) delegateOnLowSpeed(lowSpeedTickCount++)
         else lowSpeedTickCount = 0

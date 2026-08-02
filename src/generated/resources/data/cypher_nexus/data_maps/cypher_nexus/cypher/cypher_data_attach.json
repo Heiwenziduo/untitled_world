@@ -560,6 +560,19 @@
       "recharge": 0,
       "shotState": {}
     },
+    "cypher_nexus:formation_plane_bifurcated": {
+      "delay": 0,
+      "draw": 2,
+      "flags": 0,
+      "manaDrain": 1.0,
+      "projectile": {},
+      "recharge": 0,
+      "shotState": {
+        "cypher_nexus:spread": {
+          "add": -12.0
+        }
+      }
+    },
     "cypher_nexus:formation_plane_trifurcated": {
       "delay": 0,
       "draw": 3,
@@ -1145,6 +1158,15 @@
           "add": 3.0
         }
       }
+    },
+    "cypher_nexus:smoke_surrounding": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 40.0,
+      "projectile": {},
+      "recharge": 0,
+      "shotState": {}
     },
     "cypher_nexus:snowball": {
       "delay": 0,

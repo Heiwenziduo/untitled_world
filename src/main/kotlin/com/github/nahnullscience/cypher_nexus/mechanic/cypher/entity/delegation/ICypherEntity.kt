@@ -5,6 +5,7 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
@@ -52,7 +53,12 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherEntityBeforeIn
     /**
      * init from [ShotStateChunk]
      * */
-    override fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk, node: ProjectileNode?)
+    override fun initCypher(
+        cypher: AbstractProjectileCypher<*>,
+        shotState: ShotStateChunk,
+        node: ProjectileNode?,
+        steerer: AbstractCypherSteerer?
+    )
     /**
      *
      * */
@@ -60,7 +66,11 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherEntityBeforeIn
     /**
      * initialize from [MapOfCypherCounts]
      * */
-    override fun initCypher(cypher: AbstractProjectileCypher<*>, ccMap: MapOfCypherCounts?)
+    override fun initCypher(
+        cypher: AbstractProjectileCypher<*>,
+        ccMap: MapOfCypherCounts?,
+        steerer: AbstractCypherSteerer
+    )
     /**
      *
      * */
@@ -70,6 +80,7 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherEntityBeforeIn
     /** this field directly forwards to the backing [ShotStateChunk] and should be treated as `immutable` */
     val hooks: HookContainer?
     val hooksSharedData: HooksSharedData<*>
+    val steerer: AbstractCypherSteerer
 
     val triggerType: TriggerType
     val payload: ShotStateChunk?
@@ -88,6 +99,17 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherEntityBeforeIn
     fun getAttribute(attr: CypherAttribute): Double?
     fun getAttribute(holer: Holder<CypherAttribute>): Double?
     /**
+     * change the value of the given attribute, this won't sync to another side.
+     * @return the old value, or null if there isn't.
+     * */
+    fun setAttribute(attr: CypherAttribute, value: Double): Double?
+    /**
+     * change the value of the given attribute, this won't sync to another side.
+     * @return the old value, or null if there isn't.
+     * */
+    fun setAttribute(holer: Holder<CypherAttribute>, value: Double): Double?
+
+    /**
      * get value through entity-specific map > cypher default > attribute default
      * */
     fun getAttributeOrDefault(attr: CypherAttribute): Double
@@ -95,7 +117,15 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherEntityBeforeIn
      * get value through entity-specific map > cypher default > attribute default
      * */
     fun getAttributeOrDefault(holer: Holder<CypherAttribute>): Double
+    /**
+     * @return the unmodified base attribute value of the entity if any
+     * @see [AbstractProjectileCypher.getAttrBaseOrNull]
+     * */
     fun getAttrBaseOrNull(holder: Holder<CypherAttribute>): Double?
+    /**
+     * @return the unmodified base attribute value of the entity if any
+     * @see [AbstractProjectileCypher.getAttrBaseOrNull]
+     * */
     fun getAttrBaseOrNull(attr: CypherAttribute): Double?
     //
     fun getExisting(): Int
