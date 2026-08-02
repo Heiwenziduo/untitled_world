@@ -31,10 +31,10 @@ object HandleWandEvents {
 
         val inputs = inputModules.filter { tracker.isPerforming(it) }.toMutableList()
         if (inputs.isNotEmpty()) {
-            CNCommonEvents.livingGatherWandsActive(living).wandsSequence().forEach { stack ->
+            CNCommonEvents.livingGatherWandsActive(living) active@ { index, stack ->
                 val instance = stack.wandInstanceOrNull(living) ?: run {
                     CypherNexus.debugWand(Level.ERROR) { "ItemStack: $stack is not a wand! why it's in the active wand list?" }
-                    return@forEach
+                    return@active
                 }
 
                 inputs.removeIf { type ->
@@ -60,7 +60,7 @@ object HandleWandEvents {
 
         run {
             // should we strictly limit Primary & Secondary modules that can only be performed on Hands?
-            CNCommonEvents.livingGatherWandsActive(invoker).wandsSequence().forEach { stack ->
+            CNCommonEvents.livingGatherWandsActive(invoker) { index, stack ->
                 stack.wandInstanceOrNull(invoker)?.getModule(type)?.let { module ->
                     module.onHoldingStart(level, invoker, stack)
                     if (module.stopBubble) return@run
@@ -81,7 +81,7 @@ object HandleWandEvents {
         val level = invoker.level()
 
         run {
-            CNCommonEvents.livingGatherWandsActive(invoker).wandsSequence().forEach { stack ->
+            CNCommonEvents.livingGatherWandsActive(invoker) { index, stack ->
                 stack.wandInstanceOrNull(invoker)?.getModule(type)?.let { module ->
                     if (module.isHolding) module.onHoldingStop(level, invoker, stack)
                 }
@@ -98,10 +98,9 @@ object HandleWandEvents {
     private fun wandInstanceUpdatePlayer(event: PlayerTickEvent.Post) {
         val player = event.entity
         val map = player.getData(ModDataAttachments.WAND_DATA_MAP)
-        val wands = CNCommonEvents.livingGatherWandsTracking(player).wands()
-        wands.forEach { wand ->
+        CNCommonEvents.livingGatherWandsTracking(player) track@ { index, wand ->
             map.getOrPutInstance(
-                (wand.item as IWandLike).getWandData(wand, null) ?: return@forEach,
+                (wand.item as IWandLike).getWandData(wand, null) ?: return@track,
                 (wand.item as IWandLike),
                 player.level()
             ).tick(player)

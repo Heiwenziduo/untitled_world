@@ -4,7 +4,9 @@ import com.github.nahnullscience.cypher_nexus.mechanic.event.wand.WandCanPerform
 import com.github.nahnullscience.cypher_nexus.mechanic.event.wand.WandPerformingStateChangeEvent
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.WandModuleType
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.AbstractWandModule
+import it.unimi.dsi.fastutil.objects.ReferenceArrayList
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.common.NeoForge
 
 /**
@@ -19,13 +21,37 @@ object CNCommonEvents {
 //        return !event.isCanceled
 //    }
 
-    fun livingGatherWandsTracking(living: LivingEntity): LivingGatherWandsEvent.Tracking {
-        return NeoForge.EVENT_BUS.post(LivingGatherWandsEvent.Tracking(living))
+//    @PublishedApi
+//    internal inline fun gatherWands(
+//        living: LivingEntity,
+//        eventFactory: GatherLivingWandsConstructor,
+//        consumer: (index: Int, wand: ItemStack) -> Unit
+//    ) {
+//        val pool = PooledWandArray.poll()
+//        val event = eventFactory(living, pool.array)
+//        NeoForge.EVENT_BUS.post(event)
+//        for (i in pool.array.indices) consumer(i, pool.array[i])
+//        pool.recycle()
+//    }
+
+    @PublishedApi
+    internal inline fun gatherWandsNoPool(
+        living: LivingEntity,
+        eventFactory: GatherLivingWandsConstructor,
+        consumer: (index: Int, wand: ItemStack) -> Unit
+    ) {
+        val array = ReferenceArrayList<ItemStack>()
+        val event = eventFactory(living, array)
+        NeoForge.EVENT_BUS.post(event)
+        for (i in array.indices) consumer(i, array[i])
     }
 
-    // TODO gatherWandsActive should be pooled or cached
-    fun livingGatherWandsActive(living: LivingEntity): LivingGatherWandsEvent.Active {
-        return NeoForge.EVENT_BUS.post(LivingGatherWandsEvent.Active(living))
+    inline fun livingGatherWandsTracking(living: LivingEntity, consumer: (index: Int, wand: ItemStack) -> Unit) {
+        gatherWandsNoPool(living, LivingGatherWandsEvent::Tracking, consumer)
+    }
+
+    inline fun livingGatherWandsActive(living: LivingEntity, consumer: (index: Int, wand: ItemStack) -> Unit) {
+        gatherWandsNoPool(living, LivingGatherWandsEvent::Active, consumer)
     }
 
     /**

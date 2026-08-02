@@ -104,6 +104,7 @@ interface IWandLike {
          * @return whether the item behind the stack is a decent [IWandLike]
          * */
         fun ItemStack.isWand(): Boolean = !isEmpty && item is IWandLike
+        fun ItemStack.isNotWand(): Boolean = !isWand()
 
         /**
          * @return true if edit success

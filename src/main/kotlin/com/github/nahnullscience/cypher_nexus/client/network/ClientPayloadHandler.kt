@@ -9,6 +9,7 @@ import com.github.nahnullscience.cypher_nexus.network.client.ClientboundOpenInde
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNData
 import net.minecraft.client.Minecraft
+import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.network.handling.IPayloadContext
 
 /*
@@ -25,7 +26,9 @@ object ClientPayloadHandler {
 
         val player = context.player()
         val map = CNData.sortCyphersByCategory(data.cyphersTotal)
-        val list = CNCommonEvents.livingGatherWandsTracking(player).wands()
+
+        val list = mutableListOf<ItemStack>()
+        CNCommonEvents.livingGatherWandsTracking(player) { index, wand -> list.add(wand) }
 
         context.enqueueWork {
             // Do something with the data, on the main thread

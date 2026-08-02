@@ -43,23 +43,26 @@ data class ServerboundEditWandCyphers(
 
             context.enqueueWork {
                 val player = context.player()
-                var stack: ItemStack
+                var stack: ItemStack? = null
 
-                val w = CNCommonEvents.livingGatherWandsTracking(player).wands().filter { stack ->
-                    val i = stack.get(ModDataComponents.WAND_INVARIABLE)
-                    i != null && i.uuid == data.uuid
+                run {
+                    CNCommonEvents.livingGatherWandsTracking(player) { index, wand ->
+                        val inv = wand.get(ModDataComponents.WAND_INVARIABLE)
+                        if (inv != null && inv.uuid == data.uuid) {
+                            stack = wand
+                            return@run
+                        }
+                    }
                 }
 
-                if (w.size > 1) CypherNexus.debugWand(Level.ERROR) { "duplicate uuid [${data.uuid}] $w" }
-                stack = w.first()
-
                 // TODO check data authentic
-                stack.editRecipeIfWand(data.cyphers).let {
+                stack?.editRecipeIfWand(data.cyphers)?.let {
                     if (it) {
                         player.getData(WAND_DATA_MAP).updateWandStats(stack, stack.item as IWandLike, player.level())
                         PacketDistributor.sendToPlayer(player as ServerPlayer, data.makeConfirm())
                     }
-                }
+                } ?: CypherNexus.debugWand(Level.ERROR) { "wand didn't find [${data.uuid}]" }
+
             }.exceptionally {
                 CypherNexus.debugNetwork(Level.WARN) { it.message.toString() }
                 return@exceptionally null
