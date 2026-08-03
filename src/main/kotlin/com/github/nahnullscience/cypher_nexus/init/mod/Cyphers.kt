@@ -394,7 +394,7 @@ object Cyphers {
         delay(-1)
         dyeColor(0.2f)
     }
-    val SNOWBALL_SURROUNDING = registerCypher(AbstractSurround::SnowballSurrounding) {
+    val SNOWBALL_ORBIT = registerCypher(AbstractEscortOrbit::SnowballOrbit) {
         manaDrain(20f)
     }
 

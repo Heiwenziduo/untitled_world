@@ -136,7 +136,9 @@ object ClientInputEventsHandler {
                     if (result is InteractionResult.Success) return true
                 }
                 is BlockHitResult -> {
-
+                    mc.gameMode?.performUseItemOn(player, hand, result)?.let {
+                        if (it is InteractionResult.Success || it is InteractionResult.Fail) return true
+                    }
                 }
             }
         }

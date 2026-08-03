@@ -4,7 +4,7 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.LifeCycle.getIdOfBound
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.createCypherEntityRaw
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.EscortSurroundSteerer
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.EscortOrbitSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.NoSteerer
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
@@ -45,5 +45,5 @@ object CypherSteerers {
         DEFERRED_REGISTER.register(path, factory)
 
     val NO_STEERER = registerSteerer(NoSteerer)
-    val ESCORT_SURROUND_STEERER = registerSteerer("escort_surround", ::EscortSurroundSteerer)
+    val ESCORT_ORBIT_STEERER = registerSteerer("escort_orbit", ::EscortOrbitSteerer)
 }

@@ -4,10 +4,10 @@ import com.github.nahnullscience.cypher_nexus.client.gui.components.AnimationCon
 import com.github.nahnullscience.cypher_nexus.client.gui.components.DragController
 import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.HEADER_HEIGHT
 import com.github.nahnullscience.cypher_nexus.client.gui.others.UiEventBus
-import com.github.nahnullscience.cypher_nexus.client.gui.components.panels.CypherLibraryPanel
-import com.github.nahnullscience.cypher_nexus.client.gui.components.panels.HeaderMenuPanel
-import com.github.nahnullscience.cypher_nexus.client.gui.components.panels.IScreenPanel
-import com.github.nahnullscience.cypher_nexus.client.gui.components.panels.WandEditorPanel
+import com.github.nahnullscience.cypher_nexus.client.gui.panels.CypherLibraryPanel
+import com.github.nahnullscience.cypher_nexus.client.gui.panels.HeaderMenuPanel
+import com.github.nahnullscience.cypher_nexus.client.gui.panels.IScreenPanel
+import com.github.nahnullscience.cypher_nexus.client.gui.panels.WandEditorPanel
 import com.github.nahnullscience.cypher_nexus.client.gui.others.IndexScreenEvents.DragEnded
 import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.ICON_SIZE_HALF
 import com.github.nahnullscience.cypher_nexus.client.gui.others.GUIConstants.renderCypherIcon

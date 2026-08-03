@@ -11,7 +11,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute.AttributeApply
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.createProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.spawnCypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeAbortReleaseHook.ReleaseAbort
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
@@ -190,7 +190,6 @@ class ShotStateChunk private constructor (
         owner: Entity?,
         directInvoker: Entity?
     ) {
-        val proj = cypher.createProjectile(level, owner, this, node)
         var dire = posDire.direction
         run spread@ {
             val random = owner?.random ?: directInvoker?.random ?: return@spread
@@ -200,11 +199,9 @@ class ShotStateChunk private constructor (
                 CypherAttributes.SPREAD.value().restrictRange(it)
             }
 
-            if (spread > 0.01)
-                dire = posDire.direction.randomInCone(spread / 2, random)
+            if (spread > 0.01) dire = dire.randomInCone(spread / 2, random)
         }
-        proj.initDirection(PosDirePair(posDire.position, dire))
-        level.addFreshEntity(proj)
+        cypher.spawnCypherEntity(level, owner, this, node, PosDirePair(posDire.position, dire))
     }
 
     fun addProjectileNode(

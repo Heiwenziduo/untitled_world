@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.client.gui.components.panels
+package com.github.nahnullscience.cypher_nexus.client.gui.panels
 
 import com.github.nahnullscience.cypher_nexus.client.gui.components.DragController
 import com.github.nahnullscience.cypher_nexus.client.gui.components.IScreenRect
@@ -41,11 +41,12 @@ class WandEditorPanel(
 ) : IScreenRect by rectLayout, IScreenPanel {
 
     companion object {
-        private const val WAND_BLOCK_MARGIN = 16
+        private const val WAND_BLOCK_MARGIN = 12
+        private const val WAND_BLOCK_PADDING = 6
+
         private const val ITEM_ICON_SIZE = 16
         private const val STAT_LINE_HEIGHT = 10
         private const val STAT_LINE_COUNT = 8
-        private const val STAT_GAP = 6 // horizontal gap between the item icon and the stat text
     }
 
     private val session = WandEditSession(wands)
@@ -58,7 +59,7 @@ class WandEditorPanel(
     // single source of truth for "how tall is the stats block" — resize() and renderWandStats()
     // both read this, so adding a stat line moves the grid down automatically instead of overlapping it
     private val statsBlockHeight: Int
-        get() = max(ITEM_ICON_SIZE, STAT_LINE_COUNT * STAT_LINE_HEIGHT)
+        get() = max(ITEM_ICON_SIZE, STAT_LINE_COUNT * STAT_LINE_HEIGHT + WAND_BLOCK_PADDING)
 
     init {
         bus.subscribe { event ->
@@ -73,8 +74,8 @@ class WandEditorPanel(
 
     override fun resize(screenX: Int, screenY: Int) {
         rectLayout.resize(screenX, screenY)
-        grid.cols = max(1, (w - 2 * WAND_BLOCK_MARGIN) / grid.elementSize)
-        grid.originX = x + WAND_BLOCK_MARGIN + ELEMENT_PADDING
+        grid.cols = max(1, (w - 2 * (WAND_BLOCK_MARGIN + WAND_BLOCK_PADDING)) / grid.elementSize)
+        grid.originX = x + WAND_BLOCK_MARGIN + WAND_BLOCK_PADDING
         grid.originY = y + WAND_BLOCK_MARGIN + statsBlockHeight + ELEMENT_PADDING * 2
     }
 
@@ -100,11 +101,13 @@ class WandEditorPanel(
         val anchorY1 = y + WAND_BLOCK_MARGIN
 
         graphics.fill(anchorX, anchorY1, right - WAND_BLOCK_MARGIN, bot - WAND_BLOCK_MARGIN, DARK)
-        graphics.item(stack, anchorX, anchorY1) // TODO: click this to session.selectNext(), or swap for a real wand selector
+
+        // TODO: click this to session.selectNext(), or swap for a real wand selector
+        graphics.item(stack, right - WAND_BLOCK_MARGIN - ITEM_ICON_SIZE, anchorY1)
 
         session.currentInvariable?.let {
             val aoc = session.currentAoc ?: return@let
-            renderWandStats(graphics, it, aoc, anchorX + ITEM_ICON_SIZE + STAT_GAP, anchorY1)
+            renderWandStats(graphics, it, aoc, anchorX + WAND_BLOCK_PADDING, anchorY1 + WAND_BLOCK_PADDING)
         }
 
         for (i in 0 until aoc.capacity) {

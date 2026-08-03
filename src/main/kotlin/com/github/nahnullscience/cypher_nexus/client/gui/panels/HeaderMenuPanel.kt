@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.client.gui.components.panels
+package com.github.nahnullscience.cypher_nexus.client.gui.panels
 
 import com.github.nahnullscience.cypher_nexus.client.gui.components.DragController
 import com.github.nahnullscience.cypher_nexus.client.gui.components.IScreenRect
