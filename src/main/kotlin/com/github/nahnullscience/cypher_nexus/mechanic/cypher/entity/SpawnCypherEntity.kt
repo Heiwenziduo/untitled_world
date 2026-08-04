@@ -65,12 +65,12 @@ fun spawnCypherEntityRaw(
     cypher: Holder<out AbstractProjectileCypher<*>>,
     level: ServerLevel,
     steerer: Holder<out AbstractCypherSteerer>,
+    posDire: PosDirePair,
     owner: Entity? = null,
-    posDire: PosDirePair? = null,
 ) {
     fun <CE> spawn(cypher: AbstractProjectileCypher<CE>) where CE : Entity, CE : ICypherEntity {
         val proj = createCypherEntityRaw(cypher, level, steerer.value(), owner)
-        posDire?.let { proj.initDirection(it) }
+        proj.initDirection(posDire)
         level.addFreshEntity(proj)
     }
     spawn(cypher.value())

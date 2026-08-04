@@ -1,0 +1,79 @@
+package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
+
+import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherSteerers.NO_STEERER
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherSteerers.SLOW_BOOT_STEERER
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.spawnCypherEntityRaw
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickBehaviorHook
+import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.randomInCone
+import net.minecraft.core.Direction
+import net.minecraft.core.Holder
+import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.level.Level
+
+/**
+ * continuously generate `illusions` during lifetime
+ *
+ * an illusion is a raw, unmodified copy of projectile itself
+ * */
+abstract class AbstractJuxta(
+    defaultAttribute: Builder.() -> Builder
+) : ModifierCypher(defaultAttribute), TickBehaviorHook {
+    companion object {
+
+    }
+    protected open val illusionSteerer: Holder<AbstractCypherSteerer> = NO_STEERER
+    protected abstract fun <CE> shootingPosPair(cyEntity: CE): PosDirePair where CE : Entity, CE : ICypherEntity
+    protected open fun <CE> isJuxtaTime(cyEntity: CE): Boolean where CE : Entity, CE : ICypherEntity {
+        return (cyEntity.tickCount - 1) and 7 == 7
+    }
+
+    final override fun <CE> onTick(
+        index: Int,
+        count: Int,
+        level: Level,
+        cyEntity: CE
+    ) where CE : Entity, CE : ICypherEntity {
+        val level = cyEntity.level() as? ServerLevel ?: return
+        if (isJuxtaTime(cyEntity)) {
+            spawnCypherEntityRaw(
+                cyEntity.cypherHolder,
+                level,
+                illusionSteerer,
+                shootingPosPair(cyEntity)
+            )
+        }
+    }
+
+    class PhantomRush(defaultAttribute: Builder.() -> Builder) : AbstractJuxta(defaultAttribute) {
+        override val resource = CypherNexus.modResource("phantom_rush")
+        override val illusionSteerer = SLOW_BOOT_STEERER
+        override fun <CE> shootingPosPair(cyEntity: CE): PosDirePair where CE : Entity, CE : ICypherEntity {
+            return PosDirePair(cyEntity.position(), cyEntity.deltaMovement.randomInCone(14.0, cyEntity.random))
+        }
+
+        override fun <CE> isJuxtaTime(cyEntity: CE): Boolean where CE : Entity, CE : ICypherEntity {
+            return (cyEntity.tickCount - 1) and 3 == 3
+        }
+    }
+
+    class DownwardJuxta(defaultAttribute: Builder.() -> Builder) : AbstractJuxta(defaultAttribute) {
+        override val resource = CypherNexus.modResource("downward_juxta")
+        override fun <CE> shootingPosPair(cyEntity: CE): PosDirePair where CE : Entity, CE : ICypherEntity {
+            return PosDirePair(cyEntity.position(), Direction.DOWN.unitVec3)
+        }
+    }
+
+    class UpwardJuxta(defaultAttribute: Builder.() -> Builder) : AbstractJuxta(defaultAttribute) {
+        override val resource = CypherNexus.modResource("upward_juxta")
+        override fun <CE> shootingPosPair(cyEntity: CE): PosDirePair where CE : Entity, CE : ICypherEntity {
+            return PosDirePair(cyEntity.position(), Direction.UP.unitVec3)
+        }
+    }
+}

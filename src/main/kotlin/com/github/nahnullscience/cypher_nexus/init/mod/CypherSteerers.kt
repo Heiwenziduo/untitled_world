@@ -6,6 +6,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.createCyphe
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.EscortOrbitSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.NoSteerer
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.SlowBootSteerer
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
 import net.minecraft.resources.Identifier
@@ -46,4 +47,5 @@ object CypherSteerers {
 
     val NO_STEERER = registerSteerer(NoSteerer)
     val ESCORT_ORBIT_STEERER = registerSteerer("escort_orbit", ::EscortOrbitSteerer)
+    val SLOW_BOOT_STEERER = registerSteerer("slow_boot", ::SlowBootSteerer)
 }

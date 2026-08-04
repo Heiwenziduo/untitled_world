@@ -25,7 +25,7 @@ object ModEntities {
         name: String,
         factory: EntityType.EntityFactory<T>,
         category: MobCategory = MobCategory.MISC,
-        updateInterval: Int = 20
+        updateInterval: Int = 10
     ): DeferredHolder<EntityType<*>, EntityType<T>> {
         return DEFERRED_REGISTER.registerEntityType(name, factory, category) { builder ->
             builder

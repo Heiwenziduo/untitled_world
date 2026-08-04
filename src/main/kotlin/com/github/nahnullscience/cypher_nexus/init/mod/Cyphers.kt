@@ -305,6 +305,21 @@ object Cyphers {
         flags(CypherFlags.HURT_OWNER, CypherFlags.PIERCE_ENTITY)
         shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -5.0)
     }
+    val PHANTOM_RUSH = registerCypher(AbstractJuxta::PhantomRush) {
+        manaDrain(200f)
+        delay(5)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.CAP_AT, 100.0)
+    }
+    val DOWNWARD_JUXTA = registerCypher(AbstractJuxta::DownwardJuxta) {
+        manaDrain(150f)
+        delay(5)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.CAP_AT, 200.0)
+    }
+    val UPWARD_JUXTA = registerCypher(AbstractJuxta::UpwardJuxta) {
+        manaDrain(150f)
+        delay(5)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.CAP_AT, 200.0)
+    }
     val DAEDALUS = registerCypher(::DaedalusCypher) {
         manaDrain(24f)
         delay(-3)
@@ -396,6 +411,10 @@ object Cyphers {
     }
     val SNOWBALL_ORBIT = registerCypher(AbstractEscortOrbit::SnowballOrbit) {
         manaDrain(20f)
+    }
+
+    val JUXTA_ORBIT = registerCypher(AbstractEscortOrbit::JuxtaOrbit) {
+        manaDrain(120f)
     }
 
 

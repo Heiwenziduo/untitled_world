@@ -226,6 +226,21 @@ interface ICypherEntity : TraceableEntity, IFlagExtension, ICypherEntityBeforeIn
             }
         }
 
+        inline fun ICypherEntity.computeAttribute(holer: Holder<CypherAttribute>, formular: (current: Double) -> Double) {
+            val current = getAttributeOrDefault(holer)
+            setAttribute(holer, formular(current))
+        }
+
+        inline fun ICypherEntity.computeAttributeIfPresent(holer: Holder<CypherAttribute>, formular: (current: Double) -> Double) {
+            val current = getAttribute(holer) ?: return
+            setAttribute(holer, formular(current))
+        }
+
+        inline fun ICypherEntity.computeAttributeWithDefault(holer: Holder<CypherAttribute>, formular: (default: Double) -> Double) {
+            val current = getAttrBaseOrNull(holer) ?: holer.value().defaultValue
+            setAttribute(holer, formular(current))
+        }
+
         fun ICypherEntity.exertDamage(level: ServerLevel, target: Entity) {
             var damage = getAttributeOrDefault(CypherAttributes.DAMAGE)
             var crit = getAttributeOrDefault(CypherAttributes.CRIT_CHANCE)

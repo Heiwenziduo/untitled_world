@@ -28,10 +28,10 @@ abstract class AbstractEscortOrbit(
         }
     }
 
-    abstract fun <CE> getProjectileToGen(cyEntity: CE): Holder<out AbstractProjectileCypher<*>>
-    where CE : Entity, CE : ICypherEntity
+    protected abstract fun <CE> getProjectileToGen(cyEntity: CE): Holder<out AbstractProjectileCypher<*>>
+            where CE : Entity, CE : ICypherEntity
 
-    override fun <CE> onTick(
+    final override fun <CE> onTick(
         index: Int,
         count: Int,
         level: Level,
@@ -43,8 +43,8 @@ abstract class AbstractEscortOrbit(
                 getProjectileToGen(cyEntity),
                 level,
                 ESCORT_ORBIT_STEERER,
-                cyEntity,
-                PosDirePair(cyEntity.position())
+                PosDirePair(cyEntity.position()),
+                cyEntity
             )
         }
     }
@@ -54,8 +54,14 @@ abstract class AbstractEscortOrbit(
     ) : AbstractEscortOrbit(defaultAttribute) {
         override val resource = CypherNexus.modResource("snowball_orbit")
         override fun <CE> getProjectileToGen(cyEntity: CE): Holder<out AbstractProjectileCypher<*>>
-        where CE : Entity, CE : ICypherEntity = SNOWBALL
-
+                where CE : Entity, CE : ICypherEntity = SNOWBALL
     }
 
+    class JuxtaOrbit(
+        defaultAttribute: Builder.() -> Builder
+    ) : AbstractEscortOrbit(defaultAttribute) {
+        override val resource = CypherNexus.modResource("juxta_orbit")
+        override fun <CE> getProjectileToGen(cyEntity: CE): Holder<out AbstractProjectileCypher<*>>
+                where CE : Entity, CE : ICypherEntity = cyEntity.cypherHolder
+    }
 }

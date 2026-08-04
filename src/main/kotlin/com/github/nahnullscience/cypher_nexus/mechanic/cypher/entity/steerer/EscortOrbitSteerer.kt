@@ -12,13 +12,14 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
 import kotlin.math.PI
 
-class EscortOrbitSteerer(resource: Identifier) : AbstractCypherSteerer(resource) {
+/**
+ * orbit around owner. assume the `owner` is another cypher-entity.
+ * */
+open class EscortOrbitSteerer(resource: Identifier) : AbstractCypherSteerer(resource) {
     companion object {
-        const val RAD_PER_TICK = (PI / 8).toFloat()
-        /**
-         * collection of unit vectors
-         * */
-        val phases: Array<Vec3>
+        private const val RAD_PER_TICK = (PI / 8).toFloat()
+
+        private val phases: Array<Vec3> // phase vectors are constant, this will save trigonometry calculations at runtime.
         init {
             val tmp = mutableListOf<Vec3>()
             for (i in 0 .. 15) {

@@ -6,6 +6,9 @@ import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.resources.Identifier
 import net.minecraft.world.entity.Entity
 
+/**
+ * stateless behavior modules.
+ * */
 abstract class AbstractCypherSteerer(
     override val resource: Identifier
 ) : IRegisterable {
