@@ -40,7 +40,7 @@ import net.minecraft.world.phys.Vec3
 import kotlin.inc
 import kotlin.math.pow
 
-open class CEPhysicsBasics <CE> () : ICypherEntityPhysics where CE : Entity, CE : ICypherEntity {
+open class CEPhysicsBasics <CE> : ICEPhysics where CE : Entity, CE : ICypherEntity {
     protected lateinit var cyEntity: CE
     protected val level get() = cyEntity.level()
     protected val random get() = cyEntity.random
@@ -56,14 +56,11 @@ open class CEPhysicsBasics <CE> () : ICypherEntityPhysics where CE : Entity, CE 
     protected val collideWithBlocks: Boolean get() = cyEntity.noFlagsNone(CypherFlags.IGNORE_BLOCK, CypherFlags.PENETRATE_WORLD)
     protected val collideWithEntities: Boolean get() = cyEntity.noFlagsNone(CypherFlags.PENETRATE_WORLD)
 
-    override fun initPhysics(
-        cypher: AbstractProjectileCypher<*>,
-        shotState: ShotStateChunk
-    ) {
+    override fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk?) {
         TODO("Not yet implemented")
     }
 
-    override fun <CE> initPhysicsEntity(cy: CE) where CE : Entity, CE : ICypherEntity {
+    override fun <CE> initEntity(cy: CE) where CE : Entity, CE : ICypherEntity {
         TODO("Not yet implemented")
     }
 

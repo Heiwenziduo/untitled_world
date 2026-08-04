@@ -1,58 +1,31 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation
 
-import com.github.nahnullscience.cypher_nexus.init.data_driven.ModDamageTypes.CYPHER_DEFAULT
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.CAPTURE_SIZE
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.HIT_BB_INFLATION
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.LOW_SPEED_THRESHOLD_SQR
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.exertDamage
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityLogicContext
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityPhysics
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.NoSteerer
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStatePool
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.*
 import com.github.nahnullscience.cypher_nexus.utility.exception.CypherEntityException
-import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastMap
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
-import net.minecraft.core.Direction
 import net.minecraft.core.Holder
-import net.minecraft.core.registries.Registries
-import net.minecraft.server.level.ServerLevel
-import net.minecraft.util.profiling.Profiler
-import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.EntitySelector
-import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.animal.Animal
-import net.minecraft.world.level.ClipContext
-import net.minecraft.world.level.ClipContext.Block
-import net.minecraft.world.level.ClipContext.Fluid
-import net.minecraft.world.level.gameevent.GameEvent
-import net.minecraft.world.level.gameevent.GameEvent.Context
 import net.minecraft.world.phys.*
-import net.minecraft.world.phys.HitResult.Type
-import kotlin.math.pow
 
 
 class CypherEntityDelegation <CE> (
-    val attribute: CEAttributeAccessor = CEAttributeAccessor(),
-    val context: ICypherEntityLogicContext = CELogicContext<CE>(),
-    val physics: ICypherEntityPhysics = CEPhysicsBasics<CE>()
+    val attribute: ICEAttribute = CEAttribute(),
+    val context: ICEContext = CEContext<CE>(),
+    val physics: ICEPhysics = CEPhysicsBasics<CE>()
 ) : ICypherEntity,
     ICypherEntityAttributeAccessor by attribute,
     ICypherEntityLogicContext by context,
@@ -85,6 +58,22 @@ class CypherEntityDelegation <CE> (
      * */
     open val moveAsProjectile: Boolean = true
 
+    override fun initCypher(
+        cypher: AbstractProjectileCypher<*>,
+        ccMap: MapOfCypherCounts?,
+        steerer: AbstractCypherSteerer
+    ) {
+        if (isInit) return
+        if (ccMap == null) {
+            attribute.initCypher(cypher, null)
+            context.initCypher(cypher, null, steerer)
+            physics.initCypher(cypher, null)
+            isInit = true
+            return
+        } else {
+            initCypher(cypher, ShotStatePool.getOrCreateShotState(ccMap), null, steerer)
+        }
+    }
 
     override fun initCypher(
         cypher: AbstractProjectileCypher<*>,
@@ -93,18 +82,11 @@ class CypherEntityDelegation <CE> (
         steerer: AbstractCypherSteerer?
     ) {
         if (isInit) return
-
-        enabledFlags = shotState.enabledFlags or cypher.flags
-        hooks = shotState.hooks
-        ccMap = shotState.ccMap
-        hue = shotState.dyeAccumulator.color
-        hueFloatArray = shotState.dyeAccumulator.colorArray
-        if (node != null) {
-            triggerType = node.trigger
-            payload = node.payload
-        }
-        steerer?.let { this.steerer = it }
+        attribute.initCypher(cypher, shotState)
+        context.initCypher(cypher, shotState, steerer)
+        physics.initCypher(cypher, shotState)
         isInit = true
+
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -112,21 +94,6 @@ class CypherEntityDelegation <CE> (
         _cyEntity = cy as CE
         initDirection()
     }
-
-    override fun initCypher(
-        cypher: AbstractProjectileCypher<*>,
-        ccMap: MapOfCypherCounts?,
-        steerer: AbstractCypherSteerer
-    ) {
-        if (ccMap == null) {
-            this.steerer = steerer
-            isInit = true
-            return
-        }
-        val state = ShotStatePool.getOrCreateShotState(ccMap)
-        initCypher(cypher, state, null, steerer)
-    }
-
 
     private var _initPosition: Vec3? = null // due to CyEntity init timing, remember direction data and init later
     private var _initDirection: Vec3? = null

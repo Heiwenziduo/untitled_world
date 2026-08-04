@@ -2,14 +2,21 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import net.minecraft.core.Holder
 
 interface ICypherEntityAttributeAccessor {
 
-    fun initAttribute(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk)
-
+    /**
+     * get a modified attribute or null if untouched, should note that null return doesn't mean
+     * the projectile not has the given attribute.
+     * @see getAttrBaseOrNull
+     * */
     fun getAttribute(attr: CypherAttribute): Double?
+    /**
+     * get a modified attribute or null if untouched, should note that null return doesn't mean
+     * the projectile not has the given attribute.
+     * @see getAttrBaseOrNull
+     * */
     fun getAttribute(holer: Holder<CypherAttribute>): Double?
     /**
      * change the value of the given attribute, this won't sync to another side.
@@ -21,7 +28,6 @@ interface ICypherEntityAttributeAccessor {
      * @return the old value, or null if there isn't.
      * */
     fun setAttribute(holer: Holder<CypherAttribute>, value: Double): Double?
-
     /**
      * get value through entity-specific map > cypher default > attribute default
      * */

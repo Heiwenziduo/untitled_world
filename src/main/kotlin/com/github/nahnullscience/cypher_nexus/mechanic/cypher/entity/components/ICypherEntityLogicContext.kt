@@ -15,8 +15,6 @@ import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 
 interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
-    fun initContext(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk, steerer: AbstractCypherSteerer?)
-    fun <CE> initLogicEntity(cy: CE) where CE : Entity, CE : ICypherEntity
 
     /**
      * [MapOfCypherCounts] serves as the token of [ShotStateChunk],
@@ -41,7 +39,7 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
 
     // hooks // TODO extensive refactor
     /** call on both sides, override friendly */
-    fun beforeDiscard(reason: DiscardReason)
+    fun <CE> beforeDiscard(reason: DiscardReason)
     /** call on both sides, override friendly */
     fun onHit(result: HitResult)
     /** call on both sides, override friendly */

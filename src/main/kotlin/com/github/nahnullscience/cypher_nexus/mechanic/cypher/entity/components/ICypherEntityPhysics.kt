@@ -14,9 +14,6 @@ import net.minecraft.world.phys.Vec3
 
 interface ICypherEntityPhysics {
 
-    fun initPhysics(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk)
-    fun <CE> initPhysicsEntity(cy: CE) where CE : Entity, CE : ICypherEntity
-
     val triggerType: TriggerType
     val payload: ShotStateChunk?
 

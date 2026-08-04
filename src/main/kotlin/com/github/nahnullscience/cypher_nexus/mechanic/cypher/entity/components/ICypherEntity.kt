@@ -3,28 +3,16 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.CypherEntityDelegation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
-import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
-import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastMap
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
-import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.server.level.ServerLevel
-import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.TraceableEntity
-import net.minecraft.world.phys.BlockHitResult
-import net.minecraft.world.phys.EntityHitResult
-import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.neoforged.bus.api.EventPriority
 import net.neoforged.bus.api.SubscribeEvent
@@ -33,10 +21,7 @@ import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent
 
 /**
  * define data pieces that all cypher-entity would require.
- * those pieces then could be delivered through Delegation
- *
- * ONLY methods start with prefix "get" can be overridden in respective entity classes,
- * overriding other method have no effect.
+ * those pieces then could be delivered through [CypherEntityDelegation].
  * */
 interface ICypherEntity :
     ICypherEntityAttributeAccessor,
@@ -47,6 +32,15 @@ interface ICypherEntity :
     val cypher get() = cypherHolder.value()
 
     /**
+     * initialize from [MapOfCypherCounts]
+     * */
+    fun initCypher(
+        cypher: AbstractProjectileCypher<*>,
+        ccMap: MapOfCypherCounts?,
+        steerer: AbstractCypherSteerer
+    )
+
+    /**
      * init from [ShotStateChunk]
      * */
     fun initCypher(
@@ -55,18 +49,12 @@ interface ICypherEntity :
         node: ProjectileNode?,
         steerer: AbstractCypherSteerer?
     )
+
     /**
      *
      * */
     fun <E> initEntity(cy: E) where E : Entity, E : ICypherEntity
-    /**
-     * initialize from [MapOfCypherCounts]
-     * */
-    fun initCypher(
-        cypher: AbstractProjectileCypher<*>,
-        ccMap: MapOfCypherCounts?,
-        steerer: AbstractCypherSteerer
-    )
+
     /**
      *
      * */
