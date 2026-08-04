@@ -1,6 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.component
 
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3

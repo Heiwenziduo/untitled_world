@@ -3,7 +3,7 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.EntityCaptureHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickBehaviorHook
 import com.github.nahnullscience.cypher_nexus.utility.rotateTowards

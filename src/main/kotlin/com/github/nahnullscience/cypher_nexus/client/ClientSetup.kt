@@ -10,7 +10,7 @@ import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.*
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.init.ModParticleTypes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.commands.Commands
 import net.minecraft.world.entity.Entity

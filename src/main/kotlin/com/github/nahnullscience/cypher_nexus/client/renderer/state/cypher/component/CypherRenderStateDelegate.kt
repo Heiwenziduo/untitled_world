@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.comp
 
 import com.github.nahnullscience.cypher_nexus.init.config.ModClientConfig
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags.Companion.containsFlag
 import net.minecraft.client.renderer.entity.state.EntityRenderState

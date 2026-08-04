@@ -4,7 +4,7 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.INVOKER_STATE_TRACKER
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickBehaviorHook
 import com.github.nahnullscience.cypher_nexus.utility.PlaneDefinition.Companion.sideOf
 import com.github.nahnullscience.cypher_nexus.utility.PlaneDefinition.Companion.vectorToPlaneNormal

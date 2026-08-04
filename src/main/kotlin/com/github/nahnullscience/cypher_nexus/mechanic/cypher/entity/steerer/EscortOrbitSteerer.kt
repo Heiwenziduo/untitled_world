@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer
 
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.utility.isServerSide
 import com.github.nahnullscience.cypher_nexus.utility.plus

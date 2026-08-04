@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook
 
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity.Companion.CAPTURE_SIZE_SQR
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.CAPTURE_SIZE_SQR
 import com.github.nahnullscience.cypher_nexus.utility.CircleDefinition
 import net.minecraft.world.entity.Entity
 

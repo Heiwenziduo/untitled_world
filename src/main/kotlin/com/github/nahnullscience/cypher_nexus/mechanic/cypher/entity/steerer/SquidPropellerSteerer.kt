@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import net.minecraft.resources.Identifier
 import net.minecraft.world.entity.Entity
 

@@ -50,7 +50,8 @@ class AttributeFastMap(
     override val size: Int get() = fastMap.size
     override val keys: MutableSet<CypherAttribute> get() = fastMap.keys
     override val values: MutableCollection<Double> get() = fastMap.values
-    override val entries: MutableSet<MutableEntry<CypherAttribute, Double>> get() = fastMap.reference2DoubleEntrySet() as MutableSet<MutableEntry<CypherAttribute, Double>>
+    override val entries: MutableSet<MutableEntry<CypherAttribute, Double>> get() =
+        fastMap.reference2DoubleEntrySet() as MutableSet<MutableEntry<CypherAttribute, Double>>
 
     override fun isEmpty(): Boolean  = fastMap.isEmpty()
 

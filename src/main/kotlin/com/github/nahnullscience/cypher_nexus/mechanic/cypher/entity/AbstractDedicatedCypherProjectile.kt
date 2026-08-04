@@ -3,8 +3,8 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.CypherEntityBasics
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.CypherEntityDelegation
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
@@ -39,7 +39,7 @@ abstract class AbstractDedicatedCypherProjectile(
     entityType: EntityType<out AbstractDedicatedCypherProjectile>,
     level: Level
 ) : Projectile(entityType, level), IEntityWithComplexSpawn,
-    IFlagExtension, ICypherEntity by CypherEntityBasics<AbstractDedicatedCypherProjectile>() {
+    IFlagExtension, ICypherEntity by CypherEntityDelegation<AbstractDedicatedCypherProjectile>() {
     companion object {
 
     }

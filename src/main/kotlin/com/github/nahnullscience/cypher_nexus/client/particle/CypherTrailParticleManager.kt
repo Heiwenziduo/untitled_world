@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.client.particle
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.AbstractCypherRenderer
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.Entity
 import net.neoforged.api.distmarker.Dist
