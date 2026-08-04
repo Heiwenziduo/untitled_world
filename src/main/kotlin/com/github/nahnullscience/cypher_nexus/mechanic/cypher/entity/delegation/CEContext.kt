@@ -1,6 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation
 
 import com.github.nahnullscience.cypher_nexus.init.data_driven.ModDamageTypes.CYPHER_DEFAULT
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
@@ -15,10 +16,8 @@ import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.phys.HitResult
-import net.minecraft.world.phys.Vec3
 
-open class CEContext <CE> : ICEContext where CE : Entity, CE : ICypherEntity {
+open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity {
     protected lateinit var cyEntity: CE
     protected val level get() = cyEntity.level()
     protected val random get() = cyEntity.random
@@ -47,19 +46,19 @@ open class CEContext <CE> : ICEContext where CE : Entity, CE : ICypherEntity {
         ccMap = shotState?.ccMap
         hue = shotState?.dyeAccumulator?.color
         hueFloatArray = shotState?.dyeAccumulator?.colorArray
-        if (node != null) {
-            triggerType = node.trigger
-            payload = node.payload
-        }
         steerer?.let { this.steerer = it }
     }
 
-    override fun <CE> initEntity(cy: CE) where CE : Entity, CE : ICypherEntity {
-        TODO("Not yet implemented")
-    }
+    override fun initEntity(ce: CE) = let { cyEntity = ce }
 
     override fun getOwner(): Entity? = owner
     override fun setOwner(owner: Entity?) = let { this.owner = owner }
+
+    override fun getExisting(): Int = cyEntity.getAttributeOrDefault(CypherAttributes.EXISTING).toInt()
+    override fun getBounce(): Int = cyEntity.getAttributeOrDefault(CypherAttributes.BOUNCE).toInt()
+    override fun getGravityFactor(): Double = cyEntity.getAttributeOrDefault(CypherAttributes.GRAVITY_FACTOR)
+    override fun getSpeedFactor(): Double = 1f - cyEntity.getAttributeOrDefault(CypherAttributes.FRICTION_FACTOR)
+    override fun getEffectRadius(): Float = cyEntity.getAttributeOrDefault(CypherAttributes.EFFECT_RADIUS).toFloat()
 
     override fun getDamageSource(): DamageSource {
         return DamageSource(
@@ -68,28 +67,5 @@ open class CEContext <CE> : ICEContext where CE : Entity, CE : ICypherEntity {
             cyEntity.owner,
             cyEntity.position()
         )
-    }
-
-    override fun beforeDiscard(reason: DiscardReason) {}
-
-    override fun onHit(result: HitResult) {}
-
-    override fun onFirstTick() {}
-
-    override fun onTick() {}
-
-    override fun finalizeTickMovement() {}
-
-    override fun onBounce(bouncePoint: Vec3) {}
-
-    override fun forEntityCaptured(captured: Entity) {}
-
-    override fun onLowSpeed(count: Int) {
-        if (count < 7) return
-
-        // this means the projectile is decelerated to low speed
-        if (capturedInitialSpeedSqr > LOW_SPEED_THRESHOLD_SQR && noFlag(CypherFlags.MOTION_FOLLOWS_OWNER)) {
-            cyEntity.discardCypher(DiscardReason.LOW_SPEED)
-        }
     }
 }

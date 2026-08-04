@@ -24,20 +24,7 @@ interface ICypherEntityPhysics {
     val bouncedThisTick: Boolean
     val canBounce: Boolean
 
-    fun getExisting(): Int
-    fun getBounce(): Int
-    fun getGravityFactor(): Double
-    fun getSpeedFactor(): Double
-    fun getEffectRadius(): Float
-    /**
-     * used as a factor inside `Entity.rotateTowardSpeed`,
-     * the higher the faster the entity will rotate, to face the direction the deltaMovement is pointed at
-     * */
-    fun getRotationSpeed(): Float
-    fun getUnderwaterSpeedFactor(): Double
-    fun getInWallSpeedFactor(): Double
-    fun getBounceSpeedPenalty(): Double
-    fun needCaptureSurrounding(): Boolean
+
 
     /***/
     fun discardCypher(reason: DiscardReason)

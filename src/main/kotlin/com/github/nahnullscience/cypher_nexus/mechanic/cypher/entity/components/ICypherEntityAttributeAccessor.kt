@@ -47,6 +47,7 @@ interface ICypherEntityAttributeAccessor {
      * */
     fun getAttrBaseOrNull(attr: CypherAttribute): Double?
 
+
     companion object {
         inline fun ICypherEntityAttributeAccessor.computeAttribute(holer: Holder<CypherAttribute>, formular: (current: Double) -> Double) {
             val current = getAttributeOrDefault(holer)

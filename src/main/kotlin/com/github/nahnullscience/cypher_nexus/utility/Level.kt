@@ -20,7 +20,9 @@ private object LevelUtil {
 
 fun Level.sideString(): String = if (isClientSide) CLIENT else SERVER
 
-val Level.isServerSide get() = !isClientSide
+inline val Level.isServerSide get() = !isClientSide
+
+inline val Entity.level get() = level()
 
 /**
  * an optimized entity searching function.

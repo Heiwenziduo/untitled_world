@@ -53,7 +53,7 @@ interface ICypherEntity :
     /**
      *
      * */
-    fun <E> initEntity(cy: E) where E : Entity, E : ICypherEntity
+    fun <CE> initEntity(ce: CE) where CE : Entity, CE : ICypherEntity
 
     /**
      *
