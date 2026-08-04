@@ -19,7 +19,7 @@ class SmokeBombCypherRenderer(context: Context) : SimpleParticleProjectileRender
         yo: Double,
         zo: Double
     ) {
-        linearInterpolateGaps(xo, yo, zo, x, y, z, 0.25) { step, x, y, z ->
+        linearInterpolateGaps(xo, yo, zo, x, y, z, 0.4) { step, x, y, z ->
             addCypherTrailParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, x, y, z, 0.0, 0.0, 0.0) {
                 entity.hueFloatArray?.let {
                     setColor(it[0], it[1], it[2])

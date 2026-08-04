@@ -16,6 +16,7 @@ import net.minecraft.core.Holder
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
 
 /**
  * continuously generate `illusions` during lifetime
@@ -55,7 +56,11 @@ abstract class AbstractJuxta(
         override val resource = CypherNexus.modResource("phantom_rush")
         override val illusionSteerer = SLOW_BOOT_STEERER
         override fun <CE> shootingPosPair(cyEntity: CE): PosDirePair where CE : Entity, CE : ICypherEntity {
-            return PosDirePair(cyEntity.position(), cyEntity.deltaMovement.randomInCone(14.0, cyEntity.random))
+            val dire: Vec3
+            cyEntity.deltaMovement.let {
+                dire = if (it == Vec3.ZERO) Vec3.ZERO else it.randomInCone(14.0, cyEntity.random)
+            }
+            return PosDirePair(cyEntity.position(), dire)
         }
 
         override fun <CE> isJuxtaTime(cyEntity: CE): Boolean where CE : Entity, CE : ICypherEntity {

@@ -353,6 +353,24 @@
         }
       }
     },
+    "cypher_nexus:direct_groundward": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 1.0,
+      "projectile": {},
+      "recharge": 0,
+      "shotState": {}
+    },
+    "cypher_nexus:direct_skyward": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 1.0,
+      "projectile": {},
+      "recharge": 0,
+      "shotState": {}
+    },
     "cypher_nexus:divide_by_10": {
       "delay": 15,
       "draw": 0,

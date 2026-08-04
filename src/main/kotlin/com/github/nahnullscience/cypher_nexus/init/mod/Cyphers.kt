@@ -320,6 +320,11 @@ object Cyphers {
         delay(5)
         shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.CAP_AT, 200.0)
     }
+    val FORTUNE = registerModifier("fortune", 120f) {
+        delay(12)
+        recharge(12)
+        shotStateAttr(CypherAttributes.FORTUNE_LEVEL, AttributeOperator.ADD, 1.0)
+    }
     val DAEDALUS = registerCypher(::DaedalusCypher) {
         manaDrain(24f)
         delay(-3)
@@ -328,10 +333,11 @@ object Cyphers {
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 24.0)
         shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.04)
     }
-    val FORTUNE = registerModifier("fortune", 120f) {
-        delay(12)
-        recharge(12)
-        shotStateAttr(CypherAttributes.FORTUNE_LEVEL, AttributeOperator.ADD, 1.0)
+    val DIRECT_SKYWARD = registerCypher(::DirectSkywardCypher) {
+        manaDrain(1f)
+    }
+    val DIRECT_GROUNDWARD = registerCypher(::DirectGroundwardCypher) {
+        manaDrain(1f)
     }
     val ANTIGRAVITY = registerModifier("antigravity", 2f) {
         shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, -0.03)

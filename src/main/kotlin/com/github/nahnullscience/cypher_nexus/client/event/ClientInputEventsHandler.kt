@@ -84,8 +84,6 @@ object ClientInputEventsHandler {
                     }
                 }.also { primaryIsPerforming = it }
 
-                // TODO when point something and not consumeVanillaInput, don't start
-
                 instance ?: continue
                 // wand in any hand has Secondary module && mouse button down -> Yes, otherwise No
                 run Secondary@ {
