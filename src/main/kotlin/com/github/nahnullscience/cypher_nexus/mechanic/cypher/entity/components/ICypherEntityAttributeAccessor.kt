@@ -1,10 +1,16 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components
 
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import net.minecraft.core.Holder
+import net.minecraft.world.entity.Entity
 
 interface ICypherEntityAttributeAccessor {
+
+    fun hasModifiedAttribute(): Boolean
+    fun hasModifiedAttribute(attr: CypherAttribute): Boolean
+    fun hasModifiedAttribute(holer: Holder<CypherAttribute>): Boolean
 
     /**
      * get a modified attribute or null if untouched, should note that null return doesn't mean
@@ -40,12 +46,18 @@ interface ICypherEntityAttributeAccessor {
      * @return the unmodified base attribute value of the entity if any
      * @see [AbstractProjectileCypher.getAttrBaseOrNull]
      * */
-    fun getAttrBaseOrNull(holder: Holder<CypherAttribute>): Double?
+    fun getAttrBaseOrNull(attr: CypherAttribute): Double?
     /**
      * @return the unmodified base attribute value of the entity if any
      * @see [AbstractProjectileCypher.getAttrBaseOrNull]
      * */
-    fun getAttrBaseOrNull(attr: CypherAttribute): Double?
+    fun getAttrBaseOrNull(holder: Holder<CypherAttribute>): Double?
+
+
+    /**
+     * print modified AttrMap.
+     * */
+    fun debugAttributes()
 
 
     companion object {
@@ -63,5 +75,20 @@ interface ICypherEntityAttributeAccessor {
             val current = getAttrBaseOrNull(holer) ?: holer.value().defaultValue
             setAttribute(holer, formular(current))
         }
+
+        fun <CE> CE.getExisting(): Int where CE : Entity, CE : ICypherEntity =
+            getAttributeOrDefault(CypherAttributes.EXISTING).toInt()
+
+        fun <CE> CE.getBounce(): Int where CE : Entity, CE : ICypherEntity =
+            getAttributeOrDefault(CypherAttributes.BOUNCE).toInt()
+
+        fun <CE> CE.getGravityFactor(): Double where CE : Entity, CE : ICypherEntity =
+            getAttributeOrDefault(CypherAttributes.GRAVITY_FACTOR)
+
+        fun <CE> CE.getSpeedFactor(): Double where CE : Entity, CE : ICypherEntity =
+            1f - getAttributeOrDefault(CypherAttributes.FRICTION_FACTOR)
+
+        fun <CE> CE.getEffectRadius(): Float where CE : Entity, CE : ICypherEntity =
+            getAttributeOrDefault(CypherAttributes.EFFECT_RADIUS).toFloat()
     }
 }

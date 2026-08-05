@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.client.renderer.cypher
 import com.github.nahnullscience.cypher_nexus.client.particle.CypherTrailParticleGroup.Companion.addCypherTrailParticle
 import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.ParticleProjectileRenderState
 import com.github.nahnullscience.cypher_nexus.content.entity.BubbleColumn
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
 import com.github.nahnullscience.cypher_nexus.utility.linearInterpolateGaps
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.multiplayer.ClientLevel

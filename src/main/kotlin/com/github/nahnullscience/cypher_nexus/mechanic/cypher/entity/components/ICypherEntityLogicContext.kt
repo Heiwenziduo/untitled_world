@@ -40,16 +40,9 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
     override fun getOwner(): Entity?
     fun setOwner(owner: Entity?)
 
-    /**
-     *
-     * */
-    fun getDamageSource(): DamageSource
+    fun <CE> canHurtOwner(ce: CE): Boolean where CE : Entity, CE : ICypherEntity =
+        ce.haveFlag(CypherFlags.HURT_OWNER) && ce.tickCount > 1
 
-    fun getExisting(): Int
-    fun getBounce(): Int
-    fun getGravityFactor(): Double
-    fun getSpeedFactor(): Double
-    fun getEffectRadius(): Float
     /**
      * used as a factor inside `Entity.rotateTowardSpeed`,
      * the higher the faster the entity will rotate, to face the direction the deltaMovement is pointed at
@@ -58,6 +51,21 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
     fun getInWallSpeedFactor() = 0.5
     fun getBounceSpeedPenalty() = 0.95
     fun getRotationSpeed(): Float = 0.25f
+
+    /**
+     *
+     * */
+    fun getDamageSource(): DamageSource
+
+    /**
+     * use as general entity selector through [net.minecraft.world.level.Level.getEntities]
+     * */
+    fun canHitTarget(target: Entity): Boolean
+
+    /**
+     *
+     * */
+    fun canHomeTarget(target: Entity): Boolean
 
 
 

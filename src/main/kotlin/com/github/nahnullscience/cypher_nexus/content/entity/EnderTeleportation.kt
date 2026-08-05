@@ -3,10 +3,13 @@ package com.github.nahnullscience.cypher_nexus.content.entity
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers.ENDER_TELEPORTATION
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.utility.isServerSide
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.sounds.SoundSource
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.projectile.ItemSupplier
@@ -27,13 +30,6 @@ open class EnderTeleportation(
     override val cypherHolder = ENDER_TELEPORTATION
 
     override fun discardVisualEffect() {
-//        for (i in 0..7) {
-//            level().addParticle(
-////                ColorParticleOption.create(ParticleTypes.DRAGON_BREATH, 114f, 51f, 4f),
-//                PowerParticleOption.create(ParticleTypes.DRAGON_BREATH, 1f),
-//                x, y, z, 0.0, -0.1, 0.0)
-//        }
-
         for (i in 0..31) {
             level()
                 .addParticle(
@@ -48,27 +44,27 @@ open class EnderTeleportation(
         }
     }
 
-    override fun beforeDiscard(reason: DiscardReason) {
-        if (!level().isClientSide && owner() != null) {
-            // compare to #teleportTo on Entity, this can handle dimension
-            // owner()?.teleportTo(x, y, z)
-            val owner = owner()!!
-            owner.teleport(TeleportTransition(
-                level() as ServerLevel,
-                position(),
-                owner.deltaMovement,
-                owner.yRot,
-                owner.xRot,
-                TeleportTransition.DO_NOTHING
-            )).let { newOwner ->
-                newOwner?.resetFallDistance()
-                if (newOwner is LivingEntity) newOwner.resetCurrentImpulseContext()
-            }
 
-            level().playSound(null, x, y, z, SoundEvents.PLAYER_TELEPORT, SoundSource.PLAYERS)
+    override fun <CE> beforeDiscard(ce: CE, reason: DiscardReason) where CE : Entity, CE : ICypherEntity {
+        if (level().isServerSide && owner() != null) {
+            owner()?.let { owner ->
+                // compare to #teleportTo on Entity, this can handle dimension
+                // owner()?.teleportTo(x, y, z)
+                owner.teleport(TeleportTransition(
+                    level() as ServerLevel,
+                    position(),
+                    owner.deltaMovement,
+                    owner.yRot,
+                    owner.xRot,
+                    TeleportTransition.DO_NOTHING
+                )).let { newOwner ->
+                    newOwner?.resetFallDistance()
+                    if (newOwner is LivingEntity) newOwner.resetCurrentImpulseContext()
+                }
+                level().playSound(null, x, y, z, SoundEvents.PLAYER_TELEPORT, SoundSource.PLAYERS)
+            }
         }
 
-
-        super.beforeDiscard(reason)
+        super.beforeDiscard(ce, reason)
     }
 }

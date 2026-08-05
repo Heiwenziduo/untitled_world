@@ -21,16 +21,29 @@ open class CEAttribute : ICEAttribute {
         }
     }
 
+    override fun hasModifiedAttribute(): Boolean = attributeMap.isNotEmpty()
 
-    override fun getAttribute(holer: Holder<CypherAttribute>): Double? = getAttribute(holer.value())
+    override fun hasModifiedAttribute(attr: CypherAttribute): Boolean = attributeMap.containsKey(attr)
+    override fun hasModifiedAttribute(holer: Holder<CypherAttribute>): Boolean = hasModifiedAttribute(holer.value())
+
     override fun getAttribute(attr: CypherAttribute): Double? = attributeMap[attr]
+    override fun getAttribute(holer: Holder<CypherAttribute>): Double? = getAttribute(holer.value())
 
-    override fun setAttribute(holer: Holder<CypherAttribute>, value: Double): Double? = setAttribute(holer.value(), value)
     override fun setAttribute(attr: CypherAttribute, value: Double): Double? = attributeMap.put(attr, value) // return the old
+    override fun setAttribute(holer: Holder<CypherAttribute>, value: Double): Double? = setAttribute(holer.value(), value)
 
-    override fun getAttributeOrDefault(holer: Holder<CypherAttribute>) = getAttributeOrDefault(holer.value())
     override fun getAttributeOrDefault(attr: CypherAttribute) = attributeMap[attr] ?: cypher.getAttrBaseOrDefault(attr)
+    override fun getAttributeOrDefault(holer: Holder<CypherAttribute>) = getAttributeOrDefault(holer.value())
 
-    override fun getAttrBaseOrNull(holder: Holder<CypherAttribute>) = getAttrBaseOrNull(holder.value())
     override fun getAttrBaseOrNull(attr: CypherAttribute) = cypher.getAttrBaseOrNull(attr)
+    override fun getAttrBaseOrNull(holder: Holder<CypherAttribute>) = getAttrBaseOrNull(holder.value())
+
+    override fun debugAttributes() {
+        println("attribute: ")
+        if (hasModifiedAttribute())
+        for ((a, d) in attributeMap) {
+            println("$a: $d")
+        }
+        else println("no modified attribute")
+    }
 }

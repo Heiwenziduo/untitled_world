@@ -3,8 +3,10 @@ package com.github.nahnullscience.cypher_nexus.content.entity
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.utility.mostAlignedDirection
 import net.minecraft.core.Direction
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
@@ -14,7 +16,7 @@ class DrillingBolt(
 ) : AbstractDedicatedCypherProjectile(entityType, level) {
     override val cypherHolder = Cyphers.DRILLING_BOLT
 
-    override fun beforeDiscard(reason: DiscardReason) {
+    override fun <CE> beforeDiscard(ce: CE, reason: DiscardReason) where CE : Entity, CE : ICypherEntity {
         var pos = blockPosition()
         var block = level().getBlockState(pos)
         if (block.isAir) {
@@ -27,5 +29,6 @@ class DrillingBolt(
         }
         val id = owner()?.id ?: id
         level().destroyBlockProgress(id, pos, 8)
+        super.beforeDiscard(ce, reason)
     }
 }

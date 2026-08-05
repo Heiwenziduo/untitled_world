@@ -5,11 +5,14 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.CypherEntityDelegation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getExisting
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.CYPHER_STEERER_STREAM
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.MOCC_STREAM
+import com.github.nahnullscience.cypher_nexus.utility.sideString
 import net.minecraft.core.Holder
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
@@ -73,6 +76,8 @@ abstract class AbstractDedicatedCypherProjectile(
 
     override fun onAddedToLevel() {
         super.onAddedToLevel()
+        println("onAddToLevel ${level().sideString()}")
+        debugAttributes()
     }
 
     override fun onRemovedFromLevel() {
@@ -104,10 +109,6 @@ abstract class AbstractDedicatedCypherProjectile(
 
     abstract override val cypherHolder: Holder<out AbstractProjectileCypher<out AbstractDedicatedCypherProjectile>>
 
-    private var _existing: Int? = null
-    override fun getExisting(): Int = _existing ?: getAttributeOrDefault(CypherAttributes.EXISTING).toInt()
-    fun setExisting(t: Int) = run { _existing = t }
-
     fun owner() = getOwner()
     override fun getOwner(): Entity? = super<Projectile>.getOwner()
     override fun setOwner(owner: Entity?) = super<Projectile>.setOwner(owner)
@@ -117,8 +118,13 @@ abstract class AbstractDedicatedCypherProjectile(
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    open fun doEntitySetup() = Unit
+
     override fun tick() {
-        if (firstTick) debugMsg()
+        if (firstTick) {
+            doEntitySetup()
+            debugMsg()
+        }
 
         super.tick()
         doTick()
@@ -217,11 +223,7 @@ abstract class AbstractDedicatedCypherProjectile(
         CypherNexus.LOGGER.debug("create projectile [{} {}]: [{}]", this, getExisting(), cypher)
         CypherFlags.printFlag(enabledFlags)
 
-        // modified AttrMap
-        attributeMap.forEach { (a, v) ->
-            println("$a: $v")
-        }
-        if (attributeMap.isEmpty()) println("projectile $cypher has no modified attributes")
+        debugAttributes()
     }
 
     override fun hashCode() = super.hashCode()

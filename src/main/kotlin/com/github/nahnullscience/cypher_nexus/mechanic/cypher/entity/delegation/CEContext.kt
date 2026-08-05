@@ -1,11 +1,8 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation
 
 import com.github.nahnullscience.cypher_nexus.init.data_driven.ModDamageTypes.CYPHER_DEFAULT
-import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.LOW_SPEED_THRESHOLD_SQR
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.NoSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
@@ -16,6 +13,10 @@ import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EntitySelector
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.animal.Animal
 
 open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity {
     protected lateinit var cyEntity: CE
@@ -34,7 +35,7 @@ open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity
     override var hue: Int? = null
     override var hueFloatArray: FloatArray? = null
 
-    private var owner: Entity? = null
+    private var ownerD: Entity? = null
 
     override fun initCypher(
         cypher: AbstractProjectileCypher<*>,
@@ -51,14 +52,9 @@ open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity
 
     override fun initEntity(ce: CE) = let { cyEntity = ce }
 
-    override fun getOwner(): Entity? = owner
-    override fun setOwner(owner: Entity?) = let { this.owner = owner }
+    override fun getOwner(): Entity? = ownerD
+    override fun setOwner(owner: Entity?) = let { this.ownerD = owner }
 
-    override fun getExisting(): Int = cyEntity.getAttributeOrDefault(CypherAttributes.EXISTING).toInt()
-    override fun getBounce(): Int = cyEntity.getAttributeOrDefault(CypherAttributes.BOUNCE).toInt()
-    override fun getGravityFactor(): Double = cyEntity.getAttributeOrDefault(CypherAttributes.GRAVITY_FACTOR)
-    override fun getSpeedFactor(): Double = 1f - cyEntity.getAttributeOrDefault(CypherAttributes.FRICTION_FACTOR)
-    override fun getEffectRadius(): Float = cyEntity.getAttributeOrDefault(CypherAttributes.EFFECT_RADIUS).toFloat()
 
     override fun getDamageSource(): DamageSource {
         return DamageSource(
@@ -67,5 +63,31 @@ open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity
             cyEntity.owner,
             cyEntity.position()
         )
+    }
+
+
+    override fun canHitTarget(target: Entity): Boolean {
+        if (!target.canBeHitByProjectile()) {
+            return false // vanilla logic, for item-entities
+        }
+        cyEntity.owner?.let { owner ->
+            if (!cyEntity.canHurtOwner(cyEntity) &&
+                (owner == target || owner.isPassengerOfSameVehicle(target))) return false
+        }
+        return true
+    }
+
+
+    override fun canHomeTarget(target: Entity): Boolean {
+        return cyEntity.canHitTarget(target)
+                && target is LivingEntity
+                && target !is Animal
+                && target !is ICypherEntity
+                && EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(target)
+                && !target.isInvisible
+                && !target.isInvulnerable
+                && target.isAlive
+                && target != cyEntity.owner
+                && !target.`is`(EntityType.ARMOR_STAND)
     }
 }

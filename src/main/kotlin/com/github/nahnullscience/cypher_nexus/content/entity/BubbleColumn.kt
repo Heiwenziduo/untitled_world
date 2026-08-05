@@ -2,6 +2,7 @@ package com.github.nahnullscience.cypher_nexus.content.entity
 
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers.BUBBLE_COLUMN
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
 import net.minecraft.core.Direction
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.sounds.SoundEvents
@@ -34,7 +35,7 @@ class BubbleColumn(
             result.location.x,
             result.location.y,
             result.location.z,
-            SoundEvents.BUBBLE_POP,
+            SoundEvents.BUBBLE_COLUMN_UPWARDS_INSIDE,
             soundSource,
             1.0f,
             1.0f,

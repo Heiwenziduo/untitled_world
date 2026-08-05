@@ -14,8 +14,8 @@ import net.minecraft.world.phys.HitResult.Type
 import net.minecraft.world.phys.Vec3
 
 private object LevelUtil {
-    const val CLIENT = "client"
-    const val SERVER = "server"
+    const val CLIENT = "Client"
+    const val SERVER = "Server"
 }
 
 fun Level.sideString(): String = if (isClientSide) CLIENT else SERVER

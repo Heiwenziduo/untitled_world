@@ -6,26 +6,19 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.HIT_BB_INFLATION
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.LOW_SPEED_THRESHOLD_SQR
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.exertDamage
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getBounce
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getExisting
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getGravityFactor
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getSpeedFactor
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
-import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
-import com.github.nahnullscience.cypher_nexus.utility.flipByAxis
-import com.github.nahnullscience.cypher_nexus.utility.forEachEntityWithin
-import com.github.nahnullscience.cypher_nexus.utility.perspectiveCoordinate
-import com.github.nahnullscience.cypher_nexus.utility.rayCastThen
-import com.github.nahnullscience.cypher_nexus.utility.rotateTowardSpeed
-import com.github.nahnullscience.cypher_nexus.utility.times
-import com.github.nahnullscience.cypher_nexus.utility.toSameDire
+import com.github.nahnullscience.cypher_nexus.utility.*
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.EntitySelector
-import net.minecraft.world.entity.EntityType
-import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.animal.Animal
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.ClipContext.Block
 import net.minecraft.world.level.ClipContext.Fluid
@@ -36,7 +29,6 @@ import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.HitResult.Type
 import net.minecraft.world.phys.Vec3
-import kotlin.inc
 import kotlin.math.pow
 
 open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypherEntity {
@@ -285,16 +277,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         Profiler.get().pop()
     }
 
-    fun canHurtOwner(entity: CE): Boolean = entity.haveFlag(CypherFlags.HURT_OWNER) && entity.tickCount != 1
-    override fun canHitTarget(target: Entity): Boolean {
-        if (!target.canBeHitByProjectile()) {
-            return false // vanilla logic, for item-entities
-        }
-        if (cyEntity.owner == null) return true
-        if (!canHurtOwner(cyEntity) &&
-            (cyEntity.owner == target || cyEntity.owner!!.isPassengerOfSameVehicle(target))) return false
-        return true
-    }
+
 
     override fun whenHit(result: HitResult, direction: Direction) = Unit
     override fun whenHitEntity(result: EntityHitResult, direction: Direction) = Unit
@@ -347,19 +330,6 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         val blockPos = result.blockPos
         if (cyEntity.noFlag(CypherFlags.SILENT))
             this.level.gameEvent(GameEvent.PROJECTILE_LAND, blockPos, Context.of(cyEntity, level.getBlockState(blockPos)))
-    }
-
-    override fun canHomeTarget(target: Entity): Boolean {
-        return canHitTarget(target)
-                && target is LivingEntity
-                && target !is Animal
-                && target !is ICypherEntity
-                && EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(target)
-                && !target.isInvisible
-                && !target.isInvulnerable
-                && target.isAlive
-                && target != cyEntity.owner
-                && !target.`is`(EntityType.ARMOR_STAND)
     }
 
     override fun whileHomeTarget(target: Entity) {}

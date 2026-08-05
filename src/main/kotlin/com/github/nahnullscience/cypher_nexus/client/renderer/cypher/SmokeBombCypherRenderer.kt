@@ -2,6 +2,7 @@ package com.github.nahnullscience.cypher_nexus.client.renderer.cypher
 
 import com.github.nahnullscience.cypher_nexus.client.particle.CypherTrailParticleGroup.Companion.addCypherTrailParticle
 import com.github.nahnullscience.cypher_nexus.content.entity.SmokeBomb
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
 import com.github.nahnullscience.cypher_nexus.utility.linearInterpolateGaps
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context

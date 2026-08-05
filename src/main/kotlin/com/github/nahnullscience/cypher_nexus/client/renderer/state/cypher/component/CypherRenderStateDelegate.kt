@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.comp
 import com.github.nahnullscience.cypher_nexus.init.config.ModClientConfig
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags.Companion.containsFlag
 import net.minecraft.client.renderer.entity.state.EntityRenderState
@@ -27,9 +28,15 @@ class CypherRenderStateDelegate : ICypherEntityRenderState {
         bouncePoints = ce.bouncePoints
         deltaMove = ce.deltaMovement
 
-        if (flags.containsFlag(CypherFlags.GLOWING)) {
+        if (flags.containsFlag(CypherFlags.GLOWING) || flags.containsFlag(CypherFlags.PENETRATE_WORLD)) {
+            // full light when glow
             val block = LightCoordsUtil.block(state.lightCoords)
             state.lightCoords = LightCoordsUtil.pack(block, 15)
+        } else if (flags.containsFlag(CypherFlags.IGNORE_BLOCK)) {
+            // avoid full black when phase block
+            val block = LightCoordsUtil.block(state.lightCoords).coerceAtLeast(3)
+            val sky = LightCoordsUtil.sky(state.lightCoords)
+            state.lightCoords = LightCoordsUtil.pack(block, sky)
         }
 
 //        state.boundingBoxHeight *= ce.getEffectRadius()

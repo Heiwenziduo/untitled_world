@@ -1,5 +1,8 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity
 
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
+import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
@@ -12,11 +15,13 @@ abstract class AbstractStaticSummoner(
     level: Level
 ) : AbstractDedicatedCypherProjectile(entityType, level) {
 
-    override fun getExisting() = 2
+    override fun doEntitySetup() {
+        setAttribute(CypherAttributes.EXISTING, 2.0)
+    }
 
-    override fun beforeDiscard(reason: DiscardReason) {
+    override fun <CE> beforeDiscard(ce: CE, reason: DiscardReason) where CE : Entity, CE : ICypherEntity {
         summon()
-        super.beforeDiscard(reason)
+        super.beforeDiscard(ce, reason)
     }
 
     abstract fun summon()

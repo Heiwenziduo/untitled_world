@@ -36,17 +36,12 @@ class CypherEntityDelegation <CE> (
     override val cypherHolder: Holder<out AbstractProjectileCypher<*>> get() = cyEntity.cypherHolder // FIXME this may lead to infinite loop
 
     private var _cyEntity: CE? = null
-    protected val cyEntity: CE get() = _cyEntity ?:
+    private val cyEntity: CE get() = _cyEntity ?:
     throw CypherEntityException("CypherEntityDelegation failed to initialize! make sure call #initEntity before it's adding to world!")
 
     override fun getDirectionInitial(): Vec3 = _initDirection ?: Vec3.ZERO
     override fun getPositionInitial(): Vec3  = _initPosition ?: cyEntity.owner?.position() ?: Vec3.ZERO
 
-
-    /**
-     * if the entity has its own movement logic, set this to false
-     * */
-    open val moveAsProjectile: Boolean = true
 
     override fun initCypher(
         cypher: AbstractProjectileCypher<*>,
