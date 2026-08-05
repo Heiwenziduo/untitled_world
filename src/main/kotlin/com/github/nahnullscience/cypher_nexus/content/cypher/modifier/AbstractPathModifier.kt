@@ -5,6 +5,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData.DataTicket
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickMovementFinalizeHook
 import com.github.nahnullscience.cypher_nexus.utility.coerceMaxLength
 import com.github.nahnullscience.cypher_nexus.utility.headLeftVectorF
@@ -24,11 +25,20 @@ abstract class AbstractPathModifier(
     companion object {
         private const val ORBIT_RAD = (PI / 16).toFloat()
 
-        private fun <CE> HooksSharedData<*>.initOrbitCircle(
+        private val OrbitCircleTicket = object : DataTicket<CircleDefinition>() {
+            override fun <CE> shouldAbortData(
+                cyEntity: CE,
+                data: CircleDefinition
+            ): Boolean where CE : Entity, CE : ICypherEntity {
+                return false // never outdate
+            }
+        }
+
+        private fun <CE> HooksSharedData.initOrbitCircle(
             cyEntity: CE,
             target: Entity
         ): CircleDefinition where CE : Entity, CE : ICypherEntity {
-            return orbitingCircle ?: run {
+            return this[OrbitCircleTicket] ?: run {
                 val center = target.eyePosition
                 val targetPos = cyEntity.position() + cyEntity.deltaMovement
                 val radius = center.vectorTo(targetPos).coerceMaxLength(32.0)
@@ -44,7 +54,7 @@ abstract class AbstractPathModifier(
                     normal.set(target.headLeftVectorF())
                 }
 
-                CircleDefinition(center, radius, normal).also { orbitingCircle = it }
+                CircleDefinition(center, radius, normal).also { this[OrbitCircleTicket] = it }
             }
         }
     }

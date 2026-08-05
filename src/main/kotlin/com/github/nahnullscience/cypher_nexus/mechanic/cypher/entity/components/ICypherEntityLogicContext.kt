@@ -32,7 +32,7 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
 
     /** this field directly forwards to the backing [ShotStateChunk] and should be treated as `immutable` */
     val hooks: HookContainer?
-    val hooksSharedData: HooksSharedData<*>
+    val hooksSharedData: HooksSharedData
     val steerer: AbstractCypherSteerer
 
     /** tint from dyes */

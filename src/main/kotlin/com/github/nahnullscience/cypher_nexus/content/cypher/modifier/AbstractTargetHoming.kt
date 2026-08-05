@@ -50,16 +50,6 @@ abstract class AbstractTargetHoming(
         return !cyEntity.canHomeTarget(target)
     }
 
-//    protected open fun authenticateTarget(projectile: AbstractCypherProjectile): Boolean {
-//        // consider merge with AbstractCypherProjectile#canHomeTarget
-//        val target = projectile.hooksSharedData.homingTarget ?: return false
-//        if (projectile.distanceToSqr(target.eyePosition) > CAPTURE_SIZE_SQR * 2) {
-//            projectile.hooksSharedData.homingTarget = null
-//            return false
-//        }
-//        return true
-//    }
-
 
     class Homing(defaultAttribute: Builder.() -> Builder) : AbstractTargetHoming("homing", defaultAttribute) {
         override fun <CE> onTick(

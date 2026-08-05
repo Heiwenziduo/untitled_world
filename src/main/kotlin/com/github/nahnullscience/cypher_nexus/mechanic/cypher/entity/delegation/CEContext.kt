@@ -32,7 +32,7 @@ open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity
     override var ccMap: MapOfCypherCounts? = null
 
     override var hooks: HookContainer? = null
-    override val hooksSharedData = HooksSharedData<CE>()
+    override val hooksSharedData = HooksSharedData()
 
     override var steerer: AbstractCypherSteerer = NoSteerer
 
