@@ -186,19 +186,17 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
             hook.forEntityCaptured(index, count, ce.level(), ce, captured)
         }
     }
-    /**
-     * call on both sides, override friendly
-     * @see
-     * */
-    fun <CE> onLowSpeed(ce: CE, ticks: Int, initialSpeedSqr: Double) where CE : Entity, CE : ICypherEntity {
-        if (ticks < 7) return
+//    /**
+//     * call on both sides, override friendly
+//     * @see
+//     * */
+//    fun <CE> onLowSpeed(ce: CE, ticks: Int, initialSpeedSqr: Double) where CE : Entity, CE : ICypherEntity {
+//        if (ticks < 7) return
+//
+//        // this means the projectile is decelerated to low speed
+//        if (initialSpeedSqr > LOW_SPEED_THRESHOLD_SQR && noFlag(CypherFlags.MOTION_FOLLOWS_OWNER)) {
+//            ce.discardCypher(DiscardReason.LOW_SPEED)
+//        }
+//    }
 
-        // this means the projectile is decelerated to low speed
-        if (initialSpeedSqr > LOW_SPEED_THRESHOLD_SQR && noFlag(CypherFlags.MOTION_FOLLOWS_OWNER)) {
-            ce.discardCypher(DiscardReason.LOW_SPEED)
-        }
-    }
-
-//    /** only on Server */
-//    fun onDealDamage(damage: Double)
 }

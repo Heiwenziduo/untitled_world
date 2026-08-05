@@ -2,6 +2,8 @@ package com.github.nahnullscience.cypher_nexus.client.particle
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus.MOD_ID
 import com.github.nahnullscience.cypher_nexus.init.config.ModClientConfig
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
 import com.google.common.collect.EvictingQueue
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.ParticleEngine
@@ -9,6 +11,7 @@ import net.minecraft.client.particle.ParticleRenderType
 import net.minecraft.client.particle.QuadParticleGroup
 import net.minecraft.client.particle.SingleQuadParticle
 import net.minecraft.core.particles.ParticleOptions
+import net.minecraft.world.entity.Entity
 import java.util.*
 
 class CypherTrailParticleGroup(
@@ -33,43 +36,6 @@ class CypherTrailParticleGroup(
                     CypherTrailParticleGroup(engine)
                 } as CypherTrailParticleGroup).also { INSTANCE = it }
             }
-        }
-
-        /**
-         *
-         * */
-        // now we can ntr vanilla quad to our render layer
-        fun <T : ParticleOptions> addCypherTrailParticle(
-            options: T,
-            x: Double, y: Double, z: Double,
-            xa: Double, ya: Double, za: Double
-        ) {
-            if (mainCamera.position().distanceToSqr(x, y, z) > MAX_PARTICLE_TRACKING_DISTANCE_SQR) return
-            val particle = particleEngine.makeParticle(options, x, y, z, xa, ya, za)
-            if (particle is SingleQuadParticle) {
-                (INSTANCE ?: updateInstance()).particlesToAdd.add(particle)
-            }
-        }
-        /**
-         *
-         * */
-        inline fun <T : ParticleOptions> addCypherTrailParticle(
-            options: T,
-            x: Double, y: Double, z: Double,
-            xa: Double, ya: Double, za: Double,
-            config: SingleQuadParticle.() -> Unit
-        ) {
-            if (mainCamera.position().distanceToSqr(x, y, z) > MAX_PARTICLE_TRACKING_DISTANCE_SQR) return
-            val particle = Minecraft.getInstance().particleEngine.makeParticle(options, x, y, z, xa, ya, za)
-            if (particle is SingleQuadParticle) {
-                particle.config()
-                (INSTANCE ?: updateInstance()).particlesToAdd.add(particle)
-            }
-        }
-
-        fun SingleQuadParticle.setARGB(a: Float, r: Float, g: Float, b: Float) {
-            setColor(r, g, b)
-            setAlpha(a)
         }
     }
 

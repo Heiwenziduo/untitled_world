@@ -471,13 +471,13 @@
       }
     },
     "cypher_nexus:drilling_blast": {
-      "delay": -2,
+      "delay": -3,
       "draw": 0,
-      "flags": 0,
+      "flags": 1024,
       "manaDrain": 10.0,
       "projectile": {
         "cypher_nexus:damage": 1.0,
-        "cypher_nexus:existing": 2.0,
+        "cypher_nexus:existing": 3.0,
         "cypher_nexus:gravity_factor": 0.02,
         "cypher_nexus:speed": 0.3
       },
@@ -495,7 +495,7 @@
       "manaDrain": 5.0,
       "projectile": {
         "cypher_nexus:damage": 1.0,
-        "cypher_nexus:existing": 2.0,
+        "cypher_nexus:existing": 3.0,
         "cypher_nexus:gravity_factor": 0.02,
         "cypher_nexus:speed": 0.3
       },
@@ -590,6 +590,55 @@
       "projectile": {},
       "recharge": 0,
       "shotState": {}
+    },
+    "cypher_nexus:firework_orbit": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 100.0,
+      "projectile": {},
+      "recharge": 0,
+      "shotState": {}
+    },
+    "cypher_nexus:firework_rocket": {
+      "delay": 0,
+      "draw": 0,
+      "flags": 1024,
+      "manaDrain": 50.0,
+      "projectile": {
+        "cypher_nexus:crit_chance": 0.1,
+        "cypher_nexus:damage": 4.0,
+        "cypher_nexus:existing": 45.0,
+        "cypher_nexus:friction_factor": -0.02,
+        "cypher_nexus:gravity_factor": 0.0,
+        "cypher_nexus:speed": 0.8
+      },
+      "recharge": 5,
+      "shotState": {
+        "cypher_nexus:spread": {
+          "add": -5.0
+        }
+      }
+    },
+    "cypher_nexus:firework_rocket_random": {
+      "delay": 0,
+      "draw": 0,
+      "flags": 1024,
+      "manaDrain": 60.0,
+      "projectile": {
+        "cypher_nexus:crit_chance": 0.1,
+        "cypher_nexus:damage": 4.0,
+        "cypher_nexus:existing": 45.0,
+        "cypher_nexus:friction_factor": -0.02,
+        "cypher_nexus:gravity_factor": 0.0,
+        "cypher_nexus:speed": 0.8
+      },
+      "recharge": 5,
+      "shotState": {
+        "cypher_nexus:spread": {
+          "add": -5.0
+        }
+      }
     },
     "cypher_nexus:formation_plane_bifurcated": {
       "delay": 0,

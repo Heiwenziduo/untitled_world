@@ -16,7 +16,8 @@ enum class DiscardReason {
     CONSUMED,
     /**  */
     LOW_SPEED,
-
+    /**  */
+    FEAR_OF_HEIGHTS,
     /** by some special reason */
     ERASE,
 }

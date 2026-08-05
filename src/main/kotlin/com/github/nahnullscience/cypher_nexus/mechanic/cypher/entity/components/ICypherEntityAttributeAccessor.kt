@@ -75,7 +75,7 @@ interface ICypherEntityAttributeAccessor {
             setAttribute(holer, formular(current))
         }
 
-        inline fun ICypherEntity.computeAttributeWithDefault(holer: Holder<CypherAttribute>, formular: (default: Double) -> Double) {
+        inline fun ICypherEntity.computeBaseAttribute(holer: Holder<CypherAttribute>, formular: (default: Double) -> Double) {
             val current = getAttrBaseOrNull(holer) ?: holer.value().defaultValue
             setAttribute(holer, formular(current))
         }

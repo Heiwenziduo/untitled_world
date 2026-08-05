@@ -42,7 +42,7 @@ object CypherTrailParticleManager {
         if (event.entity.level().isClientSide) event.entity.let { ce ->
             if (ce is ICypherEntity) {
                 getCERenderer(ce)?.
-                clientTickPost(level!!, ce, ce.x, ce.y, ce.z, ce.xo, ce.yo, ce.zo)
+                addTrailParticles(level!!, ce, ce.x, ce.y, ce.z, ce.xo, ce.yo, ce.zo)
             }
         }
     }

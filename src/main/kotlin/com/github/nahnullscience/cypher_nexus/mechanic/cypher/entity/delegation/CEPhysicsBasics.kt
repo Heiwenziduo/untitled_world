@@ -47,6 +47,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
 
     protected var capturedInitialSpeedSqr: Double = 0.0
     protected var lowSpeedTickCount = 0
+    protected var highElevationTickCount = 0
 
     protected val collideWithBlocks: Boolean get() = ce.noFlagsNone(CypherFlags.IGNORE_BLOCK, CypherFlags.PENETRATE_WORLD)
     protected val collideWithEntities: Boolean get() = ce.noFlagsNone(CypherFlags.PENETRATE_WORLD)
@@ -58,13 +59,18 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         }
     }
 
-    override fun initEntity(ce: CE) = let { this@CEPhysicsBasics.ce = ce }
+    override fun initEntity(ce: CE) = let {
+        this@CEPhysicsBasics.ce = ce
+        ce.noPhysics = ce.noFlag(CypherFlags.PHYSICS_SOLID)
+    }
 
 
 
     protected open fun applyGravity() {
         if (ce.getGravityFactor() != 0.0)
             ce.deltaMovement = ce.deltaMovement.add(0.0, -ce.getGravityFactor(), 0.0)
+//        if (ce.y > 4000 && ce.deltaMovement.y > 0)
+//            ce.deltaMovement = ce.deltaMovement.add(0.0, -0.03, 0.0)
     }
 
     protected open fun applyFriction() {
@@ -152,9 +158,8 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         ce.finalizeTickMovement(ce)
         ce.steerer.tickSpeedOverride(ce)
 
-        if (ce.deltaMovement.lengthSqr() <= LOW_SPEED_THRESHOLD_SQR)
-            ce.onLowSpeed(ce, lowSpeedTickCount++, capturedInitialSpeedSqr)
-        else lowSpeedTickCount = 0
+        onLowSpeedCheck()
+        onHighSkyCheck()
 
         loopHitAndBounce()
 
@@ -207,7 +212,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
                         // if tagged pierce, collide all
                         level.getEntities(
                             ce,
-                            ce.boundingBox.expandTowards(stepMovement),
+                            ce.boundingBox.expandToAtMost(stepMovement, 16.0),
                             ce::canHitTarget
                         ).forEach { target ->
                             // there is a trigger call inside whenHit, which may modifies the entity list in section storage.
@@ -224,7 +229,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
 
                         level.forEachEntityWithin(
                             ce,
-                            ce.boundingBox.expandTowards(stepMovement),
+                            ce.boundingBox.expandToAtMost(stepMovement, 16.0),
                             ce::canHitTarget
                         ) { target ->
                             stepPosition.rayCastThen(destination, target.boundingBox, margin) { hitPoint, dir ->
@@ -328,4 +333,21 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
             this.level.gameEvent(GameEvent.PROJECTILE_LAND, blockPos, Context.of(ce, level.getBlockState(blockPos)))
     }
 
+
+    protected open fun onLowSpeedCheck() {
+        if (ce.noFlag(CypherFlags.PHYSICS_SOLID) &&
+            capturedInitialSpeedSqr > LOW_SPEED_THRESHOLD_SQR &&
+            ce.deltaMovement.lengthSqr() <= LOW_SPEED_THRESHOLD_SQR)
+        {
+            if (++lowSpeedTickCount > 7) ce.discardCypher(DiscardReason.LOW_SPEED)
+        }
+        else lowSpeedTickCount = 0
+    }
+
+    protected open fun onHighSkyCheck() {
+        if (ce.y > 4000 && ce.deltaMovement.y > 0) {
+            if (++highElevationTickCount > 20) ce.discardCypher(DiscardReason.FEAR_OF_HEIGHTS)
+        }
+        else highElevationTickCount = 0
+    }
 }

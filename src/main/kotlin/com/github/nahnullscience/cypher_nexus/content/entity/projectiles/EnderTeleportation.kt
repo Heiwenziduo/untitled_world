@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.content.entity
+package com.github.nahnullscience.cypher_nexus.content.entity.projectiles
 
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers.ENDER_TELEPORTATION
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
@@ -12,9 +12,6 @@ import net.minecraft.sounds.SoundSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.projectile.ItemSupplier
-import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.portal.TeleportTransition
 
@@ -22,11 +19,6 @@ open class EnderTeleportation(
     entityType: EntityType<out AbstractDedicatedCypherProjectile>,
     level: Level
 ) : AbstractDedicatedCypherProjectile(entityType, level) {
-    companion object {
-        // teleportation utils
-
-    }
-
     override val cypherHolder = ENDER_TELEPORTATION
 
     override fun discardVisualEffect() {

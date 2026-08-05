@@ -1,7 +1,17 @@
 package com.github.nahnullscience.cypher_nexus.init
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.entity.*
+import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.Arrow
+import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.BubbleColumn
+import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.DrillingBlast
+import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.DrillingBolt
+import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.EnderRecall
+import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.EnderTeleportation
+import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.FireworkRocket
+import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.LlamaSpit
+import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.SmokeBomb
+import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.Snowball
+import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.SpawnEgg
 import com.github.nahnullscience.cypher_nexus.content.entity.statics.SummonedExplosion
 import com.github.nahnullscience.cypher_nexus.content.entity.statics.SummonedLightning
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
@@ -18,8 +28,28 @@ object ModEntities {
         DEFERRED_REGISTER.register(MOD_BUS)
     }
 
+    // projectile ////////////////////////////////////////////////////////////////////////////////////////
+    // using "cypher_" prefix is a convention
+    val CYPHER_ARROW = registerDedicated("cypher_arrow", ::Arrow)
+    val CYPHER_SNOWBALL = registerDedicated("cypher_snowball", ::Snowball)
+    val CYPHER_ENDER_TELEPORTATION = registerDedicated("cypher_ender_teleportation", ::EnderTeleportation)
+    val CYPHER_ENDER_RECALL = registerDedicated("cypher_ender_recall", ::EnderRecall)
+    val CYPHER_SPAWN_EGG = registerDedicated("cypher_spawn_egg", ::SpawnEgg)
+    val CYPHER_BUBBLE_COLUMN = registerDedicated("cypher_bubble_column", ::BubbleColumn)
+    val CYPHER_LLAMA_SPIT = registerDedicated("cypher_llama_spit", ::LlamaSpit)
+    val CYPHER_DRILLING_BOLT = registerDedicated("cypher_drilling_bolt", ::DrillingBolt)
+    val CYPHER_DRILLING_BLAST = registerDedicated("cypher_drilling_blast", ::DrillingBlast)
+    val CYPHER_SMOKE_BOMB = registerDedicated("cypher_smoke_bomb", ::SmokeBomb)
+    val CYPHER_FIREWORK_ROCKET = registerDedicated("cypher_firework_rocket", ::FireworkRocket)
+    val CYPHER_RANDOM_FIREWORK_ROCKET = registerDedicated("cypher_firework_rocket_random", FireworkRocket::RandomFireRocket)
+
+    // static-projectile //////////////////////////////////////////////////////////////////////////////////
+    val CYPHER_EXPLOSION = registerDedicated("cypher_explosion", ::SummonedExplosion)
+    val CYPHER_LIGHTING = registerDedicated("cypher_lighting", ::SummonedLightning)
+
+
     /**
-     * check [EntityType]
+     * @see [EntityType]
      * */
     fun <T : AbstractDedicatedCypherProjectile> registerDedicated(
         name: String,
@@ -44,23 +74,5 @@ object ModEntities {
                 .updateInterval(updateInterval)
         }
     }
-
-
-    // projectile ////////////////////////////////////////////////////////////////////////////////////////
-    // using "cypher_" prefix is a convention
-    val CYPHER_ARROW = registerDedicated("cypher_arrow", ::Arrow)
-    val CYPHER_SNOWBALL = registerDedicated("cypher_snowball", ::Snowball)
-    val CYPHER_ENDER_TELEPORTATION = registerDedicated("cypher_ender_teleportation", ::EnderTeleportation)
-    val CYPHER_ENDER_RECALL = registerDedicated("cypher_ender_recall", ::EnderRecall)
-    val CYPHER_SPAWN_EGG = registerDedicated("cypher_spawn_egg", ::SpawnEgg)
-    val CYPHER_BUBBLE_COLUMN = registerDedicated("cypher_bubble_column", ::BubbleColumn)
-    val CYPHER_LLAMA_SPIT = registerDedicated("cypher_llama_spit", ::LlamaSpit)
-    val CYPHER_DRILLING_BOLT = registerDedicated("cypher_drilling_bolt", ::DrillingBolt)
-    val CYPHER_DRILLING_BLAST = registerDedicated("cypher_drilling_blast", ::DrillingBlast)
-    val CYPHER_SMOKE_BOMB = registerDedicated("cypher_smoke_bomb", ::SmokeBomb)
-
-    // static-projectile //////////////////////////////////////////////////////////////////////////////////
-    val CYPHER_EXPLOSION = registerDedicated("cypher_explosion", ::SummonedExplosion)
-    val CYPHER_LIGHTING = registerDedicated("cypher_lighting", ::SummonedLightning)
 }
 

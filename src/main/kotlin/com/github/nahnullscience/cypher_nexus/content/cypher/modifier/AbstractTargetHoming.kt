@@ -6,11 +6,11 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.EntityCaptureHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickBehaviorHook
+import com.github.nahnullscience.cypher_nexus.utility.plus
 import com.github.nahnullscience.cypher_nexus.utility.rotateTowards
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import kotlin.math.PI
-import kotlin.math.min
 
 /** these homing-s share the same "homing target" on HooksSharedData */
 abstract class AbstractTargetHoming(
@@ -22,6 +22,14 @@ abstract class AbstractTargetHoming(
         private const val HOMING_STRENGTH = 0.1
         private const val HOMING_STRENGTH_LEVEL = 0.02
         private const val ROTATION_RADIUS = PI / 36
+
+        fun <CE> CE.homeTo(target: Entity, power: Double) where CE : Entity, CE : ICypherEntity {
+            if (!target.boundingBox.contains(this.position())) {
+                val dir = this.position().vectorTo(target.eyePosition)
+                val speed = dir.normalize().scale(power)
+                this.deltaMovement += speed
+            }
+        }
     }
 
     override val resource = CypherNexus.modResource(path)
@@ -59,12 +67,7 @@ abstract class AbstractTargetHoming(
             cyEntity: CE
         ) where CE : Entity, CE : ICypherEntity {
             val target = cyEntity.hooksSharedData.homingTarget ?: return
-            if (!target.boundingBox.contains(cyEntity.position())) {
-                val dir = cyEntity.position().vectorTo(target.eyePosition)
-                val dis =  min(dir.length(), count * HOMING_STRENGTH_LEVEL + HOMING_STRENGTH)
-                val speed = dir.normalize().scale(dis)
-                cyEntity.addDeltaMovement(speed)
-            }
+            cyEntity.homeTo(target, count * HOMING_STRENGTH_LEVEL + HOMING_STRENGTH)
         }
     }
 

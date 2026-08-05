@@ -116,34 +116,33 @@ object Cyphers {
     val SPAWN_EGG = registerProjectile(ModEntities.CYPHER_SPAWN_EGG) {
         manaDrain(20f)
         draw(1)
-        flags(CypherFlags.LINGER)
+        flags(CypherFlags.PHYSICS_SOLID)
         trigger(TriggerType.COLLISION)
         projectileAttr(CypherAttributes.SPEED, 1.0)
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
     }
-    val DRILLING_BOLT = registerProjectile(ModEntities.CYPHER_DRILLING_BOLT) {
-        manaDrain(5f)
+    private val configDrilling: SimpleProjectile.() -> Unit = {
         delay(-3)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 6.0)
         projectileAttr(CypherAttributes.DAMAGE, 1.0)
         projectileAttr(CypherAttributes.SPEED, 0.3)
-        projectileAttr(CypherAttributes.EXISTING, 2.0)
+        projectileAttr(CypherAttributes.EXISTING, 3.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.02)
     }
+    val DRILLING_BOLT = registerProjectile(ModEntities.CYPHER_DRILLING_BOLT) {
+        configDrilling()
+        manaDrain(5f)
+    }
     val DRILLING_BLAST = registerProjectile(ModEntities.CYPHER_DRILLING_BLAST) {
+        configDrilling()
+        flags(CypherFlags.EXPLOSIVE)
         manaDrain(10f)
-        delay(-2)
-        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 6.0)
-        projectileAttr(CypherAttributes.DAMAGE, 1.0)
-        projectileAttr(CypherAttributes.SPEED, 0.3)
-        projectileAttr(CypherAttributes.EXISTING, 2.0)
-        projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.02)
     }
     val SMOKE_BOMB = registerProjectile(ModEntities.CYPHER_SMOKE_BOMB) {
         manaDrain(40f)
         delay(6)
-        flags(CypherFlags.LINGER, CypherFlags.EXPLOSIVE)
+        flags(CypherFlags.PHYSICS_SOLID, CypherFlags.EXPLOSIVE)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 3.0)
         projectileAttr(CypherAttributes.DAMAGE, 2.0)
         projectileAttr(CypherAttributes.CRIT_CHANCE, 0.05)
@@ -151,7 +150,25 @@ object Cyphers {
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
     }
-
+    private val configFirework: SimpleProjectile.() -> Unit = {
+        recharge(5)
+        flags(CypherFlags.EXPLOSIVE)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -5.0)
+        projectileAttr(CypherAttributes.DAMAGE, 4.0)
+        projectileAttr(CypherAttributes.CRIT_CHANCE, 0.1)
+        projectileAttr(CypherAttributes.SPEED, 0.8)
+        projectileAttr(CypherAttributes.EXISTING, 45.0)
+        projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.0)
+        projectileAttr(CypherAttributes.FRICTION_FACTOR, -0.02)
+    }
+    val FIREWORK_ROCKET = registerProjectile(ModEntities.CYPHER_FIREWORK_ROCKET) {
+        configFirework()
+        manaDrain(50f)
+    }
+    val RANDOM_FIREWORK_ROCKET = registerProjectile(ModEntities.CYPHER_RANDOM_FIREWORK_ROCKET) {
+        configFirework()
+        manaDrain(60f)
+    }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // static projectile
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -285,22 +302,14 @@ object Cyphers {
     val KNOCKBACK = registerModifier("knockback", 5f) {
         shotStateAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 20.0)
     }
-    val HOMING = registerCypher(AbstractTargetHoming::Homing) {
-        manaDrain(60f)
-    }
-    val TURN_TOWARD_TARGET = registerCypher(AbstractTargetHoming::TurnTowardTarget) {
-        manaDrain(30f)
-    }
+    val HOMING = registerCypher(AbstractTargetHoming::Homing, 60f)
+    val TURN_TOWARD_TARGET = registerCypher(AbstractTargetHoming::TurnTowardTarget, 30f)
     val BOOMERANG = registerCypher(::BoomerangCypher) {
         manaDrain(10f)
         flags(CypherFlags.MOTION_FOLLOWS_OWNER)
     }
-    val AIMING_ARC = registerCypher(AbstractAiming::AimingArc) {
-        manaDrain(30f)
-    }
-    val AIMING_RETURN = registerCypher(AbstractAiming::AimingReturn) {
-        manaDrain(60f)
-    }
+    val AIMING_ARC = registerCypher(AbstractAiming::AimingArc, 30f)
+    val AIMING_RETURN = registerCypher(AbstractAiming::AimingReturn, 60f)
     val PIERCE_ENTITY = registerModifier("pierce_entity", 110f) {
         flags(CypherFlags.HURT_OWNER, CypherFlags.PIERCE_ENTITY)
         shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -5.0)
@@ -333,12 +342,8 @@ object Cyphers {
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 24.0)
         shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.04)
     }
-    val DIRECT_SKYWARD = registerCypher(::DirectSkywardCypher) {
-        manaDrain(1f)
-    }
-    val DIRECT_GROUNDWARD = registerCypher(::DirectGroundwardCypher) {
-        manaDrain(1f)
-    }
+    val DIRECT_SKYWARD = registerCypher(::DirectSkywardCypher, 1f)
+    val DIRECT_GROUNDWARD = registerCypher(::DirectGroundwardCypher, 1f)
     val ANTIGRAVITY = registerModifier("antigravity", 2f) {
         shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, -0.03)
     }
@@ -361,8 +366,7 @@ object Cyphers {
         manaDrain(0f)
         shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 2.0)
     }
-    val PLANE_ORBIT = registerCypher(AbstractPathModifier::PlaneOrbit) {
-        manaDrain(3f)
+    private val configOrbit: CypherDataMap.Builder.() -> CypherDataMap.Builder = {
         delay(-4)
         flags(CypherFlags.IGNORE_BLOCK, CypherFlags.MOTION_FOLLOWS_OWNER)
         shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 40.0)
@@ -370,14 +374,13 @@ object Cyphers {
         shotStateAttr(CypherAttributes.FRICTION_FACTOR, AttributeOperator.SET_ALL, 0.0)
         shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.SET_ALL, 0.0)
     }
+    val PLANE_ORBIT = registerCypher(AbstractPathModifier::PlaneOrbit) {
+        manaDrain(3f)
+        configOrbit()
+    }
     val TRUE_ORBIT = registerCypher(AbstractPathModifier::TrueOrbit) {
         manaDrain(5f)
-        delay(-4)
-        flags(CypherFlags.IGNORE_BLOCK, CypherFlags.MOTION_FOLLOWS_OWNER)
-        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 40.0)
-        shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.SET_ALL, 0.0)
-        shotStateAttr(CypherAttributes.FRICTION_FACTOR, AttributeOperator.SET_ALL, 0.0)
-        shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.SET_ALL, 0.0)
+        configOrbit()
     }
     val RED_TINT = registerModifier("red_tint", 0f) {
         delay(-1)
@@ -415,13 +418,9 @@ object Cyphers {
         delay(-1)
         dyeColor(0.2f)
     }
-    val SNOWBALL_ORBIT = registerCypher(AbstractEscortOrbit::SnowballOrbit) {
-        manaDrain(20f)
-    }
-
-    val JUXTA_ORBIT = registerCypher(AbstractEscortOrbit::JuxtaOrbit) {
-        manaDrain(120f)
-    }
+    val SNOWBALL_ORBIT = registerCypher(AbstractEscortOrbit::SnowballOrbit, 20f)
+    val FIREWORK_ORBIT = registerCypher(AbstractEscortOrbit::FireworkOrbit, 100f)
+    val JUXTA_ORBIT = registerCypher(AbstractEscortOrbit::JuxtaOrbit, 120f)
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -586,6 +585,11 @@ object Cyphers {
         constructor: (builder: CypherDataMap.Builder.() -> CypherDataMap.Builder) -> CY,
         defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE_ATTR
     ): Holder<CY> = registerCypher(constructor(defaultAttribute))
+
+    private fun <CY: AbstractCypher> registerCypher(
+        constructor: (builder: CypherDataMap.Builder.() -> CypherDataMap.Builder) -> CY,
+        manaDrain: Float
+    ): Holder<CY> = registerCypher(constructor { manaDrain(manaDrain) })
 
 
     private typealias CypherProjectileHolder = DeferredHolder<EntityType<*>, out EntityType<out AbstractDedicatedCypherProjectile>>

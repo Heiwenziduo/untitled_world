@@ -265,3 +265,10 @@ inline fun AABB.clipWithDirection(
     }
 }
 
+fun AABB.expandToAtMost(to: Vec3, most: Double) =
+    expandTowards(
+        to.x.coerceIn(-most, +most),
+        to.y.coerceIn(-most, +most),
+        to.z.coerceIn(-most, +most)
+    )
+

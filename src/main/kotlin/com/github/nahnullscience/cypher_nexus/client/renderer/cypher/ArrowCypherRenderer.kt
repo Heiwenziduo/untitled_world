@@ -1,16 +1,20 @@
 package com.github.nahnullscience.cypher_nexus.client.renderer.cypher
 
+import com.github.nahnullscience.cypher_nexus.client.particle.addCypherTrailParticle
 import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.ArrowCypherRenderState
-import com.github.nahnullscience.cypher_nexus.content.entity.Arrow
+import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.Arrow
+import com.github.nahnullscience.cypher_nexus.utility.linearInterpolateTimes
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.model.geom.ModelLayers
 import net.minecraft.client.model.`object`.projectile.ArrowModel
+import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context
 import net.minecraft.client.renderer.entity.TippableArrowRenderer.NORMAL_ARROW_LOCATION
 import net.minecraft.client.renderer.state.level.CameraRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.core.particles.ParticleTypes
 
 class ArrowCypherRenderer (
     context: Context
@@ -41,7 +45,30 @@ class ArrowCypherRenderer (
         poseStack.popPose()
         super.submit(state, poseStack, submitNodeCollector, camera)
     }
-//
+
+    override fun addTrailParticles(
+        level: ClientLevel,
+        entity: Arrow,
+        x: Double,
+        y: Double,
+        z: Double,
+        xo: Double,
+        yo: Double,
+        zo: Double
+    ) {
+        val speed = entity.knownMovement
+        linearInterpolateTimes(xo, yo, zo, x, y, z, 1) { step, x, y, z ->
+            addCypherTrailParticle(
+                entity,
+                ParticleTypes.CRIT,
+                x, y, z,
+                -speed.x * 0.25,
+                -speed.y * 0.25,
+                -speed.z * 0.25
+            )
+        }
+    }
+
 //    override fun submitCypher(
 //        state: ArrowCypherRenderState,
 //        poseStack: PoseStack,

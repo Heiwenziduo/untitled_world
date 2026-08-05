@@ -1,13 +1,13 @@
-package com.github.nahnullscience.cypher_nexus.content.entity
+package com.github.nahnullscience.cypher_nexus.content.entity.projectiles
 
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
-class DrillingBlast(
+class SmokeBomb(
     entityType: EntityType<out AbstractDedicatedCypherProjectile>,
     level: Level
 ) : AbstractDedicatedCypherProjectile(entityType, level) {
-    override val cypherHolder = Cyphers.DRILLING_BLAST
+    override val cypherHolder = Cyphers.SMOKE_BOMB
 }

@@ -1,10 +1,9 @@
-package com.github.nahnullscience.cypher_nexus.content.entity
+package com.github.nahnullscience.cypher_nexus.content.entity.projectiles
 
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers.BUBBLE_COLUMN
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
 import net.minecraft.core.Direction
-import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level

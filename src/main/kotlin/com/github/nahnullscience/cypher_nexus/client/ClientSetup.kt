@@ -84,6 +84,8 @@ object ClientSetup {
         event.registerParticleProjectile(ModEntities.CYPHER_DRILLING_BOLT)
         event.registerParticleProjectile(ModEntities.CYPHER_DRILLING_BLAST)
         event.registerEntityRenderer(ModEntities.CYPHER_SMOKE_BOMB, ::SmokeBombCypherRenderer)
+        event.registerEntityRenderer(ModEntities.CYPHER_FIREWORK_ROCKET, ::FireworkRocketCypherRenderer)
+        event.registerEntityRenderer(ModEntities.CYPHER_RANDOM_FIREWORK_ROCKET, ::FireworkRocketCypherRenderer)
 
         //////////////////////////////////////////////////////////////////////////////
         // static

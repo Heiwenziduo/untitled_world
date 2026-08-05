@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getExisting
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.utility.isServerSide
 import com.github.nahnullscience.cypher_nexus.utility.plus
@@ -34,6 +35,11 @@ open class EscortOrbitSteerer(resource: Identifier) : AbstractCypherSteerer(reso
         ce.setAttribute(CypherAttributes.BOUNCE, 0.0)
         ce.setAttribute(CypherAttributes.GRAVITY_FACTOR, 0.0)
         ce.setAttribute(CypherAttributes.FRICTION_FACTOR, 0.0)
+
+        ce.owner?.let {
+            if (it is ICypherEntity)
+                ce.setAttribute(CypherAttributes.EXISTING, it.getExisting().toDouble())
+        }
     }
 
     override fun <CE> tick(ce: CE) where CE : ICypherEntity, CE : Entity {

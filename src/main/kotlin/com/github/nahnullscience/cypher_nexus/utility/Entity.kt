@@ -16,6 +16,9 @@ object EntityUtil {
         return true
     }
 }
+
+inline val Entity.level get() = level()
+
 /**
  * a direct duplication of #updateRotation in Projectile
  * */

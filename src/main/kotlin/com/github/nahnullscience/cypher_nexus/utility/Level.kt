@@ -22,7 +22,6 @@ fun Level.sideString(): String = if (isClientSide) CLIENT else SERVER
 
 inline val Level.isServerSide get() = !isClientSide
 
-inline val Entity.level get() = level()
 
 /**
  * an optimized entity searching function.

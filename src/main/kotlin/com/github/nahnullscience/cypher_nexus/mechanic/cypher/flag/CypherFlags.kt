@@ -67,10 +67,11 @@ enum class CypherFlags : IFlagExtension.IFlagEnum {
     WITH_ENDER_POWER,
 
     /**
+     * with physics,
      * keep existence even speed is low
      * */
     // TODO
-    LINGER,
+    PHYSICS_SOLID,
 
     /**
      * let the projectile movement client-authoritative, if the owner is client-authoritative
@@ -92,6 +93,7 @@ enum class CypherFlags : IFlagExtension.IFlagEnum {
      * always render in full light
      * */
     GLOWING,
+
 
 //    /**
 //     * disable rotation and save a few triangular computation each tick,

@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.content.entity
+package com.github.nahnullscience.cypher_nexus.content.entity.projectiles
 
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers.ENDER_RECALL
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
