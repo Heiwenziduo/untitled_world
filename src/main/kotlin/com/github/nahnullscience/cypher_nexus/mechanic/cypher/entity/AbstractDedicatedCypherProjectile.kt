@@ -5,6 +5,7 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.CypherEntityDelegation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.cypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getExisting
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
@@ -67,6 +68,7 @@ abstract class AbstractDedicatedCypherProjectile(
         // only on client
         // should note this function is called after EntityJoinLevelEvent
         // this results initEntity -> initCypher order on client side
+        // while        initCypher -> initEntity on the server side
         val hasCC = buffer.readBoolean()
         val ccMap = if (hasCC) MOCC_STREAM.decode(buffer) else null
         val steerer = CYPHER_STEERER_STREAM.decode(buffer)
@@ -76,8 +78,6 @@ abstract class AbstractDedicatedCypherProjectile(
 
     override fun onAddedToLevel() {
         super.onAddedToLevel()
-        println("onAddToLevel ${level().sideString()}")
-        debugAttributes()
     }
 
     override fun onRemovedFromLevel() {

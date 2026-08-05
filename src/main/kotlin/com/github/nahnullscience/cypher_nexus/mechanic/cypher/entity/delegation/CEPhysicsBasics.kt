@@ -32,24 +32,24 @@ import net.minecraft.world.phys.Vec3
 import kotlin.math.pow
 
 open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypherEntity {
-    protected lateinit var cyEntity: CE
-    protected val level get() = cyEntity.level()
-    protected val random get() = cyEntity.random
+    protected lateinit var ce: CE
+    protected val level get() = ce.level()
+    protected val random get() = ce.random
 
 
     override var triggerType = TriggerType.NONE
     override var payload: ShotStateChunk? = null
 
     protected var bounceCount = 0
-    override val canBounce: Boolean get() = bounceCount < cyEntity.getBounce()
+    override val canBounce: Boolean get() = bounceCount < ce.getBounce()
     override val bouncePoints = ArrayList<Vec3>()
     override val bouncedThisTick: Boolean get() = bouncePoints.isNotEmpty()
 
     protected var capturedInitialSpeedSqr: Double = 0.0
     protected var lowSpeedTickCount = 0
 
-    protected val collideWithBlocks: Boolean get() = cyEntity.noFlagsNone(CypherFlags.IGNORE_BLOCK, CypherFlags.PENETRATE_WORLD)
-    protected val collideWithEntities: Boolean get() = cyEntity.noFlagsNone(CypherFlags.PENETRATE_WORLD)
+    protected val collideWithBlocks: Boolean get() = ce.noFlagsNone(CypherFlags.IGNORE_BLOCK, CypherFlags.PENETRATE_WORLD)
+    protected val collideWithEntities: Boolean get() = ce.noFlagsNone(CypherFlags.PENETRATE_WORLD)
 
     override fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk?, node: ProjectileNode?) {
         if (node != null) {
@@ -58,29 +58,29 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         }
     }
 
-    override fun initEntity(ce: CE) = let { cyEntity = ce }
+    override fun initEntity(ce: CE) = let { this@CEPhysicsBasics.ce = ce }
 
 
 
     protected open fun applyGravity() {
-        if (cyEntity.getGravityFactor() != 0.0)
-            cyEntity.deltaMovement = cyEntity.deltaMovement.add(0.0, -cyEntity.getGravityFactor(), 0.0)
+        if (ce.getGravityFactor() != 0.0)
+            ce.deltaMovement = ce.deltaMovement.add(0.0, -ce.getGravityFactor(), 0.0)
     }
 
     protected open fun applyFriction() {
         val f: Double =
-            if (cyEntity.isInWater) cyEntity.getUnderwaterSpeedFactor() * cyEntity.getSpeedFactor()
-            else cyEntity.getSpeedFactor()
-        if (f != 1.0) cyEntity.deltaMovement *= f
+            if (ce.isInWater) ce.getUnderwaterSpeedFactor() * ce.getSpeedFactor()
+            else ce.getSpeedFactor()
+        if (f != 1.0) ce.deltaMovement *= f
     }
 
     override fun trigger(type: TriggerType, releaseTo: PosDirePair) {
         payload?.release(
             level,
-            cyEntity.perspectiveCoordinate(),
+            ce.perspectiveCoordinate(),
             releaseTo,
-            cyEntity,
-            cyEntity.owner,
+            ce,
+            ce.owner,
             null
         )
     }
@@ -89,47 +89,47 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         if (triggerType != TriggerType.NONE && type == triggerType)
             when (type) {
                 TriggerType.COLLISION ->
-                    cyEntity.trigger(type, PosDirePair(releasePoint, cyEntity.deltaMovement.reverse()))
+                    ce.trigger(type, PosDirePair(releasePoint, ce.deltaMovement.reverse()))
                 else ->
-                    cyEntity.trigger(type, PosDirePair(releasePoint, cyEntity.deltaMovement))
+                    ce.trigger(type, PosDirePair(releasePoint, ce.deltaMovement))
             }
     }
 
 
     override fun discardCypher(reason: DiscardReason) {
         if (level.isClientSide) return
-        trigger(TriggerType.DEATH, cyEntity.position())
+        trigger(TriggerType.DEATH, ce.position())
         when(reason){
             DiscardReason.ERASE -> {}
             else -> {
-                cyEntity.beforeDiscard(cyEntity, reason)
-                cyEntity.steerer.discard(cyEntity, reason)
+                ce.beforeDiscard(ce, reason)
+                ce.steerer.discard(ce, reason)
             }
         }
-        level.broadcastEntityEvent(cyEntity, 3)
-        cyEntity.discard()
+        level.broadcastEntityEvent(ce, 3)
+        ce.discard()
     }
 
     override fun doTick() {
         Profiler.get().push { "cypherEntityTick" }
 
-        if (cyEntity.tickCount == 1) {
-            cyEntity.onFirstTick(cyEntity)
-            cyEntity.steerer.init(cyEntity)
+        if (ce.tickCount == 1) {
+            ce.onFirstTick(ce)
+            ce.steerer.init(ce)
         }
-        if (triggerType.timer == cyEntity.tickCount) trigger(triggerType, cyEntity.position())
+        if (triggerType.timer == ce.tickCount) trigger(triggerType, ce.position())
 
-        cyEntity.captureSurroundings(cyEntity)
+        ce.captureSurroundings(ce)
 
-        if (cyEntity.tickCount == 3) {
-            capturedInitialSpeedSqr = cyEntity.deltaMovement.lengthSqr()
+        if (ce.tickCount == 3) {
+            capturedInitialSpeedSqr = ce.deltaMovement.lengthSqr()
         }
 
 //        cyEntity.hooksSharedData.tick(cyEntity)
 //        if (moveAsProjectile)
         projectileTick()
 
-        if (cyEntity.getExisting() <= cyEntity.tickCount && cyEntity.getExisting() != 0) {
+        if (ce.getExisting() <= ce.tickCount && ce.getExisting() != 0) {
             // here's a trick, if player make existing-time exactly equal to 0, projectile will last till the game quit
             discardCypher(DiscardReason.EXPIRE)
         }
@@ -145,15 +145,15 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
          * deltaMovement: the movement for the "next tick", client smooth animation relay on this
          * an AABB check is used everyTick every vanilla projectile, sounds outrageous, but is ok in performance
          * */
-        cyEntity.onTick(cyEntity)
-        cyEntity.steerer.tick(cyEntity)
+        ce.onTick(ce)
+        ce.steerer.tick(ce)
 
-        cyEntity.rotateTowardSpeed(cyEntity.getRotationSpeed())
-        cyEntity.finalizeTickMovement(cyEntity)
-        cyEntity.steerer.tickSpeedOverride(cyEntity)
+        ce.rotateTowardSpeed(ce.getRotationSpeed())
+        ce.finalizeTickMovement(ce)
+        ce.steerer.tickSpeedOverride(ce)
 
-        if (cyEntity.deltaMovement.lengthSqr() <= LOW_SPEED_THRESHOLD_SQR)
-            cyEntity.onLowSpeed(cyEntity, lowSpeedTickCount++, capturedInitialSpeedSqr)
+        if (ce.deltaMovement.lengthSqr() <= LOW_SPEED_THRESHOLD_SQR)
+            ce.onLowSpeed(ce, lowSpeedTickCount++, capturedInitialSpeedSqr)
         else lowSpeedTickCount = 0
 
         loopHitAndBounce()
@@ -167,8 +167,8 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
 
         bouncePoints.clear()
 //        val speedSqr = cyEntity.deltaMovement.lengthSqr()
-        var stepPosition = cyEntity.position()
-        var stepMovement = cyEntity.deltaMovement
+        var stepPosition = ce.position()
+        var stepMovement = ce.deltaMovement
 
         var hitSomething: Boolean
         var loopTimes = 0
@@ -177,7 +177,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
 //        else if (speedSqr <= LOW_SPEED_THRESHOLD_SQR) {} // too slow, do nothing
         else
             do {
-                if (cyEntity.isRemoved) break
+                if (ce.isRemoved) break
                 hitSomething = false
 
                 val stepDestination0 = stepPosition.add(stepMovement)
@@ -190,7 +190,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
                 if (collideWithBlocks) {
                     // get path end-point by checking Block collision
                     blockResult = level.clipIncludingBorder(
-                        ClipContext(stepPosition, destination, Block.COLLIDER, Fluid.NONE, cyEntity)
+                        ClipContext(stepPosition, destination, Block.COLLIDER, Fluid.NONE, ce)
                     )
                     if (blockResult.type != Type.MISS) {
                         // truncate stepDestination
@@ -202,13 +202,13 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
 
                 // handle entity collisions
                 if (collideWithEntities) {
-                    val margin = HIT_BB_INFLATION + cyEntity.getDimensions(cyEntity.pose).width / 2
-                    if (cyEntity.haveFlag(CypherFlags.PIERCE_ENTITY)) {
+                    val margin = HIT_BB_INFLATION + ce.getDimensions(ce.pose).width / 2
+                    if (ce.haveFlag(CypherFlags.PIERCE_ENTITY)) {
                         // if tagged pierce, collide all
                         level.getEntities(
-                            cyEntity,
-                            cyEntity.boundingBox.expandTowards(stepMovement),
-                            cyEntity::canHitTarget
+                            ce,
+                            ce.boundingBox.expandTowards(stepMovement),
+                            ce::canHitTarget
                         ).forEach { target ->
                             // there is a trigger call inside whenHit, which may modifies the entity list in section storage.
                             // execute an on-site sub-effect may raise ConcurrentModificationException
@@ -223,9 +223,9 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
                         var hitEntity: Entity? = null
 
                         level.forEachEntityWithin(
-                            cyEntity,
-                            cyEntity.boundingBox.expandTowards(stepMovement),
-                            cyEntity::canHitTarget
+                            ce,
+                            ce.boundingBox.expandTowards(stepMovement),
+                            ce::canHitTarget
                         ) { target ->
                             stepPosition.rayCastThen(destination, target.boundingBox, margin) { hitPoint, dir ->
                                 val dd: Double = stepPosition.distanceToSqr(hitPoint)
@@ -252,50 +252,46 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
 
                     if (canBounce) {
                         bounceCount++
-                        cyEntity.onBounce(cyEntity, bouncePoint, bounceCount)
+                        ce.onBounce(ce, bouncePoint, bounceCount)
                         bouncePoints.add(bouncePoint)
 
                         stepPosition = bouncePoint.add(bounceDirection.unitVec3.scale(1E-7)) // avoid "diving into blocks" bug
                         stepMovement = stepDestination0.subtract(destination).flipByAxis(
                             bounceDirection.axis,
-                            cyEntity.getBounceSpeedPenalty()
+                            ce.getBounceSpeedPenalty()
                         )
-                        cyEntity.setPos(stepPosition)
+                        ce.setPos(stepPosition)
                     }
                 }
 
             } while (hitSomething && canBounce && loopTimes++ <= 8)
 
         // finalize position
-        cyEntity.setPos(stepPosition.add(stepMovement))
+        ce.setPos(stepPosition.add(stepMovement))
 
         if (loopTimes > 0) {
-            cyEntity.deltaMovement = cyEntity.deltaMovement.toSameDire(stepMovement).scale(cyEntity.getBounceSpeedPenalty().pow(loopTimes))
-            cyEntity.rotateTowardSpeed(1f) // instant facing direction after bounce
+            ce.deltaMovement = ce.deltaMovement.toSameDire(stepMovement).scale(this@CEPhysicsBasics.ce.getBounceSpeedPenalty().pow(loopTimes))
+            ce.rotateTowardSpeed(1f) // instant facing direction after bounce
         }
 
         Profiler.get().pop()
     }
 
 
-
-    override fun whenHit(result: HitResult, direction: Direction) = Unit
-    override fun whenHitEntity(result: EntityHitResult, direction: Direction) = Unit
-    override fun whenHitBlock(result: BlockHitResult, direction: Direction) = Unit
     // in case subclasses want to override whenHit
     // if implementing it here, any subclass of ICypherEntity can't call super.whenHit since its abstract
     // if implementing it inside ICypherEntity as a default function, there will be one more step to link to the function
     // cyEntity.whenHit -> Delegation.whenHit -> interface default
     protected open fun whenHitDelegate(result: HitResult, direction: Direction) {
-        cyEntity.whenHit(result, direction)
-        cyEntity.onHit(cyEntity, result)
+        ce.whenHit(result, direction)
+        ce.onHit(ce, result)
         if (level.isClientSide || result.type == Type.MISS) return
         trigger(TriggerType.COLLISION, result.location)
 
         if (result is EntityHitResult) {
             whenHitEntityDelegate(result, direction)
 
-            if (!canBounce && cyEntity.noFlag(CypherFlags.PIERCE_ENTITY))
+            if (!canBounce && ce.noFlag(CypherFlags.PIERCE_ENTITY))
                 discardCypher(DiscardReason.HIT_ENTITY)
         }
         else if (result is BlockHitResult) {
@@ -310,15 +306,15 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         result: EntityHitResult,
         direction: Direction
     ) {
-        cyEntity.whenHitEntity(result, direction)
+        ce.whenHitEntity(result, direction)
         val target = result.entity
         if (level.isClientSide) {
-            if (cyEntity.noFlag(CypherFlags.SKIP_DAMAGE_CHECK))
-                target.hurtClient(cyEntity.getDamageSource())
+            if (ce.noFlag(CypherFlags.SKIP_DAMAGE_CHECK))
+                target.hurtClient(ce.getDamageSource())
         }
         else {
-            if (cyEntity.noFlag(CypherFlags.SKIP_DAMAGE_CHECK))
-                cyEntity.exertDamage(level as ServerLevel, target)
+            if (ce.noFlag(CypherFlags.SKIP_DAMAGE_CHECK))
+                ce.exertDamage(level as ServerLevel, target)
         }
     }
 
@@ -326,11 +322,10 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         result: BlockHitResult,
         direction: Direction
     ) {
-        cyEntity.whenHitBlock(result, direction)
+        ce.whenHitBlock(result, direction)
         val blockPos = result.blockPos
-        if (cyEntity.noFlag(CypherFlags.SILENT))
-            this.level.gameEvent(GameEvent.PROJECTILE_LAND, blockPos, Context.of(cyEntity, level.getBlockState(blockPos)))
+        if (ce.noFlag(CypherFlags.SILENT))
+            this.level.gameEvent(GameEvent.PROJECTILE_LAND, blockPos, Context.of(ce, level.getBlockState(blockPos)))
     }
 
-    override fun whileHomeTarget(target: Entity) {}
 }

@@ -1,10 +1,10 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components
 
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.cypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getAttrBaseOrNull
 import net.minecraft.core.Holder
-import net.minecraft.world.entity.Entity
 
 interface ICypherEntityAttributeAccessor {
 
@@ -34,24 +34,24 @@ interface ICypherEntityAttributeAccessor {
      * @return the old value, or null if there isn't.
      * */
     fun setAttribute(holer: Holder<CypherAttribute>, value: Double): Double?
-    /**
-     * get value through entity-specific map > cypher default > attribute default
-     * */
-    fun getAttributeOrDefault(attr: CypherAttribute): Double
-    /**
-     * get value through entity-specific map > cypher default > attribute default
-     * */
-    fun getAttributeOrDefault(holer: Holder<CypherAttribute>): Double
-    /**
-     * @return the unmodified base attribute value of the entity if any
-     * @see [AbstractProjectileCypher.getAttrBaseOrNull]
-     * */
-    fun getAttrBaseOrNull(attr: CypherAttribute): Double?
-    /**
-     * @return the unmodified base attribute value of the entity if any
-     * @see [AbstractProjectileCypher.getAttrBaseOrNull]
-     * */
-    fun getAttrBaseOrNull(holder: Holder<CypherAttribute>): Double?
+//    /**
+//     * get value through entity-specific map > cypher default > attribute default
+//     * */
+//    fun getAttributeOrDefault(attr: CypherAttribute): Double
+//    /**
+//     * get value through entity-specific map > cypher default > attribute default
+//     * */
+//    fun getAttributeOrDefault(holer: Holder<CypherAttribute>): Double
+//    /**
+//     * @return the unmodified base attribute value of the entity if any
+//     * @see [AbstractProjectileCypher.getAttrBaseOrNull]
+//     * */
+//    fun getAttrBaseOrNull(attr: CypherAttribute): Double?
+//    /**
+//     * @return the unmodified base attribute value of the entity if any
+//     * @see [AbstractProjectileCypher.getAttrBaseOrNull]
+//     * */
+//    fun getAttrBaseOrNull(holder: Holder<CypherAttribute>): Double?
 
 
     /**
@@ -61,34 +61,33 @@ interface ICypherEntityAttributeAccessor {
 
 
     companion object {
-        inline fun ICypherEntityAttributeAccessor.computeAttribute(holer: Holder<CypherAttribute>, formular: (current: Double) -> Double) {
+        fun ICypherEntity.getAttributeOrDefault(holer: Holder<CypherAttribute>) = getAttribute(holer) ?: cypher.getAttrBaseOrDefault(holer)
+
+        fun ICypherEntity.getAttrBaseOrNull(holer: Holder<CypherAttribute>) = cypher.getAttrBaseOrNull(holer)
+
+        inline fun ICypherEntity.computeAttribute(holer: Holder<CypherAttribute>, formular: (current: Double) -> Double) {
             val current = getAttributeOrDefault(holer)
             setAttribute(holer, formular(current))
         }
 
-        inline fun ICypherEntityAttributeAccessor.computeAttributeIfPresent(holer: Holder<CypherAttribute>, formular: (current: Double) -> Double) {
+        inline fun ICypherEntity.computeAttributeIfPresent(holer: Holder<CypherAttribute>, formular: (current: Double) -> Double) {
             val current = getAttribute(holer) ?: return
             setAttribute(holer, formular(current))
         }
 
-        inline fun ICypherEntityAttributeAccessor.computeAttributeWithDefault(holer: Holder<CypherAttribute>, formular: (default: Double) -> Double) {
+        inline fun ICypherEntity.computeAttributeWithDefault(holer: Holder<CypherAttribute>, formular: (default: Double) -> Double) {
             val current = getAttrBaseOrNull(holer) ?: holer.value().defaultValue
             setAttribute(holer, formular(current))
         }
 
-        fun <CE> CE.getExisting(): Int where CE : Entity, CE : ICypherEntity =
-            getAttributeOrDefault(CypherAttributes.EXISTING).toInt()
+        fun ICypherEntity.getExisting(): Int = getAttributeOrDefault(CypherAttributes.EXISTING).toInt()
 
-        fun <CE> CE.getBounce(): Int where CE : Entity, CE : ICypherEntity =
-            getAttributeOrDefault(CypherAttributes.BOUNCE).toInt()
+        fun ICypherEntity.getBounce(): Int = getAttributeOrDefault(CypherAttributes.BOUNCE).toInt()
 
-        fun <CE> CE.getGravityFactor(): Double where CE : Entity, CE : ICypherEntity =
-            getAttributeOrDefault(CypherAttributes.GRAVITY_FACTOR)
+        fun ICypherEntity.getGravityFactor(): Double = getAttributeOrDefault(CypherAttributes.GRAVITY_FACTOR)
 
-        fun <CE> CE.getSpeedFactor(): Double where CE : Entity, CE : ICypherEntity =
-            1f - getAttributeOrDefault(CypherAttributes.FRICTION_FACTOR)
+        fun ICypherEntity.getSpeedFactor(): Double = 1f - getAttributeOrDefault(CypherAttributes.FRICTION_FACTOR)
 
-        fun <CE> CE.getEffectRadius(): Float where CE : Entity, CE : ICypherEntity =
-            getAttributeOrDefault(CypherAttributes.EFFECT_RADIUS).toFloat()
+        fun ICypherEntity.getEffectRadius(): Float = getAttributeOrDefault(CypherAttributes.EFFECT_RADIUS).toFloat()
     }
 }

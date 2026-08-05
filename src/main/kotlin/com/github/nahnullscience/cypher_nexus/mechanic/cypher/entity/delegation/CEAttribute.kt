@@ -7,15 +7,12 @@ import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastMap
 import net.minecraft.core.Holder
 
 open class CEAttribute : ICEAttribute {
-    protected lateinit var attributeMap: AttributeFastMap
-    protected lateinit var cypher: AbstractProjectileCypher<*>
+    protected val attributeMap = AttributeFastMap()
 
     override fun initCypher(
         cypher: AbstractProjectileCypher<*>,
         shotState: ShotStateChunk?,
     ) {
-        this.cypher = cypher
-        attributeMap = AttributeFastMap()
         shotState?.let {
             attributeMap.initFromShotState(it, cypher)
         }
@@ -32,14 +29,14 @@ open class CEAttribute : ICEAttribute {
     override fun setAttribute(attr: CypherAttribute, value: Double): Double? = attributeMap.put(attr, value) // return the old
     override fun setAttribute(holer: Holder<CypherAttribute>, value: Double): Double? = setAttribute(holer.value(), value)
 
-    override fun getAttributeOrDefault(attr: CypherAttribute) = attributeMap[attr] ?: cypher.getAttrBaseOrDefault(attr)
-    override fun getAttributeOrDefault(holer: Holder<CypherAttribute>) = getAttributeOrDefault(holer.value())
-
-    override fun getAttrBaseOrNull(attr: CypherAttribute) = cypher.getAttrBaseOrNull(attr)
-    override fun getAttrBaseOrNull(holder: Holder<CypherAttribute>) = getAttrBaseOrNull(holder.value())
+//    override fun getAttributeOrDefault(attr: CypherAttribute) = attributeMap[attr] ?: cypher.getAttrBaseOrDefault(attr)
+//    override fun getAttributeOrDefault(holer: Holder<CypherAttribute>) = getAttributeOrDefault(holer.value())
+//
+//    override fun getAttrBaseOrNull(attr: CypherAttribute) = cypher.getAttrBaseOrNull(attr)
+//    override fun getAttrBaseOrNull(holder: Holder<CypherAttribute>) = getAttrBaseOrNull(holder.value())
 
     override fun debugAttributes() {
-        println("attribute: ")
+        println("Attributes: ")
         if (hasModifiedAttribute())
         for ((a, d) in attributeMap) {
             println("$a: $d")

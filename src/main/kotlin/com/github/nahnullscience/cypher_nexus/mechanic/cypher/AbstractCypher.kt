@@ -60,7 +60,7 @@ sealed class AbstractCypher(
             CypherHooks.REGISTRY.filter { module ->
                 val c1 = module.hook.isInstance(this)
                 val c2 = (this is AbstractProjectileCypher<*> && module.type == HookType.BEHAVIOR)
-                    .also { if (it) CypherNexus.LOGGER.warn("Don't register [behavior] hook [{}] on [projectile-cypher] [{}], instead implement them on related cypher-entity directly.", module.hook, this) }
+                    .also { if (c1 && it) CypherNexus.LOGGER.warn("Don't register [behavior] hook [{}] on [projectile-cypher] [{}], instead implement them on related cypher-entity directly.", module.hook, this) }
 
                 return@filter c1 && !c2
             }.also { _implementHooksBacking = it }

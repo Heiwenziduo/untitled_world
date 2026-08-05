@@ -4,11 +4,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReas
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
-import net.minecraft.core.Direction
-import net.minecraft.world.entity.Entity
-import net.minecraft.world.phys.BlockHitResult
-import net.minecraft.world.phys.EntityHitResult
-import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 
 interface ICypherEntityPhysics {
@@ -23,31 +18,18 @@ interface ICypherEntityPhysics {
     val bouncedThisTick: Boolean
     val canBounce: Boolean
 
+    /**
+     *
+     * */
+    fun trigger(type: TriggerType, releaseTo: PosDirePair)
 
-
-    /***/
+    /**
+     *
+     * */
     fun discardCypher(reason: DiscardReason)
 
     /**
      * should call inside Entity#tick, this handles all cypher-related logic
      * */
     fun doTick()
-    /***/
-    fun trigger(type: TriggerType, releaseTo: PosDirePair)
-
-    /**
-     * when the entity "hit" something,
-     * both [net.minecraft.world.phys.EntityHitResult] and [net.minecraft.world.phys.BlockHitResult]
-     * will be passed into this method.
-     *
-     * this method is called on both sides
-     * */
-    fun whenHit(result: HitResult, direction: Direction)
-    fun whenHitEntity(result: EntityHitResult, direction: Direction)
-    fun whenHitBlock(result: BlockHitResult, direction: Direction)
-
-    /**
-     *
-     * */
-    fun whileHomeTarget(target: Entity)
 }

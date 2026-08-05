@@ -3,7 +3,9 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.cypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getAttributeOrDefault
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityLogicContext
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityPhysics
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
@@ -33,14 +35,12 @@ class CypherEntityDelegation <CE> (
         private set
 
 
-    override val cypherHolder: Holder<out AbstractProjectileCypher<*>> get() = cyEntity.cypherHolder // FIXME this may lead to infinite loop
+    override val cypherHolder get() =
+        throw CypherEntityException("field #cypherHolder should be implemented by the concrete cypher-entity.")
 
-    private var _cyEntity: CE? = null
-    private val cyEntity: CE get() = _cyEntity ?:
-    throw CypherEntityException("CypherEntityDelegation failed to initialize! make sure call #initEntity before it's adding to world!")
-
-    override fun getDirectionInitial(): Vec3 = _initDirection ?: Vec3.ZERO
-    override fun getPositionInitial(): Vec3  = _initPosition ?: cyEntity.owner?.position() ?: Vec3.ZERO
+//    private var _cyEntity: CE? = null
+//    private val cyEntity: CE get() = _cyEntity ?:
+//        throw CypherEntityException("CypherEntityDelegation failed to initialize! make sure call #initEntity before it's adding to world!")
 
 
     override fun initCypher(
@@ -81,6 +81,10 @@ class CypherEntityDelegation <CE> (
         physics.initEntity(ce)
         initDirection(ce)
     }
+
+
+    override fun getDirectionInitial(): Vec3 = _initDirection ?: Vec3.ZERO
+    override fun getPositionInitial(): Vec3  = _initPosition ?: owner?.position() ?: Vec3.ZERO
 
     private var _initPosition: Vec3? = null // due to CyEntity init timing, remember direction data and init later
     private var _initDirection: Vec3? = null

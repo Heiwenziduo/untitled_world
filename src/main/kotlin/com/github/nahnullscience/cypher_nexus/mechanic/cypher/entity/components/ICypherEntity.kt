@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getAttributeOrDefault
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.CypherEntityDelegation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
@@ -29,7 +30,6 @@ interface ICypherEntity :
     ICypherEntityPhysics
 {
     val cypherHolder: Holder<out AbstractProjectileCypher<*>>
-    val cypher get() = cypherHolder.value()
 
     /**
      * initialize from [MapOfCypherCounts]
@@ -68,12 +68,6 @@ interface ICypherEntity :
     ///////////////////////////// helpers /////////////////////////////////
     @EventBusSubscriber(modid = CypherNexus.MOD_ID)
     companion object {
-        const val CLIP_MARGIN = 0.2f
-        const val CAPTURE_SIZE = 8.0
-        const val CAPTURE_SIZE_SQR = CAPTURE_SIZE * CAPTURE_SIZE
-        const val LOW_SPEED_THRESHOLD = 0.02
-        const val LOW_SPEED_THRESHOLD_SQR = LOW_SPEED_THRESHOLD * LOW_SPEED_THRESHOLD
-        const val HIT_BB_INFLATION = 0.25
 
         @SubscribeEvent(priority = EventPriority.NORMAL)
         private fun initCypherEntity(event: EntityJoinLevelEvent) {
@@ -82,6 +76,15 @@ interface ICypherEntity :
                 entity.initEntity(entity)
             }
         }
+
+        const val CLIP_MARGIN = 0.2f
+        const val CAPTURE_SIZE = 8.0
+        const val CAPTURE_SIZE_SQR = CAPTURE_SIZE * CAPTURE_SIZE
+        const val LOW_SPEED_THRESHOLD = 0.02
+        const val LOW_SPEED_THRESHOLD_SQR = LOW_SPEED_THRESHOLD * LOW_SPEED_THRESHOLD
+        const val HIT_BB_INFLATION = 0.25
+
+        val ICypherEntity.cypher get() = cypherHolder.value()
 
 
         fun ICypherEntity.exertDamage(level: ServerLevel, target: Entity) {

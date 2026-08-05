@@ -11,9 +11,12 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedDa
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
+import net.minecraft.core.Direction
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.TraceableEntity
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 
@@ -61,11 +64,26 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
      * use as general entity selector through [net.minecraft.world.level.Level.getEntities]
      * */
     fun canHitTarget(target: Entity): Boolean
+    /**
+     * when the entity "hit" something,
+     * both [net.minecraft.world.phys.EntityHitResult] and [net.minecraft.world.phys.BlockHitResult]
+     * will be passed into this method.
+     *
+     * this method is called on both sides
+     * */
+    fun whenHit(result: HitResult, direction: Direction)
+    fun whenHitEntity(result: EntityHitResult, direction: Direction)
+    fun whenHitBlock(result: BlockHitResult, direction: Direction)
 
     /**
      *
      * */
     fun canHomeTarget(target: Entity): Boolean
+
+    /**
+     *
+     * */
+    fun whileHomeTarget(target: Entity)
 
 
 
