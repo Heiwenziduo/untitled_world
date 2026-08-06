@@ -161,7 +161,7 @@ object Cyphers {
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.0)
         projectileAttr(CypherAttributes.FRICTION_FACTOR, -0.02)
     }
-    val FIREWORK_ROCKET = registerProjectile(ModEntities.CYPHER_FIREWORK_ROCKET) {
+    val FIREWORK_ROCKET = registerProjectile(ModEntities.CYPHER_FIREWORK_ROCKET, TriggerType.DEATH) {
         configFirework()
         manaDrain(50f)
     }

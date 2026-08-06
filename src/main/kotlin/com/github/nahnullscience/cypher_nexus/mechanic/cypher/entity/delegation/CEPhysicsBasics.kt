@@ -122,14 +122,13 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         if (ce.tickCount == 1) {
             ce.onFirstTick(ce)
             ce.steerer.init(ce)
-        }
-        if (triggerType.timer == ce.tickCount) trigger(triggerType, ce.position())
-
-        ce.captureSurroundings(ce)
-
-        if (ce.tickCount == 3) {
             capturedInitialSpeedSqr = ce.deltaMovement.lengthSqr()
         }
+
+        if (triggerType.timer == ce.tickCount) trigger(triggerType, ce.position())
+
+        // try capture on tick 1, and then every 4 ticks
+        if (ce.tickCount == 1 || (ce.tickCount - 2) and 3 == 3) ce.captureSurroundings(ce)
 
 //        cyEntity.hooksSharedData.tick(cyEntity)
 //        if (moveAsProjectile)

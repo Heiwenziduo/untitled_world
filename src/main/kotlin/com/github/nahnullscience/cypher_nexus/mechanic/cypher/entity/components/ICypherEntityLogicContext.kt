@@ -3,7 +3,6 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.CAPTURE_SIZE
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.LOW_SPEED_THRESHOLD_SQR
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
@@ -66,7 +65,7 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
     fun canHitTarget(target: Entity): Boolean
     /**
      * when the entity "hit" something,
-     * both [net.minecraft.world.phys.EntityHitResult] and [net.minecraft.world.phys.BlockHitResult]
+     * both [EntityHitResult] and [BlockHitResult]
      * will be passed into this method.
      *
      * this method is called on both sides
@@ -98,27 +97,25 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
      * @see CypherHooks.ENTITY_CAPTURE
      * */
     fun <CE> captureSurroundings(ce: CE) where CE : Entity, CE : ICypherEntity {
-        if (ce.tickCount == 1 || (ce.tickCount - 2) and 3 == 3) { // trigger on tick 1, and then every 4 ticks
-            hooks?.get(CypherHooks.ENTITY_CAPTURE)?.let {
-                val level = ce.level()
-                var need = ce.needCaptureSurrounding()
-                if (!need) run {
-                    hooks?.cumulateHooks(CypherHooks.ENTITY_CAPTURE, false) { _, hook, _, _ ->
-                        need = hook.needCapture(level, ce)
-                        if (need) return@run
-                        false
-                    }
+        hooks?.get(CypherHooks.ENTITY_CAPTURE)?.let {
+            val level = ce.level()
+            var need = ce.needCaptureSurrounding()
+            if (!need) run {
+                hooks?.cumulateHooks(CypherHooks.ENTITY_CAPTURE, false) { _, hook, _, _ ->
+                    need = hook.needCapture(level, ce)
+                    if (need) return@run
+                    false
                 }
+            }
 
-                if (need) {
-                    val entities = level.getEntities(
-                        ce,
-                        ce.boundingBox.inflate(CAPTURE_SIZE)
-                    ) { entity -> ce.canHitTarget(entity) && entity !is ICypherEntity }
+            if (need) {
+                val entities = level.getEntities(
+                    ce,
+                    ce.boundingBox.inflate(CAPTURE_SIZE)
+                ) { entity -> ce.canHitTarget(entity) && entity !is ICypherEntity }
 
-                    for (entity in entities) {
-                        ce.forEntityCaptured(ce, entity)
-                    }
+                for (entity in entities) {
+                    ce.forEntityCaptured(ce, entity)
                 }
             }
         }
