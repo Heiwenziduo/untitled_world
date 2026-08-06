@@ -15,6 +15,7 @@ object ModDamageTypes {
         ResourceKey.create(Registries.DAMAGE_TYPE, CypherNexus.modResource(path))
 
     val CYPHER_DEFAULT = damageType("cypher_default")
+    val CYPHER_DEFAULT_EXPLOSION = damageType("cypher_default_explosion")
 
     // generate jsons
     fun registerDamageType(bootstrap: BootstrapContext<DamageType>) {
@@ -26,6 +27,13 @@ object ModDamageTypes {
                 DeathMessageType.DEFAULT
             )
         )
-        bootstrap
+        bootstrap.register(CYPHER_DEFAULT_EXPLOSION, DamageType(
+            CYPHER_DEFAULT_EXPLOSION.identifier().path,
+                DamageScaling.NEVER,
+                0.1f,
+                DamageEffects.HURT,
+                DeathMessageType.DEFAULT
+            )
+        )
     }
 }

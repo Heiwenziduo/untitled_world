@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider.Context
 import net.minecraft.client.renderer.item.ItemModelResolver
 import net.minecraft.client.renderer.state.level.CameraRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
-import net.minecraft.world.entity.projectile.ItemSupplier
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
@@ -46,7 +45,7 @@ class SimpleItemProjectileRenderer <CE> (
         camera: CameraRenderState,
     ) {
         poseStack.pushPose()
-        poseStack.cypherSetup(state, submitNodeCollector, camera)
+        poseStack.scaleByEffectRadius(state)
         poseStack.scale(DEFAULT_SCALE, DEFAULT_SCALE, DEFAULT_SCALE)
         poseStack.mulPose(camera.orientation)
         poseStack.translate(0f, -0.125f, 0f) // put item in the center of a bounding box, no matter how it scaled

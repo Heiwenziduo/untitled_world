@@ -105,6 +105,8 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     override fun discardCypher(reason: DiscardReason) {
         if (level.isClientSide) return
         trigger(TriggerType.DEATH, ce.position())
+        ce.explosion?.explode(level as ServerLevel, ce.x, ce.y, ce.z)
+
         when(reason){
             DiscardReason.ERASE -> {}
             else -> {
@@ -122,6 +124,9 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         if (ce.tickCount == 1) {
             ce.onFirstTick(ce)
             ce.steerer.init(ce)
+        }
+
+        if (ce.tickCount == 3) {
             capturedInitialSpeedSqr = ce.deltaMovement.lengthSqr()
         }
 

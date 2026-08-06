@@ -65,8 +65,9 @@ abstract class AbstractCypherRenderer <CE, State> (
     /**
      *
      * */
-    protected fun PoseStack.cypherSetup(state: State, submitNodeCollector: SubmitNodeCollector, camera: CameraRenderState) {
-        scale(state.effectRadius, state.effectRadius, state.effectRadius)
+    protected fun PoseStack.scaleByEffectRadius(state: State, factor: Float? = null) {
+        val f = factor?.times(state.effectRadius) ?: state.effectRadius
+        scale(f, f, f)
 
 //        submitNodeCollector.submitParticleGroup() {  }
 

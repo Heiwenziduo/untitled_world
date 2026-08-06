@@ -20,6 +20,9 @@ import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 
 interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
+    companion object {
+        fun <CE> CE.canNotHurtOwner(): Boolean where CE : Entity, CE : ICypherEntity = !canHurtOwner(this)
+    }
 
     /**
      * [MapOfCypherCounts] serves as the token of [ShotStateChunk],
@@ -38,6 +41,8 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
     val hue: Int?
     /** 0f~1f float representation of [hue], in order of r0 g1 b2 a3 */
     val hueFloatArray: FloatArray?
+
+    val explosion: ExplosionSettings<*>?
 
     override fun getOwner(): Entity?
     fun setOwner(owner: Entity?)
@@ -60,6 +65,11 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
     fun getDamageSource(): DamageSource
 
     /**
+     *
+     * */
+    fun getExplosionDamageSource(): DamageSource
+
+    /**
      * use as general entity selector through [net.minecraft.world.level.Level.getEntities]
      * */
     fun canHitTarget(target: Entity): Boolean
@@ -70,9 +80,9 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
      *
      * this method is called on both sides
      * */
-    fun whenHit(result: HitResult, direction: Direction)
-    fun whenHitEntity(result: EntityHitResult, direction: Direction)
-    fun whenHitBlock(result: BlockHitResult, direction: Direction)
+    fun whenHit(result: HitResult, direction: Direction) = Unit
+    fun whenHitEntity(result: EntityHitResult, direction: Direction) = Unit
+    fun whenHitBlock(result: BlockHitResult, direction: Direction) = Unit
 
     /**
      *
@@ -82,7 +92,7 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
     /**
      *
      * */
-    fun whileHomeTarget(target: Entity)
+    fun whileHomeTarget(target: Entity) = Unit
 
 
 

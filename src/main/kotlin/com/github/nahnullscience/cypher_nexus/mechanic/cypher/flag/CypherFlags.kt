@@ -81,8 +81,12 @@ enum class CypherFlags : IFlagExtension.IFlagEnum {
     /**
      * let the projectile explode when disappear
      * */
-    // TODO
     EXPLOSIVE,
+
+    /**
+     * make explosions not break blocks
+     * */
+    SAFE_EXPLODE,
 
     /**
      * do not play server sound

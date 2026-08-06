@@ -25,7 +25,7 @@ class LlamaSpitCypherRenderer (
     ) {
         poseStack.pushPose()
         poseStack.translate(0.0f, 0.15f, 0.0f)
-        poseStack.cypherSetup(state, submitNodeCollector, camera)
+        poseStack.scaleByEffectRadius(state)
         poseStack.mulPose(Axis.YP.rotationDegrees(state.yRot - 90.0f))
         poseStack.mulPose(Axis.ZP.rotationDegrees(state.xRot))
         submitNodeCollector.submitModel(

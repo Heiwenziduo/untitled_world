@@ -84,10 +84,14 @@ interface ICypherEntityAttributeAccessor {
 
         fun ICypherEntity.getBounce(): Int = getAttributeOrDefault(CypherAttributes.BOUNCE).toInt()
 
+        fun ICypherEntity.getInitialSpeed(): Double = getAttributeOrDefault(CypherAttributes.SPEED)
+
         fun ICypherEntity.getGravityFactor(): Double = getAttributeOrDefault(CypherAttributes.GRAVITY_FACTOR)
 
         fun ICypherEntity.getSpeedFactor(): Double = 1f - getAttributeOrDefault(CypherAttributes.FRICTION_FACTOR)
 
         fun ICypherEntity.getEffectRadius(): Float = getAttributeOrDefault(CypherAttributes.EFFECT_RADIUS).toFloat()
+
+        fun ICypherEntity.getDamage(): Float = getAttributeOrDefault(CypherAttributes.DAMAGE).toFloat()
     }
 }

@@ -66,6 +66,7 @@ object Cyphers {
     val ARROW = registerProjectile(ModEntities.CYPHER_ARROW, TriggerType.COLLISION, TriggerType.TIMER_10) {
         manaDrain(15f)
         delay(3)
+        flags(CypherFlags.PHYSICS_SOLID)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -16.0)
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 1.0)
         projectileAttr(CypherAttributes.DAMAGE, 3.0)
@@ -142,7 +143,7 @@ object Cyphers {
     val SMOKE_BOMB = registerProjectile(ModEntities.CYPHER_SMOKE_BOMB) {
         manaDrain(40f)
         delay(6)
-        flags(CypherFlags.PHYSICS_SOLID, CypherFlags.EXPLOSIVE)
+        flags(CypherFlags.PHYSICS_SOLID, CypherFlags.EXPLOSIVE, CypherFlags.SAFE_EXPLODE)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 3.0)
         projectileAttr(CypherAttributes.DAMAGE, 2.0)
         projectileAttr(CypherAttributes.CRIT_CHANCE, 0.05)
@@ -152,7 +153,7 @@ object Cyphers {
     }
     private val configFirework: SimpleProjectile.() -> Unit = {
         recharge(5)
-        flags(CypherFlags.EXPLOSIVE)
+        flags(CypherFlags.EXPLOSIVE, CypherFlags.SAFE_EXPLODE)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -5.0)
         projectileAttr(CypherAttributes.DAMAGE, 4.0)
         projectileAttr(CypherAttributes.CRIT_CHANCE, 0.1)
@@ -233,17 +234,18 @@ object Cyphers {
         shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.35)
     }
     val EFFECTIVE_RADIUS = registerModifier("effective_radius", 30f) {
-        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 1.5)
+        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 1.0)
         shotStateAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 5.0)
         shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, 0.5)
     }
     val REMOVE_DAMAGE = registerModifier("remove_damage", 0f) {
+        flags(CypherFlags.SAFE_EXPLODE)
         shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.SET_ALL, 0.0)
         shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.SET_ALL, 0.0)
     }
     val PEACEFUL_MODE = registerModifier("peaceful_mode", 5f) {
         delay(-2)
-        flags(CypherFlags.SKIP_DAMAGE_CHECK)
+        flags(CypherFlags.SKIP_DAMAGE_CHECK, CypherFlags.SAFE_EXPLODE)
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, -1.0)
         shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 100.0)
     }

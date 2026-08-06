@@ -31,8 +31,8 @@ class FireworkRocketCypherRenderer(
         camera: CameraRenderState
     ) {
         poseStack.pushPose()
-        poseStack.cypherSetup(state, submitNodeCollector, camera)
-        poseStack.scale(0.5f, 0.5f, 0.5f)
+        poseStack.scaleByEffectRadius(state)
+        poseStack.scale(0.75f, 0.75f, 0.75f)
         poseStack.mulPose(camera.orientation)
         poseStack.translate(0f, -0.125f, 0f)
         state.item.submit(

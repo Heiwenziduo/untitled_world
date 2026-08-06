@@ -28,7 +28,7 @@ class ArrowCypherRenderer (
         camera: CameraRenderState
     ) {
         poseStack.pushPose()
-        poseStack.cypherSetup(state, submitNodeCollector, camera)
+        poseStack.scaleByEffectRadius(state)
         poseStack.mulPose(Axis.YP.rotationDegrees(state.yRot - 90.0f))
         poseStack.mulPose(Axis.ZP.rotationDegrees(state.xRot))
         poseStack.translate(-0.125f, 0f, 0f)
@@ -57,6 +57,7 @@ class ArrowCypherRenderer (
         zo: Double
     ) {
         val speed = entity.knownMovement
+        if (entity.tickCount and 1 == 1)
         linearInterpolateTimes(xo, yo, zo, x, y, z, 1) { step, x, y, z ->
             addCypherTrailParticle(
                 entity,

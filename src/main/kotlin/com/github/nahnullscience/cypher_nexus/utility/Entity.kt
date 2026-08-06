@@ -1,8 +1,10 @@
 package com.github.nahnullscience.cypher_nexus.utility
 
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.TraceableEntity
 import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
 import org.joml.Vector3f
@@ -18,6 +20,14 @@ object EntityUtil {
 }
 
 inline val Entity.level get() = level()
+
+fun <CE> Entity.isOwnerOf(ce: CE): Boolean where CE : Entity, CE : ICypherEntity {
+    if (this == ce.owner) return true
+    ce.owner?.let {
+        if (it is TraceableEntity && it.owner == this) return true
+    }
+    return false
+}
 
 /**
  * a direct duplication of #updateRotation in Projectile
