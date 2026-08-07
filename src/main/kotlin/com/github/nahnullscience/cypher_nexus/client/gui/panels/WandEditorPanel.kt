@@ -158,7 +158,7 @@ class WandEditorPanel(
 
     override fun mouseReleased(event: MouseButtonEvent): Boolean {
         val payload = drag.current ?: return false
-        val index = grid.indexAt(event.x.toInt(), event.y.toInt()) ?: return false
+        val index = grid.indexAt(event.x.toInt(), event.y.toInt()).takeIf { it >= 0 } ?: return false
         session.setSlot(index, payload.cypher)
         return true
     }
@@ -168,7 +168,7 @@ class WandEditorPanel(
     private fun hitTest(mouseX: Double, mouseY: Double): Hit? {
         if (!contains(mouseX, mouseY)) return null
         val aoc = session.currentAoc ?: return null
-        val index = grid.indexAt(mouseX.toInt(), mouseY.toInt()) ?: return null
+        val index = grid.indexAt(mouseX.toInt(), mouseY.toInt()).takeIf { it >= 0 } ?: return null
         if (index !in 0 until aoc.capacity) return null
         return Hit(aoc[index], index, grid.cellRect(index))
     }

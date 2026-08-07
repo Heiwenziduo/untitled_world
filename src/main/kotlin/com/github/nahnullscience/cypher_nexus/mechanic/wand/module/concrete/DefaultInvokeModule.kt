@@ -19,8 +19,8 @@ class DefaultInvokeModule(
         wand: ItemStack?,
         invokerCoordinate: CoordinateDefinition?,
         indirectTarget: Entity?,
-        performingTicks: Int?,
-        power: Double?
+        performingTicks: Int,
+        power: Double
     ): Boolean {
         val coordinate = invokerCoordinate ?: invoker.perspectiveCoordinate()
         return instance.wand.tryInvoke(invoker.level(), invoker, coordinate, wand).state

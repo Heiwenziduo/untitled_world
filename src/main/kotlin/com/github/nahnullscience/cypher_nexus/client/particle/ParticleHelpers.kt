@@ -52,7 +52,7 @@ inline fun <T : ParticleOptions, CE> addCypherTrailParticle(
     if (mainCamera.position().distanceToSqr(x, y, z) > MAX_PARTICLE_TRACKING_DISTANCE_SQR) return
     val particle = Minecraft.getInstance().particleEngine.makeParticle(options, x, y, z, xa, ya, za)
     if (particle is SingleQuadParticle) {
-        cyEntity.hueFloatArray?.let {
+        if (cyEntity.dyed) cyEntity.hueFloatArray.let {
             particle.setColor(it[0], it[1], it[2])
             particle.setAlpha(it[3]) // TODO if no alpha pass
             particle.scale(cyEntity.getEffectRadius().coerceIn(0.25f, 4f))

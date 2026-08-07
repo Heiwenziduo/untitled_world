@@ -37,10 +37,12 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
     val hooksSharedData: HooksSharedData
     val steerer: AbstractCypherSteerer
 
+    /***/
+    val dyed: Boolean
     /** tint from dyes */
-    val hue: Int?
+    val hue: Int
     /** 0f~1f float representation of [hue], in order of r0 g1 b2 a3 */
-    val hueFloatArray: FloatArray?
+    val hueFloatArray: FloatArray
 
     val explosion: ExplosionSettings<*>?
 

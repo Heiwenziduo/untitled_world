@@ -131,7 +131,7 @@ class CypherLibraryPanel(
         val localY = (mouseY - y).toInt() + scrollbar.offset.toInt()
 
         val block = blocks.firstOrNull { localY >= it.reY && localY < it.reY + it.height } ?: return null
-        val index = block.grid.indexAt(mouseX.toInt(), mouseY.toInt()) ?: return null
+        val index = block.grid.indexAt(mouseX.toInt(), mouseY.toInt()).takeIf { it >= 0 } ?: return null
         val cypher = block.list.getOrNull(index)?.takeIf { it.isNotEmpty() } ?: return null
 
         return Hit(cypher, index, block.grid.cellRect(index))

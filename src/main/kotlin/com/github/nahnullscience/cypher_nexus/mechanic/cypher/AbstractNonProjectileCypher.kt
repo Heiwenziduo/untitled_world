@@ -7,8 +7,8 @@ abstract class AbstractNonProjectileCypher(
 ): AbstractCypher(defaultAttribute) {
 
     open val rgb: Color? = null
-    open val alpha: Float? = null
-    open val brightness: Float? = null
+    open val alpha: Float = Float.NaN
+    open val brightness: Float = Float.NaN
 
     override fun triggerInterplay() = false
 }

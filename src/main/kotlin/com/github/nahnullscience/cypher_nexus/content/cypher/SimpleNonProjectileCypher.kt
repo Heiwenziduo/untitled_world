@@ -19,10 +19,11 @@ open class SimpleNonProjectileCypher(
     val category: Holder<CypherCategory>
 ) : CypherDataMap.Builder() {
 
-    protected var borderColor: Int? = null
+    protected var border: Boolean = false
+    protected var borderColor: Int = 0
     protected var rgb: Int? = null
-    protected var alpha: Float? = null
-    protected var brightness: Float? = null
+    protected var alpha: Float = Float.NaN
+    protected var brightness: Float = Float.NaN
     protected var pattern: Holder<AbstractInvokingPattern> = NO_PATTERN
 
     // register timing can't unpack holder, so use holder directly here
@@ -33,7 +34,10 @@ open class SimpleNonProjectileCypher(
     override fun delay(int: Int) = apply { super.delay(int) }
     override fun recharge(int: Int) = apply { super.recharge(int) }
     override fun flags(vararg flag: CypherFlags) = apply { super.flags(*flag) }
-    open fun borderColor(color: Int) = apply { borderColor = color }
+    open fun borderColor(color: Int) = apply {
+        borderColor = color
+        border = true
+    }
     open fun dyeColor(rgb: Int) = apply { this.rgb = rgb }
     open fun dyeColor(color: Color) = apply {
         this.rgb = color.rgb
@@ -64,10 +68,11 @@ open class SimpleNonProjectileCypher(
     open fun createCypher() : AbstractNonProjectileCypher = object : AbstractNonProjectileCypher() {
         override val category = this@SimpleNonProjectileCypher.category
         override val resource: Identifier = this@SimpleNonProjectileCypher.path
-        override val borderColor: Int? = this@SimpleNonProjectileCypher.borderColor
+        override val overrideBorder: Boolean = this@SimpleNonProjectileCypher.border
+        override val borderColor: Int = this@SimpleNonProjectileCypher.borderColor
         override val rgb: Color? = this@SimpleNonProjectileCypher.rgb?.toRGB()
-        override val alpha: Float? = this@SimpleNonProjectileCypher.alpha
-        override val brightness: Float? = this@SimpleNonProjectileCypher.brightness
+        override val alpha: Float = this@SimpleNonProjectileCypher.alpha
+        override val brightness: Float = this@SimpleNonProjectileCypher.brightness
         override val pattern: Holder<AbstractInvokingPattern> = this@SimpleNonProjectileCypher.pattern
         override fun defaultAttributes() = this@SimpleNonProjectileCypher
     }

@@ -47,11 +47,11 @@ data class CypherDataMap(
     open class Builder {
         var manaDrain: Float = 0f
             private set
-        var draw: Int? = null
+        var draw: Int = 0
             private set
-        var delay: Int? = null
+        var delay: Int = 0
             private set
-        var recharge: Int? = null
+        var recharge: Int = 0
             private set
         var flags: Int = 0
             private set
@@ -79,9 +79,9 @@ data class CypherDataMap(
 
         open fun build(): CypherDataMap = CypherDataMap(
             manaDrain,
-            draw ?: 0,
-            delay ?: 0,
-            recharge ?: 0,
+            draw.coerceAtLeast(0),
+            delay,
+            recharge,
             flags,
             AttributeFastMap(projectile),
             AttributeFastOpMap(shotState)

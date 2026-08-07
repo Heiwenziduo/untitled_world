@@ -41,10 +41,11 @@ class SimpleModifier(
 
     override fun createCypher(): ModifierCypher = object : ModifierCypher(NONE_ATTR) {
         override val resource: Identifier = this@SimpleModifier.path
-        override val borderColor: Int? = this@SimpleModifier.borderColor
+        override val overrideBorder: Boolean = this@SimpleModifier.border
+        override val borderColor: Int = this@SimpleModifier.borderColor
         override val rgb: Color? = this@SimpleModifier.rgb?.toRGB()
-        override val alpha: Float? = this@SimpleModifier.alpha
-        override val brightness: Float? = this@SimpleModifier.brightness
+        override val alpha: Float = this@SimpleModifier.alpha
+        override val brightness: Float = this@SimpleModifier.brightness
         override fun defaultAttributes() = this@SimpleModifier
     }
 

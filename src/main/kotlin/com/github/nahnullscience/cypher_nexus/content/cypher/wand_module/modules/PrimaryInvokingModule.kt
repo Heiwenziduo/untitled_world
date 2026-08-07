@@ -18,7 +18,7 @@ class PrimaryInvokingModule(
 
     override fun onHoldingTick(level: Level, invoker: LivingEntity, stack: ItemStack) {
         super.onHoldingTick(level, invoker, stack)
-        instance.functionModule(INVOKE_MODULE.get(), invoker, wand = stack)
+        instance.functionModule(INVOKE_MODULE.get(), invoker, wand = stack, performingTicks = holdingTicks)
     }
 
     override fun onHoldingStop(level: Level, invoker: LivingEntity, stack: ItemStack) {

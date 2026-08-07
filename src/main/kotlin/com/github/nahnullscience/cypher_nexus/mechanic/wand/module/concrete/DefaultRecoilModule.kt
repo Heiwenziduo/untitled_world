@@ -16,16 +16,18 @@ class DefaultRecoilModule(
         wand: ItemStack?,
         invokerCoordinate: CoordinateDefinition?,
         indirectTarget: Entity?,
-        performingTicks: Int?,
-        power: Double?
+        performingTicks: Int,
+        power: Double
     ): Boolean {
-        power ?: return false
-        // since it is the client side that is Player position authoritative
-        // this logic should run on both side, client for smooth movement, server for verification
-        val coo = invokerCoordinate ?: invoker.perspectiveCoordinate()
-        val dire = coo.front.reverse()
-        val recoil = power / 20
-        invoker.push(dire.scale(recoil))
-        return true
+        if (power.isFinite()) {
+            // since it is the client side that is Player position authoritative
+            // this logic should run on both side, client for smooth movement, server for verification
+            val coo = invokerCoordinate ?: invoker.perspectiveCoordinate()
+            val dire = coo.front.reverse()
+            val recoil = power / 20
+            invoker.push(dire.scale(recoil))
+            return true
+        }
+        return false
     }
 }

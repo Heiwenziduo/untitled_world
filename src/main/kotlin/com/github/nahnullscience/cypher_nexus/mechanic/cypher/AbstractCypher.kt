@@ -46,7 +46,8 @@ sealed class AbstractCypher(
     open val pattern: Holder<AbstractInvokingPattern> = NO_PATTERN
 
     /** override colors from category */
-    open val borderColor: Int? = null
+    open val overrideBorder: Boolean = false
+    open val borderColor: Int = 0
     /** whether the cypher shows in the index(left side) */
     open val hide: Boolean = false
 

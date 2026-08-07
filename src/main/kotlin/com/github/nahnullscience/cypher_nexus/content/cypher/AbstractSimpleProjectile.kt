@@ -30,8 +30,8 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
         private set
     var triggerCount: Int = 1
         private set
-    var borderColor: Int? = null
-        private set
+    protected var border: Boolean = false
+    protected var borderColor: Int = 0
 
     private val projectileAttrHolder: HashMap<Holder<CypherAttribute>, Double> = HashMap()
     private val shotStateAttrHolder: HashMap<Holder<CypherAttribute>, EnumMap<AttributeOperator, Double>> = HashMap()
@@ -41,7 +41,10 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
     override fun delay(int: Int) = apply { super.delay(int) }
     override fun recharge(int: Int) = apply { super.recharge(int) }
     override fun flags(vararg flag: CypherFlags) = apply { super.flags(*flag) }
-    fun borderColor(int: Int) = apply { borderColor = int }
+    fun borderColor(int: Int) = apply {
+        borderColor = int
+        border = true
+    }
     fun trigger(type: TriggerType, count: Int = 1) = apply { trigger = type; triggerCount = count }
 
     override fun projectileAttr(holder: Holder<CypherAttribute>, value: Double) = apply { projectileAttrHolder[holder] = value }
@@ -74,6 +77,7 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
         override fun createProjectile() = object : ProjectileCypher<AbstractDedicatedCypherProjectile>() {
             override val resource = this@SimpleProjectile.path
             override val projectileType = this@SimpleProjectile.type
+            override val overrideBorder = this@SimpleProjectile.border
             override val borderColor = this@SimpleProjectile.borderColor
             override val innateTrigger = this@SimpleProjectile.trigger
             override val innateTriggerCharge = this@SimpleProjectile.triggerCount
@@ -88,6 +92,7 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
         override fun createProjectile() = object : StaticProjectileCypher<AbstractDedicatedCypherProjectile>() {
             override val resource = this@SimpleStaticProjectile.path
             override val projectileType = this@SimpleStaticProjectile.type
+            override val overrideBorder = this@SimpleStaticProjectile.border
             override val borderColor = this@SimpleStaticProjectile.borderColor
             override val innateTrigger = this@SimpleStaticProjectile.trigger
             override val innateTriggerCharge = this@SimpleStaticProjectile.triggerCount

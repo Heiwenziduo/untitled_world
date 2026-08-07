@@ -5,12 +5,17 @@ import java.awt.Color
 import kotlin.math.pow
 
 class DyeAccumulator {
-    private var resolvedColor: Int? = null
-    private var resolvedColorArray: FloatArray? = null
-    val color: Int?
-        get() = if (lock) resolvedColor else resolveColor()
+    private var resolvedColor: Int = -1
+    private var resolvedColorArray: FloatArray = floatArrayOf()
 
-    val colorArray: FloatArray?
+    private var lock = false
+
+    var isResolved = false
+        private set
+
+    val color: Int get() = if (isResolved) resolvedColor else 0xFFFF_FFFF.toInt()
+
+    val colorArray: FloatArray
         get() = resolvedColorArray
 
     private var totalR = 0f
@@ -23,7 +28,6 @@ class DyeAccumulator {
     var dyeCount = 0
         private set
 
-    private var lock: Boolean = false
 
 
     fun addDye(r: Float, g: Float, b: Float, count: Int = 1) = apply {
@@ -92,8 +96,9 @@ class DyeAccumulator {
         lock = true
         if (v == 0xFFFFFFFF.toInt()) return@run null
         else v
-    } .also {
+    }?.also {
+        isResolved = true
         resolvedColor = it
-        resolvedColorArray = it?.getArrayRGBA()
+        resolvedColorArray = it.getArrayRGBA()
     }
 }

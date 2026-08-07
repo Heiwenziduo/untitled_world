@@ -252,8 +252,8 @@ class ShotStateChunk private constructor (
 
                     run color@ {
                         cypher.rgb?.let { dyeAccumulator.addDye(it, counts) }
-                        cypher.alpha?.let { dyeAccumulator.multiplyAlpha(it, counts) }
-                        cypher.brightness?.let { dyeAccumulator.adjustBrightness(it, counts) }
+                        cypher.alpha.takeIf { it.isFinite() }?.let { dyeAccumulator.multiplyAlpha(it, counts) }
+                        cypher.brightness.takeIf { it.isFinite() }?.let { dyeAccumulator.adjustBrightness(it, counts) }
                     }
                 }
 

@@ -20,7 +20,7 @@ abstract class AbstractFunctionalModule : AbstractWandModule(), ITypeUniqueModul
         wand: ItemStack? = null,
         invokerCoordinate: CoordinateDefinition? = null,
         indirectTarget: Entity? = null,
-        performingTicks: Int? = null,
-        power: Double? = null,
+        performingTicks: Int = -1,
+        power: Double = Double.NaN,
     ): Boolean
 }

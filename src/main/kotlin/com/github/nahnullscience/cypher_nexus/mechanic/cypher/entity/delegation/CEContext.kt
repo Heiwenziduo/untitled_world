@@ -36,8 +36,9 @@ open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity
 
     override var steerer: AbstractCypherSteerer = NoSteerer
 
-    override var hue: Int? = null
-    override var hueFloatArray: FloatArray? = null
+    override var dyed: Boolean = false
+    override var hue: Int = 0
+    override lateinit var hueFloatArray: FloatArray
 
     override var explosion: ExplosionSettings<*>? = null
 
@@ -51,8 +52,13 @@ open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity
         enabledFlags = (shotState?.enabledFlags ?: 0) or cypher.flags
         hooks = shotState?.hooks
         ccMap = shotState?.ccMap
-        hue = shotState?.dyeAccumulator?.color
-        hueFloatArray = shotState?.dyeAccumulator?.colorArray
+        shotState?.dyeAccumulator?.let {
+            if (it.isResolved) {
+                dyed = true
+                hue = it.color
+                hueFloatArray = it.colorArray
+            }
+        } ?: run { hueFloatArray = floatArrayOf() }
         steerer?.let { this.steerer = it }
     }
 

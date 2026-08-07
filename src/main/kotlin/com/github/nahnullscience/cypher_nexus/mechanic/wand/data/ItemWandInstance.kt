@@ -1,9 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.INVOKE_MODULE
-import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.RECOIL_MODULE
-import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.SECONDARY_MODULE
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.MapOfModules
@@ -14,9 +11,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.WandModuleTyp
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.AbstractFunctionalModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.AbstractWandModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.ITypeUniqueModule
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.concrete.DefaultInvokeModule
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.concrete.DefaultRecoilModule
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.concrete.DefaultSecondaryInput
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
@@ -127,8 +121,8 @@ class ItemWandInstance(
         wand: ItemStack? = null,
         invokerCoordinate: CoordinateDefinition? = null,
         indirectTarget: Entity? = null,
-        performingTicks: Int? = null,
-        power: Double? = null,
+        performingTicks: Int = -1,
+        power: Double = Double.NaN,
     ): Boolean where T : AbstractFunctionalModule {
         return getModule(type)?.run {
             execute(invoker, wand, invokerCoordinate, indirectTarget, performingTicks, power)
