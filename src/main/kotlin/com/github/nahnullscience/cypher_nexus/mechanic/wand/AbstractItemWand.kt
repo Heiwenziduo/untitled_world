@@ -36,7 +36,7 @@ abstract class AbstractItemWand(
     abstract override val isEditableWand: Boolean
 
     override fun getUseAnimation(stack: ItemStack) = ItemUseAnimation.EAT
-    override fun getUseDuration(stack: ItemStack, entity: LivingEntity) = 114_514
+    override fun getUseDuration(stack: ItemStack, entity: LivingEntity) = 114
 
     override fun use(level: Level, player: Player, hand: InteractionHand): InteractionResult {
         val stack = player.getItemInHand(hand)

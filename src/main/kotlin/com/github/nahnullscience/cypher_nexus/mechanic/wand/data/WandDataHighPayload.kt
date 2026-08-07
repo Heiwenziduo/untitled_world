@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.core.component.DataComponentGetter
 import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.world.item.Item.TooltipContext
@@ -24,10 +25,13 @@ data class WandDataHighPayload(val aoc: ArrayOfCyphers) : TooltipProvider {
         flag: TooltipFlag,
         components: DataComponentGetter
     ) {
+        consumer.accept(CommonComponents.NEW_LINE)
         consumer.accept(Component.literal("$aoc"))
     }
 
     companion object {
+        val EMPTY = of(1)
+
         fun of(capacity: Int) = WandDataHighPayload(ArrayOfCyphers(capacity))
 
 //        val SPELL_DATA_CODEC: Codec<AbstractCypher> = ResourceLocation.CODEC.xmap(

@@ -22,7 +22,7 @@ import net.neoforged.neoforge.client.event.InputEvent.InteractionKeyMappingTrigg
 
 @EventBusSubscriber(modid = CypherNexus.MOD_ID, value = [Dist.CLIENT])
 object ClientInputEventsHandler {
-    val mc get() = Minecraft.getInstance()
+    private val mc get() = Minecraft.getInstance()
 
     @SubscribeEvent(priority = EventPriority.LOW)
     private fun handleMouseInput(event: InteractionKeyMappingTriggered) {

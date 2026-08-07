@@ -1,14 +1,24 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
 
+import com.github.nahnullscience.cypher_nexus.init.ModDataComponents.WAND_HIGH_PAYLOAD
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.CapacityRow
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.ManaMaxRow
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.ManaRegenRow
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.SpreadRow
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.WandCastDelayRow
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.WandDrawRow
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.WandRechargeTimeRow
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.UUID_CODEC
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.UUID_STREAM
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import io.netty.buffer.ByteBuf
+import net.minecraft.ChatFormatting
 import net.minecraft.core.component.DataComponentGetter
 import net.minecraft.network.RegistryFriendlyByteBuf
+import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
@@ -36,7 +46,27 @@ data class WandDataInvariable(
         flag: TooltipFlag,
         components: DataComponentGetter
     ) {
-        consumer.accept(Component.literal("this is a wand..."))
+        val aoc = components.getOrDefault(WAND_HIGH_PAYLOAD, WandDataHighPayload.EMPTY).aoc
+        val a = Component.literal("this is a wand...").withStyle(ChatFormatting.GOLD)
+        consumer.accept(a)
+
+        val (manaMax, manaRegen, spread) = chunkF
+        val (draw, delay, recharge) = chunkI
+
+        consumer.accept(ManaMaxRow.row(manaMax).withStyle(ChatFormatting.GRAY))
+        consumer.accept(ManaRegenRow.row(manaRegen).withStyle(ChatFormatting.GRAY))
+        consumer.accept(CapacityRow.row(aoc.capacity).withStyle(ChatFormatting.GRAY))
+        consumer.accept(WandDrawRow.row(draw).withStyle(ChatFormatting.GRAY))
+        consumer.accept(WandCastDelayRow.row(delay).withStyle(ChatFormatting.GRAY))
+        consumer.accept(WandRechargeTimeRow.row(recharge).withStyle(ChatFormatting.GRAY))
+        consumer.accept(SpreadRow.row(spread).withStyle(ChatFormatting.GRAY))
+
+
+        if (flag.hasControlDown()) {
+            val u = Component.literal(uuid.toString().drop(0)).withStyle(ChatFormatting.UNDERLINE)
+
+            consumer.accept(u)
+        }
     }
 
     data class WandDataChunkF(val manaMax: Float, val manaRegen: Float, val spread: Float)

@@ -25,6 +25,8 @@ sealed class WandProperties <T : Any> (
             return Component.translatable(text, (v * 20).toInt())
         }
     }
+    object CapacityRow : WandProperties<Int>("capacity")
+    object WandDrawRow : WandProperties<Int>("draw")
     object WandCastDelayRow : WandProperties<Int>("cast_delay") {
         override fun row(v: Int): MutableComponent {
             return Component.translatable(text, v.tick2second())
@@ -40,8 +42,5 @@ sealed class WandProperties <T : Any> (
             return Component.translatable(text, dot2digit.format(v))
         }
     }
-    object WandDrawRow : WandProperties<Int>("draw")
-    object CapacityRow : WandProperties<Int>("capacity")
     object EtchRow : WandProperties<ArrayOfCyphers>("etch")
-
 }
