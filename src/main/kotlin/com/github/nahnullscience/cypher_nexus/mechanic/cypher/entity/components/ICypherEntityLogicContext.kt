@@ -48,7 +48,7 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
     fun setOwner(owner: Entity?)
 
     fun <CE> canHurtOwner(ce: CE): Boolean where CE : Entity, CE : ICypherEntity =
-        ce.haveFlag(CypherFlags.HURT_OWNER) && ce.tickCount > 1
+        ce.hasFlag(CypherFlags.HURT_OWNER) && ce.tickCount > 1
 
     /**
      * used as a factor inside `Entity.rotateTowardSpeed`,

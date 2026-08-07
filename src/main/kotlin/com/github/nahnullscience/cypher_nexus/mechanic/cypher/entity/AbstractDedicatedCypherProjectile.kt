@@ -1,7 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.CypherEntityDelegation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
@@ -13,7 +12,6 @@ import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.CYPHER_STEERER_STREAM
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.MOCC_STREAM
-import com.github.nahnullscience.cypher_nexus.utility.sideString
 import net.minecraft.core.Holder
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
@@ -159,13 +157,13 @@ abstract class AbstractDedicatedCypherProjectile(
     override fun isClientAuthoritative(): Boolean {
         // make boomerang client-track smooth
         return super.isClientAuthoritative() ||
-                (haveFlag(CypherFlags.MOTION_FOLLOWS_OWNER) && owner()?.isClientAuthoritative == true) ||
+                (hasFlag(CypherFlags.MOTION_FOLLOWS_OWNER) && owner()?.isClientAuthoritative == true) ||
                 hooksSharedData.homingTarget?.isClientAuthoritative == true
     }
     override fun isLocalClientAuthoritative(): Boolean {
         // make boomerang client-track smooth
         return super.isLocalClientAuthoritative() ||
-                (haveFlag(CypherFlags.MOTION_FOLLOWS_OWNER) && owner()?.isLocalClientAuthoritative == true) ||
+                (hasFlag(CypherFlags.MOTION_FOLLOWS_OWNER) && owner()?.isLocalClientAuthoritative == true) ||
                 hooksSharedData.homingTarget?.isLocalClientAuthoritative == true
     }
 
@@ -182,7 +180,7 @@ abstract class AbstractDedicatedCypherProjectile(
         }
     }
 
-    override fun displayFireAnimation() = haveFlag(CypherFlags.WITH_FIRE)
+    override fun displayFireAnimation() = hasFlag(CypherFlags.WITH_FIRE)
 
     override fun shouldRender(x: Double, y: Double, z: Double): Boolean = super.shouldRender(x, y, z)
     override fun shouldRenderAtSqrDistance(distance: Double): Boolean {

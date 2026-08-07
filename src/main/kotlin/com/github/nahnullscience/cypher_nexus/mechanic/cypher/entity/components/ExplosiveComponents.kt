@@ -14,7 +14,6 @@ import net.minecraft.sounds.SoundEvent
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.util.random.WeightedList
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.ExplosionDamageCalculator
 import net.minecraft.world.level.Level.ExplosionInteraction
@@ -34,11 +33,11 @@ open class ExplosionSettings <CE> (
     val source get() = ce.owner // delay getter to avoid init problems
 
     open val blockInteract: ExplosionInteraction get() = interaction ?:
-    if (ce.haveFlag(CypherFlags.SAFE_EXPLODE)) ExplosionInteraction.NONE else ExplosionInteraction.BLOCK
+    if (ce.hasFlag(CypherFlags.SAFE_EXPLODE)) ExplosionInteraction.NONE else ExplosionInteraction.BLOCK
 
     open val damageSource get() = ce.getExplosionDamageSource()
 
-    open val fire get() = ce.haveFlag(CypherFlags.WITH_FIRE)
+    open val fire get() = ce.hasFlag(CypherFlags.WITH_FIRE)
 
     fun getEffectRadius(): Float = sqrt(radiusSqr * ce.getEffectRadius())
 
@@ -47,7 +46,7 @@ open class ExplosionSettings <CE> (
     open fun getDamage(): Float = damageFactor * ce.getDamage()
 
     override fun shouldDamageEntity(explosion: Explosion, entity: Entity): Boolean {
-        if (ce.haveFlag(CypherFlags.SKIP_DAMAGE_CHECK)) return false
+        if (ce.hasFlag(CypherFlags.SKIP_DAMAGE_CHECK)) return false
         if (ce.canNotHurtOwner() && entity.isOwnerOf(ce)) return false
         return super.shouldDamageEntity(explosion, entity)
     }

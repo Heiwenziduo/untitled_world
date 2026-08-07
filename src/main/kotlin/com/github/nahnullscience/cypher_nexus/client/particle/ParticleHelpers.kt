@@ -9,6 +9,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.SingleQuadParticle
+import net.minecraft.client.particle.SingleQuadParticle.Layer
 import net.minecraft.core.particles.ParticleOptions
 import net.minecraft.world.entity.Entity
 
@@ -53,7 +54,7 @@ inline fun <T : ParticleOptions, CE> addCypherTrailParticle(
     if (particle is SingleQuadParticle) {
         cyEntity.hueFloatArray?.let {
             particle.setColor(it[0], it[1], it[2])
-            particle.setAlpha(it[3])
+            particle.setAlpha(it[3]) // TODO if no alpha pass
             particle.scale(cyEntity.getEffectRadius().coerceIn(0.25f, 4f))
         }
         particle.config()
@@ -67,7 +68,7 @@ fun <T : ParticleOptions, CE> addCypherTrailParticle(
     xa: Double, ya: Double, za: Double,
 ) where CE : Entity, CE : ICypherEntity = addCypherTrailParticle(cyEntity, options, x, y, z, xa, ya, za) { }
 
-fun SingleQuadParticle.setARGB(a: Float, r: Float, g: Float, b: Float) {
-    setColor(r, g, b)
-    setAlpha(a)
-}
+//fun SingleQuadParticle.setARGB(a: Float, r: Float, g: Float, b: Float) {
+//    setColor(r, g, b)
+//    setAlpha(a)
+//}

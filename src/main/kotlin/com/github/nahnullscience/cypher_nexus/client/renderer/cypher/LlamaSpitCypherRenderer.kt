@@ -26,8 +26,9 @@ class LlamaSpitCypherRenderer (
         poseStack.pushPose()
         poseStack.translate(0.0f, 0.15f, 0.0f)
         poseStack.scaleByEffectRadius(state)
-        poseStack.mulPose(Axis.YP.rotationDegrees(state.yRot - 90.0f))
-        poseStack.mulPose(Axis.ZP.rotationDegrees(state.xRot))
+        poseStack.rotateToSpeed(state)
+//        poseStack.mulPose(Axis.YP.rotationDegrees(state.yRot - 90.0f))
+//        poseStack.mulPose(Axis.ZP.rotationDegrees(state.xRot))
         submitNodeCollector.submitModel(
             model,
             state,
@@ -45,7 +46,5 @@ class LlamaSpitCypherRenderer (
     override fun createRenderState() = LlamaSpitCypherRenderState()
     override fun extractRenderState(entity: LlamaSpit, state: LlamaSpitCypherRenderState, partialTicks: Float) {
         super.extractRenderState(entity, state, partialTicks)
-        state.xRot = entity.getXRot(partialTicks)
-        state.yRot = entity.getYRot(partialTicks)
     }
 }

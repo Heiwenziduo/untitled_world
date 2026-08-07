@@ -37,6 +37,9 @@ open class FireworkRocket(
         }
     }
 
+    var selfRotate: Int = 0
+        private set
+
     override val cypherHolder = FIREWORK_ROCKET
 
     final override val explosion: ExplosionSettings<*>
@@ -46,10 +49,12 @@ open class FireworkRocket(
         with(firework) {
             radiusSqr = 2f
             smallParticle = ParticleTypes.POOF
-            largeParticle = ParticleTypes.POOF
+            largeParticle = ParticleTypes.FIREWORK
+            // this cause double sound when explode at distance
             sound = BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.FIREWORK_ROCKET_BLAST)
         }
         explosion = firework
+        selfRotate = (random.nextFloat() * 180f).toInt()
     }
 
     override fun doEntitySetup() {
@@ -63,6 +68,12 @@ open class FireworkRocket(
             3.0f,
             1.0f
         )
+    }
+
+    override fun tick() {
+        selfRotate++
+        selfRotate = selfRotate.mod(359)
+        super.tick()
     }
 
     override fun discardVisualEffect() {

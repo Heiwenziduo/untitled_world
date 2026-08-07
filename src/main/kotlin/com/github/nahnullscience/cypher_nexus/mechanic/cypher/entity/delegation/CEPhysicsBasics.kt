@@ -128,6 +128,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
 
         if (ce.tickCount == 3) {
             capturedInitialSpeedSqr = ce.deltaMovement.lengthSqr()
+//                .also { println("== capture speed: $it ==") }
         }
 
         if (triggerType.timer == ce.tickCount) trigger(triggerType, ce.position())
@@ -212,7 +213,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
                 // handle entity collisions
                 if (collideWithEntities) {
                     val margin = HIT_BB_INFLATION + ce.getDimensions(ce.pose).width / 2
-                    if (ce.haveFlag(CypherFlags.PIERCE_ENTITY)) {
+                    if (ce.hasFlag(CypherFlags.PIERCE_ENTITY)) {
                         // if tagged pierce, collide all
                         level.getEntities(
                             ce,

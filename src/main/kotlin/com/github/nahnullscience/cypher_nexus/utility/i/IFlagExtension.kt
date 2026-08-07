@@ -12,7 +12,7 @@ interface IFlagExtension {
 //    var disabledFlags: Int
 
 //    fun allowFlag(flag0: IFlagEnum) = disabledFlags and flag0.value == 0 && enabledFlags and flag0.value > 0
-    fun haveFlag(flag0: IFlagEnum) = enabledFlags and flag0.value == flag0.value
+    fun hasFlag(flag0: IFlagEnum) = enabledFlags and flag0.value == flag0.value
     /**
      * ALL given flags are present
      * */
@@ -24,7 +24,7 @@ interface IFlagExtension {
      * NONE of given flags are present
      * */
     fun noFlagsNone(vararg flags: IFlagEnum) =
-        flags.firstOrNull { flag -> haveFlag(flag) } ?.let { false } ?: true
+        flags.firstOrNull { flag -> hasFlag(flag) } ?.let { false } ?: true
 
     fun enableFlag(flag0: IFlagEnum) = let { enabledFlags = enabledFlags or flag0.value }
     fun enableFlag(flags: Int) = let { enabledFlags = enabledFlags or flags }

@@ -2,6 +2,8 @@ package com.github.nahnullscience.cypher_nexus.client.renderer.cypher
 
 import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.component.ICypherEntityRenderState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.utility.ANG_2_RAD_F
+import com.github.nahnullscience.cypher_nexus.utility.toVec3
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.multiplayer.ClientLevel
@@ -16,6 +18,8 @@ import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f
+import org.joml.Quaternionf
+import org.joml.Vector3f
 
 abstract class AbstractCypherRenderer <CE, State> (
     context: Context
@@ -96,13 +100,13 @@ abstract class AbstractCypherRenderer <CE, State> (
 
     protected fun PoseStack.addTrailEffect(state: State, submitNodeCollector: SubmitNodeCollector, camera: CameraRenderState) {
         // Invert the velocity vector so the trail stretches backwards from local origin (0,0,0)
-        val velocity = state.deltaMove
+        val velocity = Vector3f(state.vx.toFloat(), state.vy.toFloat(), state.vz.toFloat())
         val trailX = -velocity.x
         val trailY = -velocity.y
         val trailZ = -velocity.z
         // Generate a simple perpendicular vector for the ribbon's thickness half-width (0.15 blocks)
-        val upVec = Vec3.Y_AXIS
-        val side = velocity.cross(upVec).normalize().scale(0.15)
+        val upVec = Vector3f(0f, 1f, 0f)
+        val side = velocity.cross(upVec).normalize().mul(0.15f).toVec3()
 
         // Grab a translucent blending consumer from the multi-buffer pipeline
         submitNodeCollector.submitCustomGeometry(this, RenderTypes.lightning()) { pose, buffer ->
@@ -138,5 +142,17 @@ abstract class AbstractCypherRenderer <CE, State> (
             addVertex(matrix, (cx + size).toFloat(), (cy + size).toFloat(), cz.toFloat()).setColor(255, 255, 255, 200).setUv(1f, 1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(0f, 1f, 0f)
             addVertex(matrix, (cx - size).toFloat(), (cy + size).toFloat(), cz.toFloat()).setColor(255, 255, 255, 200).setUv(0f, 1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(0f, 1f, 0f)
         }
+
+        inline fun rotateOfSpeed(state: ICypherEntityRenderState, config: Quaternionf.() -> Unit): Quaternionf {
+            val yr = (state.yRot - 90.0f) * ANG_2_RAD_F
+            val xr = state.xRot * ANG_2_RAD_F
+            return Quaternionf().rotateY(yr).rotateZ(xr).also { it.config() }
+        }
+        fun rotateOfSpeed(state: ICypherEntityRenderState) = rotateOfSpeed(state) { }
+
+        inline fun PoseStack.rotateToSpeed(state: ICypherEntityRenderState, crossinline config: Quaternionf.() -> Unit) {
+            mulPose(rotateOfSpeed(state, config))
+        }
+        fun PoseStack.rotateToSpeed(state: ICypherEntityRenderState) = mulPose(rotateOfSpeed(state))
     }
 }

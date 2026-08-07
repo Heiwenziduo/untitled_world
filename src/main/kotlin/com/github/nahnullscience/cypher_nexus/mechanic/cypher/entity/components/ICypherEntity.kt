@@ -80,7 +80,7 @@ interface ICypherEntity :
         const val CLIP_MARGIN = 0.2f
         const val CAPTURE_SIZE = 8.0
         const val CAPTURE_SIZE_SQR = CAPTURE_SIZE * CAPTURE_SIZE
-        const val LOW_SPEED_THRESHOLD = 0.02
+        const val LOW_SPEED_THRESHOLD = 0.03
         const val LOW_SPEED_THRESHOLD_SQR = LOW_SPEED_THRESHOLD * LOW_SPEED_THRESHOLD
         const val HIT_BB_INFLATION = 0.25
 

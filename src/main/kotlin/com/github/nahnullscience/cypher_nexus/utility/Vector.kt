@@ -28,6 +28,7 @@ operator fun Vec3.component1() = x
 operator fun Vec3.component2() = y
 operator fun Vec3.component3() = z
 
+fun Vector3f.toVec3(): Vec3 = Vec3(this)
 operator fun Vector3f.unaryMinus() = Vector3f(-x, -y, -z)
 operator fun Vector3f.times(v: Double) = times(v.toFloat())
 operator fun Vector3f.times(v: Float) = Vector3f(x * v, y * v, z * v)

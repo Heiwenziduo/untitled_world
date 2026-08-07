@@ -20,7 +20,6 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntitySelector
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.TraceableEntity
 import net.minecraft.world.entity.animal.Animal
 
 open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity {
@@ -59,7 +58,7 @@ open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity
 
     override fun initEntity(ce: CE) = let {
         this@CEContext.ce = ce
-        if (ce.explosion == null && ce.haveFlag(CypherFlags.EXPLOSIVE)) explosion = ExplosionSettings(ce)
+        if (ce.explosion == null && ce.hasFlag(CypherFlags.EXPLOSIVE)) explosion = ExplosionSettings(ce)
     }
 
     override fun getOwner(): Entity? = ownerD

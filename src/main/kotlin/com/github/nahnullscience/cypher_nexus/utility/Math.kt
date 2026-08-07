@@ -2,12 +2,19 @@ package com.github.nahnullscience.cypher_nexus.utility
 
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import kotlin.math.PI
 import kotlin.math.sqrt
 
 //fun <T> T.toSameSymbol(s: T): T where T : Number, T : Comparable<T> {
 //    if (this == 0 || s == 0) return this
 //    return if (this * s > 0) this else this * -1
 //}
+
+const val RAD_2_ANG = 180.0 / PI
+const val RAD_2_ANG_F = RAD_2_ANG.toFloat()
+const val ANG_2_RAD = PI / 180.0
+const val ANG_2_RAD_F = ANG_2_RAD.toFloat()
+
 
 /**  */
 fun Double.toSameSymbol(t: Double): Double {

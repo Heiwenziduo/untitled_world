@@ -5,7 +5,7 @@ import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.compo
 import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.client.renderer.item.ItemStackRenderState
 
-class ItemProjectileRenderState : EntityRenderState(),
+open class ItemProjectileRenderState : EntityRenderState(),
     ICypherEntityRenderState by CypherRenderStateDelegate()
 {
     val item: ItemStackRenderState = ItemStackRenderState()
