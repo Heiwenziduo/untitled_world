@@ -1288,6 +1288,7 @@
       "manaDrain": 5.0,
       "projectile": {
         "cypher_nexus:existing": 300.0,
+        "cypher_nexus:friction_factor": 0.04,
         "cypher_nexus:gravity_factor": 0.03,
         "cypher_nexus:speed": 1.2
       },
@@ -1301,6 +1302,7 @@
       "manaDrain": 25.0,
       "projectile": {
         "cypher_nexus:existing": 300.0,
+        "cypher_nexus:friction_factor": 0.04,
         "cypher_nexus:gravity_factor": 0.03,
         "cypher_nexus:speed": 1.2
       },
@@ -1323,6 +1325,7 @@
       "manaDrain": 25.0,
       "projectile": {
         "cypher_nexus:existing": 300.0,
+        "cypher_nexus:friction_factor": 0.04,
         "cypher_nexus:gravity_factor": 0.03,
         "cypher_nexus:speed": 1.2
       },

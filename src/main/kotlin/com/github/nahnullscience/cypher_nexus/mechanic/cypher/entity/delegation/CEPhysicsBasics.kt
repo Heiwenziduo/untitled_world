@@ -4,7 +4,10 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.HIT_BB_INFLATION
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.KINETIC_DAMAGE_SPEED_SQR
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.LOW_SPEED_THRESHOLD_SQR
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.collideWithBlocks
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.collideWithEntities
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.exertDamage
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getBounce
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getExisting
@@ -49,9 +52,6 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     protected var lowSpeedTickCount = 0
     protected var highElevationTickCount = 0
 
-    protected val collideWithBlocks: Boolean get() = ce.noFlagsNone(CypherFlags.IGNORE_BLOCK, CypherFlags.PENETRATE_WORLD)
-    protected val collideWithEntities: Boolean get() = ce.noFlagsNone(CypherFlags.PENETRATE_WORLD)
-
     override fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk?, node: ProjectileNode?) {
         if (node != null) {
             triggerType = node.trigger
@@ -69,8 +69,6 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     protected open fun applyGravity() {
         if (ce.getGravityFactor() != 0.0)
             ce.deltaMovement = ce.deltaMovement.add(0.0, -ce.getGravityFactor(), 0.0)
-//        if (ce.y > 4000 && ce.deltaMovement.y > 0)
-//            ce.deltaMovement = ce.deltaMovement.add(0.0, -0.03, 0.0)
     }
 
     protected open fun applyFriction() {
@@ -103,14 +101,14 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
 
 
     override fun discardCypher(reason: DiscardReason) {
-        if (level.isClientSide) return
+        if (level.isClientSide) { return }
         trigger(TriggerType.DEATH, ce.position())
         ce.explosion?.explode(level as ServerLevel, ce.x, ce.y, ce.z)
 
         when(reason){
             DiscardReason.ERASE -> {}
             else -> {
-                ce.beforeDiscard(ce, reason)
+                ce.beforeDiscardServer(ce, reason)
                 ce.steerer.discard(ce, reason)
             }
         }
@@ -183,7 +181,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         var hitSomething: Boolean
         var loopTimes = 0
         // Block: { normal, ignore } X Entity: { normal, pierce, ignore }
-        if (!collideWithBlocks && !collideWithEntities) {} // penetrate, do nothing
+        if (!ce.collideWithBlocks && !ce.collideWithEntities) {} // penetrate, do nothing
 //        else if (speedSqr <= LOW_SPEED_THRESHOLD_SQR) {} // too slow, do nothing
         else
             do {
@@ -194,10 +192,10 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
                 var destination = stepDestination0
                 var bouncePoint: Vec3? = null
                 var blockResult: BlockHitResult? = null
-                var bounceDirection: Direction = Direction.NORTH
+                var bounceDirection: Direction? = null
 
                 // if normal, truncate path
-                if (collideWithBlocks) {
+                if (ce.collideWithBlocks) {
                     // get path end-point by checking Block collision
                     blockResult = level.clipIncludingBorder(
                         ClipContext(stepPosition, destination, Block.COLLIDER, Fluid.NONE, ce)
@@ -211,7 +209,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
                 }
 
                 // handle entity collisions
-                if (collideWithEntities) {
+                if (ce.collideWithEntities) {
                     val margin = HIT_BB_INFLATION + ce.getDimensions(ce.pose).width / 2
                     if (ce.hasFlag(CypherFlags.PIERCE_ENTITY)) {
                         // if tagged pierce, collide all
@@ -224,7 +222,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
                             // execute an on-site sub-effect may raise ConcurrentModificationException
                             // it seems we have to extract entities first and go through the list one more time
                             stepPosition.rayCastThen(destination, target.boundingBox, margin) { hitPoint, dir ->
-                                whenHitDelegate(EntityHitResult(target, hitPoint), dir)
+                                whenHitDelegate(EntityHitResult(target, hitPoint), stepMovement, dir)
                             }
                         }
                     } else {
@@ -249,7 +247,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
                         }
 
                         if (hitEntity != null) {
-                            whenHitDelegate(EntityHitResult(hitEntity, destination), bounceDirection)
+                            whenHitDelegate(EntityHitResult(hitEntity, destination), stepMovement, bounceDirection)
                             bouncePoint = destination
                         }
                     }
@@ -258,23 +256,24 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
                 // bounce from the point
                 if (bouncePoint != null) {
                     hitSomething = true
-                    if (blockResult?.location == bouncePoint) whenHitDelegate(blockResult, bounceDirection)
+                    if (blockResult?.location == bouncePoint) whenHitDelegate(blockResult, stepMovement, bounceDirection)
 
                     if (canBounce) {
                         bounceCount++
-                        ce.onBounce(ce, bouncePoint, bounceCount)
                         bouncePoints.add(bouncePoint)
+                        val bd = bounceDirection ?: stepMovement.mostAlignedDirection()
+                        onBounceDelegate(bouncePoint, bounceCount, bd)
 
-                        stepPosition = bouncePoint.add(bounceDirection.unitVec3.scale(1E-7)) // avoid "diving into blocks" bug
+                        stepPosition = bouncePoint.add(bd.unitVec3.scale(1E-7)) // avoid "diving into blocks" bug
                         stepMovement = stepDestination0.subtract(destination).flipByAxis(
-                            bounceDirection.axis,
+                            bd.axis,
                             ce.getBounceSpeedPenalty()
                         )
                         ce.setPos(stepPosition)
                     }
                 }
 
-            } while (hitSomething && canBounce && loopTimes++ <= 8)
+            } while (hitSomething && canBounce && loopTimes++ <= 16)
 
         // finalize position
         ce.setPos(stepPosition.add(stepMovement))
@@ -288,24 +287,35 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     }
 
 
+
+    protected open fun onBounceDelegate(bouncePoint: Vec3, bounceCount: Int, bounceSurface: Direction) {
+        ce.onBounce(ce, bouncePoint, bounceSurface, bounceCount)
+    }
+
+
     // in case subclasses want to override whenHit
     // if implementing it here, any subclass of ICypherEntity can't call super.whenHit since its abstract
     // if implementing it inside ICypherEntity as a default function, there will be one more step to link to the function
     // cyEntity.whenHit -> Delegation.whenHit -> interface default
-    protected open fun whenHitDelegate(result: HitResult, direction: Direction) {
-        ce.whenHit(result, direction)
+    protected open fun whenHitDelegate(result: HitResult, stepMove: Vec3, direction: Direction?) {
+        val dir = direction ?: run {
+            if (stepMove.lengthSqr() > KINETIC_DAMAGE_SPEED_SQR) stepMove.mostAlignedDirection()
+            else return
+        }
+
+        ce.whenHit(result, dir)
         ce.onHit(ce, result)
         if (level.isClientSide || result.type == Type.MISS) return
         trigger(TriggerType.COLLISION, result.location)
 
         if (result is EntityHitResult) {
-            whenHitEntityDelegate(result, direction)
+            whenHitEntityDelegate(result, dir)
 
             if (!canBounce && ce.noFlag(CypherFlags.PIERCE_ENTITY))
                 discardCypher(DiscardReason.HIT_ENTITY)
         }
         else if (result is BlockHitResult) {
-            whenHitBlockDelegate(result, direction)
+            whenHitBlockDelegate(result, dir)
 
             if (!canBounce)
                 discardCypher(DiscardReason.HIT_BLOCK)
@@ -340,7 +350,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
 
 
     protected open fun onLowSpeedCheck() {
-        if (ce.noFlag(CypherFlags.PHYSICS_SOLID) &&
+        if (ce.noFlagsNone(CypherFlags.PHYSICS_SOLID, CypherFlags.MOTION_FOLLOWS_OWNER) &&
             capturedInitialSpeedSqr > LOW_SPEED_THRESHOLD_SQR &&
             ce.deltaMovement.lengthSqr() <= LOW_SPEED_THRESHOLD_SQR)
         {

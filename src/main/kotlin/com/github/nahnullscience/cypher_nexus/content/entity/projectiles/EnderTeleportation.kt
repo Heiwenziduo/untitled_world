@@ -37,7 +37,7 @@ open class EnderTeleportation(
     }
 
 
-    override fun <CE> beforeDiscard(ce: CE, reason: DiscardReason) where CE : Entity, CE : ICypherEntity {
+    override fun <CE> beforeDiscardServer(ce: CE, reason: DiscardReason) where CE : Entity, CE : ICypherEntity {
         if (level().isServerSide && owner() != null) {
             owner()?.let { owner ->
                 // compare to #teleportTo on Entity, this can handle dimension
@@ -57,6 +57,6 @@ open class EnderTeleportation(
             }
         }
 
-        super.beforeDiscard(ce, reason)
+        super.beforeDiscardServer(ce, reason)
     }
 }

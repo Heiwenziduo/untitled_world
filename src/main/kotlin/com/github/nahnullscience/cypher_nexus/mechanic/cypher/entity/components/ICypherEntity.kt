@@ -6,6 +6,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getAttributeOrDefault
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.CypherEntityDelegation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
@@ -78,14 +79,21 @@ interface ICypherEntity :
         }
 
         const val CLIP_MARGIN = 0.2f
-        const val CAPTURE_SIZE = 8.0
-        const val CAPTURE_SIZE_SQR = CAPTURE_SIZE * CAPTURE_SIZE
+
+        const val GENERIC_CAPTURE_RADIUS = 8.0
+        const val GENERIC_CAPTURE_RADIUS_SQR = GENERIC_CAPTURE_RADIUS * GENERIC_CAPTURE_RADIUS
+
         const val LOW_SPEED_THRESHOLD = 0.03
         const val LOW_SPEED_THRESHOLD_SQR = LOW_SPEED_THRESHOLD * LOW_SPEED_THRESHOLD
+
+        const val KINETIC_DAMAGE_SPEED = 0.25
+        const val KINETIC_DAMAGE_SPEED_SQR = KINETIC_DAMAGE_SPEED * KINETIC_DAMAGE_SPEED
+
         const val HIT_BB_INFLATION = 0.25
 
-        val ICypherEntity.cypher get() = cypherHolder.value()
-
+        inline val ICypherEntity.cypher get() = cypherHolder.value()
+        inline val ICypherEntity.collideWithBlocks get() = noFlagsNone(CypherFlags.IGNORE_BLOCK, CypherFlags.PENETRATE_WORLD)
+        inline val ICypherEntity.collideWithEntities get() = noFlagsNone(CypherFlags.PENETRATE_WORLD)
 
         fun ICypherEntity.exertDamage(level: ServerLevel, target: Entity) {
             var damage = getAttributeOrDefault(CypherAttributes.DAMAGE)

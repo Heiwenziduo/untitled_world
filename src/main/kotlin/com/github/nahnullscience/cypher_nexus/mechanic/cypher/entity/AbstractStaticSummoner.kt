@@ -19,9 +19,9 @@ abstract class AbstractStaticSummoner(
         setAttribute(CypherAttributes.EXISTING, 2.0)
     }
 
-    override fun <CE> beforeDiscard(ce: CE, reason: DiscardReason) where CE : Entity, CE : ICypherEntity {
+    override fun <CE> beforeDiscardServer(ce: CE, reason: DiscardReason) where CE : Entity, CE : ICypherEntity {
         summon()
-        super.beforeDiscard(ce, reason)
+        super.beforeDiscardServer(ce, reason)
     }
 
     abstract fun summon()

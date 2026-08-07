@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components
 
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.CAPTURE_SIZE
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.GENERIC_CAPTURE_RADIUS
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
@@ -121,7 +121,7 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
             if (need) {
                 val entities = level.getEntities(
                     ce,
-                    ce.boundingBox.inflate(CAPTURE_SIZE)
+                    ce.boundingBox.inflate(GENERIC_CAPTURE_RADIUS)
                 ) { entity -> ce.canHitTarget(entity) && entity !is ICypherEntity }
 
                 for (entity in entities) {
@@ -132,19 +132,19 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
     }
     /**
      * call on both sides, override friendly
-     * @see CypherHooks.BEFORE_DISCARD
+     * @see CypherHooks.BEFORE_DISCARD_SERVER
      * */
-    fun <CE> beforeDiscard(ce: CE, reason: DiscardReason) where CE : Entity, CE : ICypherEntity {
-        hooks?.playHooks(CypherHooks.BEFORE_DISCARD) { index, hook, count ->
-            hook.beforeDiscard(index, count, ce.level(), ce, reason)
+    fun <CE> beforeDiscardServer(ce: CE, reason: DiscardReason) where CE : Entity, CE : ICypherEntity {
+        hooks?.playHooks(CypherHooks.BEFORE_DISCARD_SERVER) { index, hook, count ->
+            hook.beforeDiscardServer(index, count, ce.level(), ce, reason)
         }
     }
     /**
      * call on both sides, override friendly
-     * @see CypherHooks.HIT_ENTITY
+     * @see CypherHooks.GENERAL_HIT
      * */
     fun <CE> onHit(ce: CE, result: HitResult) where CE : Entity, CE : ICypherEntity {
-        hooks?.playHooks(CypherHooks.HIT_ENTITY) { index, hook, count ->
+        hooks?.playHooks(CypherHooks.GENERAL_HIT) { index, hook, count ->
             hook.onHit(index, count, ce.level(), ce, result)
         }
     }
@@ -179,7 +179,7 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
      * call on both sides, override friendly
      * @see CypherHooks.ON_BOUNCE
      * */
-    fun <CE> onBounce(ce: CE, bouncePoint: Vec3, bounceCount: Int) where CE : Entity, CE : ICypherEntity {
+    fun <CE> onBounce(ce: CE, bouncePoint: Vec3, bounceSurface: Direction, bounceCount: Int) where CE : Entity, CE : ICypherEntity {
         hooks?.playHooks(CypherHooks.ON_BOUNCE) { index, hook, count ->
             hook.onBounce(index, count, ce.level(), ce, bounceCount, bouncePoint)
         }
@@ -193,17 +193,4 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
             hook.forEntityCaptured(index, count, ce.level(), ce, captured)
         }
     }
-//    /**
-//     * call on both sides, override friendly
-//     * @see
-//     * */
-//    fun <CE> onLowSpeed(ce: CE, ticks: Int, initialSpeedSqr: Double) where CE : Entity, CE : ICypherEntity {
-//        if (ticks < 7) return
-//
-//        // this means the projectile is decelerated to low speed
-//        if (initialSpeedSqr > LOW_SPEED_THRESHOLD_SQR && noFlag(CypherFlags.MOTION_FOLLOWS_OWNER)) {
-//            ce.discardCypher(DiscardReason.LOW_SPEED)
-//        }
-//    }
-
 }

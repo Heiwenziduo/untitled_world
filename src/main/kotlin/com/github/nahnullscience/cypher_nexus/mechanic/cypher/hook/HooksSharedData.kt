@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.CAPTURE_SIZE_SQR
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.GENERIC_CAPTURE_RADIUS_SQR
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap
 import net.minecraft.world.entity.Entity
 
@@ -22,7 +22,7 @@ class HooksSharedData {
                 data: Entity
             ): Boolean where CE : Entity, CE : ICypherEntity {
                 // clear target if too far
-                return data.isRemoved || data.distanceToSqr(cyEntity.position()) > CAPTURE_SIZE_SQR * 2
+                return data.isRemoved || data.distanceToSqr(cyEntity.position()) > GENERIC_CAPTURE_RADIUS_SQR * 2
             }
         }
     }

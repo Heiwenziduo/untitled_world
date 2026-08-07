@@ -55,7 +55,7 @@ inline fun Level.forEachEntityWithin(
  * */
 fun Level.nearestHitPoint(from: Vec3, to: Vec3, context: Entity, margin: Double): Vec3 {
     var t = to
-    val f: processHit = { h, d -> t = h }
+    val f: onClip = { h, d -> t = h }
     nearestHitPointThen(from, to, context, margin, f)
     return t
 }
@@ -63,9 +63,9 @@ fun Level.nearestHitPoint(from: Vec3, to: Vec3, context: Entity, margin: Double)
 /**
  * perform a [Level.clipIncludingBorder] and [Level.getEntities] to get the closest hit point between [from] and [to].
  * */
-inline fun Level.nearestHitPointThen(from: Vec3, to: Vec3, context: Entity, margin: Double, then: processHit) {
+inline fun Level.nearestHitPointThen(from: Vec3, to: Vec3, context: Entity, margin: Double, then: onClip) {
     var hit = false
-    var hitDir: Direction = Direction.UP
+    var hitDir: Direction? = null
     var destination = to
     val blockResult = this.clipIncludingBorder(
         ClipContext(from, destination, Block.COLLIDER, Fluid.NONE, context)

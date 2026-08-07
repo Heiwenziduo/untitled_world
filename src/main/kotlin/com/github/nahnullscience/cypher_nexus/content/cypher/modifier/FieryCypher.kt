@@ -4,7 +4,7 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.HitEntityHook
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.GeneralOnHitHook
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.EntityHitResult
@@ -14,7 +14,7 @@ import kotlin.math.max
 
 class FieryCypher(
     defaultAttribute: Builder.() -> Builder
-) : ModifierCypher(defaultAttribute), HitEntityHook {
+) : ModifierCypher(defaultAttribute), GeneralOnHitHook {
     override val resource = CypherNexus.modResource("fiery")
     override fun <CE> onHit(
         index: Int,

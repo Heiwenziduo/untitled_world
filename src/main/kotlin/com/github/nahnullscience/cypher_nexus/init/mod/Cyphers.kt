@@ -80,6 +80,7 @@ object Cyphers {
         projectileAttr(CypherAttributes.SPEED, 1.2)
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
+        projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.04)
     }
     val ENDER_TELEPORTATION = registerProjectile(ModEntities.CYPHER_ENDER_TELEPORTATION) {
         manaDrain(20f)
@@ -92,7 +93,7 @@ object Cyphers {
         manaDrain(20f)
         flags(CypherFlags.SKIP_DAMAGE_CHECK, CypherFlags.WITH_ENDER_POWER)
         projectileAttr(CypherAttributes.SPEED, 0.0)
-        projectileAttr(CypherAttributes.EXISTING, 100.0)
+        projectileAttr(CypherAttributes.EXISTING, 101.0)
         projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.0)
     }
     val BUBBLE_COLUMN = registerProjectile(ModEntities.CYPHER_BUBBLE_COLUMN) {
@@ -304,7 +305,10 @@ object Cyphers {
     val KNOCKBACK = registerModifier("knockback", 5f) {
         shotStateAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 20.0)
     }
-    val HOMING = registerCypher(AbstractTargetHoming::Homing, 60f)
+    val HOMING = registerCypher(AbstractTargetHoming::Homing) {
+        manaDrain(60f)
+//        shotStateAttr(CypherAttributes.FRICTION_FACTOR, AttributeOperator.ADD, 0.01)
+    }
     val TURN_TOWARD_TARGET = registerCypher(AbstractTargetHoming::TurnTowardTarget, 30f)
     val BOOMERANG = registerCypher(::BoomerangCypher) {
         manaDrain(10f)

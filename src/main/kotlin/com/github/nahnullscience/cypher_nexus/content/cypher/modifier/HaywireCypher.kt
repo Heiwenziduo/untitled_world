@@ -20,7 +20,7 @@ class HaywireCypher(
 
     override val resource = CypherNexus.modResource("haywire")
 
-    override fun abortRelease(
+    override fun abortReleaseServer(
         index: Int,
         count: Int,
         level: ServerLevel,

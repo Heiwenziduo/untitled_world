@@ -37,7 +37,7 @@ open class FireworkRocket(
         }
     }
 
-    var selfRotate: Int = 0
+    var selfRotate: Int = (random.nextFloat() * 180f).toInt()
         private set
 
     override val cypherHolder = FIREWORK_ROCKET
@@ -54,7 +54,6 @@ open class FireworkRocket(
             sound = BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.FIREWORK_ROCKET_BLAST)
         }
         explosion = firework
-        selfRotate = (random.nextFloat() * 180f).toInt()
     }
 
     override fun doEntitySetup() {
@@ -71,7 +70,7 @@ open class FireworkRocket(
     }
 
     override fun tick() {
-        selfRotate++
+        selfRotate+= 3
         selfRotate = selfRotate.mod(359)
         super.tick()
     }

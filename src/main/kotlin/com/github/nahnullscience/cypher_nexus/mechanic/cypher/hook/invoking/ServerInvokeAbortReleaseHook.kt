@@ -11,7 +11,7 @@ interface ServerInvokeAbortReleaseHook : IHook {
     /**
      * @return determine whether this release should be aborted
      * */
-    fun abortRelease(
+    fun abortReleaseServer(
         index: Int,
         count: Int,
         level: ServerLevel,

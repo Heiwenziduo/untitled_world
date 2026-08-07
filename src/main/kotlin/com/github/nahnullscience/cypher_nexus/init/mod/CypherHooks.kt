@@ -42,14 +42,14 @@ object CypherHooks {
 
 
 
-    val INVOKE_ABORT_RELEASE = registerHook(ServerInvokeAbortReleaseHook.HOOK)
+    val INVOKE_ABORT_RELEASE_SERVER = registerHook(ServerInvokeAbortReleaseHook.HOOK)
     val INVOKE_POS_REDIRECTION_SERVER = registerHook(ServerInvokePosRedirectionHook.HOOK)
     val INVOKE_CAPTURE_SERVER = registerHook(ServerInvokeSurroundingCaptureHook.HOOK)
 
-    val BEFORE_DISCARD = registerHook(BeforeDiscardHook.HOOK)
+    val BEFORE_DISCARD_SERVER = registerHook(ServerBeforeDiscardHook.HOOK)
     val ENTITY_CAPTURE = registerHook(EntityCaptureHook.HOOK)
     val FIRST_TICK = registerHook(FirstTickHook.HOOK)
-    val HIT_ENTITY = registerHook(HitEntityHook.HOOK)
+    val GENERAL_HIT = registerHook(GeneralOnHitHook.HOOK)
     val ON_BOUNCE = registerHook(OnBounceHook.HOOK)
     val TICK_BEHAVIOR = registerHook(TickBehaviorHook.HOOK)
     val TICK_MOVEMENT_FINALIZE = registerHook(TickMovementFinalizeHook.HOOK)

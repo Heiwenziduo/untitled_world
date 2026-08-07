@@ -121,9 +121,9 @@ class ShotStateChunk private constructor (
         if (level !is ServerLevel) return
 
         // let hooks determine if this release should be aborted
-        hooks[CypherHooks.INVOKE_ABORT_RELEASE]?.let {
-            hooks.playHooks(CypherHooks.INVOKE_ABORT_RELEASE) { index, hook, count ->
-                val result = hook.abortRelease(index, count, level, owner, accessor)
+        hooks[CypherHooks.INVOKE_ABORT_RELEASE_SERVER]?.let {
+            hooks.playHooks(CypherHooks.INVOKE_ABORT_RELEASE_SERVER) { index, hook, count ->
+                val result = hook.abortReleaseServer(index, count, level, owner, accessor)
                 if (result == ReleaseAbort.ABORT) return
             }
         }

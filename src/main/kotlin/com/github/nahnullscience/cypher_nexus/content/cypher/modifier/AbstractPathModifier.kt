@@ -41,7 +41,7 @@ abstract class AbstractPathModifier(
             return this[OrbitCircleTicket] ?: run {
                 val center = target.eyePosition
                 val targetPos = cyEntity.position() + cyEntity.deltaMovement
-                val radius = center.vectorTo(targetPos).coerceMaxLength(32.0)
+                val radius = center.vectorTo(targetPos).coerceMaxLength(64.0)
 
                 val radF = radius.toVector3f()
                 val normal = Vector3f()

@@ -31,6 +31,8 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.BlockHitResult
+import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn
@@ -102,17 +104,29 @@ abstract class AbstractDedicatedCypherProjectile(
     // initialization
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    init {
-        noPhysics = true
-    }
-
     abstract override val cypherHolder: Holder<out AbstractProjectileCypher<out AbstractDedicatedCypherProjectile>>
 
     fun owner() = getOwner()
     override fun getOwner(): Entity? = super<Projectile>.getOwner()
     override fun setOwner(owner: Entity?) = super<Projectile>.setOwner(owner)
-    override fun onHit(result: HitResult) {
+
+    /**
+     * use [whenHit] instead
+     * */
+    final override fun onHit(result: HitResult) {
 //        super<Projectile>.onHit(result)
+    }
+
+    /**
+     * use [whenHitBlock] instead
+     * */
+    final override fun onHitBlock(hitResult: BlockHitResult) {
+    }
+
+    /**
+     * use [whenHitEntity] instead
+     * */
+    final override fun onHitEntity(hitResult: EntityHitResult) {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

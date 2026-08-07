@@ -12,8 +12,20 @@ import net.minecraft.world.entity.Entity
 abstract class AbstractCypherSteerer(
     override val resource: Identifier
 ) : IRegisterable {
+    /**
+     * on both sides
+     * */
     abstract fun <CE> init(ce: CE) where CE : ICypherEntity, CE : Entity
+    /**
+     * on both sides
+     * */
     abstract fun <CE> tick(ce: CE) where CE : ICypherEntity, CE : Entity
+    /**
+     * on both sides
+     * */
     abstract fun <CE> tickSpeedOverride(ce: CE) where CE : ICypherEntity, CE : Entity
+    /**
+     * server only
+     * */
     abstract fun <CE> discard(ce: CE, reason: DiscardReason) where CE : ICypherEntity, CE : Entity
 }

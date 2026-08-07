@@ -11,8 +11,6 @@ import org.joml.Vector3f
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.*
 
-typealias processHit = (hitPoint: Vec3, dir: Direction) -> Unit
-
 fun Vec3.toVec3i() = Vec3i(x.toInt(), y.toInt(), z.toInt())
 
 operator fun Vec3.unaryMinus() = Vec3(-x, -y, -z)
@@ -179,7 +177,7 @@ fun Vec3.rotateTowards(target: Vec3, maxAngleRadians: Double): Vec3 {
  * */
 fun Vec3.randomInCone(maxAngle: Double, random: RandomSource): Vec3 {
     val vf = this.toVector3f().randomInCone(maxAngle, random)
-    return Vec3(vf.x.toDouble(), vf.y.toDouble(), vf.z.toDouble())
+    return vf.toVec3()
 }
 
 /**
@@ -229,22 +227,29 @@ fun Vector3f.randomInCone(maxAngle: Double, random: RandomSource): Vector3f {
 /**
  * @return the hit point the given line from this to [destination] collide with [bb], null if not collide
  * */
-fun Vec3.rayCast(destination: Vec3, bb: AABB, margin: Double): Vec3? {
-    return bb.inflate(margin).clip(this, destination).getOrNull()
+fun Vec3.rayCastVanilla(destination: Vec3, bb: AABB, margin: Double? = null): Vec3? {
+    val b = margin?.let { bb.inflate(it) } ?: bb
+    return b.clip(this, destination).getOrNull()
 }
 
+typealias onClip = (clippingPoint: Vec3, direction: Direction?) -> Unit
+
 /**
- * immediately execute [task] if ray hit the given AABB
+ * execute [task] if ray pierce the given AABB.
+ * direction might be null if both the start and the end vector are inside the AABB.
  * */
-inline fun Vec3.rayCastThen(destination: Vec3, bb: AABB, margin: Double, task: processHit) {
-    bb.inflate(margin).clipWithDirection(this, destination, task)
+inline fun Vec3.rayCastThen(destination: Vec3, bb: AABB, margin: Double? = null, task: onClip): Boolean {
+    val b = margin?.let { bb.inflate(it) } ?: bb
+    return b.checkIntersectionThen(this, destination, task)
 }
 
 /**
  * direct copy from [AABB.clip], but pass a lambda to utilize the direction
  * */
-inline fun AABB.clipWithDirection(from: Vec3, to: Vec3, task: processHit) = clipWithDirection(minX, minY, minZ, maxX, maxY, maxZ, from, to, task)
-inline fun AABB.clipWithDirection(
+@Deprecated("this misses the situation that both from and to are inside the box, use [checkAABBIntersection] instead")
+inline fun AABB.vanillaAABBClip(from: Vec3, to: Vec3, task: onClip) = vanillaAABBClip(minX, minY, minZ, maxX, maxY, maxZ, from, to, task)
+@Deprecated("this misses the situation that both from and to are inside the box, use [checkAABBIntersection] instead")
+inline fun vanillaAABBClip(
     minX: Double,
     minY: Double,
     minZ: Double,
@@ -253,7 +258,7 @@ inline fun AABB.clipWithDirection(
     maxZ: Double,
     from: Vec3,
     to: Vec3,
-    task: processHit
+    task: onClip
 ) {
     val scaleReference = doubleArrayOf(1.0)
     val dx: Double = to.x - from.x
@@ -273,3 +278,86 @@ fun AABB.expandToAtMost(to: Vec3, most: Double) =
         to.z.coerceIn(-most, +most)
     )
 
+
+/**
+ * Checks line segment intersection with an AABB, passing hit point, direction,
+ * and entry face normal to the callback.
+ */
+inline fun AABB.checkIntersectionThen(from: Vec3, to: Vec3, onIntersect: onClip): Boolean =
+    checkAABBIntersection(from, to, minX, minY, minZ, maxX, maxY, maxZ, onIntersect)
+inline fun checkAABBIntersection(
+    from: Vec3,
+    to: Vec3,
+    minX: Double,
+    minY: Double,
+    minZ: Double,
+    maxX: Double,
+    maxY: Double,
+    maxZ: Double,
+    onIntersect: onClip
+): Boolean {
+    val dir = to - from
+    val len = dir.lengthSqr()
+    if (len < 1e-9) return false
+
+    var tEntry = 0.0
+    var tExit = 1.0
+
+    // Tracks the raw unclamped entry time and winning axis for normal calculation
+    var lastTMin = -Double.MAX_VALUE
+    var normalAxis = 0
+    var normalSign = 0.0
+
+    val f = doubleArrayOf(from.x, from.y, from.z)
+    val d = doubleArrayOf(dir.x, dir.y, dir.z)
+    val bMin = doubleArrayOf(minX, minY, minZ)
+    val bMax = doubleArrayOf(maxX, maxY, maxZ)
+
+    for (i in 0..2) {
+        if (abs(d[i]) < 1e-9) {
+            if (f[i] < bMin[i] || f[i] > bMax[i]) return false
+        } else {
+            val t1 = (bMin[i] - f[i]) / d[i]
+            val t2 = (bMax[i] - f[i]) / d[i]
+
+            val tMinI = min(t1, t2)
+            val tMaxI = max(t1, t2)
+
+            // Record which axis was hit last (determines the entry face)
+            if (tMinI > lastTMin) {
+                lastTMin = tMinI
+                normalAxis = i
+                normalSign = sign(d[i])
+            }
+
+            tEntry = max(tEntry, tMinI)
+            tExit = min(tExit, tMaxI)
+
+            if (tEntry > tExit) return false
+        }
+    }
+
+    if (tEntry <= tExit) {
+        val clippingPoint = from + (dir * tEntry)
+
+        // Construct axis-aligned unit normal vector
+        val direction =
+            if (lastTMin <= 0.0) null // Ray origin is inside the box
+            else when (normalAxis) {
+                    0 -> directionFromAxisAndSign(Axis.X, normalSign)
+                    1 -> directionFromAxisAndSign(Axis.Y, normalSign)
+                    else -> directionFromAxisAndSign(Axis.Z, normalSign)
+                }
+
+
+        onIntersect(clippingPoint, direction)
+        return true
+    }
+
+    return false
+}
+
+fun directionFromAxisAndSign(axis: Axis, sign: Double): Direction {
+    require(abs(sign) > 1e-12)
+    return if (sign > 0) axis.positive else axis.negative
+}

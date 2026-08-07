@@ -85,6 +85,6 @@ class FireworkRocketCypherRenderer(
     override fun extractRenderState(entity: FireworkRocket, state: FireworkRocketCypherRenderState, partialTicks: Float) {
         super.extractRenderState(entity, state, partialTicks)
         itemModelResolver.updateForNonLiving(state.item, stack, ItemDisplayContext.GROUND, entity)
-        state.selfRotate = entity.selfRotate.toFloat() + partialTicks
+        state.selfRotate = entity.selfRotate.toFloat() + partialTicks * 3f
     }
 }

@@ -38,19 +38,19 @@ class DaedalusCypher(
         if (directInvoker == null) return pair
 
         val heightMax = (16.0 + 8.0 * count).coerceAtMost(128.0)
-        val lengthMax = (16.0 + 8.0 * count).coerceAtMost(128.0)
+        val lengthMax = (16.0 + 8.0 * count).coerceAtMost(64.0)
         val (start, direction) = pair
         if (direction != Vec3.ZERO) {
             val angle = 24.0
             val routeDefault = direction.normalize().scale(lengthMax)
             var hitDestination = start.add(routeDefault)
-            var hitDir = Direction.UP
+            var hitDir: Direction? = null
             level.nearestHitPointThen(start, hitDestination, directInvoker, MARGIN) { hitPoint, dir ->
                 hitDestination = hitPoint
                 hitDir = dir
             }
             if (hitDir != Direction.DOWN) {
-                val upward = Vec3.Y_AXIS.randomInCone(angle, directInvoker.random).scale(heightMax)
+                val upward = Vec3(0.0, 1.0, 0.0).randomInCone(angle, directInvoker.random).scale(heightMax)
                 val blockResult2 = level.clipIncludingBorder(
                     ClipContext(hitDestination, hitDestination.add(upward), Block.COLLIDER, Fluid.NONE, directInvoker)
                 )
