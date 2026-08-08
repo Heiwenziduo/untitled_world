@@ -1,7 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.event
 
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike.Companion.isWand
-import io.netty.util.Recycler
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.IItemWand.Companion.isWand
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.entity.LivingEntity

@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.init
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.registries.Registries
 import net.neoforged.neoforge.registries.DeferredRegister
@@ -18,11 +18,11 @@ object ModDataComponents {
         DEFERRED_REGISTER.register(MOD_BUS)
     }
 
-    val WAND_INVARIABLE: Supplier<DataComponentType<WandDataInvariable>> =
+    val WAND_INVARIABLE: Supplier<DataComponentType<ItemWandDataInvariable>> =
         DEFERRED_REGISTER.registerComponentType("wand_invariable") { builder ->
             builder
-                .persistent(WandDataInvariable.INVARIABLE_DATA_CODEC)
-                .networkSynchronized(WandDataInvariable.INVARIABLE_DATA_STREAM)
+                .persistent(ItemWandDataInvariable.INVARIABLE_DATA_CODEC)
+                .networkSynchronized(ItemWandDataInvariable.INVARIABLE_DATA_STREAM)
                 .cacheEncoding()
         }
 

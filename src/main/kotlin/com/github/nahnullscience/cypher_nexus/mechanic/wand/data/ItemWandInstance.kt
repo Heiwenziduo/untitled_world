@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.IItemWand
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.MapOfModules
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModuleSlot.Companion.DEFAULT_INVOKING
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModuleSlot.Companion.DEFAULT_RECOIL
@@ -27,19 +27,27 @@ import kotlin.math.abs
  * hold variable wand data, and handle invoking modules
  * */
 class ItemWandInstance(
-    val invariable: WandDataInvariable,
+    val wandData: ItemWandDataInvariable,
+    val wand: IItemWand,
     val isClient: Boolean,
     private var aoc: ArrayOfCyphers, // player may edit the wand after the instance has been created
     private val map: ItemWandInstanceMap,
-    val wand: IWandLike
 ) {
     companion object {
         private const val SYNC_TOLERANCE_TICK = 2
     }
 
-    val uuid = invariable.uuid
-    val manaMax = invariable.chunkF.manaMax
-    val manaRegen = invariable.chunkF.manaRegen
+    val uuid = wandData.uuid
+
+    val manaMax get(): Float = wandData.chunkF.manaMax
+    val manaRegen get(): Float = wandData.chunkF.manaRegen
+    val manaCurrent get(): Float = _manaCurrent
+    val delay get(): Int = _delayCurrent
+    val recharge get(): Int = _rechargeCurrent
+    val isRecharging get(): Boolean = _rechargeCurrent > 0 && _deck == 0L
+    val lastModifyTime get(): Long = _lastModifyTime
+    val lastInvokeTime get(): Long = _lastInvokeTime
+
     private var _manaCurrent = 0f
     private var _delayCurrent = 0
     private var _rechargeCurrent = 0
@@ -56,14 +64,6 @@ class ItemWandInstance(
         _manaCurrent = manaMax
         computeModules()
     }
-
-    val manaCurrent get(): Float = _manaCurrent
-    val delay get(): Int = _delayCurrent
-    val recharge get(): Int = _rechargeCurrent
-    val isRecharging get(): Boolean = _rechargeCurrent > 0 && _deck == 0L
-    val lastModifyTime get(): Long = _lastModifyTime
-    val lastInvokeTime get(): Long = _lastInvokeTime
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     fun tick(entity: Entity) {
@@ -138,12 +138,12 @@ class ItemWandInstance(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /** when cypher-list is edited */
-    fun updateWandStatsServerOnly(bundle: WandDataBundle) {
+    fun updateWandStatsServerOnly(wandData: ItemWandDataInvariable, aoc: ArrayOfCyphers) {
         if (isClient) CypherNexus.LOGGER.error("server method calls on client side: updateWandStatsFromServer")
         _deck = 0
         _discard = 0
         _rechargeCurrent = 0
-        updateAoc(bundle.highPayload.aoc)
+        updateAoc(aoc)
     }
 
     fun updateAoc(aoc: ArrayOfCyphers) {
@@ -174,9 +174,9 @@ class ItemWandInstance(
 
     fun toHelperDataBundle() = HelperDataBundle(
         manaCurrent = _manaCurrent,
-        draw = invariable.chunkI.draw,
-        delay = invariable.chunkI.castDelay,
-        recharge = if (isBeginning()) invariable.chunkI.rechargeTime else _rechargeCurrent,
+        draw = wandData.chunkI.draw,
+        delay = wandData.chunkI.castDelay,
+        recharge = if (isBeginning()) wandData.chunkI.rechargeTime else _rechargeCurrent,
         deck = _deck,
         discard = _discard
     )

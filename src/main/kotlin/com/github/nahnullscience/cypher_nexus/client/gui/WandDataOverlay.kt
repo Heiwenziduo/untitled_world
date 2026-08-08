@@ -1,10 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.client.gui
 
-import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
 import com.github.nahnullscience.cypher_nexus.mechanic.event.CNCommonEvents
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike.Companion.isNotWand
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike.Companion.wandInstanceOrNull
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.IItemWand.Companion.wandInstanceOrNull
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft

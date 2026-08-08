@@ -2,8 +2,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments
-import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.IItemWand
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.sideString
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap
@@ -14,7 +13,7 @@ import net.neoforged.bus.api.EventPriority
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.event.tick.EntityTickEvent
-import java.util.UUID
+import java.util.*
 
 /**
  * exist on both sides. this data can be found through [Entity.getData] on any Entity who had used a wand once.
@@ -60,27 +59,25 @@ class ItemWandInstanceMap {
     }
 
 
-    fun getOrPutInstance(invariable: WandDataInvariable, aoc: ArrayOfCyphers, wand: IWandLike, level: Level): ItemWandInstance {
-        val uuid = invariable.uuid
-        return uuid2InstanceMap.getOrPut(uuid)
-        {
-            ItemWandInstance(invariable, level.isClientSide, aoc, this, wand)
+    fun getOrPutInstance(level: Level, wandData: ItemWandDataInvariable, aoc: ArrayOfCyphers, wand: IItemWand): ItemWandInstance {
+        val uuid = wandData.uuid
+        return uuid2InstanceMap.getOrPut(uuid) {
+            ItemWandInstance(wandData, wand, level.isClientSide, aoc, this)
             .also { CypherNexus.debugWand { "wand-like [$wand] just created a ${level.sideString()} sided instance: [$uuid]" } }
         }
     }
-    fun getOrPutInstance(bundle: WandDataBundle, wand: IWandLike, level: Level) =
-        getOrPutInstance(bundle.invariable, bundle.highPayload.aoc, wand, level)
-
+    fun getOrPutInstance(level: Level, stack: ItemStack, wand: IItemWand): ItemWandInstance {
+        val wandData = wand.getWandData(stack)
+        val aoc = wand.getInvokingRecipe(stack)
+        return getOrPutInstance(level, wandData, aoc, wand)
+    }
 
 
     /** main scene is to edit cyphers */
-    fun updateWandStats(bundle: WandDataBundle, wand: IWandLike, level: Level) = run {
-        if (level.isClientSide) return@run
-        getOrPutInstance(bundle, wand, level).updateWandStatsServerOnly(bundle)
-    }
-    fun updateWandStats(stack: ItemStack, wand: IWandLike, level: Level) {
-        val invariable = stack.get(ModDataComponents.WAND_INVARIABLE) ?: return
-        val highPayload = stack.get(ModDataComponents.WAND_HIGH_PAYLOAD) ?: return
-        return updateWandStats(WandDataBundle(invariable, highPayload), wand, level)
+    fun updateWandInstance(level: Level, stack: ItemStack, wand: IItemWand) {
+        if (level.isClientSide) return
+        val wandData = wand.getWandData(stack)
+        val aoc = wand.getInvokingRecipe(stack)
+        getOrPutInstance(level, wandData, aoc, wand).updateWandStatsServerOnly(wandData, aoc)
     }
 }

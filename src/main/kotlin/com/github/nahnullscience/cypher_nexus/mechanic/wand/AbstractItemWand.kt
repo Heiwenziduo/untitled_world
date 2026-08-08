@@ -6,16 +6,22 @@ import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.SECONDARY
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable.Companion.FALL_BACK
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable.Companion.TO_BE_GENERATED
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload.Companion.EMPTY
 import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.nearestHitPoint
+import net.minecraft.core.component.DataComponentMap
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
@@ -32,7 +38,7 @@ abstract class AbstractItemWand(
     properties: Properties = Properties()
 ) : Item(
     properties.stacksTo(1)
-), IWandLike  {
+), IItemWand  {
     abstract override val isEditableWand: Boolean
 
     override fun getUseAnimation(stack: ItemStack) = ItemUseAnimation.EAT
@@ -40,7 +46,7 @@ abstract class AbstractItemWand(
 
     override fun use(level: Level, player: Player, hand: InteractionHand): InteractionResult {
         val stack = player.getItemInHand(hand)
-        val instance = itemWandInstance(level, player, stack)
+        val instance = getWandInstance(level, player, stack)
 
         val module = instance.getModule(SECONDARY_MODULE) ?: return InteractionResult.PASS
         // if not startUsingItem, further functions like onUseTick / onStopUsing will not perform
@@ -50,23 +56,27 @@ abstract class AbstractItemWand(
 
     override fun onUseTick(level: Level, user: LivingEntity, stack: ItemStack, remainTicks: Int) {
         // call on both sides
-        val instance = itemWandInstance(level, user, stack)
+        val instance = getWandInstance(level, user, stack)
         instance.getModule(SECONDARY_MODULE)?.onVanillaUseTick(user, stack, remainTicks) // #getUseDuration - used ticks, resets to full if reach 0
     }
 
     override fun onStopUsing(stack: ItemStack, user: LivingEntity, remainTicks: Int) {
         // call on both sides
-        val instance = itemWandInstance(user.level(), user, stack)
+        val instance = getWandInstance(user.level(), user, stack)
         instance.getModule(SECONDARY_MODULE)?.onVanillaUseStop(user, stack, remainTicks)
     }
 
     override fun inventoryTick(stack: ItemStack, level: ServerLevel, entity: Entity, slot: EquipmentSlot?) {
+        if (getWandData(stack) == TO_BE_GENERATED) {
+            generateWandData(stack)
+        }
+
         // call through (living#aistep)EntityEquipment#tick / (player#aistep)Inventory#tick -> stack#tick -> item#tick
         // inventory 0-35, does not contain equipment-slots, so everything tick once per tick
 
         if (entity is Player) return // tick player hotbar through events, since that runs on both sides
         if (slot == EquipmentSlot.MAINHAND || slot == EquipmentSlot.OFFHAND) {
-            itemWandInstance(level, entity, stack).tick(entity)
+            getWandInstance(level, entity, stack).tick(entity)
         }
     }
 
@@ -81,41 +91,43 @@ abstract class AbstractItemWand(
 //        return super.getBarWidth(stack)
 //    }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    override fun onEntityItemUpdate(stack: ItemStack, entity: ItemEntity): Boolean {
+        return super.onEntityItemUpdate(stack, entity)
+    }
 
-    protected open fun getWandData(stack: ItemStack?) = stack?.let { getWandData(stack, null) }
-    override fun <EntityWand> getWandData(
-        stack: ItemStack?,
-        entityWand: EntityWand?
-    ): WandDataBundle where EntityWand : Entity, EntityWand : IWandLike {
-        /* @doc
-         * Any component values within the map should be treated as immutable.
-         * Always call #set or one of its referring methods discussed below after modifying the value of a data component.
-         * */
-        run {
-            if (stack != null && !stack.isEmpty) {
-                val invariable = stack.get(ModDataComponents.WAND_INVARIABLE) ?: return@run
-                val highPayload = stack.get(ModDataComponents.WAND_HIGH_PAYLOAD) ?: return@run
+    override fun components(): DataComponentMap {
+        return super.components()
+    }
 
-                return WandDataBundle(invariable, highPayload)
-            }
-        }
-
-        return WandDataBundle.missingData { "wand [$stack] missing data" }
+    override fun onCraftedPostProcess(itemStack: ItemStack, level: Level) {
+        super.onCraftedPostProcess(itemStack, level)
     }
 
 
-    override fun checkInvokingPrerequisites(level: Level, invoker: Entity, stack: ItemStack?): Boolean {
-        return itemWandInstance(level, invoker, stack).canInvoke()
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    protected abstract fun generateWandData(stack: ItemStack)
+
+    override fun getWandData(dataProvider: ItemStack): ItemWandDataInvariable {
+        return dataProvider.getOrDefault(ModDataComponents.WAND_INVARIABLE, FALL_BACK)
     }
 
-    protected open fun wandLength(data: WandDataBundle?): Float =
-        data?.let { 0.4f + (it.highPayload.aoc.capacity.toFloat() / 16).coerceAtMost(3.0f) } ?: 0.4f
+    override fun getInvokingRecipe(dataProvider: ItemStack): ArrayOfCyphers {
+        return dataProvider.getOrDefault(ModDataComponents.WAND_HIGH_PAYLOAD, EMPTY).aoc
+    }
 
-    override fun getInvokingPosDire(level: Level, invoker: Entity, stack: ItemStack?): PosDirePair {
+    override fun getWandInstance(level: Level, invoker: Entity, stack: ItemStack): ItemWandInstance {
+        return invoker.getData(WAND_DATA_MAP).getOrPutInstance(level, stack, this)
+    }
+
+    protected open fun wandLength(stack: ItemStack): Float {
+        val aoc = getInvokingRecipe(stack)
+        return 0.4f + (aoc.capacity.toFloat() / 16).coerceAtMost(3.0f)
+    }
+
+    override fun getInvokingPosDire(level: Level, invoker: Entity, stack: ItemStack): PosDirePair {
         // for an Item Wand, pos and dire just use the living's view vector
-        val tip = wandLength(getWandData(stack))
+        val tip = wandLength(stack)
         val eye = invoker.eyePosition
         val looking = invoker.headLookAngle
         val scale = tip + invoker.knownMovement.dot(looking).coerceAtLeast(0.0) // solve inertia problem
@@ -125,26 +137,14 @@ abstract class AbstractItemWand(
         return PosDirePair(pos, looking)
     }
 
-
-    override fun itemWandInstance(level: Level, invoker: Entity, stack: ItemStack?): ItemWandInstance {
-        val wandData = getWandData(stack, null)
-        return invoker.getData(WAND_DATA_MAP).getOrPutInstance(wandData, this, level)
-    }
-
-
-    override fun getHelperDataBundle(level: Level, invoker: Entity, stack: ItemStack?): HelperDataBundle {
-        return itemWandInstance(level, invoker, stack).toHelperDataBundle()
-    }
-
-
     override fun afterInvoke(
         level: Level,
         invoker: Entity,
-        stack: ItemStack?,
+        stack: ItemStack,
         dataBundle: HelperDataBundle,
         rootChunk: ShotStateChunk
     ): InvokingState {
-        val instance = itemWandInstance(level, invoker, stack)
+        val instance = getWandInstance(level, invoker, stack)
         instance.updateFromHelperData(dataBundle)
         instance.invokeFinish(level)
         return InvokingState.SUCCESS

@@ -71,15 +71,15 @@ class InvokingHelper (
     /**
      *
      * @param posDire location information of resultant projectiles, direction doesn't have to be normalized
-     * @param itemWand [ItemWandInstance], can be null if invoked from an `EntityWand`
+     * @param itemWandInstance [ItemWandInstance], can be null if invoked from an `EntityWand`
      * */
-    fun finalizeInvoking(
+    fun releaseInvokingResult(
         level: Level,
         coordinate: CoordinateDefinition,
         posDire: PosDirePair,
-        itemWand: ItemWandInstance?
+        itemWandInstance: ItemWandInstance?
     ) {
-        shotRoot.release(level, coordinate, posDire, invoker, invoker, itemWand)
+        shotRoot.release(level, coordinate, posDire, invoker, invoker, itemWandInstance)
     }
 
     private fun step(): Boolean {

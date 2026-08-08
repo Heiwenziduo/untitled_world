@@ -1,7 +1,10 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand.data
 
-import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs
+import com.github.nahnullscience.cypher_nexus.init.ModDataComponents.WAND_INVARIABLE
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable.Companion.FALL_BACK
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable.Companion.TO_BE_GENERATED
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
+import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import net.minecraft.core.component.DataComponentGetter
@@ -25,12 +28,23 @@ data class WandDataHighPayload(val aoc: ArrayOfCyphers) : TooltipProvider {
         flag: TooltipFlag,
         components: DataComponentGetter
     ) {
+        val data = components.getOrDefault(WAND_INVARIABLE, FALL_BACK)
+        if (this == EMPTY) return
+        if (data == FALL_BACK || data == TO_BE_GENERATED) return
+
         consumer.accept(CommonComponents.NEW_LINE)
-        consumer.accept(Component.literal("$aoc"))
+        // TODO
+        // show a slice
+
+        // show full
+        if (flag.hasShiftDown()) {
+            consumer.accept(Component.literal("$aoc"))
+        }
     }
 
     companion object {
-        val EMPTY = of(1)
+        val EMPTY_AOC = ArrayOfCyphers(1)
+        val EMPTY = WandDataHighPayload(EMPTY_AOC)
 
         fun of(capacity: Int) = WandDataHighPayload(ArrayOfCyphers(capacity))
 

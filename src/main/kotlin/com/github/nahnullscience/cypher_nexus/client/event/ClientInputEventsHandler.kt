@@ -5,14 +5,12 @@ import com.github.nahnullscience.cypher_nexus.client.network.ClientInputModuleSt
 import com.github.nahnullscience.cypher_nexus.client.network.ClientInputModuleStateUpdater.endModule
 import com.github.nahnullscience.cypher_nexus.client.network.ClientInputModuleStateUpdater.startModule
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike.Companion.wandInstanceOrNull
-import com.github.nahnullscience.cypher_nexus.utility.minus
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.IItemWand.Companion.wandInstanceOrNull
 import net.minecraft.client.Minecraft
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResult
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
-import net.minecraft.world.phys.HitResult
 import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.EventPriority
 import net.neoforged.bus.api.SubscribeEvent

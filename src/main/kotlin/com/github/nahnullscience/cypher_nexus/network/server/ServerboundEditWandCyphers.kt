@@ -4,8 +4,8 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.mechanic.event.CNCommonEvents
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike.Companion.editRecipeIfWand
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.IItemWand
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.IItemWand.Companion.editRecipeIfWand
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundEditWandCyphersConfirm
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs
@@ -58,7 +58,7 @@ data class ServerboundEditWandCyphers(
                 // TODO check data authentic
                 stack?.editRecipeIfWand(data.cyphers)?.let {
                     if (it) {
-                        player.getData(WAND_DATA_MAP).updateWandStats(stack, stack.item as IWandLike, player.level())
+                        player.getData(WAND_DATA_MAP).updateWandInstance(player.level(), stack, stack.item as IItemWand)
                         PacketDistributor.sendToPlayer(player as ServerPlayer, data.makeConfirm())
                     }
                 } ?: CypherNexus.debugWand(Level.ERROR) { "wand didn't find [${data.uuid}]" }

@@ -23,7 +23,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.ManaM
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.ManaRegenRow
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.WandRechargeTimeRow
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.WandProperties.SpreadRow
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
@@ -121,7 +121,7 @@ class WandEditorPanel(
     }
 
     /** Noita-style stat readout: colored swatch + label, one stat per line */
-    private fun renderWandStats(graphics: GuiGraphicsExtractor, data: WandDataInvariable, aoc: ArrayOfCyphers, x: Int, y: Int) {
+    private fun renderWandStats(graphics: GuiGraphicsExtractor, data: ItemWandDataInvariable, aoc: ArrayOfCyphers, x: Int, y: Int) {
         val font = screen.font
         var lineY = y
 

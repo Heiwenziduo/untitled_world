@@ -89,7 +89,7 @@ class MapOfModules(
 
     fun finalizeInit() {
         init = true
-        CypherNexus.debugWand { "$instance computed modules, current module: $this" }
+//        CypherNexus.debugWand { "$instance computed modules, current module: $this" }
     }
 
     fun clear() {

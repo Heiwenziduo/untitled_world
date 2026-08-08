@@ -3,9 +3,9 @@ package com.github.nahnullscience.cypher_nexus.datagen.server.loot_table
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.IItemWand
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataInvariable
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.mojang.serialization.Codec
@@ -29,7 +29,7 @@ class TieredWandGenerationFunction(
     override fun codec(): MapCodec<out LootItemConditionalFunction> = CODEC
 
     override fun run(stack: ItemStack, context: LootContext): ItemStack {
-        if (stack.item !is IWandLike) return stack
+        if (stack.item !is IItemWand) return stack
         val random = context.random
         val tier = tier.getInt(context).coerceIn(0, 100)
 
@@ -62,7 +62,7 @@ class TieredWandGenerationFunction(
             remainToken -= allocated
         }
 
-        val invariable = WandDataInvariable.builder()
+        val invariable = ItemWandDataInvariable.builder()
             .manaMax(attrMap[WandPropertyPreference.MANA_MAX]?.toFloat()?.times(WandPropertyPreference.MANA_MAX.rate)?.plus(random.nextFloat() * WandPropertyPreference.MANA_MAX.rate) ?: 0f)
             .manaRegen(attrMap[WandPropertyPreference.MANA_REGEN]?.toFloat()?.times(WandPropertyPreference.MANA_REGEN.rate)?.plus(random.nextFloat() * WandPropertyPreference.MANA_REGEN.rate) ?: 0f)
 //            .capacity(attrMap[WandPropertyPreference.CAPA]?.times(WandPropertyPreference.CAPA.rate)?.plus(1)?.toInt() ?: 2)

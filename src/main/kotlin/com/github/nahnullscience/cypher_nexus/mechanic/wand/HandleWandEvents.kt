@@ -6,7 +6,7 @@ import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_MODUL
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.inputModules
 import com.github.nahnullscience.cypher_nexus.mechanic.event.CNCommonEvents
 import com.github.nahnullscience.cypher_nexus.mechanic.event.wand.WandPerformingStateChangeEvent
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.IWandLike.Companion.wandInstanceOrNull
+import com.github.nahnullscience.cypher_nexus.mechanic.wand.IItemWand.Companion.wandInstanceOrNull
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.WandModuleType
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.AbstractInputModule
 import net.minecraft.world.entity.LivingEntity
@@ -98,12 +98,9 @@ object HandleWandEvents {
     private fun wandInstanceUpdatePlayer(event: PlayerTickEvent.Post) {
         val player = event.entity
         val map = player.getData(ModDataAttachments.WAND_DATA_MAP)
-        CNCommonEvents.livingGatherWandsTracking(player) track@ { index, wand ->
-            map.getOrPutInstance(
-                (wand.item as IWandLike).getWandData(wand, null) ?: return@track,
-                (wand.item as IWandLike),
-                player.level()
-            ).tick(player)
+        CNCommonEvents.livingGatherWandsTracking(player) track@ { index, stack ->
+            val wand = stack.item as? IItemWand ?: return@track
+            map.getOrPutInstance(player.level(), stack, wand).tick(player)
         }
     }
 
