@@ -205,19 +205,6 @@
         }
       }
     },
-    "cypher_nexus:brisk": {
-      "delay": 0,
-      "draw": 1,
-      "flags": 0,
-      "manaDrain": 5.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {
-        "cypher_nexus:speed": {
-          "multiply_total": 2.5
-        }
-      }
-    },
     "cypher_nexus:bubble_column": {
       "delay": -3,
       "draw": 0,
@@ -540,7 +527,7 @@
       "flags": 144,
       "manaDrain": 20.0,
       "projectile": {
-        "cypher_nexus:existing": 100.0,
+        "cypher_nexus:existing": 101.0,
         "cypher_nexus:friction_factor": 0.0,
         "cypher_nexus:speed": 0.0
       },
@@ -595,7 +582,7 @@
       "delay": 0,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 100.0,
+      "manaDrain": 120.0,
       "projectile": {},
       "recharge": 0,
       "shotState": {}
@@ -1344,6 +1331,19 @@
       },
       "recharge": 0,
       "shotState": {}
+    },
+    "cypher_nexus:speed_boost": {
+      "delay": 0,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 5.0,
+      "projectile": {},
+      "recharge": 0,
+      "shotState": {
+        "cypher_nexus:speed": {
+          "multiply_total": 2.5
+        }
+      }
     },
     "cypher_nexus:tau": {
       "delay": 10,

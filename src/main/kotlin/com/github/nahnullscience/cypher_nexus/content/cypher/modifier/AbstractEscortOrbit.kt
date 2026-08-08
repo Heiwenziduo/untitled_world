@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherSteerers.ESCORT_ORBIT_STEERER
-import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers.FIREWORK_ROCKET
+import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers.RANDOM_FIREWORK_ROCKET
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers.SNOWBALL
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
@@ -63,7 +63,7 @@ abstract class AbstractEscortOrbit(
     ) : AbstractEscortOrbit(defaultAttribute) {
         override val resource = CypherNexus.modResource("firework_orbit")
         override fun <CE> getProjectileToGen(cyEntity: CE): Holder<out AbstractProjectileCypher<*>>
-                where CE : Entity, CE : ICypherEntity = FIREWORK_ROCKET
+                where CE : Entity, CE : ICypherEntity = RANDOM_FIREWORK_ROCKET
     }
 
     class JuxtaOrbit(

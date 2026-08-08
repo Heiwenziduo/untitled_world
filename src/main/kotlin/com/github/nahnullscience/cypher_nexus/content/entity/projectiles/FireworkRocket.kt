@@ -83,7 +83,7 @@ open class FireworkRocket(
     }
 
     open fun fireworkExplosions(): List<FireworkExplosion> {
-        val hueColor = hue?.let { IntList.of(it) } ?: IntList.of(DyeColor.WHITE.fireworkColor)
+        val hueColor = if (dyed) IntList.of(hue) else IntList.of(DyeColor.WHITE.fireworkColor)
         val explode = FireworkExplosion(
             Shape.BURST,
             hueColor,
@@ -110,7 +110,7 @@ open class FireworkRocket(
                 val color = DyeColor.byId(random.nextInt(15)).fireworkColor
                 colors.add(color)
             } while (i++ < 3 && random.nextBoolean())
-            val fade = hue?.let { IntList.of(it) } ?: IntList.of()
+            val fade = if (dyed) IntList.of(hue) else IntList.of()
             val count = getExplosionsFromRadius(getEffectRadius())
             val exp = FireworkExplosion(
                 Shape.byId(shape),

@@ -196,7 +196,7 @@ object Cyphers {
         flags(CypherFlags.GLOWING)
         brightness(0.2f)
     }
-    val BRISK = registerModifier("brisk", 5f) {
+    val SPEED_BOOST = registerModifier("speed_boost", 5f) {
         shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 2.5)
     }
     val ACCELERATING = registerModifier("accelerating", 5f) {
@@ -244,14 +244,14 @@ object Cyphers {
         shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.SET_ALL, 0.0)
         shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.SET_ALL, 0.0)
     }
+    val CRIT_PLUS = registerModifier("critical_plus", 10f) {
+        shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.25)
+    }
     val PEACEFUL_MODE = registerModifier("peaceful_mode", 5f) {
         delay(-2)
         flags(CypherFlags.SKIP_DAMAGE_CHECK, CypherFlags.SAFE_EXPLODE)
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, -1.0)
         shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 100.0)
-    }
-    val CRIT_PLUS = registerModifier("critical_plus", 10f) {
-        shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.25)
     }
     val FIERY = registerCypher(::FieryCypher) {
         manaDrain(5f)
@@ -425,7 +425,7 @@ object Cyphers {
         dyeColor(0.2f)
     }
     val SNOWBALL_ORBIT = registerCypher(AbstractEscortOrbit::SnowballOrbit, 20f)
-    val FIREWORK_ORBIT = registerCypher(AbstractEscortOrbit::FireworkOrbit, 100f)
+    val FIREWORK_ORBIT = registerCypher(AbstractEscortOrbit::FireworkOrbit, 120f)
     val JUXTA_ORBIT = registerCypher(AbstractEscortOrbit::JuxtaOrbit, 120f)
 
 

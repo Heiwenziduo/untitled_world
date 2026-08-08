@@ -2,12 +2,16 @@ package com.github.nahnullscience.cypher_nexus.client.renderer.cypher
 
 import com.github.nahnullscience.cypher_nexus.client.particle.addCypherTrailParticle
 import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.FireworkRocketCypherRenderState
+import com.github.nahnullscience.cypher_nexus.client.util.Colors
 import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.FireworkRocket
+import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.FireworkRocket.RandomFireRocket
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
 import com.github.nahnullscience.cypher_nexus.utility.ANG_2_RAD_F
 import com.github.nahnullscience.cypher_nexus.utility.linearInterpolateGaps
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.math.Axis
 import net.minecraft.client.multiplayer.ClientLevel
+import net.minecraft.client.particle.SingleQuadParticle
 import net.minecraft.client.renderer.SubmitNodeCollector
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context
 import net.minecraft.client.renderer.item.ItemModelResolver
@@ -67,17 +71,45 @@ class FireworkRocketCypherRenderer(
     ) {
         val speed = entity.knownMovement
         val random = entity.random
+        val scale = entity.getEffectRadius().coerceIn(0.25f, 2f) // vanilla firework can't be easily scale, that's a shame
+        val config: SingleQuadParticle.() -> Unit =
+            if (entity is RandomFireRocket) {
+                {
+                    scale(scale)
+                    lifetime = 11
+                    if (random.nextDouble() > 0.33) {
+                        val id = random.nextInt(15)
+                        Colors.vanillaDyeColorsFirework[id].let {
+                            setColor(it[0], it[1], it[2])
+                        }
+                    }
+                    if (entity.dyed) {
+                        setAlpha(entity.hueFloatArray[3])
+                    }
+                }
+            }
+            else if (entity.dyed) {
+                {
+                    scale(scale)
+                    lifetime = 11
+                    entity.hueFloatArray.let {
+                        setColor(it[0], it[1], it[2])
+                        setAlpha(it[3])
+                    }
+                }
+            }
+            else {
+                { scale(scale); lifetime = 11 }
+            }
         linearInterpolateGaps(xo, yo, zo, x, y, z, 0.4) { step, x, y, z ->
             addCypherTrailParticle(
-                entity,
                 ParticleTypes.FIREWORK,
                 x, y, z,
                 -speed.x * random.nextGaussian() * 0.33,
                 -speed.y * random.nextDouble() * 0.33,
-                -speed.z * random.nextGaussian() * 0.33
-            ) {
-                lifetime = 11
-            }
+                -speed.z * random.nextGaussian() * 0.33,
+                config
+            )
         }
     }
 
