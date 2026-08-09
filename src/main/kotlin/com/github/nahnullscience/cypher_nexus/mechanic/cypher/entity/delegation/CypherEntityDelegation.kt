@@ -22,11 +22,9 @@ import net.minecraft.world.phys.*
 
 
 class CypherEntityDelegation <CE> (
-    val attribute: ICEAttribute = CEAttribute(),
     val context: ICEContext<CE> = CEContext(),
     val physics: ICEPhysics<CE> = CEPhysicsBasics()
 ) : ICypherEntity,
-    ICypherEntityAttributeAccessor by attribute,
     ICypherEntityLogicContext by context,
     ICypherEntityPhysics by physics
     where CE : Entity, CE : ICypherEntity
@@ -50,7 +48,6 @@ class CypherEntityDelegation <CE> (
     ) {
         if (isInit) return
         if (ccMap == null) {
-            attribute.initCypher(cypher, null)
             context.initCypher(cypher, null, steerer)
             physics.initCypher(cypher, null, null)
             isInit = true
@@ -67,7 +64,6 @@ class CypherEntityDelegation <CE> (
         steerer: AbstractCypherSteerer?
     ) {
         if (isInit) return
-        attribute.initCypher(cypher, shotState)
         context.initCypher(cypher, shotState, steerer)
         physics.initCypher(cypher, shotState, node)
         isInit = true
@@ -105,5 +101,10 @@ class CypherEntityDelegation <CE> (
             }
         }
         ce.needsSync = true
+    }
+
+    override fun printDebugMsg(o: Any?) {
+        context.printDebugMsg(o)
+        physics.printDebugMsg(o)
     }
 }

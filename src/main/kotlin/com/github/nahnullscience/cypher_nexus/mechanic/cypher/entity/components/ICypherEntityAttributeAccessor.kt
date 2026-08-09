@@ -3,95 +3,75 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.cypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getAttrBaseOrNull
 import net.minecraft.core.Holder
 
 interface ICypherEntityAttributeAccessor {
 
     fun hasModifiedAttribute(): Boolean
     fun hasModifiedAttribute(attr: CypherAttribute): Boolean
-    fun hasModifiedAttribute(holer: Holder<CypherAttribute>): Boolean
 
     /**
-     * get a modified attribute or null if untouched, should note that null return doesn't mean
-     * the projectile not has the given attribute.
-     * @see getAttrBaseOrNull
+     * get the value of an attribute either modified or default, the order of searching default value is
+     * cypher-default -> attribute-default
      * */
-    fun getAttribute(attr: CypherAttribute): Double?
-    /**
-     * get a modified attribute or null if untouched, should note that null return doesn't mean
-     * the projectile not has the given attribute.
-     * @see getAttrBaseOrNull
-     * */
-    fun getAttribute(holer: Holder<CypherAttribute>): Double?
+    fun getAttributeOrDefault(attr: CypherAttribute): Double
     /**
      * change the value of the given attribute, this won't sync to another side.
      * @return the old value, or null if there isn't.
      * */
-    fun setAttribute(attr: CypherAttribute, value: Double): Double?
-    /**
-     * change the value of the given attribute, this won't sync to another side.
-     * @return the old value, or null if there isn't.
-     * */
-    fun setAttribute(holer: Holder<CypherAttribute>, value: Double): Double?
-//    /**
-//     * get value through entity-specific map > cypher default > attribute default
-//     * */
-//    fun getAttributeOrDefault(attr: CypherAttribute): Double
-//    /**
-//     * get value through entity-specific map > cypher default > attribute default
-//     * */
-//    fun getAttributeOrDefault(holer: Holder<CypherAttribute>): Double
-//    /**
-//     * @return the unmodified base attribute value of the entity if any
-//     * @see [AbstractProjectileCypher.getAttrBaseOrNull]
-//     * */
-//    fun getAttrBaseOrNull(attr: CypherAttribute): Double?
-//    /**
-//     * @return the unmodified base attribute value of the entity if any
-//     * @see [AbstractProjectileCypher.getAttrBaseOrNull]
-//     * */
-//    fun getAttrBaseOrNull(holder: Holder<CypherAttribute>): Double?
-
-
-    /**
-     * print modified AttrMap.
-     * */
-    fun debugAttributes()
-
+    fun setAttribute(attr: CypherAttribute, value: Double): Double
 
     companion object {
-        fun ICypherEntity.getAttributeOrDefault(holer: Holder<CypherAttribute>) = getAttribute(holer) ?: cypher.getAttrBaseOrDefault(holer)
+        fun ICypherEntityAttributeAccessor.hasModifiedAttribute(holer: Holder<CypherAttribute>): Boolean = hasModifiedAttribute(holer.value())
+        fun ICypherEntityAttributeAccessor.getAttributeOrDefault(holer: Holder<CypherAttribute>): Double = getAttributeOrDefault(holer.value())
+        fun ICypherEntityAttributeAccessor.setAttribute(holer: Holder<CypherAttribute>, value: Double): Double = setAttribute(holer.value(), value)
 
-        fun ICypherEntity.getAttrBaseOrNull(holer: Holder<CypherAttribute>) = cypher.getAttrBaseOrNull(holer)
 
         inline fun ICypherEntity.computeAttribute(holer: Holder<CypherAttribute>, formular: (current: Double) -> Double) {
             val current = getAttributeOrDefault(holer)
             setAttribute(holer, formular(current))
         }
 
-        inline fun ICypherEntity.computeAttributeIfPresent(holer: Holder<CypherAttribute>, formular: (current: Double) -> Double) {
-            val current = getAttribute(holer) ?: return
+        inline fun ICypherEntity.computeAttrIfPresent(holer: Holder<CypherAttribute>, formular: (current: Double) -> Double) {
+            val current = if (hasModifiedAttribute(holer)) getAttributeOrDefault(holer) else return
             setAttribute(holer, formular(current))
         }
 
-        inline fun ICypherEntity.computeBaseAttribute(holer: Holder<CypherAttribute>, formular: (default: Double) -> Double) {
-            val current = getAttrBaseOrNull(holer) ?: holer.value().defaultValue
-            setAttribute(holer, formular(current))
+        inline fun ICypherEntity.computeAttrWithCurrent(holer: Holder<CypherAttribute>, formular: (value: Double) -> Double) =
+            computeAttrWithCurrent(holer, holer.value().defaultValue, formular)
+        inline fun ICypherEntity.computeAttrWithCurrent(
+            holer: Holder<CypherAttribute>,
+            fallback: Double,
+            formular: (value: Double) -> Double
+        ) {
+            val attr = if (hasModifiedAttribute(holer)) getAttributeOrDefault(holer) else fallback
+            setAttribute(holer, formular(attr))
         }
 
-        fun ICypherEntity.getExisting(): Int = getAttributeOrDefault(CypherAttributes.EXISTING).toInt()
+        inline fun ICypherEntity.computeAttrWithBase(holer: Holder<CypherAttribute>, formular: (value: Double) -> Double) =
+            computeAttrWithBase(holer, holer.value().defaultValue, formular)
+        inline fun ICypherEntity.computeAttrWithBase(
+            holer: Holder<CypherAttribute>,
+            fallback: Double,
+            formular: (value: Double) -> Double
+        ) {
+            val attr = holer.value()
+            val value = if (cypher.hasAttr(attr)) cypher.getAttrOrDefault(attr) else fallback
+            setAttribute(holer, formular(value))
+        }
 
-        fun ICypherEntity.getBounce(): Int = getAttributeOrDefault(CypherAttributes.BOUNCE).toInt()
+        fun ICypherEntity.getExisting(): Int = this@getExisting.getAttributeOrDefault(CypherAttributes.EXISTING).toInt()
 
-        fun ICypherEntity.getInitialSpeed(): Double = getAttributeOrDefault(CypherAttributes.SPEED)
+        fun ICypherEntity.getBounce(): Int = this@getBounce.getAttributeOrDefault(CypherAttributes.BOUNCE).toInt()
 
-        fun ICypherEntity.getGravityFactor(): Double = getAttributeOrDefault(CypherAttributes.GRAVITY_FACTOR)
+        fun ICypherEntity.getInitialSpeed(): Double = this@getInitialSpeed.getAttributeOrDefault(CypherAttributes.SPEED)
 
-        fun ICypherEntity.getSpeedFactor(): Double = 1f - getAttributeOrDefault(CypherAttributes.FRICTION_FACTOR)
+        fun ICypherEntity.getGravityFactor(): Double = this@getGravityFactor.getAttributeOrDefault(CypherAttributes.GRAVITY_FACTOR)
 
-        fun ICypherEntity.getEffectRadius(): Float = getAttributeOrDefault(CypherAttributes.EFFECT_RADIUS).toFloat()
+        fun ICypherEntity.getSpeedFactor(): Double = 1f - this@getSpeedFactor.getAttributeOrDefault(CypherAttributes.FRICTION_FACTOR)
 
-        fun ICypherEntity.getDamage(): Float = getAttributeOrDefault(CypherAttributes.DAMAGE).toFloat()
+        fun ICypherEntity.getEffectRadius(): Float = this@getEffectRadius.getAttributeOrDefault(CypherAttributes.EFFECT_RADIUS).toFloat()
+
+        fun ICypherEntity.getDamage(): Float = this@getDamage.getAttributeOrDefault(CypherAttributes.DAMAGE).toFloat()
     }
 }

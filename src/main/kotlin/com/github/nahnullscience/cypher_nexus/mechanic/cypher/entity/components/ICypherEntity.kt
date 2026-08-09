@@ -26,7 +26,6 @@ import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent
  * those pieces then could be delivered through [CypherEntityDelegation].
  * */
 interface ICypherEntity :
-    ICypherEntityAttributeAccessor,
     ICypherEntityLogicContext,
     ICypherEntityPhysics
 {
@@ -65,6 +64,8 @@ interface ICypherEntity :
     fun getDirectionInitial(): Vec3
     fun getPositionInitial(): Vec3
 
+    fun printDebugMsg(o: Any? = null) {}
+
 
     ///////////////////////////// helpers /////////////////////////////////
     @EventBusSubscriber(modid = CypherNexus.MOD_ID)
@@ -96,8 +97,8 @@ interface ICypherEntity :
         inline val ICypherEntity.collideWithEntities get() = noFlagsNone(CypherFlags.PENETRATE_WORLD)
 
         fun ICypherEntity.exertDamage(level: ServerLevel, target: Entity) {
-            var damage = getAttributeOrDefault(CypherAttributes.DAMAGE)
-            var crit = getAttributeOrDefault(CypherAttributes.CRIT_CHANCE)
+            var damage = this@exertDamage.getAttributeOrDefault(CypherAttributes.DAMAGE)
+            var crit = this@exertDamage.getAttributeOrDefault(CypherAttributes.CRIT_CHANCE)
             var critMulti = (owner as? LivingEntity)?.let { 1.5 } ?: 1.5 // there is no CritMultiplier Attribute, why
             var t = 1
             while (crit > 1 && t++ < Int.MAX_VALUE) {

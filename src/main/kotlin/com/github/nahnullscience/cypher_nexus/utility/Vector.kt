@@ -227,8 +227,8 @@ fun Vector3f.randomInCone(maxAngle: Double, random: RandomSource): Vector3f {
 /**
  * @return the hit point the given line from this to [destination] collide with [bb], null if not collide
  * */
-fun Vec3.rayCastVanilla(destination: Vec3, bb: AABB, margin: Double? = null): Vec3? {
-    val b = margin?.let { bb.inflate(it) } ?: bb
+fun Vec3.rayCastVanilla(destination: Vec3, bb: AABB, margin: Double = Double.NaN): Vec3? {
+    val b = if (margin.isNaN()) bb else bb.inflate(margin)
     return b.clip(this, destination).getOrNull()
 }
 
@@ -238,8 +238,8 @@ typealias onClip = (clippingPoint: Vec3, direction: Direction?) -> Unit
  * execute [task] if ray pierce the given AABB.
  * direction might be null if both the start and the end vector are inside the AABB.
  * */
-inline fun Vec3.rayCastThen(destination: Vec3, bb: AABB, margin: Double? = null, task: onClip): Boolean {
-    val b = margin?.let { bb.inflate(it) } ?: bb
+inline fun Vec3.rayCastThen(destination: Vec3, bb: AABB, margin: Double = Double.NaN, task: onClip): Boolean {
+    val b = if (margin.isNaN()) bb else bb.inflate(margin)
     return b.checkIntersectionThen(this, destination, task)
 }
 

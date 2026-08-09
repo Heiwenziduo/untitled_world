@@ -3,8 +3,11 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation
 import com.github.nahnullscience.cypher_nexus.init.data_driven.ModDamageTypes.CYPHER_DEFAULT
 import com.github.nahnullscience.cypher_nexus.init.data_driven.ModDamageTypes.CYPHER_DEFAULT_EXPLOSION
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ExplosionSettings
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.cypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityLogicContext.Companion.canNotHurtOwner
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.NoSteerer
@@ -13,6 +16,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.isOwnerOf
+import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastMap
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.damagesource.DamageSource
@@ -27,6 +31,7 @@ open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity
     protected val level get() = ce.level()
     protected val random get() = ce.random
 
+    protected val attributeMap = AttributeFastMap()
     override var enabledFlags = CypherFlags.fromFlags() // no flag by default
 
     override var ccMap: MapOfCypherCounts? = null
@@ -52,6 +57,8 @@ open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity
         enabledFlags = (shotState?.enabledFlags ?: 0) or cypher.flags
         hooks = shotState?.hooks
         ccMap = shotState?.ccMap
+
+        shotState?.let { attributeMap.initFromShotState(it, cypher) }
         shotState?.dyeAccumulator?.let {
             if (it.isResolved) {
                 dyed = true
@@ -113,5 +120,36 @@ open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity
                 && target.isAlive
                 && target != ce.owner
                 && !target.`is`(EntityType.ARMOR_STAND)
+    }
+
+    override fun hasModifiedAttribute(): Boolean {
+        return attributeMap.isNotEmpty()
+    }
+
+    override fun hasModifiedAttribute(attr: CypherAttribute): Boolean {
+        return attributeMap.hasAttribute(attr)
+    }
+
+    override fun getAttributeOrDefault(attr: CypherAttribute): Double {
+        return attributeMap.getDouble(attr).let {
+            if (it.isNaN()) ce.cypher.getAttrOrDefault(attr)
+            else it
+        }
+    }
+
+    override fun setAttribute(
+        attr: CypherAttribute,
+        value: Double
+    ): Double {
+        return attributeMap.setAttribute(attr, value).let { if (it.isNaN()) attr.defaultValue else it }
+    }
+
+    override fun printDebugMsg(o: Any?) {
+        println("Attributes: ")
+        if (hasModifiedAttribute())
+        for ((a, d) in attributeMap) {
+            println("$a: $d")
+        }
+        else println("no modified attribute")
     }
 }

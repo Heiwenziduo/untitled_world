@@ -8,7 +8,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingH
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
-import net.minecraft.core.Holder
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import java.util.function.Supplier
@@ -73,8 +72,9 @@ abstract class AbstractProjectileCypher <CE> (
     ): ShotStateChunk = ShotStateChunk(charge).also { old.addProjectileNode(this, it, trigger) }
 
 
-    fun getAttrBaseOrDefault(holder: Holder<CypherAttribute>) = getAttrBaseOrDefault(holder.value())
-    fun getAttrBaseOrDefault(attr: CypherAttribute): Double = dataMap().projectile.getAttrOrDefault(attr)
-    fun getAttrBaseOrNull(holder: Holder<CypherAttribute>) = getAttrBaseOrNull(holder.value())
-    fun getAttrBaseOrNull(attr: CypherAttribute): Double? = dataMap().projectile[attr]
+    fun getAttrOrDefault(attr: CypherAttribute): Double = dataMap().projectile.getAttributeOrDefault(attr)
+//    fun getAttrOrDefault(holder: Holder<CypherAttribute>) = getAttrOrDefault(holder.value())
+
+    fun hasAttr(attr: CypherAttribute): Boolean = dataMap().projectile.hasAttribute(attr)
+//    fun hasAttr(holder: Holder<CypherAttribute>): Boolean = hasAttr(holder.value())
 }

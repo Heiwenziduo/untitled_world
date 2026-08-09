@@ -112,9 +112,6 @@ class ShotStateChunk private constructor (
             wandInstance ?: return@recoil
             if (directInvoker !is LivingEntity) return@recoil
             val recoilMap = attributes[CypherAttributes.RECOIL.value()] ?: return@recoil
-//            val recoil = AttributeOperator.attributeCalculator(CypherAttributes.RECOIL.value().defaultValue, recoilMap).let {
-//                CypherAttributes.RECOIL.value().restrictRange(it)
-//            }
             val recoil = AttributeFastMap.attributeCalculator(CypherAttributes.RECOIL, recoilMap)
             wandInstance.functionModule(RECOIL_MODULE.get(), directInvoker, null, invokerCoordinate, power = recoil)
         }
@@ -196,12 +193,7 @@ class ShotStateChunk private constructor (
         run spread@ {
             val random = owner?.random ?: directInvoker?.random ?: return@spread
             val spreadMap = attributes[CypherAttributes.SPREAD.value()] ?: return@spread
-
-//            val spread = AttributeOperator.attributeCalculator(CypherAttributes.SPREAD.value().defaultValue, spreadMap).let {
-//                CypherAttributes.SPREAD.value().restrictRange(it)
-//            }
             val spread = AttributeFastMap.attributeCalculator(CypherAttributes.SPEED, spreadMap)
-
             if (spread > 0.01) dire = dire.randomInCone(spread / 2, random)
         }
         cypher.spawnCypherEntity(level, owner, this, node, PosDirePair(posDire.position, dire))
@@ -261,13 +253,13 @@ class ShotStateChunk private constructor (
                 }
 
                 // state-attributes
-                cypher.dataMap().shotState.forEach cypherEach@ { (attribute, cyShotStateModifiers) ->
+                cypher.dataMap().shotState.forEach stateMap@ { (attribute, cyShotStateModifiers) ->
 
-                    if (attribute.applyOn == AttributeApply.INVOKING_ROOT && !isRoot) return@cypherEach
+                    if (attribute.applyOn == AttributeApply.INVOKING_ROOT && !isRoot) return@stateMap
 
                     val chunkMap = attributes.getOrPut(attribute) { EnumMap(AttributeOperator::class.java) }
                     // prune: if set, skip
-                    if (chunkMap[AttributeOperator.SET_ALL] != null && cyShotStateModifiers[AttributeOperator.SET_ALL] == null) return@cypherEach
+                    if (chunkMap[AttributeOperator.SET_ALL] != null && cyShotStateModifiers[AttributeOperator.SET_ALL] == null) return@stateMap
 
                     cyShotStateModifiers.forEach opMap@ { (operator, value) ->
                         chunkMap.compute(operator) { key, old ->

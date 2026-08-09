@@ -7,7 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.Abs
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import net.minecraft.world.entity.Entity
 
-interface ICEContext <CE> : ICypherEntityLogicContext where CE : Entity, CE : ICypherEntity {
+interface ICEContext <CE> : ICypherEntityLogicContext, IDebug where CE : Entity, CE : ICypherEntity {
     fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk?, steerer: AbstractCypherSteerer?)
     fun initEntity(ce: CE)
 }

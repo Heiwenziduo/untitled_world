@@ -7,7 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.Projectil
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import net.minecraft.world.entity.Entity
 
-interface ICEPhysics <CE> : ICypherEntityPhysics where CE : Entity, CE : ICypherEntity {
+interface ICEPhysics <CE> : ICypherEntityPhysics, IDebug where CE : Entity, CE : ICypherEntity {
     fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk?, node: ProjectileNode?)
     fun initEntity(ce: CE)
 }

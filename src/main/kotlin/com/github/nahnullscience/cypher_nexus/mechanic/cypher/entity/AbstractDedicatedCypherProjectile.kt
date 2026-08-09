@@ -236,7 +236,7 @@ abstract class AbstractDedicatedCypherProjectile(
         CypherNexus.LOGGER.debug("create projectile [{} {}]: [{}]", this, getExisting(), cypher)
         CypherFlags.printFlag(enabledFlags)
 
-        debugAttributes()
+        printDebugMsg()
     }
 
     override fun hashCode() = super.hashCode()

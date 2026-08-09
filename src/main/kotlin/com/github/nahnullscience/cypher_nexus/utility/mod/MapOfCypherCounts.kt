@@ -10,17 +10,10 @@ import kotlin.collections.MutableMap.MutableEntry
  * (this only includes shot-state attributes that shares among all CE of that state,
  * CE themselves and payload info are not included)
  * */
-open class MapOfCypherCounts(
-    private val fastMap: Reference2IntOpenHashMap<AbstractCypher> = Reference2IntOpenHashMap(32),
-) : MutableMap<AbstractCypher, Int> {
-    constructor(anyMap: Map<AbstractCypher, Int>) : this(Reference2IntOpenHashMap(anyMap))
+open class MapOfCypherCounts(capa: Int = 32) : Reference2IntOpenHashMap<AbstractCypher>(capa) {
+    constructor(map: Map<AbstractCypher, Int>) : this(map.size) { putAll(map) }
     init {
-        fastMap.defaultReturnValue(DEFAULT_RETURN)
-    }
-
-    companion object {
-        private const val DEFAULT_RETURN = 0
-
+        defaultReturnValue(0)
     }
 
     var max: Int = 0
@@ -29,46 +22,76 @@ open class MapOfCypherCounts(
     /**
      *
      * */
-    fun count(cy: AbstractCypher, n: Int = 1): Int {
-        val i = fastMap.addTo(cy, n) // count from DEFAULT_RETURN
-        max = max.coerceAtLeast(i + n)
-        return i
+    fun count(cy: AbstractCypher, n: Int = 1): Int = addTo(cy, n)
+
+    override fun addTo(k: AbstractCypher, incr: Int): Int {
+        return super.addTo(k, incr).also { max = max.coerceAtLeast(it + incr) }
     }
 
-    fun clone() = MapOfCypherCounts(fastMap.clone())
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    override fun toString() = fastMap.toString()
-    override val size: Int get() = fastMap.size
-    override val keys: MutableSet<AbstractCypher> get() = fastMap.keys
-    override val values: MutableCollection<Int> get() = fastMap.values
-    override val entries: MutableSet<MutableEntry<AbstractCypher, Int>> get() = fastMap.reference2IntEntrySet() as MutableSet<MutableEntry<AbstractCypher, Int>>
-
-    override fun isEmpty(): Boolean  = fastMap.isEmpty()
-
-    override fun containsKey(key: AbstractCypher): Boolean = fastMap.containsKey(key)
-
-    override fun containsValue(value: Int): Boolean = fastMap.containsValue(value)
-
-    override fun get(key: AbstractCypher): Int? {
-        val v = fastMap.getInt(key)
-        return if (v != DEFAULT_RETURN) v else null
-    }
-
-    override fun put(key: AbstractCypher, value: Int): Int? {
-        val v = fastMap.put(key, value)
-        return if (v != DEFAULT_RETURN) v else null
-    }
-
-    override fun remove(key: AbstractCypher): Int? {
-        val v = fastMap.removeInt(key)
-        return if (v != DEFAULT_RETURN) v else null
-    }
-
-    override fun putAll(from: Map<out AbstractCypher, Int>) = fastMap.putAll(from)
-
-    override fun clear() {
-        fastMap.clear()
-    }
+    fun getCount(cy: AbstractCypher): Int = getInt(cy)
 }
+//open class MapOfCypherCounts(
+//    private val fastMap: Reference2IntOpenHashMap<AbstractCypher> = Reference2IntOpenHashMap(32),
+//) : MutableMap<AbstractCypher, Int> {
+//    constructor(anyMap: Map<AbstractCypher, Int>) : this(Reference2IntOpenHashMap(anyMap))
+//    init {
+//        fastMap.defaultReturnValue(DEFAULT_RETURN)
+//    }
+//
+//    companion object {
+//        private const val DEFAULT_RETURN = 0
+//
+//    }
+//
+//    var max: Int = 0
+//        private set
+//
+//    /**
+//     *
+//     * */
+//    fun count(cy: AbstractCypher, n: Int = 1): Int {
+//        val i = fastMap.addTo(cy, n) // count from DEFAULT_RETURN
+//        max = max.coerceAtLeast(i + n)
+//        return i
+//    }
+//
+//    fun clone() = MapOfCypherCounts(fastMap.clone())
+//
+//    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//    override fun toString() = fastMap.toString()
+//    override val size: Int get() = fastMap.size
+//    override val keys: MutableSet<AbstractCypher> get() = fastMap.keys
+//    override val values: MutableCollection<Int> get() = fastMap.values
+//    override val entries: MutableSet<MutableEntry<AbstractCypher, Int>> get() = fastMap.reference2IntEntrySet() as MutableSet<MutableEntry<AbstractCypher, Int>>
+//
+//    override fun isEmpty(): Boolean  = fastMap.isEmpty()
+//
+//    override fun containsKey(key: AbstractCypher): Boolean = fastMap.containsKey(key)
+//
+//    override fun containsValue(value: Int): Boolean = fastMap.containsValue(value)
+//
+//    @Deprecated("")
+//    override fun get(key: AbstractCypher): Int? {
+//        val v = fastMap.getInt(key)
+//        return if (v != DEFAULT_RETURN) v else null
+//    }
+//
+//    @Deprecated("")
+//    override fun put(key: AbstractCypher, value: Int): Int? {
+//        val v = fastMap.put(key, value)
+//        return if (v != DEFAULT_RETURN) v else null
+//    }
+//
+//    @Deprecated("")
+//    override fun remove(key: AbstractCypher): Int? {
+//        val v = fastMap.removeInt(key)
+//        return if (v != DEFAULT_RETURN) v else null
+//    }
+//
+//    override fun putAll(from: Map<out AbstractCypher, Int>) = fastMap.putAll(from)
+//
+//    override fun clear() {
+//        fastMap.clear()
+//    }
+//}

@@ -19,10 +19,8 @@ import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 
-interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
-    companion object {
-        fun <CE> CE.canNotHurtOwner(): Boolean where CE : Entity, CE : ICypherEntity = !canHurtOwner(this)
-    }
+interface ICypherEntityLogicContext : TraceableEntity,
+    IFlagExtension, ICypherEntityAttributeAccessor {
 
     /**
      * [MapOfCypherCounts] serves as the token of [ShotStateChunk],
@@ -194,5 +192,9 @@ interface ICypherEntityLogicContext : TraceableEntity, IFlagExtension {
         hooks?.playHooks(CypherHooks.ENTITY_CAPTURE) { index, hook, count ->
             hook.forEntityCaptured(index, count, ce.level(), ce, captured)
         }
+    }
+
+    companion object {
+        fun <CE> CE.canNotHurtOwner(): Boolean where CE : Entity, CE : ICypherEntity = !canHurtOwner(this)
     }
 }

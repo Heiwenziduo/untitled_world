@@ -3,7 +3,8 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.computeBaseAttribute
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.computeAttrWithBase
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.setAttribute
 import com.github.nahnullscience.cypher_nexus.utility.times
 import net.minecraft.resources.Identifier
 import net.minecraft.world.entity.Entity
@@ -35,8 +36,8 @@ open class SlowBootSteerer(resource: Identifier) : AbstractCypherSteerer(resourc
 
         } else if (ce.tickCount == END) {
             ce.needsSync = true
-            ce.computeBaseAttribute(CypherAttributes.FRICTION_FACTOR) { it }
-            ce.computeBaseAttribute(CypherAttributes.GRAVITY_FACTOR) { it }
+            ce.computeAttrWithBase(CypherAttributes.FRICTION_FACTOR) { it }
+            ce.computeAttrWithBase(CypherAttributes.GRAVITY_FACTOR) { it }
         }
     }
 
