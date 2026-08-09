@@ -10,7 +10,8 @@ import com.github.nahnullscience.cypher_nexus.content.cypher.other.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.InnerForceCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.ProteusCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.RefresherRingCypher
-import com.github.nahnullscience.cypher_nexus.content.cypher.wand_module.PrimaryInvokingCypher
+import com.github.nahnullscience.cypher_nexus.content.cypher.wand_module.PrimaryInvokingModuleCypher
+import com.github.nahnullscience.cypher_nexus.content.cypher.wand_module.RecoilRocketModuleCypher
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.*
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.NONE_ATTR
@@ -70,14 +71,14 @@ object Cyphers {
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -16.0)
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 1.0)
         projectileAttr(CypherAttributes.DAMAGE, 3.0)
-        projectileAttr(CypherAttributes.SPEED, 1.3)
+        projectileAttr(CypherAttributes.SPEED_INITIAL, 1.3)
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.01)
         projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.01)
     }
     val SNOWBALL = registerProjectile(ModEntities.CYPHER_SNOWBALL, TriggerType.COLLISION, TriggerType.TIMER_20) {
         manaDrain(5f)
-        projectileAttr(CypherAttributes.SPEED, 1.2)
+        projectileAttr(CypherAttributes.SPEED_INITIAL, 1.2)
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
         projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.04)
@@ -85,14 +86,14 @@ object Cyphers {
     val ENDER_TELEPORTATION = registerProjectile(ModEntities.CYPHER_ENDER_TELEPORTATION) {
         manaDrain(20f)
         flags(CypherFlags.SKIP_DAMAGE_CHECK, CypherFlags.WITH_ENDER_POWER)
-        projectileAttr(CypherAttributes.SPEED, 1.6)
+        projectileAttr(CypherAttributes.SPEED_INITIAL, 1.6)
         projectileAttr(CypherAttributes.EXISTING, 15.0)
         projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.0)
     }
     val ENDER_RECALL = registerProjectile(ModEntities.CYPHER_ENDER_RECALL) {
         manaDrain(20f)
         flags(CypherFlags.SKIP_DAMAGE_CHECK, CypherFlags.WITH_ENDER_POWER)
-        projectileAttr(CypherAttributes.SPEED, 0.0)
+        projectileAttr(CypherAttributes.SPEED_INITIAL, 0.0)
         projectileAttr(CypherAttributes.EXISTING, 101.0)
         projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.0)
     }
@@ -102,7 +103,7 @@ object Cyphers {
         recharge(-3)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 20.0)
         projectileAttr(CypherAttributes.DAMAGE, 2.0)
-        projectileAttr(CypherAttributes.SPEED, 1.5)
+        projectileAttr(CypherAttributes.SPEED_INITIAL, 1.5)
         projectileAttr(CypherAttributes.EXISTING, 180.0)
         projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.2)
     }
@@ -111,7 +112,7 @@ object Cyphers {
         recharge(2)
         shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.1)
         projectileAttr(CypherAttributes.DAMAGE, 1.0)
-        projectileAttr(CypherAttributes.SPEED, 1.3)
+        projectileAttr(CypherAttributes.SPEED_INITIAL, 1.3)
         projectileAttr(CypherAttributes.EXISTING, 120.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.06)
     }
@@ -120,7 +121,7 @@ object Cyphers {
         draw(1)
         flags(CypherFlags.PHYSICS_SOLID)
         trigger(TriggerType.COLLISION)
-        projectileAttr(CypherAttributes.SPEED, 1.0)
+        projectileAttr(CypherAttributes.SPEED_INITIAL, 1.0)
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
     }
@@ -128,7 +129,7 @@ object Cyphers {
         delay(-3)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 6.0)
         projectileAttr(CypherAttributes.DAMAGE, 1.0)
-        projectileAttr(CypherAttributes.SPEED, 0.3)
+        projectileAttr(CypherAttributes.SPEED_INITIAL, 0.3)
         projectileAttr(CypherAttributes.EXISTING, 3.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.02)
     }
@@ -148,7 +149,7 @@ object Cyphers {
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 3.0)
         projectileAttr(CypherAttributes.DAMAGE, 2.0)
         projectileAttr(CypherAttributes.CRIT_CHANCE, 0.05)
-        projectileAttr(CypherAttributes.SPEED, 0.7)
+        projectileAttr(CypherAttributes.SPEED_INITIAL, 0.7)
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
     }
@@ -158,7 +159,7 @@ object Cyphers {
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -5.0)
         projectileAttr(CypherAttributes.DAMAGE, 4.0)
         projectileAttr(CypherAttributes.CRIT_CHANCE, 0.1)
-        projectileAttr(CypherAttributes.SPEED, 0.8)
+        projectileAttr(CypherAttributes.SPEED_INITIAL, 0.8)
         projectileAttr(CypherAttributes.EXISTING, 45.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.0)
         projectileAttr(CypherAttributes.FRICTION_FACTOR, -0.02)
@@ -197,14 +198,14 @@ object Cyphers {
         brightness(0.2f)
     }
     val SPEED_BOOST = registerModifier("speed_boost", 5f) {
-        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 2.5)
+        shotStateAttr(CypherAttributes.SPEED_INITIAL, AttributeOperator.MULTIPLY_TOTAL, 2.5)
     }
     val ACCELERATING = registerModifier("accelerating", 5f) {
-        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 0.375)
+        shotStateAttr(CypherAttributes.SPEED_INITIAL, AttributeOperator.MULTIPLY_TOTAL, 0.375)
         shotStateAttr(CypherAttributes.FRICTION_FACTOR, AttributeOperator.ADD, -0.04)
     }
     val DECELERATION = registerModifier("decelerating", 5f) {
-        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 1.625)
+        shotStateAttr(CypherAttributes.SPEED_INITIAL, AttributeOperator.MULTIPLY_TOTAL, 1.625)
         shotStateAttr(CypherAttributes.FRICTION_FACTOR, AttributeOperator.ADD, 0.03)
     }
     val POWER = registerModifier("power", 10f) {
@@ -221,7 +222,7 @@ object Cyphers {
     val HEAVY_SHOT = registerModifier("heavy_shot", 30f) {
         delay(4)
         shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 4.0)
-        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 0.5)
+        shotStateAttr(CypherAttributes.SPEED_INITIAL, AttributeOperator.MULTIPLY_TOTAL, 0.5)
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 4.0)
         shotStateAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 10.0)
         shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, 0.2)
@@ -229,7 +230,7 @@ object Cyphers {
     val LIGHT_SHOT = registerModifier("light_shot", 15f) {
         delay(-3)
         shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -4.0)
-        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 5.0)
+        shotStateAttr(CypherAttributes.SPEED_INITIAL, AttributeOperator.MULTIPLY_TOTAL, 5.0)
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, -4.0)
         shotStateAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, -10.0)
         shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.35)
@@ -267,7 +268,7 @@ object Cyphers {
     val HAYWIRE = registerCypher(::HaywireCypher) {
         manaDrain(2f)
         recharge(-8)
-        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 1.2)
+        shotStateAttr(CypherAttributes.SPEED_INITIAL, AttributeOperator.MULTIPLY_TOTAL, 1.2)
     }
     val BOUNCY = registerModifier("bouncy", 5f) {
         shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.ADD, 10.0)
@@ -343,7 +344,7 @@ object Cyphers {
     val DAEDALUS = registerCypher(::DaedalusCypher) {
         manaDrain(24f)
         delay(-3)
-        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 1.24)
+        shotStateAttr(CypherAttributes.SPEED_INITIAL, AttributeOperator.MULTIPLY_TOTAL, 1.24)
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.MULTIPLY_TOTAL, 0.0)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 24.0)
         shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.04)
@@ -370,7 +371,7 @@ object Cyphers {
     }
     val CHAOTIC_PATH = registerCypher(::ChaoticPathCypher) {
         manaDrain(0f)
-        shotStateAttr(CypherAttributes.SPEED, AttributeOperator.MULTIPLY_TOTAL, 2.0)
+        shotStateAttr(CypherAttributes.SPEED_INITIAL, AttributeOperator.MULTIPLY_TOTAL, 2.0)
     }
     private val configOrbit: CypherDataMap.Builder.() -> CypherDataMap.Builder = {
         delay(-4)
@@ -572,7 +573,8 @@ object Cyphers {
     // wand module
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    val PRIMARY_INVOKING = registerCypher(PrimaryInvokingCypher)
+    val PRIMARY_INVOKING = registerCypher(PrimaryInvokingModuleCypher)
+    val RECOIL_ROCKET = registerCypher(RecoilRocketModuleCypher)
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -17,7 +17,7 @@ import java.util.function.Supplier
 /**
  * one slot one unique module on map
  * */
-class ModuleSlot <Module> (
+class ModuleSlot <out Module> (
     val type: Supplier<out WandModuleType<Module>>,
     val factory: (instance: ItemWandInstance) -> Module
 ) where Module : AbstractWandModule, Module : ITypeUniqueModule {

@@ -4,13 +4,23 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstanc
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.types.AbstractRecoilFunctionModule
 import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.perspectiveCoordinate
+import com.github.nahnullscience.cypher_nexus.utility.plus
+import com.github.nahnullscience.cypher_nexus.utility.times
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.phys.Vec3
+import kotlin.math.sqrt
 
-class DefaultRecoilModule(
+open class DefaultRecoilModule(
     override val instance: ItemWandInstance
 ) : AbstractRecoilFunctionModule() {
+    companion object {
+//        inline fun recoilDefault(power: Double, direction: Vec3, base: Vec3): Vec3 {
+//            return base * 0.5 + direction * (sqrt(power) * 0.05)
+//        }
+    }
     override fun execute(
         invoker: LivingEntity,
         wand: ItemStack?,
@@ -22,10 +32,16 @@ class DefaultRecoilModule(
         if (power.isFinite()) {
             // since it is the client side that is Player position authoritative
             // this logic should run on both side, client for smooth movement, server for verification
+
+//            println("recoil power: $power")
             val coo = invokerCoordinate ?: invoker.perspectiveCoordinate()
             val dire = coo.front.reverse()
-            val recoil = power / 20
-            invoker.push(dire.scale(recoil))
+            val base = invoker.deltaMovement
+
+            val next = base * 0.5 + dire * (sqrt(power) * 0.05)
+
+            invoker.deltaMovement = next
+            if (invoker !is Player) { invoker.needsSync = true }
             return true
         }
         return false

@@ -193,7 +193,7 @@ class ShotStateChunk private constructor (
         run spread@ {
             val random = owner?.random ?: directInvoker?.random ?: return@spread
             val spreadMap = attributes[CypherAttributes.SPREAD.value()] ?: return@spread
-            val spread = AttributeFastMap.attributeCalculator(CypherAttributes.SPEED, spreadMap)
+            val spread = AttributeFastMap.attributeCalculator(CypherAttributes.SPREAD, spreadMap)
             if (spread > 0.01) dire = dire.randomInCone(spread / 2, random)
         }
         cypher.spawnCypherEntity(level, owner, this, node, PosDirePair(posDire.position, dire))

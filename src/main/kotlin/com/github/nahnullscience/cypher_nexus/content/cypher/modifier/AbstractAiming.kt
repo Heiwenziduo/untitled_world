@@ -22,7 +22,7 @@ abstract class AbstractAiming(
     companion object {
         private const val ROTATION_RADIUS = PI / 12
         private const val PLANE_PUSH_FORCE = 0.04
-        private const val CONCENTRATE_DIS_SQR = 4.0
+        private const val CONCENTRATE_DIS_SQR = 0.25
     }
 
     class AimingArc(defaultAttribute: Builder.() -> Builder) : AbstractAiming(defaultAttribute) {

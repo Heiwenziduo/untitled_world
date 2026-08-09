@@ -39,7 +39,7 @@ interface IItemWand : IWandLike<ItemStack> {
      * will be further processed if hooks are present.
      * direction doesn't have to be normalized
      * */
-    fun getInvokingPosDire(level: Level, invoker: Entity, stack: ItemStack): PosDirePair
+    fun getInvokingPosDire(level: Level, invoker: Entity, coordinate: CoordinateDefinition, stack: ItemStack): PosDirePair
 
     /**
      * resolve invoking feedback, for item-wands this is handled by [ItemWandInstance]
@@ -57,7 +57,7 @@ interface IItemWand : IWandLike<ItemStack> {
 
         val aoc = getInvokingRecipe(dataProvider)
         val state = instance.toHelperDataBundle()
-        val posDire = getInvokingPosDire(level, invoker, dataProvider)
+        val posDire = getInvokingPosDire(level, invoker, coordinate, dataProvider)
 
         val helper = InvokingHelper(aoc, state, invoker = invoker)
 

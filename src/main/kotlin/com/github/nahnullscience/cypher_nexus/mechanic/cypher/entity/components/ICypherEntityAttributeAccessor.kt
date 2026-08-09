@@ -64,7 +64,7 @@ interface ICypherEntityAttributeAccessor {
 
         fun ICypherEntity.getBounce(): Int = this@getBounce.getAttributeOrDefault(CypherAttributes.BOUNCE).toInt()
 
-        fun ICypherEntity.getInitialSpeed(): Double = this@getInitialSpeed.getAttributeOrDefault(CypherAttributes.SPEED)
+        fun ICypherEntity.getInitialSpeed(): Double = this@getInitialSpeed.getAttributeOrDefault(CypherAttributes.SPEED_INITIAL)
 
         fun ICypherEntity.getGravityFactor(): Double = this@getGravityFactor.getAttributeOrDefault(CypherAttributes.GRAVITY_FACTOR)
 

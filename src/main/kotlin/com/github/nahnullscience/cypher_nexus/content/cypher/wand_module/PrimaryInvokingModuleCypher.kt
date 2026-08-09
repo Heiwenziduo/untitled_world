@@ -8,7 +8,7 @@ import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.SECONDARY
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.WandModuleCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.ModuleSlot
 
-object PrimaryInvokingCypher : WandModuleCypher() {
+object PrimaryInvokingModuleCypher : WandModuleCypher() {
     override val resource = CypherNexus.modResource("primary_invoking")
     override val moduleSlots: Array<ModuleSlot<*>> = arrayOf(
         ModuleSlot(PRIMARY_MODULE, ::PrimaryInvokingModule),

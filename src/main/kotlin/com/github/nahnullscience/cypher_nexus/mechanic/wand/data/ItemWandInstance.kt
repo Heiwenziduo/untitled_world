@@ -124,9 +124,7 @@ class ItemWandInstance(
         performingTicks: Int = -1,
         power: Double = Double.NaN,
     ): Boolean where T : AbstractFunctionalModule {
-        return getModule(type)?.run {
-            execute(invoker, wand, invokerCoordinate, indirectTarget, performingTicks, power)
-        } ?: false
+        return getModule(type)?.run { execute(invoker, wand, invokerCoordinate, indirectTarget, performingTicks, power) } ?: false
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

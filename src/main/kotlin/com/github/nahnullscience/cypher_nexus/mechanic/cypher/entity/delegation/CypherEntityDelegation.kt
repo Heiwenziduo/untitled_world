@@ -3,8 +3,6 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.cypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getAttributeOrDefault
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityLogicContext
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityPhysics
@@ -16,7 +14,6 @@ import com.github.nahnullscience.cypher_nexus.utility.*
 import com.github.nahnullscience.cypher_nexus.utility.exception.CypherEntityException
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
-import net.minecraft.core.Holder
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.*
 
@@ -96,7 +93,7 @@ class CypherEntityDelegation <CE> (
         ce.getDirectionInitial().let {
             if (it == Vec3.ZERO) ce.deltaMovement = Vec3.ZERO
             else {
-                ce.deltaMovement = it.normalize().scale(ce.getAttributeOrDefault(CypherAttributes.SPEED))
+                ce.deltaMovement = it.normalize().scale(ce.getAttributeOrDefault(CypherAttributes.SPEED_INITIAL))
                 ce.rotateTowardSpeed(1f)
             }
         }

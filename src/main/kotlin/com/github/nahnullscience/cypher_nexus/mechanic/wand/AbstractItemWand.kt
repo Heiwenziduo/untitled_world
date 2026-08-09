@@ -11,6 +11,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInv
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable.Companion.TO_BE_GENERATED
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload.Companion.EMPTY
+import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.nearestHitPoint
@@ -125,16 +126,17 @@ abstract class AbstractItemWand(
         return 0.4f + (aoc.capacity.toFloat() / 16).coerceAtMost(3.0f)
     }
 
-    override fun getInvokingPosDire(level: Level, invoker: Entity, stack: ItemStack): PosDirePair {
+    override fun getInvokingPosDire(level: Level, invoker: Entity, coordinate: CoordinateDefinition, stack: ItemStack): PosDirePair {
         // for an Item Wand, pos and dire just use the living's view vector
         val tip = wandLength(stack)
         val eye = invoker.eyePosition
-        val looking = invoker.headLookAngle
-        val scale = tip + invoker.knownMovement.dot(looking).coerceAtLeast(0.0) // solve inertia problem
-        val pos = eye.add(looking.scale(scale)).let {
+        val front = coordinate.front
+        val scale = tip + invoker.knownMovement.dot(front).coerceAtLeast(0.0) // solve inertia problem
+
+        val pos = eye.add(front.scale(scale)).let {
             level.nearestHitPoint(eye, it, invoker, 0.3)
         }
-        return PosDirePair(pos, looking)
+        return PosDirePair(pos, front)
     }
 
     override fun afterInvoke(
