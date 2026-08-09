@@ -1,6 +1,23 @@
 package com.github.nahnullscience.cypher_nexus.utility
 
+import net.minecraft.world.item.DyeColor
 import java.awt.Color
+
+object Colors {
+    /**
+     * READONLY cache of pre-calculated firework colors. in the form of RGB float-array.
+     * */
+    val vanillaDyeColorsFirework: List<FloatArray>
+
+    init {
+        val fireworkArray = Array(DyeColor.entries.size) { floatArrayOf() }
+        DyeColor.entries.forEach { dyeColor ->
+            val firework = Color(dyeColor.fireworkColor)
+            fireworkArray[dyeColor.ordinal] = firework.getArrayRGB()
+        }
+        vanillaDyeColorsFirework = fireworkArray.asList()
+    }
+}
 
 /** r g b a in order */
 fun Color.getArrayRGBA(): FloatArray {
