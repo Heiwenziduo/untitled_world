@@ -22,16 +22,14 @@ class PlaneTrifurcatedPattern(path: Identifier) : AbstractInvokingPattern(path) 
         return when (i) {
             1 -> {
                 coordinate.getOrComputePatternCache(1) cache@ {
-                    val r = Quaternionf().rotateAxis(RAD, coordinate.top.toVector3f())
-                    val dire = posDire.direction.toVector3f().rotate(r)
-                    return@cache PosDirePair(posDire.position, Vec3(dire))
+                    val dire = coordinate.rightScrewFromTop(posDire.direction, RAD)
+                    return@cache PosDirePair(posDire.position, dire)
                 }
             }
             2 -> {
                 coordinate.getOrComputePatternCache(2) cache@ {
-                    val r = Quaternionf().rotateAxis(-RAD, coordinate.top.toVector3f())
-                    val dire = posDire.direction.toVector3f().rotate(r)
-                    return@cache PosDirePair(posDire.position, Vec3(dire))
+                    val dire = coordinate.rightScrewFromTop(posDire.direction, -RAD)
+                    return@cache PosDirePair(posDire.position, dire)
                 }
             }
             else -> posDire

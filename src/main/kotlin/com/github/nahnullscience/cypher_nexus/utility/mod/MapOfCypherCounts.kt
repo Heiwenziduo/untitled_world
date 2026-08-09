@@ -1,6 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.utility.mod
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
+import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
 import kotlin.collections.MutableMap.MutableEntry
 
@@ -10,7 +11,7 @@ import kotlin.collections.MutableMap.MutableEntry
  * (this only includes shot-state attributes that shares among all CE of that state,
  * CE themselves and payload info are not included)
  * */
-open class MapOfCypherCounts(capa: Int = 32) : Reference2IntOpenHashMap<AbstractCypher>(capa) {
+open class MapOfCypherCounts(capa: Int = 32) : Reference2IntLinkedOpenHashMap<AbstractCypher>(capa) {
     constructor(map: Map<AbstractCypher, Int>) : this(map.size) { putAll(map) }
     init {
         defaultReturnValue(0)

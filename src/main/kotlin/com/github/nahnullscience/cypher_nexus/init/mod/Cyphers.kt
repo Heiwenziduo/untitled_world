@@ -106,6 +106,7 @@ object Cyphers {
         projectileAttr(CypherAttributes.SPEED_INITIAL, 1.5)
         projectileAttr(CypherAttributes.EXISTING, 180.0)
         projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.2)
+        projectileAttr(CypherAttributes.GRAVITY_FACTOR, -0.02)
     }
     val LLAMA_SPIT = registerProjectile(ModEntities.CYPHER_LLAMA_SPIT) {
         manaDrain(10f)
@@ -479,6 +480,18 @@ object Cyphers {
         manaDrain(3f)
         draw(3)
         pattern(InvokingPatterns.PLANE_TRIFURCATED_PATTERN)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -15.0)
+    }
+    val FORMATION_PLANE_T_STYLE = registerCypher("formation_plane_t_style", CypherCategories.MULTI_INVOKING) {
+        manaDrain(1f)
+        draw(3)
+        pattern(InvokingPatterns.PLANE_T_STYLE_PATTERN)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -15.0)
+    }
+    val FORMATION_FRONT_TRIANGLE = registerCypher("formation_front_triangle", CypherCategories.MULTI_INVOKING) {
+        manaDrain(3f)
+        draw(3)
+        pattern(InvokingPatterns.FRONT_TRIANGLE_PATTERN)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -15.0)
     }
 

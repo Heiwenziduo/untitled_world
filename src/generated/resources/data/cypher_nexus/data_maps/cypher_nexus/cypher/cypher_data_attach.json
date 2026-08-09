@@ -5,7 +5,6 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 5.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:friction_factor": {
@@ -21,70 +20,55 @@
       "draw": 0,
       "flags": 0,
       "manaDrain": 10.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:add_trigger_death": {
       "delay": 0,
       "draw": 0,
       "flags": 0,
       "manaDrain": 20.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:add_trigger_timer": {
       "delay": 0,
       "draw": 0,
       "flags": 0,
       "manaDrain": 20.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:aiming_arc": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 30.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:aiming_return": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 60.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:all_invoking": {
       "delay": 0,
       "draw": 99,
       "flags": 0,
       "manaDrain": 99.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:alpha": {
       "delay": 5,
       "draw": 0,
       "flags": 0,
       "manaDrain": 40.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:antigravity": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 2.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:gravity_factor": {
@@ -163,7 +147,6 @@
       "draw": 1,
       "flags": 1,
       "manaDrain": 5.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:damage": {
@@ -179,25 +162,20 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:boomerang": {
       "delay": 0,
       "draw": 1,
       "flags": 512,
       "manaDrain": 10.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:bouncy": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 5.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:bounce": {
@@ -214,6 +192,7 @@
         "cypher_nexus:damage": 2.0,
         "cypher_nexus:existing": 180.0,
         "cypher_nexus:friction_factor": 0.2,
+        "cypher_nexus:gravity_factor": -0.02,
         "cypher_nexus:speed": 1.5
       },
       "recharge": -3,
@@ -228,7 +207,6 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:damage": {
@@ -241,7 +219,6 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:speed": {
@@ -254,7 +231,6 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 10.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:crit_chance": {
@@ -267,7 +243,6 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 10.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:existing": {
@@ -280,25 +255,20 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:cypher_duplication": {
       "delay": 7,
       "draw": 1,
       "flags": 0,
       "manaDrain": 300.0,
-      "projectile": {},
-      "recharge": 7,
-      "shotState": {}
+      "recharge": 7
     },
     "cypher_nexus:daedalus": {
       "delay": -3,
       "draw": 1,
       "flags": 0,
       "manaDrain": 24.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:gravity_factor": {
@@ -320,16 +290,13 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:decelerating": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 5.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:friction_factor": {
@@ -345,25 +312,20 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 1.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:direct_skyward": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 1.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:divide_by_10": {
       "delay": 15,
       "draw": 0,
       "flags": 0,
       "manaDrain": 320.0,
-      "projectile": {},
       "recharge": 10,
       "shotState": {
         "cypher_nexus:damage": {
@@ -379,7 +341,6 @@
       "draw": 0,
       "flags": 0,
       "manaDrain": 40.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:damage": {
@@ -395,7 +356,6 @@
       "draw": 0,
       "flags": 0,
       "manaDrain": 100.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:damage": {
@@ -411,7 +371,6 @@
       "draw": 0,
       "flags": 0,
       "manaDrain": 180.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:damage": {
@@ -427,16 +386,13 @@
       "draw": 2,
       "flags": 0,
       "manaDrain": 1.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:double_scatter": {
       "delay": 0,
       "draw": 2,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:spread": {
@@ -449,7 +405,6 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 150.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:existing": {
@@ -498,7 +453,6 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 30.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:damage": {
@@ -517,9 +471,7 @@
       "draw": 0,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:ender_recall": {
       "delay": 0,
@@ -531,8 +483,7 @@
         "cypher_nexus:friction_factor": 0.0,
         "cypher_nexus:speed": 0.0
       },
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:ender_teleportation": {
       "delay": 0,
@@ -544,24 +495,20 @@
         "cypher_nexus:friction_factor": 0.0,
         "cypher_nexus:speed": 1.6
       },
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:explosion": {
       "delay": 13,
       "draw": 0,
       "flags": 34,
       "manaDrain": 80.0,
-      "projectile": {},
-      "recharge": 8,
-      "shotState": {}
+      "recharge": 8
     },
     "cypher_nexus:extend_existing": {
       "delay": 5,
       "draw": 1,
       "flags": 0,
       "manaDrain": 40.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:existing": {
@@ -574,18 +521,14 @@
       "draw": 1,
       "flags": 32,
       "manaDrain": 5.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:firework_orbit": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 120.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:firework_rocket": {
       "delay": 0,
@@ -647,16 +590,39 @@
         }
       }
     },
+    "cypher_nexus:formation_front_triangle": {
+      "delay": 0,
+      "draw": 3,
+      "flags": 0,
+      "manaDrain": 3.0,
+      "recharge": 0,
+      "shotState": {
+        "cypher_nexus:spread": {
+          "add": -15.0
+        }
+      }
+    },
     "cypher_nexus:formation_plane_bifurcated": {
       "delay": 0,
       "draw": 2,
       "flags": 0,
       "manaDrain": 1.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:spread": {
           "add": -12.0
+        }
+      }
+    },
+    "cypher_nexus:formation_plane_t_style": {
+      "delay": 0,
+      "draw": 3,
+      "flags": 0,
+      "manaDrain": 1.0,
+      "recharge": 0,
+      "shotState": {
+        "cypher_nexus:spread": {
+          "add": -15.0
         }
       }
     },
@@ -665,7 +631,6 @@
       "draw": 3,
       "flags": 0,
       "manaDrain": 3.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:spread": {
@@ -678,7 +643,6 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 120.0,
-      "projectile": {},
       "recharge": 12,
       "shotState": {
         "cypher_nexus:fortune": {
@@ -691,25 +655,20 @@
       "draw": 0,
       "flags": 0,
       "manaDrain": 40.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:glowing": {
       "delay": 0,
       "draw": 1,
       "flags": 8192,
       "manaDrain": 1.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:gravity": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 2.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:gravity_factor": {
@@ -722,7 +681,6 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 2.0,
-      "projectile": {},
       "recharge": -8,
       "shotState": {
         "cypher_nexus:speed": {
@@ -735,7 +693,6 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 30.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:damage": {
@@ -760,16 +717,13 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 60.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:horizontal_path": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:damage": {
@@ -782,25 +736,20 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 10.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:juxta_orbit": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 120.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:knockback": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 5.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:knockback": {
@@ -813,7 +762,6 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 15.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:damage": {
@@ -838,18 +786,14 @@
       "draw": 0,
       "flags": 66,
       "manaDrain": 110.0,
-      "projectile": {},
-      "recharge": 10,
-      "shotState": {}
+      "recharge": 10
     },
     "cypher_nexus:lime_tint": {
       "delay": -1,
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:llama_spit": {
       "delay": 0,
@@ -874,25 +818,20 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": -40.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:mu": {
       "delay": 15,
       "draw": 1,
       "flags": 0,
       "manaDrain": 120.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:null_existing": {
       "delay": -4,
       "draw": 1,
       "flags": 0,
       "manaDrain": 14.0,
-      "projectile": {},
       "recharge": -4,
       "shotState": {
         "cypher_nexus:existing": {
@@ -905,34 +844,27 @@
       "draw": 8,
       "flags": 0,
       "manaDrain": 35.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:omega": {
       "delay": 25,
       "draw": 0,
       "flags": 0,
       "manaDrain": 320.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:orange_tint": {
       "delay": -1,
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:peaceful_mode": {
       "delay": -2,
       "draw": 1,
       "flags": 2064,
       "manaDrain": 5.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:existing": {
@@ -948,16 +880,13 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:phantom_rush": {
       "delay": 5,
       "draw": 1,
       "flags": 0,
       "manaDrain": 200.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:existing": {
@@ -970,16 +899,13 @@
       "draw": 0,
       "flags": 0,
       "manaDrain": 120.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:pierce_entity": {
       "delay": 0,
       "draw": 1,
       "flags": 3,
       "manaDrain": 110.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:damage": {
@@ -992,7 +918,6 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:existing": {
@@ -1005,7 +930,6 @@
       "draw": 1,
       "flags": 516,
       "manaDrain": 3.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:bounce": {
@@ -1027,7 +951,6 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 10.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:damage": {
@@ -1043,43 +966,34 @@
       "draw": 0,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:proteus": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 10.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:purple_tint": {
       "delay": -1,
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:quadruple_invoking": {
       "delay": 0,
       "draw": 4,
       "flags": 0,
       "manaDrain": 15.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:quadruple_scatter": {
       "delay": 0,
       "draw": 4,
       "flags": 0,
       "manaDrain": 5.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:spread": {
@@ -1092,16 +1006,13 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 15.0,
-      "projectile": {},
-      "recharge": -6,
-      "shotState": {}
+      "recharge": -6
     },
     "cypher_nexus:randomize_shot": {
       "delay": -3,
       "draw": 1,
       "flags": 0,
       "manaDrain": 3.0,
-      "projectile": {},
       "recharge": -5,
       "shotState": {
         "cypher_nexus:spread": {
@@ -1114,7 +1025,6 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 5.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:recoil": {
@@ -1127,7 +1037,6 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 5.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:recoil": {
@@ -1135,21 +1044,25 @@
         }
       }
     },
+    "cypher_nexus:recoil_rocket": {
+      "delay": 0,
+      "draw": 0,
+      "flags": 0,
+      "manaDrain": 0.0,
+      "recharge": 0
+    },
     "cypher_nexus:red_tint": {
       "delay": -1,
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:reduce_spread": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 1.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:spread": {
@@ -1162,16 +1075,13 @@
       "draw": 0,
       "flags": 0,
       "manaDrain": 20.0,
-      "projectile": {},
-      "recharge": -10,
-      "shotState": {}
+      "recharge": -10
     },
     "cypher_nexus:remove_bounce": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:bounce": {
@@ -1184,7 +1094,6 @@
       "draw": 1,
       "flags": 2048,
       "manaDrain": 0.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:crit_chance": {
@@ -1200,54 +1109,42 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:requirement_low_hp": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:requirement_not_player": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:requirement_odd_hand": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:requirement_otherwise": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:sigma": {
       "delay": 15,
       "draw": 1,
       "flags": 0,
       "manaDrain": 120.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:smoke_bomb": {
       "delay": 6,
@@ -1279,8 +1176,7 @@
         "cypher_nexus:gravity_factor": 0.03,
         "cypher_nexus:speed": 1.2
       },
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:snowball_collision": {
       "delay": 0,
@@ -1293,17 +1189,14 @@
         "cypher_nexus:gravity_factor": 0.03,
         "cypher_nexus:speed": 1.2
       },
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:snowball_orbit": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 20.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:snowball_timer_20": {
       "delay": 0,
@@ -1316,8 +1209,7 @@
         "cypher_nexus:gravity_factor": 0.03,
         "cypher_nexus:speed": 1.2
       },
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:spawn_egg": {
       "delay": 0,
@@ -1329,15 +1221,13 @@
         "cypher_nexus:gravity_factor": 0.03,
         "cypher_nexus:speed": 1.0
       },
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:speed_boost": {
       "delay": 0,
       "draw": 1,
       "flags": 0,
       "manaDrain": 5.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:speed": {
@@ -1350,25 +1240,20 @@
       "draw": 0,
       "flags": 0,
       "manaDrain": 90.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:treble_invoking": {
       "delay": 0,
       "draw": 3,
       "flags": 0,
       "manaDrain": 5.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:treble_scatter": {
       "delay": 0,
       "draw": 3,
       "flags": 0,
       "manaDrain": 1.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:spread": {
@@ -1381,7 +1266,6 @@
       "draw": 1,
       "flags": 516,
       "manaDrain": 5.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:bounce": {
@@ -1403,16 +1287,13 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 30.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     },
     "cypher_nexus:upward_juxta": {
       "delay": 5,
       "draw": 1,
       "flags": 0,
       "manaDrain": 150.0,
-      "projectile": {},
       "recharge": 0,
       "shotState": {
         "cypher_nexus:existing": {
@@ -1425,9 +1306,7 @@
       "draw": 1,
       "flags": 0,
       "manaDrain": 0.0,
-      "projectile": {},
-      "recharge": 0,
-      "shotState": {}
+      "recharge": 0
     }
   }
 }

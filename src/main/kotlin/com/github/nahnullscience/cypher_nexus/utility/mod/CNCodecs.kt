@@ -61,7 +61,7 @@ object CNCodecs {
         )
     val MOCC_STREAM: StreamCodec<RegistryFriendlyByteBuf, MapOfCypherCounts> =
         ByteBufCodecs.map(
-            { MapOfCypherCounts() },
+            { capa -> MapOfCypherCounts(capa) },
             CYPHER_STREAM, ByteBufCodecs.VAR_INT
         )
 
