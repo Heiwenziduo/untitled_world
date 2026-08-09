@@ -18,9 +18,10 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstanc
 import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
-import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastOpMap
+import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastOperatorMap
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastMap
 import com.github.nahnullscience.cypher_nexus.utility.randomInCone
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
 import net.minecraft.core.Holder
@@ -52,9 +53,9 @@ class ShotStateChunk private constructor (
         return _accessorBacking ?: ShotStateAccessor().also { _accessorBacking = it }
     }
 
-    private var _attrBacking: AttributeFastOpMap? = null
-    val attributes: AttributeFastOpMap get() {
-        return _attrBacking ?: AttributeFastOpMap().also { _attrBacking = it }
+    private var _attrBacking: AttributeFastOperatorMap? = null
+    val attributes: AttributeFastOperatorMap get() {
+        return _attrBacking ?: AttributeFastOperatorMap().also { _attrBacking = it }
     }
 
     private var _hooksBacking: HookContainer? = null
@@ -111,9 +112,10 @@ class ShotStateChunk private constructor (
             wandInstance ?: return@recoil
             if (directInvoker !is LivingEntity) return@recoil
             val recoilMap = attributes[CypherAttributes.RECOIL.value()] ?: return@recoil
-            val recoil = AttributeOperator.attributeCalculator(CypherAttributes.RECOIL.value().defaultValue, recoilMap).let {
-                CypherAttributes.RECOIL.value().restrictRange(it)
-            }
+//            val recoil = AttributeOperator.attributeCalculator(CypherAttributes.RECOIL.value().defaultValue, recoilMap).let {
+//                CypherAttributes.RECOIL.value().restrictRange(it)
+//            }
+            val recoil = AttributeFastMap.attributeCalculator(CypherAttributes.RECOIL, recoilMap)
             wandInstance.functionModule(RECOIL_MODULE.get(), directInvoker, null, invokerCoordinate, power = recoil)
         }
 
@@ -195,9 +197,10 @@ class ShotStateChunk private constructor (
             val random = owner?.random ?: directInvoker?.random ?: return@spread
             val spreadMap = attributes[CypherAttributes.SPREAD.value()] ?: return@spread
 
-            val spread = AttributeOperator.attributeCalculator(CypherAttributes.SPREAD.value().defaultValue, spreadMap).let {
-                CypherAttributes.SPREAD.value().restrictRange(it)
-            }
+//            val spread = AttributeOperator.attributeCalculator(CypherAttributes.SPREAD.value().defaultValue, spreadMap).let {
+//                CypherAttributes.SPREAD.value().restrictRange(it)
+//            }
+            val spread = AttributeFastMap.attributeCalculator(CypherAttributes.SPEED, spreadMap)
 
             if (spread > 0.01) dire = dire.randomInCone(spread / 2, random)
         }

@@ -104,7 +104,12 @@ enum class AttributeOperator(
          * @return the calculation result, since the method don't care about which `Attribute` is calculated,
          * you should perform range restriction manually
          * */
-        fun attributeCalculator(base: Double, opMap: Map<AttributeOperator, Double>) : Double {
+        fun attributeCalculator(
+            base: Double,
+            opMap: Map<AttributeOperator, Double>,
+            min: Double = Double.NEGATIVE_INFINITY,
+            max: Double = Double.POSITIVE_INFINITY
+        ) : Double {
             val s = opMap[SET_ALL]
             if (s != null) return s
 
@@ -112,7 +117,7 @@ enum class AttributeOperator(
             val m1 = opMap.getOrDefault(MULTIPLY_BASE, MULTIPLY_BASE.defaultValue)
             val m2 = opMap.getOrDefault(MULTIPLY_TOTAL, MULTIPLY_TOTAL.defaultValue)
             val cap = opMap.getOrDefault(CAP_AT, CAP_AT.defaultValue)
-            return ((base + a) * (m1 + 1) * m2).coerceAtMost(cap)
+            return ((base + a) * (m1 + 1) * m2).coerceAtMost(cap).coerceIn(min,  max)
         }
 
         fun string2operator(string: String) : AttributeOperator {

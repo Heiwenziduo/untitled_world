@@ -1,10 +1,13 @@
 package com.github.nahnullscience.cypher_nexus.utility.mod
 
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastOperatorMap.Companion.OperatorMap
 import it.unimi.dsi.fastutil.objects.Reference2DoubleOpenHashMap
+import net.minecraft.core.Holder
 import kotlin.collections.MutableMap.MutableEntry
 
 
@@ -21,6 +24,13 @@ class AttributeFastMap(
 
     companion object {
         private const val DEFAULT_RETURN = -Double.MAX_VALUE
+
+        fun attributeCalculator(attr: Holder<CypherAttribute>, map: OperatorMap, cypher: AbstractProjectileCypher<*>? = null) =
+            attributeCalculator(attr.value(), map, cypher)
+        fun attributeCalculator(attr: CypherAttribute, map: OperatorMap, cypher: AbstractProjectileCypher<*>? = null): Double {
+            val base = cypher?.getAttrBaseOrDefault(attr) ?: attr.defaultValue
+            return AttributeOperator.attributeCalculator(base, map, attr.min, attr.max)
+        }
     }
 
     fun getAttrOrDefault(attr: CypherAttribute): Double {
@@ -35,9 +45,10 @@ class AttributeFastMap(
             // TODO prune cumulation, some of attributes will not be used, depends on cypher implementation
 
             this.compute(attr) { key, old ->
-                val base = cypher.getAttrBaseOrDefault(attr)
-                val final = AttributeOperator.attributeCalculator(base, opMap)
-                attr.restrictRange(final)
+//                val base = cypher.getAttrBaseOrDefault(attr)
+//                val final = AttributeOperator.attributeCalculator(base, opMap)
+//                attr.restrictRange(final)
+                attributeCalculator(attr, opMap, cypher)
             }
         }
     }

@@ -97,9 +97,9 @@ object CNCodecs {
             { afm -> afm.toMap() }
         )
 
-    val ATTR_FAST_OP_MAP_CODEC: Codec<AttributeFastOpMap> =
+    val ATTR_FAST_OP_MAP_CODEC: Codec<AttributeFastOperatorMap> =
         Codec.unboundedMap(CYPHER_ATTRIBUTE, ATTR_OPERATOR_MAP_CODEC).xmap(
-            { map -> AttributeFastOpMap(map) },
+            { map -> AttributeFastOperatorMap(map) },
             { fastOpMap -> fastOpMap.toMap() }
         )
 }

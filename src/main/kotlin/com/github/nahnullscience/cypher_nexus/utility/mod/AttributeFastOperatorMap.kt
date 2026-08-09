@@ -2,8 +2,7 @@ package com.github.nahnullscience.cypher_nexus.utility.mod
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
-import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastOpMap.Companion.OperatorMap
-import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap
+import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastOperatorMap.Companion.OperatorMap
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
 import java.util.*
 import kotlin.collections.MutableMap.MutableEntry
@@ -11,7 +10,7 @@ import kotlin.collections.MutableMap.MutableEntry
 /**
  *
  * */
-class AttributeFastOpMap(
+class AttributeFastOperatorMap(
     private val fastMap: Reference2ObjectOpenHashMap<CypherAttribute, OperatorMap> = Reference2ObjectOpenHashMap(8),
 ) : MutableMap<CypherAttribute, OperatorMap> {
     constructor(map: Map<CypherAttribute, OperatorMap>) : this(Reference2ObjectOpenHashMap(map))
@@ -22,7 +21,7 @@ class AttributeFastOpMap(
         typealias OperatorMap = EnumMap<AttributeOperator, Double>
     }
 
-    fun clone() = AttributeFastOpMap(fastMap.clone())
+    fun clone() = AttributeFastOperatorMap(fastMap.clone())
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

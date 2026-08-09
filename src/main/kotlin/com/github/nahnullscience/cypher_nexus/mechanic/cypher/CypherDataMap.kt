@@ -4,8 +4,8 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.Attribut
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastMap
-import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastOpMap
-import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastOpMap.Companion.OperatorMap
+import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastOperatorMap
+import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastOperatorMap.Companion.OperatorMap
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.ATTR_FAST_MAP_CODEC
 import com.github.nahnullscience.cypher_nexus.utility.mod.CNCodecs.ATTR_FAST_OP_MAP_CODEC
 import com.mojang.serialization.Codec
@@ -22,7 +22,7 @@ data class CypherDataMap(
     val flags: Int,
 
     val projectile: AttributeFastMap,
-    val shotState: AttributeFastOpMap,
+    val shotState: AttributeFastOperatorMap,
 ) {
     companion object {
         val CODEC: Codec<CypherDataMap> = RecordCodecBuilder.create { it.group(
@@ -35,7 +35,7 @@ data class CypherDataMap(
                 .optionalFieldOf("projectile", AttributeFastMap())
                 .forGetter(CypherDataMap::projectile),
             ATTR_FAST_OP_MAP_CODEC
-                .optionalFieldOf("shotState", AttributeFastOpMap())
+                .optionalFieldOf("shotState", AttributeFastOperatorMap())
                 .forGetter(CypherDataMap::shotState),
         ).apply(it, ::CypherDataMap) }
 
@@ -84,7 +84,7 @@ data class CypherDataMap(
             recharge,
             flags,
             AttributeFastMap(projectile),
-            AttributeFastOpMap(shotState)
+            AttributeFastOperatorMap(shotState)
         )
     }
 }

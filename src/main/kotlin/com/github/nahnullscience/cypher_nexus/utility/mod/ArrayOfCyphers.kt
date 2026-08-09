@@ -12,49 +12,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.WandModuleCypher
  * fixed length, cypher changeable, EmptyCypher autofill, quick lookup, and bits operation-friendly
  * */
 open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
-    companion object {
-        private fun AbstractCypher.isModule(): Boolean = isNotEmpty() && category.`is`(WAND_MODULE_RESOURCE)
-
-        const val MAX_LENGTH = Long.SIZE_BITS // max length capped at a Long-bits count (64), guess this is quite enough
-
-        /**
-         * access an Array indices through 1-bits of a Long
-         * */
-        inline fun <T> Array<T>.bitForEach(bitsAccess: Long, action: (index: Int, element: T) -> Unit) {
-            if (size > 64) CypherNexus.warn { "${this.contentToString()} uses a bit access but its size exceeds 64!" }
-
-            var mask =
-                if (size < 64) bitsAccess and (-1L shl size).inv()
-                // for Kotlin use "size % 64" to wrap the distance,
-                // -1L shl 64 <=> -1L shl 0 which will result in 111...111 the 64 1s
-                // thus, x and -1L.inv() will wipe out all bits
-                else bitsAccess
-
-
-            while (mask != 0L) {
-                val index = mask.countTrailingZeroBits()
-                action(index, this[index])
-                mask = mask and (mask - 1)
-            }
-        }
-
-        /**
-         * access an Array indices through 1-bits of a Long, last element first
-         * */
-        inline fun <T> Array<T>.bitForEachReverse(bitsAccess: Long, action: (index: Int, element: T) -> Unit) {
-            if (size > 64) CypherNexus.warn { "${this.contentToString()} uses a bit access but its size exceeds 64!" }
-
-            var mask =
-                if (size < 64) bitsAccess and (-1L shl size).inv()
-                else bitsAccess
-
-            while (mask != 0L) {
-                val index = 63 - mask.countLeadingZeroBits()
-                action(index, this[index])
-                mask = mask xor (1L shl index)
-            }
-        }
-    }
 
     /** O(n) */
     constructor(list: List<AbstractCypher?>) : this(list.size) {
@@ -244,7 +201,7 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
     }
 
 
-    override fun toString() = cyphers.toList().toString()
+    override fun toString() = cyphers.toList().filter { it.isNotEmpty() }.toString()
 
 
     /**
@@ -299,5 +256,49 @@ open class ArrayOfCyphers(val capacity: Int) : Iterable<AbstractCypher> {
          * @return a copy of this [MutableAoC], changes made to the copy won't affect the original
          * */
         override fun copy(): MutableAoC = MutableAoC(toList())
+    }
+
+    companion object {
+        private fun AbstractCypher.isModule(): Boolean = isNotEmpty() && category.`is`(WAND_MODULE_RESOURCE)
+
+        const val MAX_LENGTH = Long.SIZE_BITS // max length capped at a Long-bits count (64), guess this is quite enough
+
+        /**
+         * access an Array indices through 1-bits of a Long
+         * */
+        inline fun <T> Array<T>.bitForEach(bitsAccess: Long, action: (index: Int, element: T) -> Unit) {
+            if (size > 64) CypherNexus.warn { "${this.contentToString()} uses a bit access but its size exceeds 64!" }
+
+            var mask =
+                if (size < 64) bitsAccess and (-1L shl size).inv()
+                // for Kotlin use "size % 64" to wrap the distance,
+                // -1L shl 64 <=> -1L shl 0 which will result in 111...111 the 64 1s
+                // thus, x and -1L.inv() will wipe out all bits
+                else bitsAccess
+
+
+            while (mask != 0L) {
+                val index = mask.countTrailingZeroBits()
+                action(index, this[index])
+                mask = mask and (mask - 1)
+            }
+        }
+
+        /**
+         * access an Array indices through 1-bits of a Long, last element first
+         * */
+        inline fun <T> Array<T>.bitForEachReverse(bitsAccess: Long, action: (index: Int, element: T) -> Unit) {
+            if (size > 64) CypherNexus.warn { "${this.contentToString()} uses a bit access but its size exceeds 64!" }
+
+            var mask =
+                if (size < 64) bitsAccess and (-1L shl size).inv()
+                else bitsAccess
+
+            while (mask != 0L) {
+                val index = 63 - mask.countLeadingZeroBits()
+                action(index, this[index])
+                mask = mask xor (1L shl index)
+            }
+        }
     }
 }
