@@ -29,7 +29,7 @@ open class DefaultRecoilModule(
         performingTicks: Int,
         power: Double
     ): Boolean {
-        if (power.isFinite()) {
+        if (power.isFinite() && power > 1e-7) {
             // since it is the client side that is Player position authoritative
             // this logic should run on both side, client for smooth movement, server for verification
 

@@ -494,6 +494,12 @@ object Cyphers {
         pattern(InvokingPatterns.FRONT_TRIANGLE_PATTERN)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -15.0)
     }
+    val FORMATION_FRONT_HEXAGON = registerCypher("formation_front_hexagon", CypherCategories.MULTI_INVOKING) {
+        manaDrain(6f)
+        draw(6)
+        pattern(InvokingPatterns.FRONT_HEXAGON_PATTERN)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -24.0)
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // utility //////////////////////////////////////////////////////////////////////////////////////////////////////////

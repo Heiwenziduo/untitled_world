@@ -10,9 +10,9 @@ import kotlin.math.sqrt
 
 class FrontTrianglePattern(path: Identifier) : AbstractInvokingPattern(path) {
     companion object {
-        private const val LEN = 0.5
-        private const val TOP = LEN / 2
-        private val SIDE = LEN * sqrt(3.0) / 2
+        private const val BOT = 0.5
+        private const val TOP = BOT / 2
+        private val SIDE = BOT * sqrt(3.0) / 2
     }
     override fun layout(
         index: Int,
@@ -39,7 +39,7 @@ class FrontTrianglePattern(path: Identifier) : AbstractInvokingPattern(path) {
             else -> {
                 coordinate.getOrComputePatternCache(0) cache@ {
                     val (pos, dir) = posDire
-                    val pos1 = pos + coordinate.down() * LEN
+                    val pos1 = pos + coordinate.down() * BOT
                     PosDirePair(pos1, dir)
                 }
             }

@@ -234,6 +234,7 @@
   "invoking.cypher_nexus.pattern.plane_trifurcated": "Plane Trifurcated",
   "invoking.cypher_nexus.pattern.plane_t_style": "Plane T Style",
   "invoking.cypher_nexus.pattern.front_triangle": "Front Triangle",
+  "invoking.cypher_nexus.pattern.front_hexagon": "Front Hexagon",
 
   "item_group.cypher_nexus": "Cypher Nexus",
 

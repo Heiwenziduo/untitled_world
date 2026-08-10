@@ -27,7 +27,7 @@ class RecoilRocketModule(
         performingTicks: Int,
         power: Double
     ): Boolean {
-        if (power.isFinite()) {
+        if (power.isFinite() && power > 1e-7) {
 //            println("recoil power: $power")
             val coo = invoker.perspectiveCoordinate() // always push invoker forward
             val dire = coo.front
