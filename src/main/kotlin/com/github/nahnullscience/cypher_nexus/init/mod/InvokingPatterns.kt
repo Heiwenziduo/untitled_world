@@ -2,16 +2,11 @@ package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractInvokingPattern
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.FrontHexagonPattern
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.FrontTrianglePattern
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.NoPattern
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.PlaneBifurcatedPattern
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.PlaneTStylePattern
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.PlaneTrifurcatedPattern
-import net.minecraft.core.Holder
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.*
 import net.minecraft.core.Registry
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
+import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredRegister
 import net.neoforged.neoforge.registries.RegistryBuilder
 import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
@@ -30,11 +25,14 @@ object InvokingPatterns {
         DEFERRED_REGISTER.register(MOD_BUS)
     }
 
-    fun registerPattern(pattern: AbstractInvokingPattern): Holder<AbstractInvokingPattern> {
-        return DEFERRED_REGISTER.register(pattern.resource.path) { -> pattern }
+    fun registerPattern(pattern: AbstractInvokingPattern): DeferredHolder<AbstractInvokingPattern, AbstractInvokingPattern> {
+    return DEFERRED_REGISTER.register(pattern.resource.path) { -> pattern }
     }
 
-    fun registerPattern(path: String, supplier: (resource: Identifier) -> AbstractInvokingPattern): Holder<AbstractInvokingPattern> {
+    fun registerPattern(
+        path: String,
+        supplier: (resource: Identifier) -> AbstractInvokingPattern
+    ): DeferredHolder<AbstractInvokingPattern, AbstractInvokingPattern> {
         return DEFERRED_REGISTER.register(path, supplier)
     }
 
@@ -42,7 +40,11 @@ object InvokingPatterns {
     val PLANE_BIFURCATED_PATTERN = registerPattern("plane_bifurcated", ::PlaneBifurcatedPattern)
     val PLANE_TRIFURCATED_PATTERN = registerPattern("plane_trifurcated", ::PlaneTrifurcatedPattern)
     val PLANE_T_STYLE_PATTERN = registerPattern("plane_t_style", ::PlaneTStylePattern)
+    val PLANE_PENTAGON_PATTERN = registerPattern("plane_pentagon", ::PlanePentagonPattern)
 
     val FRONT_TRIANGLE_PATTERN = registerPattern("front_triangle", ::FrontTrianglePattern)
     val FRONT_HEXAGON_PATTERN = registerPattern("front_hexagon", ::FrontHexagonPattern)
+
+    val PERPENDICULAR_SQUARE_PATTERN = registerPattern("perpendicular_square", AbstractPerpendicularPattern::Square)
+    val PERPENDICULAR_OCTAGON_PATTERN = registerPattern("perpendicular_octagon", AbstractPerpendicularPattern::Octagon)
 }

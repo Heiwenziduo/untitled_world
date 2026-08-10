@@ -44,7 +44,14 @@ interface IItemWand : IWandLike<ItemStack> {
     /**
      * resolve invoking feedback, for item-wands this is handled by [ItemWandInstance]
      * */
-    fun afterInvoke(level: Level, invoker: Entity, stack: ItemStack, dataBundle: HelperDataBundle, rootChunk: ShotStateChunk): InvokingState
+    fun afterInvoke(
+        level: Level,
+        invoker: Entity,
+        coordinate: CoordinateDefinition,
+        stack: ItemStack,
+        dataBundle: HelperDataBundle,
+        shotStateRoot: ShotStateChunk
+    ): InvokingState
 
     /**
      * call on BOTH sides.
@@ -73,8 +80,8 @@ interface IItemWand : IWandLike<ItemStack> {
 //            return InvokingState.HANG
 //        }
 
-        helper.releaseInvokingResult(level, coordinate, posDire, instance)
-        return afterInvoke(level, invoker, dataProvider, state, helper.shotRoot)
+        helper.releaseInvokingResult(level, coordinate, posDire)
+        return afterInvoke(level, invoker, coordinate, dataProvider, state, helper.shotRoot)
     }
 
 

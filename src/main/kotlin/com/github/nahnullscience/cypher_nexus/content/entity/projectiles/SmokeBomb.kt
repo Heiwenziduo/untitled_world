@@ -21,8 +21,8 @@ class SmokeBomb(
         val smoke = ExplosionSettings(this)
         with(smoke) {
             radiusSqr = 1f
-            smallParticle = ParticleTypes.CAMPFIRE_SIGNAL_SMOKE
-            largeParticle = ParticleTypes.CAMPFIRE_SIGNAL_SMOKE
+//            smallParticle = ParticleTypes.CAMPFIRE_SIGNAL_SMOKE
+//            largeParticle = ParticleTypes.CAMPFIRE_SIGNAL_SMOKE
             sound = BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.SMOKER_SMOKE)
         }
         explosion = smoke

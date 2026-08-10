@@ -31,6 +31,7 @@ operator fun Vector3f.unaryMinus() = Vector3f(-x, -y, -z)
 operator fun Vector3f.times(v: Double) = times(v.toFloat())
 operator fun Vector3f.times(v: Float) = Vector3f(x * v, y * v, z * v)
 operator fun Vector3f.plus(v: Vector3f) = Vector3f(x + v.x, y + v.y, z + v.z)
+fun Vector3f.set(v3: Vec3): Vector3f = set(v3.x, v3.y, v3.z)
 
 fun Vec3.coerceMaxLength(length: Double): Vec3 {
     val lengthSqr = x * x + y * y + z * z

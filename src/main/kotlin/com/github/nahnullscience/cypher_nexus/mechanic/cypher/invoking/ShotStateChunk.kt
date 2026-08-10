@@ -4,7 +4,6 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.init.mod.InvokingPatterns.NO_PATTERN
-import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.RECOIL_MODULE
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
@@ -14,7 +13,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAt
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.spawnCypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeAbortReleaseHook.ReleaseAbort
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
@@ -28,7 +26,6 @@ import net.minecraft.core.Holder
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.level.Level
 import java.util.*
 
@@ -92,6 +89,10 @@ class ShotStateChunk private constructor (
 
     private var shotPattern: Holder<AbstractInvokingPattern> = NO_PATTERN
 
+    fun computeRecoil(base: Double = 0.0): Double {
+        val recoilMap = attributes[CypherAttributes.RECOIL.value()] ?: return 0.0
+        return AttributeFastMap.attributeCalculator(CypherAttributes.RECOIL.value(), recoilMap, base)
+    }
 
     fun release(
         level: Level,
@@ -99,22 +100,12 @@ class ShotStateChunk private constructor (
         posDire: PosDirePair,
         directInvoker: Entity?,
         owner: Entity?,
-        wandInstance: ItemWandInstance?
     ) {
         if (charge-- <= 0) return
 
         Profiler.get().push { "cypherEntityCreation" }
         if (dirty) compute()
         CypherNexus.debugCypher { "${level.isClientSide} client ccMap: $_ccMapBacking" }
-
-        // do recoil only on root
-        if (isRoot) run recoil@ {
-            wandInstance ?: return@recoil
-            if (directInvoker !is LivingEntity) return@recoil
-            val recoilMap = attributes[CypherAttributes.RECOIL.value()] ?: return@recoil
-            val recoil = AttributeFastMap.attributeCalculator(CypherAttributes.RECOIL, recoilMap)
-            wandInstance.functionModule(RECOIL_MODULE.get(), directInvoker, null, invokerCoordinate, power = recoil)
-        }
 
         // handle entities only on server
         if (level !is ServerLevel) return
@@ -279,6 +270,7 @@ class ShotStateChunk private constructor (
 
 
     /***/
+    // TODO
     abstract inner class ShotStateViewer {
         fun getOpMap(attr: Holder<CypherAttribute>) = attributes[attr.value()]
 

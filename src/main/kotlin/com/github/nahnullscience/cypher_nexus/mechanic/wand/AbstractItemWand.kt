@@ -2,6 +2,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.wand
 
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
+import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.RECOIL_MODULE
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.SECONDARY_MODULE
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingState
@@ -142,13 +143,19 @@ abstract class AbstractItemWand(
     override fun afterInvoke(
         level: Level,
         invoker: Entity,
+        coordinate: CoordinateDefinition,
         stack: ItemStack,
         dataBundle: HelperDataBundle,
-        rootChunk: ShotStateChunk
+        shotStateRoot: ShotStateChunk
     ): InvokingState {
         val instance = getWandInstance(level, invoker, stack)
         instance.updateFromHelperData(dataBundle)
         instance.invokeFinish(level)
+
+        if (invoker is LivingEntity) {
+            val recoil = shotStateRoot.computeRecoil()
+            instance.functionModule(RECOIL_MODULE.get(), invoker, stack, coordinate, power = recoil)
+        }
         return InvokingState.SUCCESS
     }
 }

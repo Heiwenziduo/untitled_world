@@ -19,6 +19,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.Attribut
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractInvokingPattern
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.exception.CypherNotFoundException
 import net.minecraft.core.Holder
@@ -267,9 +268,10 @@ object Cyphers {
         recharge(-6)
     }
     val HAYWIRE = registerCypher(::HaywireCypher) {
-        manaDrain(2f)
+        manaDrain(1f)
         recharge(-8)
         shotStateAttr(CypherAttributes.SPEED_INITIAL, AttributeOperator.MULTIPLY_TOTAL, 1.2)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 5.0)
     }
     val BOUNCY = registerModifier("bouncy", 5f) {
         shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.ADD, 10.0)
@@ -350,8 +352,12 @@ object Cyphers {
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 24.0)
         shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.04)
     }
-    val DIRECT_SKYWARD = registerCypher(::DirectSkywardCypher, 1f)
-    val DIRECT_GROUNDWARD = registerCypher(::DirectGroundwardCypher, 1f)
+    val DIRECT_SKYWARD = registerCypher(::DirectSkywardCypher) {
+        delay(-3)
+    }
+    val DIRECT_GROUNDWARD = registerCypher(::DirectGroundwardCypher) {
+        delay(-3)
+    }
     val ANTIGRAVITY = registerModifier("antigravity", 2f) {
         shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, -0.03)
     }
@@ -454,6 +460,7 @@ object Cyphers {
     val ALL_INVOKING = registerCypher("all_invoking", CypherCategories.MULTI_INVOKING) {
         manaDrain(99f)
         draw(99)
+        recharge(60)
     }
     val DOUBLE_SCATTER = registerCypher("double_scatter", CypherCategories.MULTI_INVOKING) {
         manaDrain(0f)
@@ -470,35 +477,45 @@ object Cyphers {
         draw(4)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 40.0)
     }
-    val FORMATION_PLANE_BIFURCATED = registerCypher("formation_plane_bifurcated", CypherCategories.MULTI_INVOKING) {
+    val FORMATION_PLANE_BIFURCATED = registerFormation(InvokingPatterns.PLANE_BIFURCATED_PATTERN) {
         manaDrain(1f)
         draw(2)
-        pattern(InvokingPatterns.PLANE_BIFURCATED_PATTERN)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -12.0)
     }
-    val FORMATION_PLANE_TRIFURCATED = registerCypher("formation_plane_trifurcated", CypherCategories.MULTI_INVOKING) {
+    val FORMATION_PLANE_TRIFURCATED = registerFormation(InvokingPatterns.PLANE_TRIFURCATED_PATTERN) {
         manaDrain(3f)
         draw(3)
-        pattern(InvokingPatterns.PLANE_TRIFURCATED_PATTERN)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -15.0)
     }
-    val FORMATION_PLANE_T_STYLE = registerCypher("formation_plane_t_style", CypherCategories.MULTI_INVOKING) {
+    val FORMATION_PLANE_T_STYLE = registerFormation(InvokingPatterns.PLANE_T_STYLE_PATTERN) {
         manaDrain(1f)
         draw(3)
-        pattern(InvokingPatterns.PLANE_T_STYLE_PATTERN)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -15.0)
     }
-    val FORMATION_FRONT_TRIANGLE = registerCypher("formation_front_triangle", CypherCategories.MULTI_INVOKING) {
+    val FORMATION_PLANE_PENTAGON = registerFormation(InvokingPatterns.PLANE_PENTAGON_PATTERN) {
+        manaDrain(5f)
+        draw(5)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -21.0)
+    }
+    val FORMATION_FRONT_TRIANGLE = registerFormation(InvokingPatterns.FRONT_TRIANGLE_PATTERN) {
         manaDrain(3f)
         draw(3)
-        pattern(InvokingPatterns.FRONT_TRIANGLE_PATTERN)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -15.0)
     }
-    val FORMATION_FRONT_HEXAGON = registerCypher("formation_front_hexagon", CypherCategories.MULTI_INVOKING) {
+    val FORMATION_FRONT_HEXAGON = registerFormation(InvokingPatterns.FRONT_HEXAGON_PATTERN) {
         manaDrain(6f)
         draw(6)
-        pattern(InvokingPatterns.FRONT_HEXAGON_PATTERN)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -24.0)
+    }
+    val FORMATION_PERPENDICULAR_SQUARE = registerFormation(InvokingPatterns.PERPENDICULAR_SQUARE_PATTERN) {
+        manaDrain(1f)
+        draw(4)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -18.0)
+    }
+    val FORMATION_PERPENDICULAR_OCTAGON = registerFormation(InvokingPatterns.PERPENDICULAR_OCTAGON_PATTERN) {
+        manaDrain(3f)
+        draw(8)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -30.0)
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -687,6 +704,18 @@ object Cyphers {
         config: SimpleNonProjectileCypher.() -> Unit
     ): Holder<AbstractNonProjectileCypher> {
         val s = SimpleNonProjectileCypher(path.identifier(), category).also { it.config() }
+        return registerCypher(s.createCypher())
+    }
+
+    private fun registerFormation(
+        formation: DeferredHolder<AbstractInvokingPattern, AbstractInvokingPattern>,
+        config: SimpleNonProjectileCypher.() -> Unit
+    ): Holder<AbstractNonProjectileCypher> {
+        val path = "formation_${formation.id.path}"
+        val s = SimpleNonProjectileCypher(path.identifier(), CypherCategories.MULTI_INVOKING).also {
+            it.config()
+            it.pattern(formation)
+        }
         return registerCypher(s.createCypher())
     }
 

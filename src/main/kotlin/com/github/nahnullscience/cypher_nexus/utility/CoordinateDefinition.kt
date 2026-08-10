@@ -11,7 +11,8 @@ data class CoordinateDefinition(
     val front: Vec3,
     val left: Vec3
 ) {
-    val up = front.cross(left)
+    var up = front.cross(left)
+        private set
 
     init {
 
@@ -35,7 +36,7 @@ data class CoordinateDefinition(
 
     fun rightScrewFromTop(dire: Vec3, rad: Float): Vec3 {
         val top = up.toVector3f()
-        Quaternionf().rotateAxis(rad, top).let {
+        Quaternionf().rotationAxis(rad, top).let {
             return dire.toVector3f().rotate(it).toVec3()
         }
     }

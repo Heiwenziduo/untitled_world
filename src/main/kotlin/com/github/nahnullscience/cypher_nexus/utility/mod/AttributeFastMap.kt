@@ -46,5 +46,8 @@ class AttributeFastMap(capa: Int = 16) : Reference2DoubleOpenHashMap<CypherAttri
             val base = cypher?.getAttrOrDefault(attr) ?: attr.defaultValue
             return AttributeOperator.attributeCalculator(base, map, attr.min, attr.max)
         }
+        fun attributeCalculator(attr: CypherAttribute, map: OperatorMap, base: Double): Double {
+            return AttributeOperator.attributeCalculator(base, map, attr.min, attr.max)
+        }
     }
 }

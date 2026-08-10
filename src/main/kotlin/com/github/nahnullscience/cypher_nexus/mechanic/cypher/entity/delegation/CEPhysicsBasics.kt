@@ -84,8 +84,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
             ce.perspectiveCoordinate(),
             releaseTo,
             ce,
-            ce.owner,
-            null
+            ce.owner
         )
     }
     protected fun trigger(type: TriggerType, releasePoint: Vec3) {

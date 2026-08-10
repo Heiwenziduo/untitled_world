@@ -55,7 +55,7 @@
       "draw": 99,
       "flags": 0,
       "manaDrain": 99.0,
-      "recharge": 0
+      "recharge": 60
     },
     "cypher_nexus:alpha": {
       "delay": 5,
@@ -308,17 +308,17 @@
       }
     },
     "cypher_nexus:direct_groundward": {
-      "delay": 0,
+      "delay": -3,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 1.0,
+      "manaDrain": 0.0,
       "recharge": 0
     },
     "cypher_nexus:direct_skyward": {
-      "delay": 0,
+      "delay": -3,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 1.0,
+      "manaDrain": 0.0,
       "recharge": 0
     },
     "cypher_nexus:divide_by_10": {
@@ -590,6 +590,18 @@
         }
       }
     },
+    "cypher_nexus:formation_front_hexagon": {
+      "delay": 0,
+      "draw": 6,
+      "flags": 0,
+      "manaDrain": 6.0,
+      "recharge": 0,
+      "shotState": {
+        "cypher_nexus:spread": {
+          "add": -24.0
+        }
+      }
+    },
     "cypher_nexus:formation_front_triangle": {
       "delay": 0,
       "draw": 3,
@@ -602,6 +614,30 @@
         }
       }
     },
+    "cypher_nexus:formation_perpendicular_octagon": {
+      "delay": 0,
+      "draw": 8,
+      "flags": 0,
+      "manaDrain": 3.0,
+      "recharge": 0,
+      "shotState": {
+        "cypher_nexus:spread": {
+          "add": -30.0
+        }
+      }
+    },
+    "cypher_nexus:formation_perpendicular_square": {
+      "delay": 0,
+      "draw": 4,
+      "flags": 0,
+      "manaDrain": 1.0,
+      "recharge": 0,
+      "shotState": {
+        "cypher_nexus:spread": {
+          "add": -18.0
+        }
+      }
+    },
     "cypher_nexus:formation_plane_bifurcated": {
       "delay": 0,
       "draw": 2,
@@ -611,6 +647,18 @@
       "shotState": {
         "cypher_nexus:spread": {
           "add": -12.0
+        }
+      }
+    },
+    "cypher_nexus:formation_plane_pentagon": {
+      "delay": 0,
+      "draw": 5,
+      "flags": 0,
+      "manaDrain": 5.0,
+      "recharge": 0,
+      "shotState": {
+        "cypher_nexus:spread": {
+          "add": -21.0
         }
       }
     },
@@ -680,11 +728,14 @@
       "delay": 0,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 2.0,
+      "manaDrain": 1.0,
       "recharge": -8,
       "shotState": {
         "cypher_nexus:speed": {
           "multiply_total": 1.2
+        },
+        "cypher_nexus:spread": {
+          "add": 5.0
         }
       }
     },
