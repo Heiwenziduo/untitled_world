@@ -47,6 +47,7 @@ abstract class AbstractDedicatedCypherProjectile(
     ICypherEntity by CypherEntityDelegation<AbstractDedicatedCypherProjectile>() {
     companion object {
 
+
     }
 
     override fun defineSynchedData(builder: SynchedEntityData.Builder) { }
@@ -62,6 +63,7 @@ abstract class AbstractDedicatedCypherProjectile(
         if (ccMap != null) {
             MOCC_STREAM.encode(buffer, ccMap!!)
         }
+        // TODO maybe change this to list that multiple steerers can be applied
         CYPHER_STEERER_STREAM.encode(buffer, steerer)
     }
 

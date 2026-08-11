@@ -37,12 +37,11 @@ class DistanceDeliverCypherRenderer (
     ) {
         linearInterpolateGaps(xo, yo, zo, x, y, z, 0.25) { step, x, y, z ->
             addCypherTrailParticle(
-                entity,
-                ParticleTypes.DRIPPING_WATER,
+                ParticleTypes.PORTAL,
                 x, y, z,
                 0.0, 0.0, 0.0
             ) {
-
+                scale(0.25f)
             }
         }
     }

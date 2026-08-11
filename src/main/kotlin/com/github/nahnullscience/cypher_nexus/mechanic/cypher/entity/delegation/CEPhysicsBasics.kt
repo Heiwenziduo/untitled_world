@@ -112,7 +112,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
             else direction.axis.randomPerpendicularNormal(random) // if speed vector and direction are in the same direction
 
         val co = CoordinateDefinition.fromFrontUp(direction.unitVec3, up)
-        val po = PosDirePair(releasePoint, direction.unitVec3)
+        val po = PosDirePair(releasePoint + direction.unitVec3 * 0.1, direction.unitVec3)
         trigger(co, po)
     }
 
@@ -286,7 +286,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
                         stepPosition = bouncePoint.add(bd.unitVec3.scale(1E-7)) // avoid "diving into blocks" bug
                         stepMovement = stepDestination0.subtract(destination).flipByAxis(
                             bd.axis,
-                            ce.getBounceSpeedPenalty()
+                            ce.getBounceSpeedDegrade()
                         )
                         ce.setPos(stepPosition)
                     }
@@ -298,7 +298,11 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         ce.setPos(stepPosition.add(stepMovement))
 
         if (loopTimes > 0) {
-            ce.deltaMovement = ce.deltaMovement.toSameDire(stepMovement).scale(this@CEPhysicsBasics.ce.getBounceSpeedPenalty().pow(loopTimes))
+            ce.deltaMovement = ce.deltaMovement.toSameDire(stepMovement).let {
+                val factor = ce.getBounceSpeedDegrade()
+                if (factor != 1.0) it.scale(factor.pow(loopTimes))
+                else it
+            }
             ce.rotateTowardSpeed(1f) // instant facing direction after bounce
         }
 
@@ -319,6 +323,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     protected open fun whenHitDelegate(result: HitResult, stepMove: Vec3, direction: Direction?) {
         if (result.type == Type.MISS) return
         val dir = direction ?: run {
+            // FIXME may drain all bounce counts if overlap with other entity's AABB and not pierce
             if (tickStartSpeedSqr > KINETIC_DAMAGE_SPEED_SQR) stepMove.mostAlignedDirection()
             else return
         }

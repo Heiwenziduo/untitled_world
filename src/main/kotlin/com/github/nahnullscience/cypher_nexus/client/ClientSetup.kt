@@ -11,6 +11,7 @@ import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.BubbleColumnCypherRenderer
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.FireworkRocketCypherRenderer
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.LlamaSpitCypherRenderer
+import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.PinkyCypherRenderer
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.SmokeBombCypherRenderer
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.utility.DistanceDeliverCypherRenderer
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
@@ -92,6 +93,7 @@ object ClientSetup {
         event.registerEntityRenderer(ModEntities.CYPHER_SMOKE_BOMB, ::SmokeBombCypherRenderer)
         event.registerEntityRenderer(ModEntities.CYPHER_FIREWORK_ROCKET, ::FireworkRocketCypherRenderer)
         event.registerEntityRenderer(ModEntities.CYPHER_RANDOM_FIREWORK_ROCKET, ::FireworkRocketCypherRenderer)
+        event.registerEntityRenderer(ModEntities.CYPHER_PINKY, ::PinkyCypherRenderer)
 
         //////////////////////////////////////////////////////////////////////////////
         // static

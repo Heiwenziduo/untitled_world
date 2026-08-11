@@ -127,6 +127,7 @@ class ShotStateChunk private constructor (
             ) { index, hook, count, cumulate ->
                 hook.redirectPosDireServer(index, count, level, owner, accessor, directInvoker, cumulate)
             }
+            // TODO rotate coordinate as well
         }
 
         // capture surroundings if hooked

@@ -13,7 +13,7 @@ import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
-class SimpleItemProjectileRenderer <CE : AbstractDedicatedCypherProjectile> (
+open class SimpleItemProjectileRenderer <CE : AbstractDedicatedCypherProjectile> (
     context: Context,
     val item: Item
 ) : AbstractCypherRenderer<CE, ItemProjectileRenderState>(context) {

@@ -56,7 +56,7 @@ interface ICypherEntityLogicContext : TraceableEntity,
      * */
     fun getUnderwaterSpeedFactor() = 0.8
     fun getInWallSpeedFactor() = 0.5
-    fun getBounceSpeedPenalty() = 0.95
+    fun getBounceSpeedDegrade() = 0.9
     fun getRotationSpeed(): Float = 0.25f
 
     /**

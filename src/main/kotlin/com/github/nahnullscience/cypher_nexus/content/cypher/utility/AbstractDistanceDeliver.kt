@@ -14,11 +14,11 @@ abstract class AbstractDistanceDeliver(
     defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder
 ) : AbstractProjectileCypher<AbstractDedicatedCypherProjectile>(defaultAttribute) {
     final override val category = CypherCategories.UTILITY
-    final override val projectileType = CYPHER_DISTANCE_DELIVERER
 
     override val innateTrigger: TriggerType = TriggerType.DEATH
 
     class LongDistanceProjection(defaultAttribute: Builder.() -> Builder) : AbstractDistanceDeliver(defaultAttribute) {
         override val resource = CypherNexus.modResource("long_distance_projection")
+        override val projectileType = CYPHER_DISTANCE_DELIVERER
     }
 }

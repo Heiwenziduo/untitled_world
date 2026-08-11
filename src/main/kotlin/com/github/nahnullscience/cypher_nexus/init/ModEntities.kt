@@ -9,6 +9,7 @@ import com.github.nahnullscience.cypher_nexus.content.entity.projectile.EnderRec
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.EnderTeleportation
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.FireworkRocket
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.LlamaSpit
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.Pinky
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.SmokeBomb
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.Snowball
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.SpawnEgg
@@ -43,6 +44,7 @@ object ModEntities {
     val CYPHER_SMOKE_BOMB = registerDedicated("cypher_smoke_bomb", ::SmokeBomb)
     val CYPHER_FIREWORK_ROCKET = registerDedicated("cypher_firework_rocket", ::FireworkRocket)
     val CYPHER_RANDOM_FIREWORK_ROCKET = registerDedicated("cypher_firework_rocket_random", FireworkRocket::RandomFireRocket)
+    val CYPHER_PINKY = registerDedicated("cypher_pinky", ::Pinky)
 
     // static-projectile //////////////////////////////////////////////////////////////////////////////////
     val CYPHER_EXPLOSION = registerDedicated("cypher_explosion", ::SummonedExplosion)
@@ -58,7 +60,8 @@ object ModEntities {
         name: String,
         factory: EntityType.EntityFactory<T>,
         category: MobCategory = MobCategory.MISC,
-        updateInterval: Int = 10
+        updateInterval: Int = 10,
+        config: EntityType.Builder<*>.() -> Unit = {},
     ): DeferredHolder<EntityType<*>, EntityType<T>> {
         return DEFERRED_REGISTER.registerEntityType(name, factory, category) { builder ->
             builder
@@ -75,6 +78,8 @@ object ModEntities {
                 // How often update packets are sent for this entity, in once every x ticks. This is set to higher values
                 // for entities that have predictable movement patterns, for example, projectiles. Defaults to 3.
                 .updateInterval(updateInterval)
+                .config()
+            builder
         }
     }
 }

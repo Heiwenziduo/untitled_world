@@ -16,6 +16,7 @@ import com.github.nahnullscience.cypher_nexus.content.cypher.wand_module.RecoilR
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.*
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.NONE_ATTR
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.attrConfig
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
@@ -128,7 +129,7 @@ object Cyphers {
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
     }
-    private val configDrilling: SimpleProjectile.() -> Unit = {
+    private val configDrilling: attrConfig = {
         delay(-3)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 6.0)
         projectileAttr(CypherAttributes.DAMAGE, 1.0)
@@ -156,7 +157,7 @@ object Cyphers {
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
     }
-    private val configFirework: SimpleProjectile.() -> Unit = {
+    private val configFirework: attrConfig = {
         recharge(5)
         flags(CypherFlags.EXPLOSIVE, CypherFlags.SAFE_EXPLODE)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -5.0)
@@ -174,6 +175,16 @@ object Cyphers {
     val RANDOM_FIREWORK_ROCKET = registerProjectile(ModEntities.CYPHER_RANDOM_FIREWORK_ROCKET) {
         configFirework()
         manaDrain(60f)
+    }
+    val PINKY = registerProjectile(ModEntities.CYPHER_PINKY) {
+        manaDrain(20f)
+        flags(CypherFlags.PHYSICS_SOLID)
+        projectileAttr(CypherAttributes.DAMAGE, 1.0)
+        projectileAttr(CypherAttributes.SPEED_INITIAL, 1.0)
+        projectileAttr(CypherAttributes.EXISTING, 300.0)
+        projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.04)
+        projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.04)
+        projectileAttr(CypherAttributes.BOUNCE, 25.0)
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // static projectile
@@ -381,21 +392,22 @@ object Cyphers {
         manaDrain(0f)
         shotStateAttr(CypherAttributes.SPEED_INITIAL, AttributeOperator.MULTIPLY_TOTAL, 2.0)
     }
-    private val configOrbit: CypherDataMap.Builder.() -> CypherDataMap.Builder = {
-        delay(-4)
+    private val configOrbit: attrConfig = {
         flags(CypherFlags.IGNORE_BLOCK, CypherFlags.MOTION_FOLLOWS_OWNER)
-        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 40.0)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 50.0)
         shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.SET_ALL, 0.0)
         shotStateAttr(CypherAttributes.FRICTION_FACTOR, AttributeOperator.SET_ALL, 0.0)
         shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.SET_ALL, 0.0)
     }
     val PLANE_ORBIT = registerCypher(AbstractPathModifier::PlaneOrbit) {
-        manaDrain(3f)
         configOrbit()
+        manaDrain(3f)
+        delay(-4)
     }
     val TRUE_ORBIT = registerCypher(AbstractPathModifier::TrueOrbit) {
-        manaDrain(5f)
         configOrbit()
+        manaDrain(5f)
+        delay(-4)
     }
     val RED_TINT = registerModifier("red_tint", 0f) {
         delay(-1)
@@ -535,15 +547,18 @@ object Cyphers {
         manaDrain(10f)
         draw(1)
     }
-    val LONG_DISTANCE_PROJECTION = registerCypher(AbstractDistanceDeliver::LongDistanceProjection) {
-        manaDrain(0f)
+    private val configLongDistance: attrConfig = {
         draw(1)
-        delay(-2)
         flags(CypherFlags.PENETRATE_WORLD)
         projectileAttr(CypherAttributes.SPEED_INITIAL, 8.0)
         projectileAttr(CypherAttributes.EXISTING, 1.0)
         projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.0)
+    }
+    val LONG_DISTANCE_PROJECTION = registerCypher(AbstractDistanceDeliver::LongDistanceProjection) {
+        configLongDistance()
+        manaDrain(0f)
+        delay(-2)
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -637,12 +652,12 @@ object Cyphers {
      * */
     @Suppress("UNCHECKED_CAST")
     private fun <CY: AbstractCypher> registerCypher(
-        constructor: (builder: CypherDataMap.Builder.() -> CypherDataMap.Builder) -> CY,
-        defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE_ATTR
+        constructor: (builder: attrConfig) -> CY,
+        defaultAttribute: attrConfig = NONE_ATTR
     ): Holder<CY> = registerCypher(constructor(defaultAttribute))
 
     private fun <CY: AbstractCypher> registerCypher(
-        constructor: (builder: CypherDataMap.Builder.() -> CypherDataMap.Builder) -> CY,
+        constructor: (builder: attrConfig) -> CY,
         manaDrain: Float
     ): Holder<CY> = registerCypher(constructor { manaDrain(manaDrain) })
 

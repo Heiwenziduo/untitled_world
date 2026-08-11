@@ -29,10 +29,11 @@ import net.minecraft.server.level.ServerPlayer
  *
  * */
 sealed class AbstractCypher(
-    protected val defaultAttribute: Builder.() -> Builder = NONE_ATTR
+    protected val defaultAttribute: attrConfig = NONE_ATTR
 ): IRegisterable {
     companion object {
-        val NONE_ATTR: Builder.() -> Builder = { this }
+        typealias attrConfig = Builder.() -> Builder
+        val NONE_ATTR: attrConfig = { this }
     }
 
     abstract val category: Holder<CypherCategory>
