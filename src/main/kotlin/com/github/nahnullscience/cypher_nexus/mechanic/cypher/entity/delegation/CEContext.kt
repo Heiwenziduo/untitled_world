@@ -6,9 +6,9 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ExplosionSettings
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.canNotHurtOwner
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.cypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityLogicContext.Companion.canNotHurtOwner
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getBounce
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.NoSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
@@ -76,6 +76,9 @@ open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity
 
     override fun getOwner(): Entity? = ownerD
     override fun setOwner(owner: Entity?) = let { ownerD = owner }
+    override fun canHurtOwner(): Boolean  = ce.hasFlag(CypherFlags.HURT_OWNER) && ce.tickCount > 1
+//    override fun canHitMultipleTarget(): Boolean =
+//        ce.hasFlagsAny(CypherFlags.PHYSICS_SOLID, CypherFlags.PIERCE_ENTITY) || ce.getBounce() > 0
 
 
     override fun getDamageSource(): DamageSource {

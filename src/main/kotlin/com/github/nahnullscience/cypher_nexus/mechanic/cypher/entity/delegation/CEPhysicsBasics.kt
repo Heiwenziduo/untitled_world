@@ -13,11 +13,13 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getExisting
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getGravityFactor
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getSpeedFactor
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityLogicContext
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.*
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap
 import net.minecraft.core.Direction
 import net.minecraft.core.Direction.Axis
 import net.minecraft.server.level.ServerLevel
@@ -42,6 +44,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     protected val random get() = ce.random
 
     override var tickStartSpeedSqr: Double = 0.0
+    override var capturedInitialSpeedSqr: Double = 0.0
 
     override var triggerType = TriggerType.NONE
     override var payload: ShotStateChunk? = null
@@ -51,9 +54,11 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     override val bouncePoints = ArrayList<Vec3>()
     override val bouncedThisTick: Boolean get() = bouncePoints.isNotEmpty()
 
-    protected var capturedInitialSpeedSqr: Double = 0.0
     protected var lowSpeedTickCount = 0
     protected var highElevationTickCount = 0
+
+    protected var hitEntityInvulnerabilityMap: Int2IntOpenHashMap? = null
+        private set
 
     override fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk?, node: ProjectileNode?) {
         if (node != null) {
@@ -65,6 +70,11 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     override fun initEntity(ce: CE) = let {
         this@CEPhysicsBasics.ce = ce
         ce.noPhysics = ce.noFlag(CypherFlags.PHYSICS_SOLID)
+
+        // if can hit multiple target...
+        if (ce.hasFlagsAny(CypherFlags.PHYSICS_SOLID, CypherFlags.PIERCE_ENTITY) || ce.canBounce) {
+            hitEntityInvulnerabilityMap = Int2IntOpenHashMap(8)
+        }
     }
 
 
@@ -240,6 +250,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
                             // there is a trigger call inside whenHit, which may modifies the entity list in section storage.
                             // execute an on-site sub-effect may raise ConcurrentModificationException
                             // it seems we have to extract entities first and go through the list one more time
+                            if (canHitTargetAtThisTick(target))
                             stepPosition.rayCastThen(destination, target.boundingBox, margin) { hitPoint, dir ->
                                 whenHitDelegate(EntityHitResult(target, hitPoint), stepMovement, dir)
                             }
@@ -254,6 +265,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
                             ce.boundingBox.expandToAtMost(stepMovement, 16.0),
                             ce::canHitTarget
                         ) { target ->
+                            if (canHitTargetAtThisTick(target))
                             stepPosition.rayCastThen(destination, target.boundingBox, margin) { hitPoint, dir ->
                                 val dd: Double = stepPosition.distanceToSqr(hitPoint)
                                 if (dd < nearest) {
@@ -283,7 +295,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
                         val bd = bounceDirection ?: stepMovement.mostAlignedDirection()
                         onBounceDelegate(bouncePoint, bounceCount, bd)
 
-                        stepPosition = bouncePoint.add(bd.unitVec3.scale(1E-7)) // avoid "diving into blocks" bug
+                        stepPosition = bouncePoint.add(bd.unitVec3.scale(1E-4)) // avoid "diving into blocks" bug
                         stepMovement = stepDestination0.subtract(destination).flipByAxis(
                             bd.axis,
                             ce.getBounceSpeedDegrade()
@@ -309,6 +321,12 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         Profiler.get().pop()
     }
 
+    /**
+     * assume [target] is a valid one through [ICypherEntityLogicContext.canHitTarget]
+     * */
+    open fun canHitTargetAtThisTick(target: Entity): Boolean {
+        return hitEntityInvulnerabilityMap?.get(target.id)?.let { it <= ce.tickCount } ?: true
+    }
 
 
     protected open fun onBounceDelegate(bouncePoint: Vec3, bounceCount: Int, bounceSurface: Direction) {
@@ -323,7 +341,6 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     protected open fun whenHitDelegate(result: HitResult, stepMove: Vec3, direction: Direction?) {
         if (result.type == Type.MISS) return
         val dir = direction ?: run {
-            // FIXME may drain all bounce counts if overlap with other entity's AABB and not pierce
             if (tickStartSpeedSqr > KINETIC_DAMAGE_SPEED_SQR) stepMove.mostAlignedDirection()
             else return
         }
@@ -352,6 +369,13 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     ) {
         ce.whenHitEntity(result, direction)
         val target = result.entity
+
+        hitEntityInvulnerabilityMap?.let {
+            var next = ce.tickCount + ce.getHitSameTargetTickNeeds()
+            if (ce.noFlag(CypherFlags.PIERCE_ENTITY)) next += 10 // for bounce only
+            it.put(target.id, next)
+        }
+
         if (level.isClientSide) {
             if (ce.noFlag(CypherFlags.SKIP_DAMAGE_CHECK))
                 target.hurtClient(ce.getDamageSource())

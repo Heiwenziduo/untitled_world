@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getAttributeOrDefault
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.CypherEntityDelegation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
@@ -70,11 +71,10 @@ interface ICypherEntity :
     ///////////////////////////// helpers /////////////////////////////////
     @EventBusSubscriber(modid = CypherNexus.MOD_ID)
     companion object {
-
         @SubscribeEvent(priority = EventPriority.NORMAL)
         private fun initCypherEntity(event: EntityJoinLevelEvent) {
             val entity = event.entity
-            if (entity is ICypherEntity) {
+            if (entity is AbstractDedicatedCypherProjectile || entity is ICypherEntity) {
                 entity.initEntity(entity)
             }
         }
@@ -93,6 +93,8 @@ interface ICypherEntity :
         const val HIT_BB_INFLATION = 0.25
 
         inline val ICypherEntity.cypher get() = cypherHolder.value()
+        fun ICypherEntity.canNotHurtOwner(): Boolean = !canHurtOwner()
+
         inline val ICypherEntity.collideWithBlocks get() = noFlagsNone(CypherFlags.IGNORE_BLOCK, CypherFlags.PENETRATE_WORLD)
         inline val ICypherEntity.collideWithEntities get() = noFlagsNone(CypherFlags.PENETRATE_WORLD)
 

@@ -209,6 +209,7 @@ abstract class AbstractDedicatedCypherProjectile(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     override fun getPickResult(): ItemStack? = null // null by default, this is the creative mod middle button pick result
     override fun isPickable() = false // false by default, entirely disable the picking activity // through canBeHitByProjectile, this also prevents cypher-projectile being select by level#getEntities
+    override fun canBeHitByProjectile() = false
     override fun canSpawnSprintParticle() = false
     /**
      * since the projectile can't exist without a related cypher,

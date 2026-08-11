@@ -47,17 +47,21 @@ interface ICypherEntityLogicContext : TraceableEntity,
     override fun getOwner(): Entity?
     fun setOwner(owner: Entity?)
 
-    fun <CE> canHurtOwner(ce: CE): Boolean where CE : Entity, CE : ICypherEntity =
-        ce.hasFlag(CypherFlags.HURT_OWNER) && ce.tickCount > 1
+    fun canHurtOwner(): Boolean
 
     /**
      * used as a factor inside `Entity.rotateTowardSpeed`,
      * the higher the faster the entity will rotate, to face the direction the deltaMovement is pointed at
      * */
-    fun getUnderwaterSpeedFactor() = 0.8
-    fun getInWallSpeedFactor() = 0.5
-    fun getBounceSpeedDegrade() = 0.9
+    fun getUnderwaterSpeedFactor(): Double = 0.8
+    fun getInWallSpeedFactor(): Double = 0.5
+    fun getBounceSpeedDegrade(): Double = 0.9
     fun getRotationSpeed(): Float = 0.25f
+    /**
+     * mainly for projectiles that can `pierce`, this defines how much ticks they can hit the same target again.
+     * better over zero...
+     * */
+    fun getHitSameTargetTickNeeds(): Int = 10
 
     /**
      *
@@ -192,9 +196,5 @@ interface ICypherEntityLogicContext : TraceableEntity,
         hooks?.playHooks(CypherHooks.ENTITY_CAPTURE) { index, hook, count ->
             hook.forEntityCaptured(index, count, ce.level(), ce, captured)
         }
-    }
-
-    companion object {
-        fun <CE> CE.canNotHurtOwner(): Boolean where CE : Entity, CE : ICypherEntity = !canHurtOwner(this)
     }
 }

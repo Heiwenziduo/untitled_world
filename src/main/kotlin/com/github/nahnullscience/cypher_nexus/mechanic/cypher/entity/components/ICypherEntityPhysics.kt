@@ -9,6 +9,7 @@ import net.minecraft.world.phys.Vec3
 
 interface ICypherEntityPhysics {
     val tickStartSpeedSqr: Double
+    val capturedInitialSpeedSqr: Double
 
     val triggerType: TriggerType
     val payload: ShotStateChunk?
