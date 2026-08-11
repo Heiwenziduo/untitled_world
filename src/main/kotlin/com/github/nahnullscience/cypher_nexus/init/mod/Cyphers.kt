@@ -16,7 +16,7 @@ import com.github.nahnullscience.cypher_nexus.content.cypher.wand_module.RecoilR
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.*
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.NONE_ATTR
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.attrConfig
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.AttrConfig
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
@@ -129,7 +129,7 @@ object Cyphers {
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
     }
-    private val configDrilling: attrConfig = {
+    private val configDrilling: AttrConfig = {
         delay(-3)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 6.0)
         projectileAttr(CypherAttributes.DAMAGE, 1.0)
@@ -157,7 +157,7 @@ object Cyphers {
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
     }
-    private val configFirework: attrConfig = {
+    private val configFirework: AttrConfig = {
         recharge(5)
         flags(CypherFlags.EXPLOSIVE, CypherFlags.SAFE_EXPLODE)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -5.0)
@@ -336,20 +336,26 @@ object Cyphers {
         flags(CypherFlags.HURT_OWNER, CypherFlags.PIERCE_ENTITY)
         shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -5.0)
     }
-    val PHANTOM_RUSH = registerCypher(AbstractJuxta::PhantomRush) {
-        manaDrain(200f)
+    private val configJuxta: AttrConfig = {
         delay(5)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.CAP_AT, 200.0)
+    }
+    val PHANTOM_RUSH = registerCypher(AbstractJuxta::PhantomRush) {
+        configJuxta()
+        manaDrain(200f)
         shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.CAP_AT, 100.0)
     }
+    val CHAOTIC_JUXTA = registerCypher(AbstractJuxta::ChaoticJuxta) {
+        configJuxta()
+        manaDrain(100f)
+    }
     val DOWNWARD_JUXTA = registerCypher(AbstractJuxta::DownwardJuxta) {
+        configJuxta()
         manaDrain(150f)
-        delay(5)
-        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.CAP_AT, 200.0)
     }
     val UPWARD_JUXTA = registerCypher(AbstractJuxta::UpwardJuxta) {
+        configJuxta()
         manaDrain(150f)
-        delay(5)
-        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.CAP_AT, 200.0)
     }
     val FORTUNE = registerModifier("fortune", 120f) {
         delay(12)
@@ -392,7 +398,7 @@ object Cyphers {
         manaDrain(0f)
         shotStateAttr(CypherAttributes.SPEED_INITIAL, AttributeOperator.MULTIPLY_TOTAL, 2.0)
     }
-    private val configOrbit: attrConfig = {
+    private val configOrbit: AttrConfig = {
         flags(CypherFlags.IGNORE_BLOCK, CypherFlags.MOTION_FOLLOWS_OWNER)
         shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 50.0)
         shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.SET_ALL, 0.0)
@@ -547,7 +553,7 @@ object Cyphers {
         manaDrain(10f)
         draw(1)
     }
-    private val configLongDistance: attrConfig = {
+    private val configLongDistance: AttrConfig = {
         draw(1)
         flags(CypherFlags.PENETRATE_WORLD)
         projectileAttr(CypherAttributes.SPEED_INITIAL, 8.0)
@@ -652,12 +658,12 @@ object Cyphers {
      * */
     @Suppress("UNCHECKED_CAST")
     private fun <CY: AbstractCypher> registerCypher(
-        constructor: (builder: attrConfig) -> CY,
-        defaultAttribute: attrConfig = NONE_ATTR
+        constructor: (builder: AttrConfig) -> CY,
+        defaultAttribute: AttrConfig = NONE_ATTR
     ): Holder<CY> = registerCypher(constructor(defaultAttribute))
 
     private fun <CY: AbstractCypher> registerCypher(
-        constructor: (builder: attrConfig) -> CY,
+        constructor: (builder: AttrConfig) -> CY,
         manaDrain: Float
     ): Holder<CY> = registerCypher(constructor { manaDrain(manaDrain) })
 

@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherSteerers.NO_STEERER
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherSteerers.SLOW_BOOT_STEERER
+import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
@@ -11,12 +12,15 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.Abs
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickBehaviorHook
 import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.randomInCone
+import com.github.nahnullscience.cypher_nexus.utility.toVec3
 import net.minecraft.core.Direction
 import net.minecraft.core.Holder
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
+import org.joml.Vector3f
+import kotlin.math.PI
 
 /**
  * continuously generate `illusions` during lifetime
@@ -32,6 +36,9 @@ abstract class AbstractJuxta(
     protected open val illusionSteerer: Holder<AbstractCypherSteerer> = NO_STEERER
     protected abstract fun <CE> shootingPosPair(cyEntity: CE): PosDirePair where CE : Entity, CE : ICypherEntity
     protected open fun <CE> isJuxtaTime(cyEntity: CE): Boolean where CE : Entity, CE : ICypherEntity {
+        cyEntity.ccMap?.getCount(Cyphers.PHANTOM_RUSH)?.let {
+            if (it > 0) return (cyEntity.tickCount - 1) and 3 == 3
+        }
         return (cyEntity.tickCount - 1) and 7 == 7
     }
 
@@ -58,13 +65,21 @@ abstract class AbstractJuxta(
         override fun <CE> shootingPosPair(cyEntity: CE): PosDirePair where CE : Entity, CE : ICypherEntity {
             val dire: Vec3
             cyEntity.deltaMovement.let {
-                dire = if (it == Vec3.ZERO) Vec3.ZERO else it.randomInCone(14.0, cyEntity.random)
+                dire = if (it == Vec3.ZERO) Vec3.ZERO else it.randomInCone(6.0, cyEntity.random)
             }
             return PosDirePair(cyEntity.position(), dire)
         }
 
         override fun <CE> isJuxtaTime(cyEntity: CE): Boolean where CE : Entity, CE : ICypherEntity {
             return (cyEntity.tickCount - 1) and 3 == 3
+        }
+    }
+
+    class ChaoticJuxta(defaultAttribute: Builder.() -> Builder) : AbstractJuxta(defaultAttribute) {
+        override val resource = CypherNexus.modResource("chaotic_juxta")
+        override fun <CE> shootingPosPair(cyEntity: CE): PosDirePair where CE : Entity, CE : ICypherEntity {
+            val dire = Vector3f(1f, 0f, 0f).randomInCone(180.0, cyEntity.random)
+            return PosDirePair(cyEntity.position(), dire.toVec3())
         }
     }
 

@@ -214,6 +214,18 @@
         }
       }
     },
+    "cypher_nexus:chaotic_juxta": {
+      "delay": 5,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 100.0,
+      "recharge": 0,
+      "shotState": {
+        "cypher_nexus:existing": {
+          "cap_at": 200.0
+        }
+      }
+    },
     "cypher_nexus:chaotic_path": {
       "delay": 0,
       "draw": 1,
@@ -1000,7 +1012,7 @@
         "cypher_nexus:existing": 300.0,
         "cypher_nexus:friction_factor": 0.04,
         "cypher_nexus:gravity_factor": 0.04,
-        "cypher_nexus:speed": 0.7
+        "cypher_nexus:speed": 1.0
       },
       "recharge": 0
     },
