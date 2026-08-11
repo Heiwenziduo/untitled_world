@@ -15,6 +15,11 @@ const val RAD_2_ANG_F = RAD_2_ANG.toFloat()
 const val ANG_2_RAD = PI / 180.0
 const val ANG_2_RAD_F = ANG_2_RAD.toFloat()
 
+fun Double.ang2Rad() = Math.toRadians(this)
+fun Double.rad2Ang() = Math.toDegrees(this)
+
+fun Float.ang2Rad() = this * ANG_2_RAD_F
+fun Float.rad2Ang() = this * RAD_2_ANG_F
 
 /**  */
 fun Double.toSameSymbol(t: Double): Double {

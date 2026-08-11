@@ -5,9 +5,13 @@ import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.TraceableEntity
+import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
 import org.joml.Vector3f
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 object EntityUtil {
     /** check if A & B is adversarial  */
@@ -30,7 +34,7 @@ fun <CE> Entity.isOwnerOf(ce: CE): Boolean where CE : Entity, CE : ICypherEntity
 }
 
 /**
- * a direct duplication of #updateRotation in Projectile
+ * a direct duplication of [Projectile.updateRotation]
  * */
 fun Entity.rotateTowardSpeed(factor: Float) {
     val movement = this.deltaMovement
@@ -121,4 +125,40 @@ fun Entity.headLeftVectorF(partialTick: Float = 1.0f): Vector3f {
  * */
 fun Entity.perspectiveCoordinate(): CoordinateDefinition {
     return CoordinateDefinition(headLookAngle, headLeftVector())
+}
+
+/**
+ * Calculates the normalized `front` and `left` perspective vectors as if the entity
+ * were facing towards [towards], without modifying the entity's actual rotation.
+ *
+ * @param towards Target world position or direction vector.
+ * @param isAbsolutePosition Set to `true` if [towards] is a world position (default),
+ * or `false` if [towards] is already a direction vector.
+ * @param then Lambda receiving the normalized (front, left) vectors.
+ */
+inline fun Entity.whenFace(
+    towards: Vec3,
+    isAbsolutePosition: Boolean,
+    then: (front: Vec3, left: Vec3) -> Unit
+) {
+    // 1. Calculate direction vector from eye position to target
+    val dir = if (isAbsolutePosition) towards.subtract(this.eyePosition) else towards
+    val front = dir.normalize()
+
+    // 2. Derive horizontal component length squared (X^2 + Z^2)
+    val hLenSqr = front.x * front.x + front.z * front.z
+
+    // 3. Compute pitch-invariant horizontal Left vector
+    val left = if (hLenSqr > 1e-7) {
+        val hLen = sqrt(hLenSqr)
+        // Cross product of World Up (0, 1, 0) and horizontal Front (Fx, 0, Fz) -> (Fz, 0, -Fx)
+        Vec3(front.z / hLen, 0.0, -front.x / hLen)
+    } else {
+        // Fallback for pitch dead-zones (+90° / -90° looking straight UP/DOWN):
+        // Retain entity's current head Yaw
+        val yawRad = Math.toRadians(this.getViewYRot(1.0f).toDouble())
+        Vec3(cos(yawRad), 0.0, sin(yawRad))
+    }
+
+    then(front, left)
 }

@@ -7,6 +7,7 @@ import net.minecraft.util.RandomSource
 import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
+import org.joml.Vector3d
 import org.joml.Vector3f
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.*
@@ -32,6 +33,8 @@ operator fun Vector3f.times(v: Double) = times(v.toFloat())
 operator fun Vector3f.times(v: Float) = Vector3f(x * v, y * v, z * v)
 operator fun Vector3f.plus(v: Vector3f) = Vector3f(x + v.x, y + v.y, z + v.z)
 fun Vector3f.set(v3: Vec3): Vector3f = set(v3.x, v3.y, v3.z)
+
+fun Vector3d.toVec3(): Vec3 = Vec3(x, y, z)
 
 fun Vec3.coerceMaxLength(length: Double): Vec3 {
     val lengthSqr = x * x + y * y + z * z
@@ -361,4 +364,13 @@ inline fun checkAABBIntersection(
 fun directionFromAxisAndSign(axis: Axis, sign: Double): Direction {
     require(abs(sign) > 1e-12)
     return if (sign > 0) axis.positive else axis.negative
+}
+
+fun Axis.randomPerpendicularNormal(random: RandomSource): Vec3 {
+    val v = random.nextDouble() * Math.TAU
+    return when(this) {
+        Axis.X -> Vec3(0.0, sin(v), cos(v))
+        Axis.Y -> Vec3(sin(v), 0.0, cos(v))
+        Axis.Z -> Vec3(sin(v), cos(v), 0.0)
+    }
 }

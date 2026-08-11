@@ -1,19 +1,20 @@
 package com.github.nahnullscience.cypher_nexus.init
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.Arrow
-import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.BubbleColumn
-import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.DrillingBlast
-import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.DrillingBolt
-import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.EnderRecall
-import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.EnderTeleportation
-import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.FireworkRocket
-import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.LlamaSpit
-import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.SmokeBomb
-import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.Snowball
-import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.SpawnEgg
-import com.github.nahnullscience.cypher_nexus.content.entity.statics.SummonedExplosion
-import com.github.nahnullscience.cypher_nexus.content.entity.statics.SummonedLightning
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.Arrow
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.BubbleColumn
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.DrillingBlast
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.DrillingBolt
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.EnderRecall
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.EnderTeleportation
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.FireworkRocket
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.LlamaSpit
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.SmokeBomb
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.Snowball
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.SpawnEgg
+import com.github.nahnullscience.cypher_nexus.content.entity.static_projectile.SummonedExplosion
+import com.github.nahnullscience.cypher_nexus.content.entity.static_projectile.SummonedLightning
+import com.github.nahnullscience.cypher_nexus.content.entity.utility.DistanceDeliverer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
@@ -47,6 +48,8 @@ object ModEntities {
     val CYPHER_EXPLOSION = registerDedicated("cypher_explosion", ::SummonedExplosion)
     val CYPHER_LIGHTING = registerDedicated("cypher_lighting", ::SummonedLightning)
 
+    // utility //////////////////////////////////////////////////////////////////////////////////
+    val CYPHER_DISTANCE_DELIVERER = registerDedicated("cypher_distance_deliverer", ::DistanceDeliverer)
 
     /**
      * @see [EntityType]

@@ -1,9 +1,8 @@
-package com.github.nahnullscience.cypher_nexus.content.entity.projectiles
+package com.github.nahnullscience.cypher_nexus.content.entity.projectile
 
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ExplosionSettings
-import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.sounds.SoundEvents
 import net.minecraft.world.entity.EntityType

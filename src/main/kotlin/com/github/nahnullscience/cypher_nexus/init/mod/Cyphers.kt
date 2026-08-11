@@ -7,6 +7,7 @@ import com.github.nahnullscience.cypher_nexus.content.cypher.AbstractSimpleProje
 import com.github.nahnullscience.cypher_nexus.content.cypher.SimpleNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.*
+import com.github.nahnullscience.cypher_nexus.content.cypher.utility.AbstractDistanceDeliver
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.InnerForceCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.ProteusCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.utility.RefresherRingCypher
@@ -533,6 +534,16 @@ object Cyphers {
     val PROTEUS = registerCypher(::ProteusCypher) {
         manaDrain(10f)
         draw(1)
+    }
+    val LONG_DISTANCE_PROJECTION = registerCypher(AbstractDistanceDeliver::LongDistanceProjection) {
+        manaDrain(0f)
+        draw(1)
+        delay(-2)
+        flags(CypherFlags.PENETRATE_WORLD)
+        projectileAttr(CypherAttributes.SPEED_INITIAL, 8.0)
+        projectileAttr(CypherAttributes.EXISTING, 1.0)
+        projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.0)
+        projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.0)
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

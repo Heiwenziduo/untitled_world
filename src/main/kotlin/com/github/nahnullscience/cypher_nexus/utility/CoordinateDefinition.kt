@@ -1,5 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.utility
 
+import net.minecraft.core.Direction
 import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
 
@@ -7,16 +8,21 @@ import org.joml.Quaternionf
  * assume [front] & [left] are normalized
  *
  * */
-data class CoordinateDefinition(
+class CoordinateDefinition(
     val front: Vec3,
-    val left: Vec3
+    val left: Vec3,
+    up: Vec3? = null
 ) {
-    var up = front.cross(left)
-        private set
-
+    val up = up ?: front.cross(left)
     init {
 
     }
+    constructor(front: Direction, left: Direction): this(front.unitVec3, left.unitVec3)
+
+
+    operator fun component1() = front
+    operator fun component2() = left
+    operator fun component3() = up
 
     val reX get() = left
     val reY get() = up
@@ -42,5 +48,9 @@ data class CoordinateDefinition(
     }
 
     companion object {
+        fun fromFrontUp(front: Vec3, up: Vec3): CoordinateDefinition {
+            val left = up.cross(front)
+            return CoordinateDefinition(front, left, up)
+        }
     }
 }

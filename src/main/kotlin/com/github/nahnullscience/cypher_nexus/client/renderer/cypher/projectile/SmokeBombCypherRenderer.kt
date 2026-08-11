@@ -1,7 +1,8 @@
-package com.github.nahnullscience.cypher_nexus.client.renderer.cypher
+package com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile
 
 import com.github.nahnullscience.cypher_nexus.client.particle.addCypherTrailParticle
-import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.SmokeBomb
+import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.SimpleParticleProjectileRenderer
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.SmokeBomb
 import com.github.nahnullscience.cypher_nexus.utility.linearInterpolateGaps
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context

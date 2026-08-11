@@ -1,9 +1,9 @@
-package com.github.nahnullscience.cypher_nexus.client.renderer.cypher
+package com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile
 
-import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.LlamaSpitCypherRenderState
-import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.LlamaSpit
+import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.AbstractCypherRenderer
+import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.projectile.LlamaSpitCypherRenderState
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.LlamaSpit
 import com.mojang.blaze3d.vertex.PoseStack
-import com.mojang.math.Axis
 import net.minecraft.client.model.animal.llama.LlamaSpitModel
 import net.minecraft.client.model.geom.ModelLayers
 import net.minecraft.client.renderer.SubmitNodeCollector

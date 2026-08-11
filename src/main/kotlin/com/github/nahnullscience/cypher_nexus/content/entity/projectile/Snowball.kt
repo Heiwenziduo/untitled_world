@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.content.entity.projectiles
+package com.github.nahnullscience.cypher_nexus.content.entity.projectile
 
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers.SNOWBALL
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile

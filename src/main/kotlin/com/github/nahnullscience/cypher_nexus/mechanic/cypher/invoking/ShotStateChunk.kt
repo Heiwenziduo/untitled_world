@@ -143,11 +143,11 @@ class ShotStateChunk private constructor (
         // generate bullets
         simpleProjectiles.reference2IntEntrySet().forEach { (cypher, count) ->
             repeat(count) {
-                spawnOne(cypher, null, invokerCoordinate, hookedPosDire, level, owner, directInvoker)
+                wrapSpawn(cypher, null, invokerCoordinate, hookedPosDire, level, owner, directInvoker)
             }
         }
         triggeredProjectiles.forEach { node ->
-            spawnOne(node.instance, node, invokerCoordinate, hookedPosDire, level, owner, directInvoker)
+            wrapSpawn(node.instance, node, invokerCoordinate, hookedPosDire, level, owner, directInvoker)
         }
 
         Profiler.get().pop()
@@ -157,7 +157,7 @@ class ShotStateChunk private constructor (
     /**
      * wrap [spawnProjectile] for pattern & chain effect supports
      * */
-    private fun spawnOne(
+    private fun wrapSpawn(
         cypher: AbstractProjectileCypher<*>,
         node: ProjectileNode?,
         coordinate: CoordinateDefinition,

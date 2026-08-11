@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.content.entity.statics
+package com.github.nahnullscience.cypher_nexus.content.entity.static_projectile
 
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers.EXPLOSION
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile

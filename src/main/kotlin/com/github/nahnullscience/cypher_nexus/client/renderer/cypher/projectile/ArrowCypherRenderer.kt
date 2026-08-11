@@ -1,11 +1,11 @@
-package com.github.nahnullscience.cypher_nexus.client.renderer.cypher
+package com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile
 
 import com.github.nahnullscience.cypher_nexus.client.particle.addCypherTrailParticle
-import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.ArrowCypherRenderState
-import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.Arrow
+import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.AbstractCypherRenderer
+import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.projectile.ArrowCypherRenderState
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.Arrow
 import com.github.nahnullscience.cypher_nexus.utility.linearInterpolateTimes
 import com.mojang.blaze3d.vertex.PoseStack
-import com.mojang.math.Axis
 import net.minecraft.client.model.geom.ModelLayers
 import net.minecraft.client.model.`object`.projectile.ArrowModel
 import net.minecraft.client.multiplayer.ClientLevel
@@ -55,8 +55,8 @@ class ArrowCypherRenderer (
         yo: Double,
         zo: Double
     ) {
-        val speed = entity.knownMovement
-        if (entity.tickCount and 1 == 1)
+        val speed = entity.deltaMovement
+        if (entity.tickCount and 1 == 1 && entity.tickStartSpeedSqr >= 2)
         linearInterpolateTimes(xo, yo, zo, x, y, z, 1) { step, x, y, z ->
             addCypherTrailParticle(
                 entity,

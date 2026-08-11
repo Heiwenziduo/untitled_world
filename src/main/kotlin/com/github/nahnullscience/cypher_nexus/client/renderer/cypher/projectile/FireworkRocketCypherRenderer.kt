@@ -1,12 +1,13 @@
-package com.github.nahnullscience.cypher_nexus.client.renderer.cypher
+package com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile
 
 import com.github.nahnullscience.cypher_nexus.client.particle.addCypherTrailParticle
-import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.FireworkRocketCypherRenderState
-import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.FireworkRocket
-import com.github.nahnullscience.cypher_nexus.content.entity.projectiles.FireworkRocket.RandomFireRocket
+import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.AbstractCypherRenderer
+import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.projectile.FireworkRocketCypherRenderState
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.FireworkRocket
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.FireworkRocket.RandomFireRocket
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
-import com.github.nahnullscience.cypher_nexus.utility.ANG_2_RAD_F
 import com.github.nahnullscience.cypher_nexus.utility.Colors
+import com.github.nahnullscience.cypher_nexus.utility.ang2Rad
 import com.github.nahnullscience.cypher_nexus.utility.linearInterpolateGaps
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.multiplayer.ClientLevel
@@ -19,12 +20,13 @@ import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import kotlin.math.PI
 
 class FireworkRocketCypherRenderer(
     context: Context
 ) : AbstractCypherRenderer<FireworkRocket, FireworkRocketCypherRenderState>(context) {
     companion object {
-        const val UPWARD_TEXTURE_Z_ROT_RAD = -90f * ANG_2_RAD_F
+        const val UPWARD_TEXTURE_Z_ROT_RAD = -(PI / 2).toFloat()
     }
     private val itemModelResolver: ItemModelResolver = context.itemModelResolver
 
@@ -42,7 +44,7 @@ class FireworkRocketCypherRenderer(
         poseStack.scale(0.75f, 0.75f, 0.75f)
         poseStack.rotateToSpeed(state) {
             rotateZ(UPWARD_TEXTURE_Z_ROT_RAD)
-            rotateY(state.selfRotate * ANG_2_RAD_F)
+            rotateY(state.selfRotate.ang2Rad())
         }
         poseStack.translate(0f, -0.125f, 0f)
         state.item.submit(

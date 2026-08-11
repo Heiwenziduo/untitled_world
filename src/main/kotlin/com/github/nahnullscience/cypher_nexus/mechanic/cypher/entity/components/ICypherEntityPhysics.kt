@@ -3,10 +3,12 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
+import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
 import net.minecraft.world.phys.Vec3
 
 interface ICypherEntityPhysics {
+    val tickStartSpeedSqr: Double
 
     val triggerType: TriggerType
     val payload: ShotStateChunk?
@@ -21,7 +23,7 @@ interface ICypherEntityPhysics {
     /**
      *
      * */
-    fun trigger(type: TriggerType, releaseTo: PosDirePair)
+    fun trigger(coordinate: CoordinateDefinition, releaseTo: PosDirePair)
 
     /**
      *

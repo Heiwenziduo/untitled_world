@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.client.renderer.cypher
 
 import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.component.ICypherEntityRenderState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
-import com.github.nahnullscience.cypher_nexus.utility.ANG_2_RAD_F
+import com.github.nahnullscience.cypher_nexus.utility.ang2Rad
 import com.github.nahnullscience.cypher_nexus.utility.toVec3
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.blaze3d.vertex.VertexConsumer
@@ -16,7 +16,6 @@ import net.minecraft.client.renderer.rendertype.RenderTypes
 import net.minecraft.client.renderer.state.level.CameraRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f
 import org.joml.Quaternionf
 import org.joml.Vector3f
@@ -144,8 +143,8 @@ abstract class AbstractCypherRenderer <CE, State> (
         }
 
         inline fun rotateOfSpeed(state: ICypherEntityRenderState, config: Quaternionf.() -> Unit): Quaternionf {
-            val yr = (state.yRot - 90.0f) * ANG_2_RAD_F
-            val xr = state.xRot * ANG_2_RAD_F
+            val yr = (state.yRot - 90.0f).ang2Rad()
+            val xr = state.xRot.ang2Rad()
             return Quaternionf().rotateY(yr).rotateZ(xr).also { it.config() }
         }
         fun rotateOfSpeed(state: ICypherEntityRenderState) = rotateOfSpeed(state) { }

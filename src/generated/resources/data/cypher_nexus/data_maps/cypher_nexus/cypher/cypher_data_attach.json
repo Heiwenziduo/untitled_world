@@ -864,6 +864,19 @@
         }
       }
     },
+    "cypher_nexus:long_distance_projection": {
+      "delay": -2,
+      "draw": 1,
+      "flags": 8,
+      "manaDrain": 0.0,
+      "projectile": {
+        "cypher_nexus:existing": 1.0,
+        "cypher_nexus:friction_factor": 0.0,
+        "cypher_nexus:gravity_factor": 0.0,
+        "cypher_nexus:speed": 8.0
+      },
+      "recharge": 0
+    },
     "cypher_nexus:mana_surge": {
       "delay": 4,
       "draw": 1,

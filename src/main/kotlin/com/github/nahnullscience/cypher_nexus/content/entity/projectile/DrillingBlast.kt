@@ -1,13 +1,13 @@
-package com.github.nahnullscience.cypher_nexus.content.entity.projectiles
+package com.github.nahnullscience.cypher_nexus.content.entity.projectile
 
-import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers.ENDER_RECALL
+import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
-class EnderRecall(
+class DrillingBlast(
     entityType: EntityType<out AbstractDedicatedCypherProjectile>,
     level: Level
-) : EnderTeleportation(entityType, level) {
-    override val cypherHolder = ENDER_RECALL
+) : AbstractDedicatedCypherProjectile(entityType, level) {
+    override val cypherHolder = Cyphers.DRILLING_BLAST
 }

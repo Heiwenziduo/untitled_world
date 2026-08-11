@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.content.entity.projectiles
+package com.github.nahnullscience.cypher_nexus.content.entity.projectile
 
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers.FIREWORK_ROCKET
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers.RANDOM_FIREWORK_ROCKET

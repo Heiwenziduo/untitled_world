@@ -7,6 +7,12 @@ import com.github.nahnullscience.cypher_nexus.client.particle.CypherTrailParticl
 import com.github.nahnullscience.cypher_nexus.client.particle.CypherTrailParticleGroup.Companion.CYPHER_TRAIL_RENDER_TYPE
 import com.github.nahnullscience.cypher_nexus.client.particle.DistanceInvokeTrail
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.*
+import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.ArrowCypherRenderer
+import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.BubbleColumnCypherRenderer
+import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.FireworkRocketCypherRenderer
+import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.LlamaSpitCypherRenderer
+import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.SmokeBombCypherRenderer
+import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.utility.DistanceDeliverCypherRenderer
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.init.ModParticleTypes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
@@ -90,8 +96,14 @@ object ClientSetup {
         //////////////////////////////////////////////////////////////////////////////
         // static
         //////////////////////////////////////////////////////////////////////////////
-        event.registerEntityRenderer(ModEntities.CYPHER_EXPLOSION, ::SimpleSummonerRenderer)
-        event.registerEntityRenderer(ModEntities.CYPHER_LIGHTING, ::SimpleSummonerRenderer)
+        event.registerEntityRenderer(ModEntities.CYPHER_EXPLOSION, ::InvisibleRenderer)
+        event.registerEntityRenderer(ModEntities.CYPHER_LIGHTING, ::InvisibleRenderer)
+
+        //////////////////////////////////////////////////////////////////////////////
+        // utility
+        //////////////////////////////////////////////////////////////////////////////
+        event.registerEntityRenderer(ModEntities.CYPHER_DISTANCE_DELIVERER, ::DistanceDeliverCypherRenderer)
+
     }
 
     @SubscribeEvent

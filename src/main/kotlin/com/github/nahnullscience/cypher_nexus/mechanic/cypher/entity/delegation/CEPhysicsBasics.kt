@@ -19,6 +19,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.*
 import net.minecraft.core.Direction
+import net.minecraft.core.Direction.Axis
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
@@ -32,6 +33,7 @@ import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.HitResult.Type
 import net.minecraft.world.phys.Vec3
+import org.joml.Vector3d
 import kotlin.math.pow
 
 open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypherEntity {
@@ -39,6 +41,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     protected val level get() = ce.level()
     protected val random get() = ce.random
 
+    override var tickStartSpeedSqr: Double = 0.0
 
     override var triggerType = TriggerType.NONE
     override var payload: ShotStateChunk? = null
@@ -75,33 +78,48 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         val f: Double =
             if (ce.isInWater) ce.getUnderwaterSpeedFactor() * ce.getSpeedFactor()
             else ce.getSpeedFactor()
-        if (f != 1.0) ce.deltaMovement *= f
+        if (f >= 1.0 && tickStartSpeedSqr >= 64.0) return
+        else ce.deltaMovement *= f
     }
 
-    override fun trigger(type: TriggerType, releaseTo: PosDirePair) {
+    override fun trigger(coordinate: CoordinateDefinition, releaseTo: PosDirePair) {
         payload?.release(
             level,
-            ce.perspectiveCoordinate(),
+            coordinate,
             releaseTo,
             ce,
             ce.owner
         )
     }
-    protected fun trigger(type: TriggerType, releasePoint: Vec3) {
-        if (level.isClientSide) return
-        if (triggerType != TriggerType.NONE && type == triggerType)
-            when (type) {
-                TriggerType.COLLISION ->
-                    ce.trigger(type, PosDirePair(releasePoint, ce.deltaMovement.reverse()))
-                else ->
-                    ce.trigger(type, PosDirePair(releasePoint, ce.deltaMovement))
-            }
+    protected open fun handleTrigger(type: TriggerType, releasePoint: Vec3, speedDir: Vec3) {
+        if (level.isClientSide || triggerType == TriggerType.NONE || type != triggerType) return
+        ce.whenFace(speedDir, false) { front, left ->
+            val co = CoordinateDefinition(front, left)
+            val po = PosDirePair(releasePoint, speedDir)
+            trigger(co, po)
+        }
+    }
+    protected open fun handleCollisionTrigger(direction: Direction, releasePoint: Vec3, speedDir: Vec3) {
+        if (level.isClientSide || triggerType != TriggerType.COLLISION) return
+        val v3d = Vector3d()
+        when(direction.axis) {
+            Axis.X -> { v3d.y = speedDir.y; v3d.z = speedDir.z }
+            Axis.Y -> { v3d.x = speedDir.x; v3d.z = speedDir.z }
+            Axis.Z -> { v3d.x = speedDir.x; v3d.y = speedDir.y }
+        }
+        val up =
+            if (v3d.lengthSquared() > 1e-6) v3d.normalize().toVec3()
+            else direction.axis.randomPerpendicularNormal(random) // if speed vector and direction are in the same direction
+
+        val co = CoordinateDefinition.fromFrontUp(direction.unitVec3, up)
+        val po = PosDirePair(releasePoint, direction.unitVec3)
+        trigger(co, po)
     }
 
 
     override fun discardCypher(reason: DiscardReason) {
         if (level.isClientSide) { return }
-        trigger(TriggerType.DEATH, ce.position())
+        handleTrigger(TriggerType.DEATH, ce.position(), ce.deltaMovement)
         ce.explosion?.explode(level as ServerLevel, ce.x, ce.y, ce.z)
 
         when(reason){
@@ -123,12 +141,14 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
             ce.steerer.init(ce)
         }
 
+        tickStartSpeedSqr = ce.deltaMovement.lengthSqr()
+
         if (ce.tickCount == 3) {
-            capturedInitialSpeedSqr = ce.deltaMovement.lengthSqr()
-//                .also { println("== capture speed: $it ==") }
+            capturedInitialSpeedSqr = tickStartSpeedSqr
         }
 
-        if (triggerType.timer == ce.tickCount) trigger(triggerType, ce.position())
+        if (triggerType.timer == ce.tickCount)
+            handleTrigger(triggerType, ce.position(), ce.deltaMovement)
 
         // try capture on tick 1, and then every 4 ticks
         if (ce.tickCount == 1 || (ce.tickCount - 2) and 3 == 3) ce.captureSurroundings(ce)
@@ -297,15 +317,15 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     // if implementing it inside ICypherEntity as a default function, there will be one more step to link to the function
     // cyEntity.whenHit -> Delegation.whenHit -> interface default
     protected open fun whenHitDelegate(result: HitResult, stepMove: Vec3, direction: Direction?) {
+        if (result.type == Type.MISS) return
         val dir = direction ?: run {
-            if (stepMove.lengthSqr() > KINETIC_DAMAGE_SPEED_SQR) stepMove.mostAlignedDirection()
+            if (tickStartSpeedSqr > KINETIC_DAMAGE_SPEED_SQR) stepMove.mostAlignedDirection()
             else return
         }
 
         ce.whenHit(result, dir)
         ce.onHit(ce, result)
-        if (level.isClientSide || result.type == Type.MISS) return
-        trigger(TriggerType.COLLISION, result.location)
+        handleCollisionTrigger(dir, result.location, stepMove)
 
         if (result is EntityHitResult) {
             whenHitEntityDelegate(result, dir)
@@ -351,7 +371,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     protected open fun onLowSpeedCheck() {
         if (ce.noFlagsNone(CypherFlags.PHYSICS_SOLID, CypherFlags.MOTION_FOLLOWS_OWNER) &&
             capturedInitialSpeedSqr > LOW_SPEED_THRESHOLD_SQR &&
-            ce.deltaMovement.lengthSqr() <= LOW_SPEED_THRESHOLD_SQR)
+            tickStartSpeedSqr <= LOW_SPEED_THRESHOLD_SQR)
         {
             if (++lowSpeedTickCount > 7) ce.discardCypher(DiscardReason.LOW_SPEED)
         }
