@@ -63,7 +63,7 @@ abstract class AbstractCypherRenderer <CE, State> (
     /**
      * good timing to add trail particle to the projectile, called after tick-logic has applied
      * */
-    open fun addTrailParticles(level: ClientLevel, entity: CE, x: Double, y: Double, z: Double, xo: Double, yo: Double, zo: Double) = Unit
+    open fun addTrailParticles(level: ClientLevel, ce: CE, x: Double, y: Double, z: Double, xo: Double, yo: Double, zo: Double) = Unit
 
     /**
      *

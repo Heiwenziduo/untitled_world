@@ -31,7 +31,7 @@ class DistanceDeliverCypherRenderer (
 
     override fun addTrailParticles(
         level: ClientLevel,
-        entity: DistanceDeliverer,
+        ce: DistanceDeliverer,
         x: Double, y: Double, z: Double,
         xo: Double, yo: Double, zo: Double
     ) {

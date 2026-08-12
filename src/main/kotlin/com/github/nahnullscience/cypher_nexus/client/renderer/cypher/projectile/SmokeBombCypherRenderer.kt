@@ -12,7 +12,7 @@ class SmokeBombCypherRenderer(context: Context) : SimpleParticleProjectileRender
 
     override fun addTrailParticles(
         level: ClientLevel,
-        entity: SmokeBomb,
+        ce: SmokeBomb,
         x: Double,
         y: Double,
         z: Double,
@@ -21,7 +21,7 @@ class SmokeBombCypherRenderer(context: Context) : SimpleParticleProjectileRender
         zo: Double
     ) {
         linearInterpolateGaps(xo, yo, zo, x, y, z, 0.35) { step, x, y, z ->
-            addCypherTrailParticle(entity, ParticleTypes.CAMPFIRE_COSY_SMOKE, x, y, z, 0.0, 0.0, 0.0) {
+            addCypherTrailParticle(ce, ParticleTypes.CAMPFIRE_COSY_SMOKE, x, y, z, 0.0, 0.0, 0.0) {
                 lifetime += 60
             }
         }

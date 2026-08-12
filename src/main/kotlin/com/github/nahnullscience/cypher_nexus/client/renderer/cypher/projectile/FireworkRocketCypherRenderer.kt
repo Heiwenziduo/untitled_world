@@ -61,7 +61,7 @@ class FireworkRocketCypherRenderer(
 
     override fun addTrailParticles(
         level: ClientLevel,
-        entity: FireworkRocket,
+        ce: FireworkRocket,
         x: Double,
         y: Double,
         z: Double,
@@ -69,9 +69,9 @@ class FireworkRocketCypherRenderer(
         yo: Double,
         zo: Double
     ) {
-        val speed = entity.knownMovement
-        val random = entity.random
-        val scale = entity.getEffectRadius().coerceIn(0.25f, 2f) // vanilla firework can't be easily scale, that's a shame
+        val speed = ce.knownMovement
+        val random = ce.random
+        val scale = ce.getEffectRadius().coerceIn(0.25f, 2f) // vanilla firework can't be easily scale, that's a shame
         linearInterpolateGaps(xo, yo, zo, x, y, z, 0.4) { step, x, y, z ->
             addCypherTrailParticle(
                 ParticleTypes.FIREWORK,
@@ -83,18 +83,18 @@ class FireworkRocketCypherRenderer(
                 scale(scale)
                 lifetime = 11
 
-                if (entity is RandomFireRocket) {
+                if (ce is RandomFireRocket) {
                     if (random.nextDouble() > 0.33) {
                         val id = random.nextInt(15)
                         Colors.vanillaDyeColorsFirework[id].let {
                             setColor(it[0], it[1], it[2])
                         }
                     }
-                    if (entity.dyed) {
-                        setAlpha(entity.hueFloatArray[3])
+                    if (ce.dyed) {
+                        setAlpha(ce.hueFloatArray[3])
                     }
-                } else if (entity.dyed) {
-                    entity.hueFloatArray.let {
+                } else if (ce.dyed) {
+                    ce.hueFloatArray.let {
                         setColor(it[0], it[1], it[2])
                         setAlpha(it[3])
                     }

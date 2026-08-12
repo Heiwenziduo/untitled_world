@@ -47,7 +47,7 @@ class ArrowCypherRenderer (
 
     override fun addTrailParticles(
         level: ClientLevel,
-        entity: Arrow,
+        ce: Arrow,
         x: Double,
         y: Double,
         z: Double,
@@ -55,11 +55,11 @@ class ArrowCypherRenderer (
         yo: Double,
         zo: Double
     ) {
-        val speed = entity.deltaMovement
-        if (entity.tickCount and 1 == 1 && entity.tickStartSpeedSqr >= 2)
+        val speed = ce.deltaMovement
+        if (ce.tickCount and 1 == 1 && ce.tickStartSpeedSqr >= 2)
         linearInterpolateTimes(xo, yo, zo, x, y, z, 1) { step, x, y, z ->
             addCypherTrailParticle(
-                entity,
+                ce,
                 ParticleTypes.CRIT,
                 x, y, z,
                 -speed.x * 0.25,

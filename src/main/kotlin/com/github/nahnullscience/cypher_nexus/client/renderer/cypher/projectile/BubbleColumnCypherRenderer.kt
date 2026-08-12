@@ -16,7 +16,7 @@ class BubbleColumnCypherRenderer(context: Context) : SimpleParticleProjectileRen
 
     override fun addTrailParticles(
         level: ClientLevel,
-        entity: BubbleColumn,
+        ce: BubbleColumn,
         x: Double,
         y: Double,
         z: Double,
@@ -25,7 +25,7 @@ class BubbleColumnCypherRenderer(context: Context) : SimpleParticleProjectileRen
         zo: Double
     ) {
         linearInterpolateGaps(xo, yo, zo, x, y, z, 0.25) { step, x, y, z ->
-            addCypherTrailParticle(entity, ParticleTypes.BUBBLE, x, y, z, 0.0, 0.0, 0.0)
+            addCypherTrailParticle(ce, ParticleTypes.BUBBLE, x, y, z, 0.0, 0.0, 0.0)
         }
     }
 

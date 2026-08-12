@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile
 import com.github.nahnullscience.cypher_nexus.client.particle.addCypherTrailParticle
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.SimpleItemProjectileRenderer
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.Pinky
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
 import com.github.nahnullscience.cypher_nexus.utility.getArrayRGB
 import com.github.nahnullscience.cypher_nexus.utility.linearInterpolateGaps
 import net.minecraft.client.multiplayer.ClientLevel
@@ -16,7 +17,7 @@ class PinkyCypherRenderer(
 ) : SimpleItemProjectileRenderer<Pinky>(context, Items.SLIME_BALL) {
     override fun addTrailParticles(
         level: ClientLevel,
-        entity: Pinky,
+        ce: Pinky,
         x: Double,
         y: Double,
         z: Double,
@@ -24,7 +25,8 @@ class PinkyCypherRenderer(
         yo: Double,
         zo: Double
     ) {
-        val speed = entity.deltaMovement
+        val speed = ce.deltaMovement
+        val scale = ce.getEffectRadius().coerceIn(0.25f, 4f)
         linearInterpolateGaps(xo, yo, zo, x, y, z, 0.25) { step, x, y, z ->
             addCypherTrailParticle(
                 ParticleTypes.CLOUD,
@@ -33,7 +35,11 @@ class PinkyCypherRenderer(
                 -speed.y * 0.25,
                 -speed.z * 0.25
             ) {
-                setColor(pinkF[0], pinkF[1], pinkF[2])
+                scale(scale)
+                if (ce.dyed) ce.hueFloatArray.let {
+                    setColor(it[0], it[1], it[2])
+                    setAlpha(it[3])
+                } else setColor(pinkF[0], pinkF[1], pinkF[2])
             }
         }
     }
