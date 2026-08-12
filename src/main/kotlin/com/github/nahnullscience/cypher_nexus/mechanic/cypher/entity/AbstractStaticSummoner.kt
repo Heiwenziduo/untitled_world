@@ -3,6 +3,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.setAttribute
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
@@ -20,9 +21,13 @@ abstract class AbstractStaticSummoner(
         setAttribute(CypherAttributes.EXISTING, 2.0)
     }
 
-    override fun <CE> beforeDiscardServer(ce: CE, reason: DiscardReason) where CE : Entity, CE : ICypherEntity {
+    override fun <CE> beforeDiscardServer(
+        ce: CE,
+        level: ServerLevel,
+        reason: DiscardReason
+    ) where CE : Entity, CE : ICypherEntity {
         summon()
-        super.beforeDiscardServer(ce, reason)
+        super.beforeDiscardServer(ce, level, reason)
     }
 
     abstract fun summon()

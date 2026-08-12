@@ -34,6 +34,10 @@ operator fun Vector3f.times(v: Float) = Vector3f(x * v, y * v, z * v)
 operator fun Vector3f.plus(v: Vector3f) = Vector3f(x + v.x, y + v.y, z + v.z)
 fun Vector3f.set(v3: Vec3): Vector3f = set(v3.x, v3.y, v3.z)
 
+
+//fun Vector3f.rotateAxis(rad: Float, axis: Vec3): Vector3f =
+//    rotateAxis(rad, axis.x.toFloat(), axis.y.toFloat(), axis.z.toFloat())
+
 fun Vector3d.toVec3(): Vec3 = Vec3(x, y, z)
 
 fun Vec3.coerceMaxLength(length: Double): Vec3 {

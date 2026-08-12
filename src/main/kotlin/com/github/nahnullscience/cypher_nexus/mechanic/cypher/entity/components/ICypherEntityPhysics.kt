@@ -5,6 +5,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
+import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 
 interface ICypherEntityPhysics {
@@ -30,6 +31,11 @@ interface ICypherEntityPhysics {
      *
      * */
     fun discardCypher(reason: DiscardReason)
+
+    /**
+     *
+     * */
+    fun explode(level: Level, x: Double, y: Double, z: Double, factor: Float = 1f): Boolean
 
     /**
      * should call inside Entity#tick, this handles all cypher-related logic

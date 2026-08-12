@@ -1,8 +1,10 @@
 package com.github.nahnullscience.cypher_nexus.utility
 
 import net.minecraft.core.Direction
+import net.minecraft.core.Direction.Axis
 import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
+import org.joml.Vector3d
 
 /**
  * assume [front] & [left] are normalized
@@ -51,6 +53,27 @@ class CoordinateDefinition(
         fun fromFrontUp(front: Vec3, up: Vec3): CoordinateDefinition {
             val left = up.cross(front)
             return CoordinateDefinition(front, left, up)
+        }
+
+        /**
+         *
+         * */
+        inline fun faceDirectionWithUpVector(
+            direction: Direction,
+            approximateUp: Vec3,
+            fallback: () -> Vec3
+        ): CoordinateDefinition {
+            val v3d = Vector3d()
+            when(direction.axis) {
+                Axis.X -> { v3d.y = approximateUp.y; v3d.z = approximateUp.z }
+                Axis.Y -> { v3d.x = approximateUp.x; v3d.z = approximateUp.z }
+                Axis.Z -> { v3d.x = approximateUp.x; v3d.y = approximateUp.y }
+            }
+            val up =
+                if (v3d.lengthSquared() > 1e-6) v3d.normalize().toVec3()
+                else fallback() // if speed vector and direction are in the same direction
+
+            return fromFrontUp(direction.unitVec3, up)
         }
     }
 }

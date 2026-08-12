@@ -37,26 +37,29 @@ open class EnderTeleportation(
     }
 
 
-    override fun <CE> beforeDiscardServer(ce: CE, reason: DiscardReason) where CE : Entity, CE : ICypherEntity {
-        if (level().isServerSide && owner() != null) {
-            owner()?.let { owner ->
-                // compare to #teleportTo on Entity, this can handle dimension
-                // owner()?.teleportTo(x, y, z)
-                owner.teleport(TeleportTransition(
-                    level() as ServerLevel,
-                    position(),
-                    owner.deltaMovement,
-                    owner.yRot,
-                    owner.xRot,
-                    TeleportTransition.DO_NOTHING
-                )).let { newOwner ->
-                    newOwner?.resetFallDistance()
-                    if (newOwner is LivingEntity) newOwner.resetCurrentImpulseContext()
-                }
-                level().playSound(null, x, y, z, SoundEvents.PLAYER_TELEPORT, SoundSource.PLAYERS)
-            }
-        }
 
-        super.beforeDiscardServer(ce, reason)
+
+    override fun <CE> beforeDiscardServer(
+        ce: CE,
+        level: ServerLevel,
+        reason: DiscardReason
+    ) where CE : Entity, CE : ICypherEntity {
+        owner()?.let { owner ->
+            // compare to #teleportTo on Entity, this can handle dimension
+            // owner()?.teleportTo(x, y, z)
+            owner.teleport(TeleportTransition(
+                level,
+                position(),
+                owner.deltaMovement,
+                owner.yRot,
+                owner.xRot,
+                TeleportTransition.DO_NOTHING
+            )).let { newOwner ->
+                newOwner?.resetFallDistance()
+                if (newOwner is LivingEntity) newOwner.resetCurrentImpulseContext()
+            }
+            level().playSound(null, x, y, z, SoundEvents.PLAYER_TELEPORT, SoundSource.PLAYERS)
+        }
+        super.beforeDiscardServer(ce, level, reason)
     }
 }

@@ -2,9 +2,7 @@ package com.github.nahnullscience.cypher_nexus.utility.mod
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap
-import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
 import net.minecraft.core.Holder
-import kotlin.collections.MutableMap.MutableEntry
 
 /**
  * ccMap or MoCC,
@@ -31,5 +29,8 @@ open class MapOfCypherCounts(capa: Int = 32) : Reference2IntLinkedOpenHashMap<Ab
     }
 
     fun getCount(cy: AbstractCypher): Int = getInt(cy)
-    fun getCount(cy: Holder<out AbstractCypher>): Int = getInt(cy.value())
+    fun getCount(cy: Holder<out AbstractCypher>) = getCount(cy.value())
+
+    override fun containsKey(cy: AbstractCypher): Boolean = getInt(cy) > 0
+    fun containsKey(cy: Holder<out AbstractCypher>) = containsKey(cy.value())
 }

@@ -44,6 +44,8 @@ object InvokingPatterns {
 
     val FRONT_TRIANGLE_PATTERN = registerPattern("front_triangle", ::FrontTrianglePattern)
     val FRONT_HEXAGON_PATTERN = registerPattern("front_hexagon", ::FrontHexagonPattern)
+    val FRONT_SQUARE_PATTERN = registerPattern("front_square", AbstractFrontRotationalSymmetryLayout::FrontSquarePattern)
+    val FRONT_OCTAGON_PATTERN = registerPattern("front_octagon", AbstractFrontRotationalSymmetryLayout::FrontOctagonPattern)
 
     val PERPENDICULAR_SQUARE_PATTERN = registerPattern("perpendicular_square", AbstractPerpendicularPattern::Square)
     val PERPENDICULAR_OCTAGON_PATTERN = registerPattern("perpendicular_octagon", AbstractPerpendicularPattern::Octagon)

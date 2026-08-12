@@ -17,21 +17,6 @@ class DrillingBolt(
 ) : AbstractDedicatedCypherProjectile(entityType, level) {
     override val cypherHolder = Cyphers.DRILLING_BOLT
 
-    override fun <CE> beforeDiscardServer(ce: CE, reason: DiscardReason) where CE : Entity, CE : ICypherEntity {
-//        var pos = blockPosition()
-//        var block = level().getBlockState(pos)
-//        if (block.isAir) {
-//            val d = deltaMovement.mostAlignedDirection()
-//            pos = pos.relative(d)
-//            block = level().getBlockState(pos)
-//        }
-//        if (!block.isEmpty) {
-//            println("$block is not empty")
-//        }
-//        val id = owner()?.id ?: id
-//        level().destroyBlockProgress(id, pos, 8)
-        super.beforeDiscardServer(ce, reason)
-    }
 
     override fun whenHitBlock(result: BlockHitResult, direction: Direction) {
         var pos = blockPosition()

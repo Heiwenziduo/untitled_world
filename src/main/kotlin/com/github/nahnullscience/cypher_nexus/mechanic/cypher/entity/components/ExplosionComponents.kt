@@ -61,13 +61,13 @@ open class ExplosionSettings <CE> (
         return (exposure * exposure * (1f - dis / rad) * base).coerceAtLeast(0.5f) // inverse proportion to the square of distance
     }
 
-    open fun explode(level: ServerLevel, x: Double, y: Double, z: Double) {
+    open fun explode(level: ServerLevel, x: Double, y: Double, z: Double, factor: Float = 1f) {
         level.explode(
             source,
             damageSource,
             this,
             x, y, z,
-            getEffectRadius(),
+            getEffectRadius() * factor,
             fire,
             blockInteract,
             smallParticle,

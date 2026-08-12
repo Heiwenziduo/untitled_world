@@ -254,13 +254,19 @@ object Cyphers {
         shotStateAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 5.0)
         shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, 0.5)
     }
+    val CRIT_PLUS = registerModifier("critical_plus", 10f) {
+        shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.2)
+    }
     val REMOVE_DAMAGE = registerModifier("remove_damage", 0f) {
         flags(CypherFlags.SAFE_EXPLODE)
         shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.SET_ALL, 0.0)
         shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.SET_ALL, 0.0)
     }
-    val CRIT_PLUS = registerModifier("critical_plus", 10f) {
-        shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.25)
+    val REMOVE_EXPLOSION = registerModifier("remove_explosion", 0f) {
+        delay(-5)
+        flags(CypherFlags.SAFE_EXPLODE)
+        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -1.0)
+        shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.2)
     }
     val PEACEFUL_MODE = registerModifier("peaceful_mode", 5f) {
         delay(-2)
@@ -287,6 +293,20 @@ object Cyphers {
     }
     val BOUNCY = registerModifier("bouncy", 5f) {
         shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.ADD, 10.0)
+    }
+    val EXPLOSIVE_BOUNCE = registerCypher(AbstractOnBounceSeries::ExplosiveBounce) {
+        manaDrain(40f)
+        delay(8)
+        flags(CypherFlags.EXPLOSIVE)
+        shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.ADD, 2.0)
+        shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 3.0)
+        shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, 0.1)
+    }
+    val JUXTA_BOUNCE = registerCypher(AbstractOnBounceSeries::JuxtaBounce) {
+        manaDrain(100f)
+        delay(10)
+        shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.ADD, 2.0)
+        shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 3.0)
     }
     val REMOVE_BOUNCE = registerModifier("remove_bounce", 0f) {
         shotStateAttr(CypherAttributes.BOUNCE, AttributeOperator.SET_ALL, 0.0)
@@ -536,6 +556,13 @@ object Cyphers {
         draw(8)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -30.0)
     }
+
+
+//    val FORMATION_TEST = registerFormation(InvokingPatterns.FRONT_SQUARE_PATTERN) {
+//        manaDrain(3f)
+//        draw(4)
+//        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -30.0)
+//    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // utility //////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -285,7 +285,7 @@ sealed class AbstractCypher(
                     }
 
                     if (values == null) values = c
-                    else values.append(";  ").append(c)
+                    else values.append("; ").append(c)
                 }
 
                 values?.let {

@@ -45,8 +45,6 @@ open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity
     override var hue: Int = 0
     override lateinit var hueFloatArray: FloatArray
 
-    override var explosion: ExplosionSettings<*>? = null
-
     private var ownerD: Entity? = null
 
     override fun initCypher(
@@ -69,14 +67,16 @@ open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity
         steerer?.let { this.steerer = it }
     }
 
-    override fun initEntity(ce: CE) = let {
-        this@CEContext.ce = ce
-        if (ce.explosion == null && ce.hasFlag(CypherFlags.EXPLOSIVE)) explosion = ExplosionSettings(ce)
-    }
+    override fun initEntity(ce: CE) { this@CEContext.ce = ce }
 
     override fun getOwner(): Entity? = ownerD
     override fun setOwner(owner: Entity?) = let { ownerD = owner }
     override fun canHurtOwner(): Boolean  = ce.hasFlag(CypherFlags.HURT_OWNER) && ce.tickCount > 1
+
+    override fun initExplosion(): ExplosionSettings<*>? {
+        return if (ce.hasFlag(CypherFlags.EXPLOSIVE)) ExplosionSettings(ce)
+        else null
+    }
 //    override fun canHitMultipleTarget(): Boolean =
 //        ce.hasFlagsAny(CypherFlags.PHYSICS_SOLID, CypherFlags.PIERCE_ENTITY) || ce.getBounce() > 0
 

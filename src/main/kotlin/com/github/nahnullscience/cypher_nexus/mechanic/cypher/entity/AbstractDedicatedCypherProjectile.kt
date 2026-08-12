@@ -47,7 +47,6 @@ abstract class AbstractDedicatedCypherProjectile(
     ICypherEntity by CypherEntityDelegation<AbstractDedicatedCypherProjectile>() {
     companion object {
 
-
     }
 
     override fun defineSynchedData(builder: SynchedEntityData.Builder) { }

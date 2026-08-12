@@ -1,7 +1,9 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation
 
+import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ExplosionSettings
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.HIT_BB_INFLATION
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.KINETIC_DAMAGE_SPEED_SQR
@@ -28,6 +30,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.ClipContext.Block
 import net.minecraft.world.level.ClipContext.Fluid
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.level.gameevent.GameEvent.Context
 import net.minecraft.world.phys.BlockHitResult
@@ -60,6 +63,9 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     protected var hitEntityInvulnerabilityMap: Int2IntOpenHashMap? = null
         private set
 
+    protected var explosion: ExplosionSettings<*>? = null
+
+
     override fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk?, node: ProjectileNode?) {
         if (node != null) {
             triggerType = node.trigger
@@ -67,16 +73,17 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         }
     }
 
-    override fun initEntity(ce: CE) = let {
+    override fun initEntity(ce: CE) {
         this@CEPhysicsBasics.ce = ce
         ce.noPhysics = ce.noFlag(CypherFlags.PHYSICS_SOLID)
 
         // if can hit multiple target...
         if (ce.hasFlagsAny(CypherFlags.PHYSICS_SOLID, CypherFlags.PIERCE_ENTITY) || ce.canBounce) {
-            hitEntityInvulnerabilityMap = Int2IntOpenHashMap(8)
+            hitEntityInvulnerabilityMap = Int2IntOpenHashMap()
         }
-    }
 
+        ce.initExplosion().also { explosion = it }
+    }
 
 
     protected open fun applyGravity() {
@@ -111,36 +118,48 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     }
     protected open fun handleCollisionTrigger(direction: Direction, releasePoint: Vec3, speedDir: Vec3) {
         if (level.isClientSide || triggerType != TriggerType.COLLISION) return
-        val v3d = Vector3d()
-        when(direction.axis) {
-            Axis.X -> { v3d.y = speedDir.y; v3d.z = speedDir.z }
-            Axis.Y -> { v3d.x = speedDir.x; v3d.z = speedDir.z }
-            Axis.Z -> { v3d.x = speedDir.x; v3d.y = speedDir.y }
-        }
-        val up =
-            if (v3d.lengthSquared() > 1e-6) v3d.normalize().toVec3()
-            else direction.axis.randomPerpendicularNormal(random) // if speed vector and direction are in the same direction
 
-        val co = CoordinateDefinition.fromFrontUp(direction.unitVec3, up)
+        val co = CoordinateDefinition.faceDirectionWithUpVector(direction, speedDir) {
+            direction.axis.randomPerpendicularNormal(random)
+        }
         val po = PosDirePair(releasePoint + direction.unitVec3 * 0.1, direction.unitVec3)
         trigger(co, po)
     }
 
 
     override fun discardCypher(reason: DiscardReason) {
-        if (level.isClientSide) { return }
+        explode(level, ce.x, ce.y, ce.z)
         handleTrigger(TriggerType.DEATH, ce.position(), ce.deltaMovement)
-        ce.explosion?.explode(level as ServerLevel, ce.x, ce.y, ce.z)
+
+        if (level.isClientSide) { return }
+        val level = level as ServerLevel
 
         when(reason){
             DiscardReason.ERASE -> {}
             else -> {
-                ce.beforeDiscardServer(ce, reason)
+                ce.beforeDiscardServer(ce, level, reason)
                 ce.steerer.discard(ce, reason)
             }
         }
         level.broadcastEntityEvent(ce, 3)
         ce.discard()
+    }
+
+
+    override fun explode(
+        level: Level,
+        x: Double,
+        y: Double,
+        z: Double,
+        factor: Float
+    ): Boolean {
+        if (ce.ccMap?.containsKey(Cyphers.REMOVE_EXPLOSION) == true) return false
+        explosion?.let {
+            if (level is ServerLevel) it.explode(level, x, y, z, factor)
+            ce.onExplode(ce)
+            return true
+        }
+        return false
     }
 
     override fun doTick() {

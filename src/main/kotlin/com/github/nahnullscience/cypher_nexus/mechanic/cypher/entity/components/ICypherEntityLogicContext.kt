@@ -4,13 +4,13 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.GENERIC_CAPTURE_RADIUS
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import net.minecraft.core.Direction
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.damagesource.DamageSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.TraceableEntity
@@ -42,12 +42,12 @@ interface ICypherEntityLogicContext : TraceableEntity,
     /** 0f~1f float representation of [hue], in order of r0 g1 b2 a3 */
     val hueFloatArray: FloatArray
 
-    val explosion: ExplosionSettings<*>?
-
     override fun getOwner(): Entity?
     fun setOwner(owner: Entity?)
 
     fun canHurtOwner(): Boolean
+
+    fun initExplosion(): ExplosionSettings<*>?
 
     /**
      * used as a factor inside `Entity.rotateTowardSpeed`,
@@ -135,12 +135,12 @@ interface ICypherEntityLogicContext : TraceableEntity,
         }
     }
     /**
-     * call on both sides, override friendly
+     * call only on server side, override friendly
      * @see CypherHooks.BEFORE_DISCARD_SERVER
      * */
-    fun <CE> beforeDiscardServer(ce: CE, reason: DiscardReason) where CE : Entity, CE : ICypherEntity {
+    fun <CE> beforeDiscardServer(ce: CE, level: ServerLevel, reason: DiscardReason) where CE : Entity, CE : ICypherEntity {
         hooks?.playHooks(CypherHooks.BEFORE_DISCARD_SERVER) { index, hook, count ->
-            hook.beforeDiscardServer(index, count, ce.level(), ce, reason)
+            hook.beforeDiscardServer(index, count, level, ce, reason)
         }
     }
     /**
@@ -185,7 +185,16 @@ interface ICypherEntityLogicContext : TraceableEntity,
      * */
     fun <CE> onBounce(ce: CE, bouncePoint: Vec3, bounceSurface: Direction, bounceCount: Int) where CE : Entity, CE : ICypherEntity {
         hooks?.playHooks(CypherHooks.ON_BOUNCE) { index, hook, count ->
-            hook.onBounce(index, count, ce.level(), ce, bounceCount, bouncePoint)
+            hook.onBounce(index, count, ce.level(), ce, bounceCount, bounceSurface, bouncePoint)
+        }
+    }
+    /**
+     * call only on server side, override friendly
+     * @see CypherHooks.ON_EXPLODE
+     * */
+    fun <CE> onExplode(ce: CE) where CE : Entity, CE : ICypherEntity {
+        hooks?.playHooks(CypherHooks.ON_EXPLODE) { index, hook, count ->
+            hook.onExplode(index, count, ce.level(), ce)
         }
     }
     /**

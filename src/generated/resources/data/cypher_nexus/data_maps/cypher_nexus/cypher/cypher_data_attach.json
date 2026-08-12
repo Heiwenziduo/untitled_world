@@ -246,7 +246,7 @@
       "recharge": 0,
       "shotState": {
         "cypher_nexus:crit_chance": {
-          "add": 0.25
+          "add": 0.2
         }
       }
     },
@@ -515,6 +515,24 @@
       "flags": 34,
       "manaDrain": 80.0,
       "recharge": 8
+    },
+    "cypher_nexus:explosive_bounce": {
+      "delay": 8,
+      "draw": 1,
+      "flags": 1024,
+      "manaDrain": 40.0,
+      "recharge": 0,
+      "shotState": {
+        "cypher_nexus:bounce": {
+          "add": 2.0
+        },
+        "cypher_nexus:effect_radius": {
+          "multiply_base": 0.1
+        },
+        "cypher_nexus:recoil": {
+          "add": 3.0
+        }
+      }
     },
     "cypher_nexus:extend_existing": {
       "delay": 5,
@@ -800,6 +818,22 @@
       "flags": 0,
       "manaDrain": 10.0,
       "recharge": 0
+    },
+    "cypher_nexus:juxta_bounce": {
+      "delay": 10,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 100.0,
+      "recharge": 0,
+      "shotState": {
+        "cypher_nexus:bounce": {
+          "add": 2.0,
+          "cap_at": 64.0
+        },
+        "cypher_nexus:recoil": {
+          "add": 3.0
+        }
+      }
     },
     "cypher_nexus:juxta_orbit": {
       "delay": 0,
@@ -1192,6 +1226,21 @@
         },
         "cypher_nexus:damage": {
           "set_all": 0.0
+        }
+      }
+    },
+    "cypher_nexus:remove_explosion": {
+      "delay": -5,
+      "draw": 1,
+      "flags": 2048,
+      "manaDrain": 0.0,
+      "recharge": 0,
+      "shotState": {
+        "cypher_nexus:damage": {
+          "add": -1.0
+        },
+        "cypher_nexus:effect_radius": {
+          "multiply_base": -0.2
         }
       }
     },

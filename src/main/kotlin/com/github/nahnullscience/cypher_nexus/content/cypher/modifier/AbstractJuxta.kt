@@ -36,8 +36,8 @@ abstract class AbstractJuxta(
     protected open val illusionSteerer: Holder<AbstractCypherSteerer> = NO_STEERER
     protected abstract fun <CE> shootingPosPair(cyEntity: CE): PosDirePair where CE : Entity, CE : ICypherEntity
     protected open fun <CE> isJuxtaTime(cyEntity: CE): Boolean where CE : Entity, CE : ICypherEntity {
-        cyEntity.ccMap?.getCount(Cyphers.PHANTOM_RUSH)?.let {
-            if (it > 0) return (cyEntity.tickCount - 1) and 3 == 3
+        cyEntity.ccMap?.containsKey(Cyphers.PHANTOM_RUSH)?.let {
+            if (it) return (cyEntity.tickCount - 1) and 3 == 3
         }
         return (cyEntity.tickCount - 1) and 7 == 7
     }

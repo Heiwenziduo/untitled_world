@@ -14,9 +14,7 @@ class SmokeBomb(
 ) : AbstractDedicatedCypherProjectile(entityType, level) {
     override val cypherHolder = Cyphers.SMOKE_BOMB
 
-    override val explosion: ExplosionSettings<*>
-
-    init {
+    override fun initExplosion(): ExplosionSettings<*> {
         val smoke = ExplosionSettings(this)
         with(smoke) {
             radiusSqr = 1f
@@ -24,6 +22,6 @@ class SmokeBomb(
 //            largeParticle = ParticleTypes.CAMPFIRE_SIGNAL_SMOKE
             sound = BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.SMOKER_SMOKE)
         }
-        explosion = smoke
+        return smoke
     }
 }

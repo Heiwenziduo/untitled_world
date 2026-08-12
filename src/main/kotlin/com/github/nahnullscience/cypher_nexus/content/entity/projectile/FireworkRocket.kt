@@ -42,9 +42,7 @@ open class FireworkRocket(
 
     override val cypherHolder = FIREWORK_ROCKET
 
-    final override val explosion: ExplosionSettings<*>
-
-    init {
+    override fun initExplosion(): ExplosionSettings<*> {
         val firework = ExplosionSettings(this)
         with(firework) {
             radiusSqr = 2f
@@ -53,7 +51,7 @@ open class FireworkRocket(
             // this cause double sound when explode at distance
             sound = BuiltInRegistries.SOUND_EVENT.wrapAsHolder(SoundEvents.FIREWORK_ROCKET_BLAST)
         }
-        explosion = firework
+        return firework
     }
 
     override fun doEntitySetup() {
