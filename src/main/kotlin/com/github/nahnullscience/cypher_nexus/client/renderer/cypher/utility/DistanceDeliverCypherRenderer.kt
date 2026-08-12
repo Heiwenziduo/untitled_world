@@ -38,9 +38,10 @@ class DistanceDeliverCypherRenderer (
         linearInterpolateGaps(xo, yo, zo, x, y, z, 0.25) { step, x, y, z ->
             addCypherTrailParticle(
                 ParticleTypes.PORTAL,
-                x, y, z,
+                x, y - 0.5, z,
                 0.0, 0.0, 0.0
             ) {
+                lifetime = 10 + step
                 scale(0.25f)
             }
         }

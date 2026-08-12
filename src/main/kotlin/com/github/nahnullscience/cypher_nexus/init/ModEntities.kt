@@ -2,12 +2,14 @@ package com.github.nahnullscience.cypher_nexus.init
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.Arrow
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.Boulder
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.BubbleColumn
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.DrillingBlast
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.DrillingBolt
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.EnderRecall
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.EnderTeleportation
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.FireworkRocket
+import com.github.nahnullscience.cypher_nexus.content.entity.projectile.LightningBolt
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.LlamaSpit
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.Pinky
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.SmokeBomb
@@ -45,6 +47,8 @@ object ModEntities {
     val CYPHER_FIREWORK_ROCKET = registerDedicated("cypher_firework_rocket", ::FireworkRocket)
     val CYPHER_RANDOM_FIREWORK_ROCKET = registerDedicated("cypher_firework_rocket_random", FireworkRocket::RandomFireRocket)
     val CYPHER_PINKY = registerDedicated("cypher_pinky", ::Pinky)
+    val CYPHER_LIGHTNING_BOLT = registerDedicated("cypher_lightning_bolt", ::LightningBolt)
+    val CYPHER_BOULDER = registerDedicated("cypher_boulder", ::Boulder)
 
     // static-projectile //////////////////////////////////////////////////////////////////////////////////
     val CYPHER_EXPLOSION = registerDedicated("cypher_explosion", ::SummonedExplosion)

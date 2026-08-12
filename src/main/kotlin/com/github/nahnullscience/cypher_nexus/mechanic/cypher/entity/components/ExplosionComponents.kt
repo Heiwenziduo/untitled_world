@@ -62,6 +62,9 @@ open class ExplosionSettings <CE> (
     }
 
     open fun explode(level: ServerLevel, x: Double, y: Double, z: Double, factor: Float = 1f) {
+        /**
+         * @see net.minecraft.world.level.ServerExplosion
+         * */
         level.explode(
             source,
             damageSource,

@@ -26,7 +26,7 @@ class PinkyCypherRenderer(
         zo: Double
     ) {
         val speed = ce.deltaMovement
-        val scale = ce.getEffectRadius().coerceIn(0.25f, 4f)
+        val scale = ce.getEffectRadius().coerceIn(0.25f, 4f) * 0.5f
         linearInterpolateGaps(xo, yo, zo, x, y, z, 0.25) { step, x, y, z ->
             addCypherTrailParticle(
                 ParticleTypes.CLOUD,
@@ -35,6 +35,7 @@ class PinkyCypherRenderer(
                 -speed.y * 0.25,
                 -speed.z * 0.25
             ) {
+                lifetime = 15
                 scale(scale)
                 if (ce.dyed) ce.hueFloatArray.let {
                     setColor(it[0], it[1], it[2])

@@ -8,8 +8,10 @@ import com.github.nahnullscience.cypher_nexus.client.particle.CypherTrailParticl
 import com.github.nahnullscience.cypher_nexus.client.particle.DistanceInvokeTrail
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.*
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.ArrowCypherRenderer
+import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.BoulderCypherRenderer
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.BubbleColumnCypherRenderer
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.FireworkRocketCypherRenderer
+import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.LightningBoltCypherRenderer
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.LlamaSpitCypherRenderer
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.PinkyCypherRenderer
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile.SmokeBombCypherRenderer
@@ -81,19 +83,22 @@ object ClientSetup {
         //////////////////////////////////////////////////////////////////////////////
         event.registerEntityRenderer(ModEntities.CYPHER_ARROW, ::ArrowCypherRenderer)
         event.registerEntityRenderer(ModEntities.CYPHER_LLAMA_SPIT, ::LlamaSpitCypherRenderer)
+        event.registerEntityRenderer(ModEntities.CYPHER_BUBBLE_COLUMN, ::BubbleColumnCypherRenderer)
+        event.registerEntityRenderer(ModEntities.CYPHER_SMOKE_BOMB, ::SmokeBombCypherRenderer)
+        event.registerEntityRenderer(ModEntities.CYPHER_FIREWORK_ROCKET, ::FireworkRocketCypherRenderer)
+        event.registerEntityRenderer(ModEntities.CYPHER_RANDOM_FIREWORK_ROCKET, ::FireworkRocketCypherRenderer)
+        event.registerEntityRenderer(ModEntities.CYPHER_PINKY, ::PinkyCypherRenderer)
+        event.registerEntityRenderer(ModEntities.CYPHER_LIGHTNING_BOLT, ::LightningBoltCypherRenderer)
+
+        event.registerEntityRenderer(ModEntities.CYPHER_BOULDER, ::BoulderCypherRenderer)
 
         event.registerItemProjectile(ModEntities.CYPHER_SNOWBALL, Items.SNOWBALL)
         event.registerItemProjectile(ModEntities.CYPHER_ENDER_RECALL, Items.ENDER_PEARL)
         event.registerItemProjectile(ModEntities.CYPHER_ENDER_TELEPORTATION, Items.ENDER_PEARL)
         event.registerItemProjectile(ModEntities.CYPHER_SPAWN_EGG, Items.EGG)
 
-        event.registerEntityRenderer(ModEntities.CYPHER_BUBBLE_COLUMN, ::BubbleColumnCypherRenderer)
         event.registerParticleProjectile(ModEntities.CYPHER_DRILLING_BOLT)
         event.registerParticleProjectile(ModEntities.CYPHER_DRILLING_BLAST)
-        event.registerEntityRenderer(ModEntities.CYPHER_SMOKE_BOMB, ::SmokeBombCypherRenderer)
-        event.registerEntityRenderer(ModEntities.CYPHER_FIREWORK_ROCKET, ::FireworkRocketCypherRenderer)
-        event.registerEntityRenderer(ModEntities.CYPHER_RANDOM_FIREWORK_ROCKET, ::FireworkRocketCypherRenderer)
-        event.registerEntityRenderer(ModEntities.CYPHER_PINKY, ::PinkyCypherRenderer)
 
         //////////////////////////////////////////////////////////////////////////////
         // static

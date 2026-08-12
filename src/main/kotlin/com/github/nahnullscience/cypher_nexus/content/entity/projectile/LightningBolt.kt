@@ -5,18 +5,18 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDed
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
-class Arrow(
+class LightningBolt(
     entityType: EntityType<out AbstractDedicatedCypherProjectile>,
     level: Level
 ) : AbstractDedicatedCypherProjectile(entityType, level) {
-    override val cypherHolder = Cyphers.ARROW
-
-    var shakeTime: Float = 0f
+    override val cypherHolder = Cyphers.LIGHTNING_BOLT
+    var seed: Long = random.nextLong()
         private set
 
-    override fun discardVisualEffect() {
-//        for (i in 0 until radiusFriendlyParticleCount(8, 64)) {
-//            level().addParticle(ItemParticleOption(ParticleTypes.ITEM, Items.ARROW), x, y, z, 0.0, 0.0, 0.0)
-//        }
+    override fun tick() {
+        super.tick()
+        seed = random.nextLong()
     }
+
+    override fun shouldRender(x: Double, y: Double, z: Double): Boolean = true // doesn't affect by distance
 }

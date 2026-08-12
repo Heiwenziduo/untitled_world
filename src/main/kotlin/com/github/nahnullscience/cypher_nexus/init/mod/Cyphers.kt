@@ -75,7 +75,7 @@ object Cyphers {
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 1.0)
         projectileAttr(CypherAttributes.DAMAGE, 3.0)
         projectileAttr(CypherAttributes.SPEED_INITIAL, 1.3)
-        projectileAttr(CypherAttributes.EXISTING, 300.0)
+        projectileAttr(CypherAttributes.EXISTING, 3000.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.01)
         projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.01)
     }
@@ -186,6 +186,29 @@ object Cyphers {
         projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.04)
         projectileAttr(CypherAttributes.BOUNCE, 25.0)
     }
+    val LIGHTNING_BOLT = registerProjectile(ModEntities.CYPHER_LIGHTNING_BOLT) {
+        manaDrain(200f)
+        delay(10)
+        recharge(10)
+        flags(CypherFlags.EXPLOSIVE, CypherFlags.WITH_ELECTRICITY, CypherFlags.GLOWING)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 12.0)
+        projectileAttr(CypherAttributes.DAMAGE, 10.0)
+        projectileAttr(CypherAttributes.SPEED_INITIAL, 2.0)
+        projectileAttr(CypherAttributes.EXISTING, 155.0)
+        projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.0)
+    }
+    val BOULDER = registerProjectile(ModEntities.CYPHER_BOULDER) {
+        manaDrain(80f)
+        recharge(8)
+        flags(CypherFlags.PHYSICS_SOLID)
+        projectileAttr(CypherAttributes.DAMAGE, 1.0)
+        projectileAttr(CypherAttributes.SPEED_INITIAL, 1.0)
+        projectileAttr(CypherAttributes.EXISTING, 1000.0)
+        projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
+        projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.04)
+    }
+
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // static projectile
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

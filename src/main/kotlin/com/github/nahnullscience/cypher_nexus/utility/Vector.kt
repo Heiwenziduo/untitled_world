@@ -119,6 +119,11 @@ fun Vec3.mostAlignedDirection(): Direction {
  *
  * */
 fun Vec3.flipByAxis(axis: Axis, factor: Double = 1.0): Vec3 {
+    if (factor == 1.0) return when(axis) {
+        Axis.X -> Vec3(-x, y, z)
+        Axis.Y -> Vec3(x, -y, z)
+        Axis.Z -> Vec3(x, y, -z)
+    }
     return when(axis) {
         Axis.X -> Vec3(-x * factor, y, z)
         Axis.Y -> Vec3(x, -y * factor, z)

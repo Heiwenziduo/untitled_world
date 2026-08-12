@@ -5,18 +5,10 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDed
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
-class Arrow(
+class Boulder(
     entityType: EntityType<out AbstractDedicatedCypherProjectile>,
     level: Level
 ) : AbstractDedicatedCypherProjectile(entityType, level) {
-    override val cypherHolder = Cyphers.ARROW
+    override val cypherHolder = Cyphers.BOULDER
 
-    var shakeTime: Float = 0f
-        private set
-
-    override fun discardVisualEffect() {
-//        for (i in 0 until radiusFriendlyParticleCount(8, 64)) {
-//            level().addParticle(ItemParticleOption(ParticleTypes.ITEM, Items.ARROW), x, y, z, 0.0, 0.0, 0.0)
-//        }
-    }
 }

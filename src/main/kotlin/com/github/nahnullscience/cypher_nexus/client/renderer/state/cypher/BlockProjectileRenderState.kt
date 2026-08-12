@@ -5,7 +5,7 @@ import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.compo
 import net.minecraft.client.renderer.block.BlockModelRenderState
 import net.minecraft.client.renderer.entity.state.EntityRenderState
 
-class BlockProjectileRenderState : EntityRenderState(),
+open class BlockProjectileRenderState : EntityRenderState(),
     ICypherEntityRenderState by CypherRenderStateDelegate()
 {
     val block: BlockModelRenderState = BlockModelRenderState()

@@ -33,7 +33,8 @@ class RecoilRocketModule(
             val dire = coo.front
             val base = invoker.deltaMovement
 
-            val next = base * 0.5 + dire * (sqrt(power) * 0.05)
+//            val next = base * 0.5 + dire * (sqrt(power) * 0.05)
+            val next = base + dire * (sqrt(power) * 0.05)
 
             invoker.deltaMovement = next
             invoker.level().takeIf { it.isClientSide }?.let { level ->

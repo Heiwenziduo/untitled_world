@@ -320,6 +320,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
                             ce.getBounceSpeedDegrade()
                         )
                         ce.setPos(stepPosition)
+                        ce.needsSync = true
                     }
                 }
 

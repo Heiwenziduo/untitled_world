@@ -38,9 +38,9 @@ open class DefaultRecoilModule(
             val dire = coo.front.reverse()
             val base = invoker.deltaMovement
 
-            val next = base * 0.5 + dire * (sqrt(power) * 0.05)
+//            val next = base * 0.5 + dire * (sqrt(power) * 0.05)
 
-            invoker.deltaMovement = next
+            invoker.deltaMovement = base + dire * (sqrt(power) * 0.05)
             if (invoker !is Player) { invoker.needsSync = true }
             return true
         }
