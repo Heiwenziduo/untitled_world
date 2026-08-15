@@ -3,12 +3,16 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.utility.finiteOrDefault
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap
+import java.util.EnumMap
 
 /**
  *
  * */
 class AttributeFastOperatorMap(capa: Int = 16) : Reference2ObjectOpenHashMap<CypherAttribute, DoubleArray>(capa) {
-    constructor(map: Map<CypherAttribute, DoubleArray>) : this(map.size) { putAll(map) }
+//    constructor(map: Map<CypherAttribute, DoubleArray>) : this(map.size) { putAll(map) }
+    constructor(map: Map<CypherAttribute, OperatorMap>) : this(map.size) {
+        map.forEach { (attribute, map) -> this@AttributeFastOperatorMap[attribute] = map.toDoubleArray() }
+    }
     init {
         defaultReturnValue(null)
     }
@@ -21,7 +25,7 @@ class AttributeFastOperatorMap(capa: Int = 16) : Reference2ObjectOpenHashMap<Cyp
 
     /***/
     fun setAttribute(attr: CypherAttribute, operator: AttributeOperator, value: Double) {
-        val da = this[attr] ?: initOperatorMap().also { this[attr] = it }
+        val da = this[attr] ?: initOperatorArray().also { this[attr] = it }
         da[operator.ordinal] = value
     }
 
@@ -29,7 +33,7 @@ class AttributeFastOperatorMap(capa: Int = 16) : Reference2ObjectOpenHashMap<Cyp
      * cumulate attribute value, return the cumulation result
      * */
     fun cumulateAttribute(attr: CypherAttribute, operator: AttributeOperator, value: Double): Double {
-        val da = this[attr] ?: initOperatorMap().also { this[attr] = it }
+        val da = this[attr] ?: initOperatorArray().also { this[attr] = it }
         val old = da.valueOrOperatorDefault(operator)
         return operator.cumulate(old, value).also {
             da[operator.ordinal] = it
@@ -43,7 +47,7 @@ class AttributeFastOperatorMap(capa: Int = 16) : Reference2ObjectOpenHashMap<Cyp
         val operators = AttributeOperator.entries
         other.forEach { (attr, daOther) ->
             if (abort(attr)) return@forEach
-            val daThis = this[attr] ?: initOperatorMap().also { this[attr] = it }
+            val daThis = this[attr] ?: initOperatorArray().also { this[attr] = it }
 
             // if set, skip
             val s = daThis[AttributeOperator.SET_ALL.ordinal]
@@ -63,11 +67,26 @@ class AttributeFastOperatorMap(capa: Int = 16) : Reference2ObjectOpenHashMap<Cyp
         }
     }
 
+    fun toEnumMap(): Map<CypherAttribute, EnumMap<AttributeOperator, Double>> {
+        return buildMap(size) {
+            this@AttributeFastOperatorMap.forEach { (attribute, da) ->
+                put(attribute, da.toOperatorEnumMap())
+            }
+        }
+    }
+
     companion object {
         private const val DEFAULT_INIT = Double.NaN
 
+        private typealias OperatorMap = Map<AttributeOperator, Double>
+        private fun OperatorMap.toDoubleArray(): DoubleArray {
+            val da = initOperatorArray()
+            entries.forEach { (op, v) -> da[op.ordinal] = v }
+            return da
+        }
+
         @PublishedApi
-        internal fun AttributeFastOperatorMap.initOperatorMap(): DoubleArray {
+        internal fun initOperatorArray(): DoubleArray {
             val entries = AttributeOperator.entries
             return DoubleArray(entries.size) { DEFAULT_INIT }
             // return DoubleArray(entries.size) { i -> entries[i].defaultValue }
@@ -76,6 +95,18 @@ class AttributeFastOperatorMap(capa: Int = 16) : Reference2ObjectOpenHashMap<Cyp
         @PublishedApi
         internal fun DoubleArray.valueOrOperatorDefault(op: AttributeOperator): Double {
             return this[op.ordinal].finiteOrDefault { op.defaultValue }
+        }
+
+        private fun DoubleArray.toOperatorEnumMap(): EnumMap<AttributeOperator, Double> {
+            val m = EnumMap<AttributeOperator, Double>(AttributeOperator::class.java)
+            val operators = AttributeOperator.entries
+            for (i in indices) {
+                val v = this[i]
+                if (v.isFinite()) {
+                    m[operators[i]] = v
+                }
+            }
+            return m
         }
 
         fun AttributeFastOperatorMap.attrCalculator(

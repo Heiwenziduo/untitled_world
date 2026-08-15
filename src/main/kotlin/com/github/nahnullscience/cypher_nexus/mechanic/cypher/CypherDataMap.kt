@@ -80,8 +80,8 @@ data class CypherDataMap(
             delay,
             recharge,
             flags,
-            AttributeFastMap(projectile),
-            AttributeFastOperatorMap(shotState)
+            projectile,
+            shotState
         )
     }
 }

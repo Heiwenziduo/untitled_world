@@ -1,6 +1,8 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand
 
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
+import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingState
@@ -67,6 +69,11 @@ interface IItemWand : IWandLike<ItemStack> {
         val posDire = getInvokingPosDire(level, invoker, coordinate, dataProvider)
 
         val helper = InvokingHelper(aoc, state, invoker = invoker)
+
+        run attr@ {
+            val shotAttr = helper.shotRoot.accessor
+            shotAttr.addRaw(CypherAttributes.SPREAD, AttributeOperator.ADD, instance.wandData.chunkF.spread.toDouble())
+        }
 
         helper.processSync()
 //        scope.launch { // TODO if async #checkInvokingPrerequisites should handle "pending" state

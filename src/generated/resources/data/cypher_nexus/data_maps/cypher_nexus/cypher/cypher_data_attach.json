@@ -906,6 +906,7 @@
       "projectile": {
         "cypher_nexus:damage": 10.0,
         "cypher_nexus:existing": 155.0,
+        "cypher_nexus:friction_factor": 0.0,
         "cypher_nexus:speed": 2.0
       },
       "recharge": 10,

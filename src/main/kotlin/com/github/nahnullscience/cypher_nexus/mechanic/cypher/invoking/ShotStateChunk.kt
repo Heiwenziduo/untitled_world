@@ -137,14 +137,18 @@ class ShotStateChunk private constructor (
             }
         }
 
+
+        val spread = attributes.attrCalculator(CypherAttributes.SPREAD.value())
+
         // generate bullets
         simpleProjectiles.reference2IntEntrySet().forEach { (cypher, count) ->
             repeat(count) {
-                wrapSpawn(cypher, null, invokerCoordinate, hookedPosDire, level, owner, directInvoker)
+                wrapSpawn(cypher, null, invokerCoordinate, hookedPosDire, level, owner, directInvoker, spread)
             }
         }
+
         triggeredProjectiles.forEach { node ->
-            wrapSpawn(node.instance, node, invokerCoordinate, hookedPosDire, level, owner, directInvoker)
+            wrapSpawn(node.instance, node, invokerCoordinate, hookedPosDire, level, owner, directInvoker, spread)
         }
 
         Profiler.get().pop()
@@ -152,7 +156,7 @@ class ShotStateChunk private constructor (
 
     private var indexP = 0
     /**
-     * wrap [spawnProjectile] for pattern & chain effect supports
+     * wrap [spawnCypherEntity] for pattern & chain effect supports
      * */
     private fun wrapSpawn(
         cypher: AbstractProjectileCypher<*>,
@@ -161,30 +165,21 @@ class ShotStateChunk private constructor (
         hookedPosDire: PosDirePair,
         level: ServerLevel,
         owner: Entity?,
-        directInvoker: Entity?
+        directInvoker: Entity?,
+        spread: Double
     ) {
         val patternPosDire = shotPattern.value().layout(indexP, totalProjectiles, coordinate, hookedPosDire)
-        spawnProjectile(indexP, cypher, node, patternPosDire, level, owner, directInvoker)
+        run layer@ {
+            var dire = patternPosDire.direction
+            run spread@ {
+                val random = owner?.random ?: directInvoker?.random ?: return@spread
+                if (spread > 0.01) dire = dire.randomInCone(spread / 2, random)
+            }
+            cypher.spawnCypherEntity(level, owner, this, node, PosDirePair(patternPosDire.position, dire))
+        }
         indexP++
     }
 
-    private fun spawnProjectile(
-        index: Int,
-        cypher: AbstractProjectileCypher<*>,
-        node: ProjectileNode?,
-        posDire: PosDirePair,
-        level: ServerLevel,
-        owner: Entity?,
-        directInvoker: Entity?
-    ) {
-        var dire = posDire.direction
-        run spread@ {
-            val random = owner?.random ?: directInvoker?.random ?: return@spread
-            val spread = attributes.attrCalculator(CypherAttributes.SPREAD.value(), 0.0) // TODO wand spread
-            if (spread > 0.01) dire = dire.randomInCone(spread / 2, random)
-        }
-        cypher.spawnCypherEntity(level, owner, this, node, PosDirePair(posDire.position, dire))
-    }
 
     fun addProjectileNode(
         cypher: AbstractProjectileCypher<*>,

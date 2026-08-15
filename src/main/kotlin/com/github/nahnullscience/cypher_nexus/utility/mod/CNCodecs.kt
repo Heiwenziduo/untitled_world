@@ -31,10 +31,10 @@ object CNCodecs {
         ::UUID
     )
 
-    val DOUBLE_ARRAY_CODEC: Codec<DoubleArray> = Codec.DOUBLE.listOf().xmap(
-        { list -> DoubleArray(list.size) { i -> list[i] } },
-        { doubles -> buildList(doubles.size) { for (i in doubles.indices) add(i, doubles[i]) } }
-    )
+//    val DOUBLE_ARRAY_CODEC: Codec<DoubleArray> = Codec.DOUBLE.listOf().xmap(
+//        { list -> DoubleArray(list.size) { i -> list[i] } },
+//        { doubles -> buildList(doubles.size) { for (i in doubles.indices) add(i, doubles[i]) } }
+//    )
 
 
     val CYPHER: Codec<AbstractCypher> = Cyphers.REGISTRY.byNameCodec()
@@ -105,8 +105,8 @@ object CNCodecs {
         )
 
     val ATTR_FAST_OPER_MAP_CODEC: Codec<AttributeFastOperatorMap> =
-        Codec.unboundedMap(CYPHER_ATTRIBUTE, DOUBLE_ARRAY_CODEC).xmap(
+        Codec.unboundedMap(CYPHER_ATTRIBUTE, ATTR_OPERATOR_MAP_CODEC).xmap(
             { map -> AttributeFastOperatorMap(map) },
-            { fastOpMap -> fastOpMap.toMap() }
+            { fastOpMap -> fastOpMap.toEnumMap() }
         )
 }

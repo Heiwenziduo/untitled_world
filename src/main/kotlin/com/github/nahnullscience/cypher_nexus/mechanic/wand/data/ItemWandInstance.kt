@@ -70,7 +70,7 @@ class ItemWandInstance(
         if (_lastModifyTime == entity.level().gameTime) {
             CypherNexus.warn { "$this on [${entity.javaClass.name}] ticked multiple times" }
             // FIXME unknown bug that client instance occasionally tick twice
-            Thread.dumpStack()
+//            Thread.dumpStack()
             return
         }
 
