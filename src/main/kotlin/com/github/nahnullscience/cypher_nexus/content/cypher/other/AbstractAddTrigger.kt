@@ -6,16 +6,15 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher.Companion.TRIGGER_CHARGE_MAX
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.IRecursiveCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingSharedParameter
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 
 abstract class AbstractAddTrigger(
     private val _manaDrain: Float
-) : AbstractNonProjectileCypher() {
+) : AbstractNonProjectileCypher(UNMODIFIED) {
     override val category = CypherCategories.OTHER
     abstract val addTrigger: TriggerType
     init {
@@ -26,7 +25,7 @@ abstract class AbstractAddTrigger(
         helper: InvokingHelper,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle,
+        paras: InvokingSharedParameter,
         isCopy: Boolean
     ) = Unit
     override fun defaultAttributes() = super.defaultAttributes().manaDrain(_manaDrain).draw(0)
@@ -35,7 +34,7 @@ abstract class AbstractAddTrigger(
         helper: InvokingHelper,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle,
+        paras: InvokingSharedParameter,
         relativeIndex: Int,
         isCopy: Boolean
     ) {

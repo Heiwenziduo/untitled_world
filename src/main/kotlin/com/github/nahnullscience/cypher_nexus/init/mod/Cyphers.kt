@@ -15,7 +15,7 @@ import com.github.nahnullscience.cypher_nexus.content.cypher.wand_module.Primary
 import com.github.nahnullscience.cypher_nexus.content.cypher.wand_module.RecoilRocketModuleCypher
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.*
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.NONE_ATTR
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.UNMODIFIED
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.AttrConfig
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
@@ -638,10 +638,31 @@ object Cyphers {
 //        override val resource = CypherNexus.modResource("add_trigger_red_stone")
 //    })
 
-    val D2 = registerCypher(AbstractDivideBy.D2)
-    val D3 = registerCypher(AbstractDivideBy.D3)
-    val D4 = registerCypher(AbstractDivideBy.D4)
-    val D10 = registerCypher(AbstractDivideBy.D10)
+    val D2 = registerCypher(AbstractDivideBy::D2) {
+        manaDrain(40f)
+        delay(3)
+        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -2.0)
+        shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.2)
+    }
+    val D3 = registerCypher(AbstractDivideBy::D3) {
+        manaDrain(100f)
+        delay(5)
+        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -3.0)
+        shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.3)
+    }
+    val D4 = registerCypher(AbstractDivideBy::D4) {
+        manaDrain(180f)
+        delay(7)
+        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -4.0)
+        shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.4)
+    }
+    val D10 = registerCypher(AbstractDivideBy::D10) {
+        manaDrain(320f)
+        delay(15)
+        recharge(10)
+        shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -10.0)
+        shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -1.0)
+    }
 
     val ALPHA = registerCypher(AbstractGreekLetter::Alpha) {
         manaDrain(40f)
@@ -709,7 +730,7 @@ object Cyphers {
     @Suppress("UNCHECKED_CAST")
     private fun <CY: AbstractCypher> registerCypher(
         constructor: (builder: AttrConfig) -> CY,
-        defaultAttribute: AttrConfig = NONE_ATTR
+        defaultAttribute: AttrConfig = UNMODIFIED
     ): Holder<CY> = registerCypher(constructor(defaultAttribute))
 
     private fun <CY: AbstractCypher> registerCypher(

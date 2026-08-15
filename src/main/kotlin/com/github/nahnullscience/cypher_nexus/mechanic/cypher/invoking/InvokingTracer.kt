@@ -2,7 +2,6 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
 
 /**
  *
@@ -12,7 +11,7 @@ interface InvokingTracer {
         cypher: AbstractCypher,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle,
+        paras: InvokingSharedParameter,
         relativeIndex: Int,
         isCopy: Boolean
     )
@@ -20,14 +19,14 @@ interface InvokingTracer {
         helper: InvokingHelper,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle,
+        paras: InvokingSharedParameter,
         isCopy: Boolean
     )
     fun exit(
         cypher: AbstractCypher,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle
+        paras: InvokingSharedParameter
     )
 
     companion object {
@@ -36,7 +35,7 @@ interface InvokingTracer {
                 cypher: AbstractCypher,
                 shotState: ShotStateChunk,
                 data: HelperDataBundle,
-                paras: InvokingParameterBundle,
+                paras: InvokingSharedParameter,
                 relativeIndex: Int,
                 isCopy: Boolean
             ) = Unit
@@ -45,7 +44,7 @@ interface InvokingTracer {
                 helper: InvokingHelper,
                 shotState: ShotStateChunk,
                 data: HelperDataBundle,
-                paras: InvokingParameterBundle,
+                paras: InvokingSharedParameter,
                 isCopy: Boolean
             ) = Unit
 
@@ -53,7 +52,7 @@ interface InvokingTracer {
                 cypher: AbstractCypher,
                 shotState: ShotStateChunk,
                 data: HelperDataBundle,
-                paras: InvokingParameterBundle
+                paras: InvokingSharedParameter
             ) = Unit
         }
     }

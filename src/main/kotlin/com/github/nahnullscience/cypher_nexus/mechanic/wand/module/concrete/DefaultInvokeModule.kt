@@ -24,6 +24,6 @@ open class DefaultInvokeModule(
     ): Boolean {
         wand ?: return false
         val coordinate = invokerCoordinate ?: invoker.perspectiveCoordinate()
-        return instance.wand.tryInvoke(invoker.level(), invoker, coordinate, wand).state
+        return instance.wand.tryInvoke(invoker.level(), invoker, coordinate, wand).success
     }
 }

@@ -11,7 +11,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.StaticProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingSharedParameter
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 
 /**
@@ -29,7 +29,7 @@ abstract class AbstractGreekLetter(
         helper: InvokingHelper,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle,
+        paras: InvokingSharedParameter,
         relativeIndex: Int,
         isCopy: Boolean
     ) {
@@ -44,7 +44,7 @@ abstract class AbstractGreekLetter(
             helper: InvokingHelper,
             shotState: ShotStateChunk,
             data: HelperDataBundle,
-            paras: InvokingParameterBundle,
+            paras: InvokingSharedParameter,
             relativeIndex: Int,
             isCopy: Boolean
         ) {
@@ -71,7 +71,7 @@ abstract class AbstractGreekLetter(
             helper: InvokingHelper,
             shotState: ShotStateChunk,
             data: HelperDataBundle,
-            paras: InvokingParameterBundle,
+            paras: InvokingSharedParameter,
             relativeIndex: Int,
             isCopy: Boolean
         ) {
@@ -96,7 +96,7 @@ abstract class AbstractGreekLetter(
             helper: InvokingHelper,
             shotState: ShotStateChunk,
             data: HelperDataBundle,
-            paras: InvokingParameterBundle,
+            paras: InvokingSharedParameter,
             relativeIndex: Int,
             isCopy: Boolean
         ) {
@@ -125,7 +125,7 @@ abstract class AbstractGreekLetter(
             helper: InvokingHelper,
             shotState: ShotStateChunk,
             data: HelperDataBundle,
-            paras: InvokingParameterBundle,
+            paras: InvokingSharedParameter,
             relativeIndex: Int,
             isCopy: Boolean
         ) {
@@ -149,7 +149,7 @@ abstract class AbstractGreekLetter(
             helper: InvokingHelper,
             shotState: ShotStateChunk,
             data: HelperDataBundle,
-            paras: InvokingParameterBundle,
+            paras: InvokingSharedParameter,
             relativeIndex: Int,
             isCopy: Boolean
         ) {
@@ -174,7 +174,7 @@ abstract class AbstractGreekLetter(
             helper: InvokingHelper,
             shotState: ShotStateChunk,
             data: HelperDataBundle,
-            paras: InvokingParameterBundle,
+            paras: InvokingSharedParameter,
             relativeIndex: Int,
             isCopy: Boolean
         ) {
@@ -195,7 +195,7 @@ abstract class AbstractGreekLetter(
             helper: InvokingHelper,
             shotState: ShotStateChunk,
             data: HelperDataBundle,
-            paras: InvokingParameterBundle,
+            paras: InvokingSharedParameter,
             relativeIndex: Int,
             isCopy: Boolean
         ) {

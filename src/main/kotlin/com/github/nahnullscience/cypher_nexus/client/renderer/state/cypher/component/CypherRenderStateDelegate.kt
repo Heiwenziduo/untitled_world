@@ -45,9 +45,8 @@ class CypherRenderStateDelegate : ICypherEntityRenderState {
         bouncePoints = ce.bouncePoints
 
         if (flags.containsFlag(CypherFlags.GLOWING) || flags.containsFlag(CypherFlags.PENETRATE_WORLD)) {
-            // full light when glow
-            val block = LightCoordsUtil.block(state.lightCoords)
-            state.lightCoords = LightCoordsUtil.pack(block, 15)
+            // val block = LightCoordsUtil.block(state.lightCoords)
+            state.lightCoords = LightCoordsUtil.pack(15, 15) // full light when glow
         } else if (flags.containsFlag(CypherFlags.IGNORE_BLOCK)) {
             // avoid full black when phase block
             val block = LightCoordsUtil.block(state.lightCoords).coerceAtLeast(3)

@@ -5,7 +5,7 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingState
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingResult
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
@@ -53,16 +53,16 @@ interface IItemWand : IWandLike<ItemStack> {
         stack: ItemStack,
         dataBundle: HelperDataBundle,
         shotStateRoot: ShotStateChunk
-    ): InvokingState
+    ): InvokingResult
 
     /**
      * call on BOTH sides.
      * server side is responsible for projectile generation, authorise mana / deck / delay check.
      * client side is for user info overlay, and wand module functions.
      * */
-    override fun tryInvoke(level: Level, invoker: Entity, coordinate: CoordinateDefinition, dataProvider: ItemStack): InvokingState {
+    override fun tryInvoke(level: Level, invoker: Entity, coordinate: CoordinateDefinition, dataProvider: ItemStack): InvokingResult {
         val instance = getWandInstance(level, invoker, dataProvider)
-        if (!instance.canInvoke()) return InvokingState.LOADING
+        if (!instance.canInvoke()) return InvokingResult.LOADING
 
         val aoc = getInvokingRecipe(dataProvider)
         val state = instance.toHelperDataBundle()

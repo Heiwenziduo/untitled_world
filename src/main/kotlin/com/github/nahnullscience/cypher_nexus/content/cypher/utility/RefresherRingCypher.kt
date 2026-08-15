@@ -7,7 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.IRecursiveCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingSharedParameter
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 
 class RefresherRingCypher(
@@ -23,7 +23,7 @@ class RefresherRingCypher(
         helper: InvokingHelper,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle,
+        paras: InvokingSharedParameter,
         relativeIndex: Int,
         isCopy: Boolean
     ) {

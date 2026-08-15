@@ -5,7 +5,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.
 import net.minecraft.world.entity.Entity
 
 abstract class ProjectileCypher <CE> (
-    defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE_ATTR
+    defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = UNMODIFIED
 ): AbstractProjectileCypher <CE> (defaultAttribute) where CE : Entity, CE : ICypherEntity {
 
     final override val category = CypherCategories.PROJECTILE

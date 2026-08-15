@@ -3,8 +3,8 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
-import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
@@ -23,7 +23,7 @@ class InvokingHelper (
 ) {
     val shotRoot = ShotStateChunk.root(this)
     /** safe to modify */
-    val paras = InvokingParameterBundle()
+    val paras = InvokingSharedParameter()
     /**
      * the position of last-drawn cypher
      * */
@@ -339,24 +339,5 @@ class InvokingHelper (
                     "discard=${discard.toString(2).padStart(8, '0')}, " +
                     ")"
         }
-    }
-
-    /**
-     * for special data persist along the invoking
-     * */
-    data class InvokingParameterBundle (
-        var wrapped: Boolean = false,
-        var alreadyRefreshed: Boolean = false,
-
-        var drawEnabled: Boolean = true,
-        var recursionDepth: Int = 0,
-
-        var divideByChainLength: Int = 0,
-        var divideByChainLengthMax: Int = 0,
-    ) {
-        // val map = ... // attach additional data if desire
-
-        fun disableDraw() = run { drawEnabled = false }
-        fun enableDraw() = run { drawEnabled = true }
     }
 }

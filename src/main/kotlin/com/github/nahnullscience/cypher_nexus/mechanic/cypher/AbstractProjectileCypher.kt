@@ -1,11 +1,12 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingSharedParameter
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import net.minecraft.world.entity.Entity
@@ -13,7 +14,7 @@ import net.minecraft.world.entity.EntityType
 import java.util.function.Supplier
 
 abstract class AbstractProjectileCypher <CE> (
-    defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder = NONE_ATTR
+    defaultAttribute: Builder.() -> Builder
 ) : AbstractCypher(defaultAttribute) where CE : Entity, CE : ICypherEntity {
 
     companion object {
@@ -37,7 +38,7 @@ abstract class AbstractProjectileCypher <CE> (
         helper: InvokingHelper,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle,
+        paras: InvokingSharedParameter,
         relativeIndex: Int,
         isCopy: Boolean
     ) {

@@ -5,17 +5,17 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingSharedParameter
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 
 /** invoke the next a few cyphers only when the requirements are met */
-sealed class AbstractRequirement : AbstractNonProjectileCypher() {
+sealed class AbstractRequirement : AbstractNonProjectileCypher(UNMODIFIED) {
     override val category = CypherCategories.OTHER
     override fun modifyShotState(
         helper: InvokingHelper,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle,
+        paras: InvokingSharedParameter,
         isCopy: Boolean
     ) = Unit
     override fun defaultAttributes() = super.defaultAttributes().manaDrain(0f).draw(1)
@@ -26,14 +26,14 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher() {
             helper: InvokingHelper,
             shotState: ShotStateChunk,
             data: HelperDataBundle,
-            paras: InvokingParameterBundle,
+            paras: InvokingSharedParameter,
         ) : Boolean
 
         override fun invoke(
             helper: InvokingHelper,
             shotState: ShotStateChunk,
             data: HelperDataBundle,
-            paras: InvokingParameterBundle,
+            paras: InvokingSharedParameter,
             relativeIndex: Int,
             isCopy: Boolean
         ) {

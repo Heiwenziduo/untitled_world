@@ -32,28 +32,40 @@ import java.util.*
 
 class ShotStateChunk private constructor (
     private var charge: Int,
-    /** only root has access to the helper */
     private val helper: InvokingHelper?
 ) : IFlagExtension {
-    /** normal chunk can only release once */
-    constructor(charge: Int = 1): this(charge, null)
+    /**
+     * create ShotState with given charge, this constructor will create a `payload` shot-state,
+     * for creating root-state inside invoking process, see [root]
+     * */
+    constructor(charge: Int = 1): this(charge, null) {
+        // give payloads a default spread
+        attributes.setAttribute(CypherAttributes.SPREAD.value(), AttributeOperator.ADD, 60.0)
+    }
+    /**
+     * init from ccMap, used by client side
+     * */
     constructor(ccMap: MapOfCypherCounts): this() { dirty = true; _ccMapBacking = ccMap }
 
     companion object {
         private const val CAPTURE_RADIUS = 8.0
         private const val CAPTURE_RADIUS_HALF = CAPTURE_RADIUS / 2
 
+        /**
+         * create a `root` shot-state, only root has the access to `helper`
+         * */
         fun root(helper: InvokingHelper) = ShotStateChunk(1, helper)
     }
+
+//    private var _attrBacking: AttributeFastOperatorMap? = null
+//    private val attributes: AttributeFastOperatorMap get() {
+//        return _attrBacking ?: AttributeFastOperatorMap().also { _attrBacking = it }
+//    }
+    private val attributes = AttributeFastOperatorMap()
 
     private var _accessorBacking: ShotStateAccessor? = null
     val accessor: ShotStateAccessor get() {
         return _accessorBacking ?: ShotStateAccessor().also { _accessorBacking = it }
-    }
-
-    private var _attrBacking: AttributeFastOperatorMap? = null
-    private val attributes: AttributeFastOperatorMap get() {
-        return _attrBacking ?: AttributeFastOperatorMap().also { _attrBacking = it }
     }
 
     private var _hooksBacking: HookContainer? = null
@@ -89,6 +101,10 @@ class ShotStateChunk private constructor (
     override var enabledFlags: Int = 0
 
     private var shotPattern: Holder<AbstractInvokingPattern> = NO_PATTERN
+
+    init {
+
+    }
 
     fun release(
         level: Level,

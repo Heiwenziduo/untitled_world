@@ -3,7 +3,7 @@ package com.github.nahnullscience.cypher_nexus.client.devtools.web
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingSharedParameter
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingTracer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 
@@ -18,7 +18,7 @@ class CallTreeTracer : InvokingTracer {
         cypher: AbstractCypher,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle,
+        paras: InvokingSharedParameter,
         relativeIndex: Int,
         isCopy: Boolean
     ) {
@@ -31,7 +31,7 @@ class CallTreeTracer : InvokingTracer {
         helper: InvokingHelper,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle,
+        paras: InvokingSharedParameter,
         isCopy: Boolean
     ) {
 
@@ -41,7 +41,7 @@ class CallTreeTracer : InvokingTracer {
         cypher: AbstractCypher,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle
+        paras: InvokingSharedParameter
     ) {
         stack.removeLast()
     }

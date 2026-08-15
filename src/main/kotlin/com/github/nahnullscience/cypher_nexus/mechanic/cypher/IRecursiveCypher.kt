@@ -3,7 +3,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingSharedParameter
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import org.apache.logging.log4j.Level
 
@@ -14,7 +14,7 @@ interface IRecursiveCypher {
     companion object {
         const val RECURSION_LIMIT = 2
 
-        fun AbstractCypher.canRecursionContinue(paras: InvokingParameterBundle): Boolean {
+        fun AbstractCypher.canRecursionContinue(paras: InvokingSharedParameter): Boolean {
             if (this !is IRecursiveCypher) return true
             if (this.isRecursive && paras.recursionDepth >= RECURSION_LIMIT) {
                 CypherNexus.debugCypher { "[$this] has reached the recursion depth limit and stops function." }
@@ -38,7 +38,7 @@ interface IRecursiveCypher {
         helper: InvokingHelper,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle,
+        paras: InvokingSharedParameter,
         targetIndex: Int,
     ) {
         if (target.canRecursionContinue(paras)) {
@@ -60,7 +60,7 @@ interface IRecursiveCypher {
         helper: InvokingHelper,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle,
+        paras: InvokingSharedParameter,
         targetIndex: Int,
     ) {
         val cy = helper.aoc.getInvokableOrNull(index)

@@ -39,7 +39,7 @@ class SimpleModifier(
         value: Double
     ): SimpleModifier = apply { super.shotStateAttr(holder, operator, value) }
 
-    override fun createCypher(): ModifierCypher = object : ModifierCypher(NONE_ATTR) {
+    override fun createCypher(): ModifierCypher = object : ModifierCypher(UNMODIFIED) {
         override val resource: Identifier = this@SimpleModifier.path
         override val overrideBorder: Boolean = this@SimpleModifier.border
         override val borderColor: Int = this@SimpleModifier.borderColor

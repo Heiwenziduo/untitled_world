@@ -15,7 +15,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule.Ho
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractInvokingPattern
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingSharedParameter
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.finiteOrDefault
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
@@ -30,11 +30,11 @@ import net.minecraft.server.level.ServerPlayer
  *
  * */
 sealed class AbstractCypher(
-    protected val defaultAttribute: AttrConfig = NONE_ATTR
+    protected val defaultAttribute: Builder.() -> Builder
 ): IRegisterable {
     companion object {
         typealias AttrConfig = Builder.() -> Builder
-        val NONE_ATTR: AttrConfig = { this }
+        val UNMODIFIED: AttrConfig = { this }
     }
 
     abstract val category: Holder<CypherCategory>
@@ -107,7 +107,7 @@ sealed class AbstractCypher(
         helper: InvokingHelper,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle,
+        paras: InvokingSharedParameter,
     ) {
         paras.recursionDepth = 0
 
@@ -125,7 +125,7 @@ sealed class AbstractCypher(
         helper: InvokingHelper,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle,
+        paras: InvokingSharedParameter,
         relativeIndex: Int,
         isCopy: Boolean,
     ) {
@@ -149,7 +149,7 @@ sealed class AbstractCypher(
         helper: InvokingHelper,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle,
+        paras: InvokingSharedParameter,
         relativeIndex: Int,
         isCopy: Boolean,
     ) {
@@ -166,7 +166,7 @@ sealed class AbstractCypher(
         helper: InvokingHelper,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle,
+        paras: InvokingSharedParameter,
     ) {
         if (paras.drawEnabled && draw > 0)
         drawXForEach(helper, draw) { index, cypher ->
@@ -204,16 +204,15 @@ sealed class AbstractCypher(
         helper: InvokingHelper,
         shotState: ShotStateChunk,
         data: HelperDataBundle,
-        paras: InvokingParameterBundle,
+        paras: InvokingSharedParameter,
         isCopy: Boolean
     ) {
-        shotState.record(this)
-
         if (!isCopy) { // a copy should not affect mana / delay / recharge
             if (shotState.isRoot) data.delay += delay
             data.recharge += recharge
         }
 
+        shotState.record(this)
         helper.tracer.modify(helper, shotState, data, paras, isCopy)
     }
 

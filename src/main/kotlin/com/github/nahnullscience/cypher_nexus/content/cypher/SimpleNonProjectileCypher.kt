@@ -65,7 +65,7 @@ open class SimpleNonProjectileCypher(
         return super.build()
     }
 
-    open fun createCypher() : AbstractNonProjectileCypher = object : AbstractNonProjectileCypher() {
+    open fun createCypher() : AbstractNonProjectileCypher = object : AbstractNonProjectileCypher(UNMODIFIED) {
         override val category = this@SimpleNonProjectileCypher.category
         override val resource: Identifier = this@SimpleNonProjectileCypher.path
         override val overrideBorder: Boolean = this@SimpleNonProjectileCypher.border
