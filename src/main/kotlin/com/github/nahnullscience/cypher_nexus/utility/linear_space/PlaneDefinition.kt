@@ -1,5 +1,7 @@
-package com.github.nahnullscience.cypher_nexus.utility
+package com.github.nahnullscience.cypher_nexus.utility.linear_space
 
+import com.github.nahnullscience.cypher_nexus.utility.minus
+import com.github.nahnullscience.cypher_nexus.utility.times
 import net.minecraft.world.phys.Vec3
 import kotlin.math.sign
 

@@ -10,8 +10,8 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.spawnCypherEntityRaw
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.OnBounceHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractInvokingPattern
-import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
-import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.plus
 import com.github.nahnullscience.cypher_nexus.utility.randomPerpendicularNormal
 import com.github.nahnullscience.cypher_nexus.utility.times

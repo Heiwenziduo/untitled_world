@@ -3,8 +3,8 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
-import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
-import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 

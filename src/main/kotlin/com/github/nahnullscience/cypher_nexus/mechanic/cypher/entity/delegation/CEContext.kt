@@ -3,12 +3,12 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation
 import com.github.nahnullscience.cypher_nexus.init.data_driven.ModDamageTypes.CYPHER_DEFAULT
 import com.github.nahnullscience.cypher_nexus.init.data_driven.ModDamageTypes.CYPHER_DEFAULT_EXPLOSION
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeFastMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ExplosionSettings
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.canNotHurtOwner
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.cypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getBounce
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.NoSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
@@ -16,7 +16,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
 import com.github.nahnullscience.cypher_nexus.utility.isOwnerOf
-import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastMap
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.damagesource.DamageSource
@@ -56,7 +55,7 @@ open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity
         hooks = shotState?.hooks
         ccMap = shotState?.ccMap
 
-        shotState?.let { attributeMap.initFromShotState(it, cypher) }
+        shotState?.computeAttribute(attributeMap, cypher)
         shotState?.dyeAccumulator?.let {
             if (it.isResolved) {
                 dyed = true

@@ -1,8 +1,8 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
-import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent

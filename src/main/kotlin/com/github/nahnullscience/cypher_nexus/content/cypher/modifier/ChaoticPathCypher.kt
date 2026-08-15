@@ -4,7 +4,7 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData.DataTicket
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData.HookDataTicket
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickBehaviorHook
 import com.github.nahnullscience.cypher_nexus.utility.isServerSide
 import com.github.nahnullscience.cypher_nexus.utility.randomInCone
@@ -16,7 +16,7 @@ class ChaoticPathCypher(
     defaultAttribute: Builder.() -> Builder
 ) : ModifierCypher(defaultAttribute), TickBehaviorHook {
     companion object {
-        private val ChaoticPathTicket = object : DataTicket<Int>() {
+        private val ChaoticPathTicket = object : HookDataTicket<Int>() {
             override fun <CE> shouldAbortData(
                 cyEntity: CE,
                 data: Int

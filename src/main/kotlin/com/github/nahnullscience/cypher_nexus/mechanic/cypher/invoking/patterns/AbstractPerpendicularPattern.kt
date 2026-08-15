@@ -2,6 +2,8 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractInvokingPattern
 import com.github.nahnullscience.cypher_nexus.utility.*
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import net.minecraft.resources.Identifier
 import org.joml.Quaternionf
 import org.joml.Vector3f

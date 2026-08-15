@@ -8,8 +8,8 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
-import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
-import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack

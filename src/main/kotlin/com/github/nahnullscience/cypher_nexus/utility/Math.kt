@@ -27,6 +27,16 @@ fun Double.toSameSymbol(t: Double): Double {
     return if (this * t > 0) this else this * -1
 }
 
+inline fun Double.finiteOrDefault(default: () -> Double): Double {
+    return if (this.isFinite()) this
+    else default()
+}
+
+inline fun Float.finiteOrDefault(default: () -> Float): Float {
+    return if (this.isFinite()) this
+    else default()
+}
+
 val dot0digit = DecimalFormat("#").apply {
     roundingMode = RoundingMode.CEILING
 }

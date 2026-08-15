@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.wand.module.concrete
 
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.types.AbstractInvokeFunctionModule
-import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.perspectiveCoordinate
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity

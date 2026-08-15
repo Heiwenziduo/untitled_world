@@ -20,8 +20,8 @@ enum class AttributeOperator(
     ADD(false, true) {
         override val defaultFormatter: DecimalFormat = dot1digit
         override val defaultValue = 0.0
-        override fun cumulate(last: Double, new: Double): Double = last + new
-        override fun cumulate(last: Double, new: Double, times: Int): Double = last + new * times
+        override fun cumulate(old: Double, new: Double): Double = old + new
+        override fun cumulate(old: Double, new: Double, times: Int): Double = old + new * times
         override fun format(value: Double, format: DecimalFormat?): String {
             val n = if (value > 0) "+" else ""
             val s = format?.format(value) ?: value.toString()
@@ -33,10 +33,10 @@ enum class AttributeOperator(
     MULTIPLY_BASE(false, false) {
         override val defaultFormatter: DecimalFormat = dot0digit
         override val defaultValue = 0.0
-        override fun cumulate(last: Double, new: Double): Double = last + new
-        override fun cumulate(last: Double, new: Double, times: Int): Double = last + new * times
+        override fun cumulate(old: Double, new: Double): Double = old + new
+        override fun cumulate(old: Double, new: Double, times: Int): Double = old + new * times
         override fun format(value: Double, format: DecimalFormat?): String {
-            val n = if (value > 0) "+" else ""
+            val n = if (value > 0.0) "+" else ""
             val s = format?.format(value * 100) ?: (value * 100).toString()
             return "$n$s%"
         }
@@ -46,11 +46,11 @@ enum class AttributeOperator(
     MULTIPLY_TOTAL(false, false) {
         override val defaultFormatter: DecimalFormat = dot0digit
         override val defaultValue = 1.0
-        override fun cumulate(last: Double, new: Double): Double = last * new
-        override fun cumulate(last: Double, new: Double, times: Int): Double = last * new.pow(times)
+        override fun cumulate(old: Double, new: Double): Double = old * new
+        override fun cumulate(old: Double, new: Double, times: Int): Double = old * new.pow(times)
         override fun format(value: Double, format: DecimalFormat?): String {
             val s = format?.format(value * 100) ?: (value * 100).toString()
-            val l = if (value > 0) "x$s%" else "x($s)"
+            val l = if (value >= 0.0) "x$s%" else "x($s)"
             return l
         }
     },
@@ -62,11 +62,11 @@ enum class AttributeOperator(
     SET_ALL(true, true) {
         override val defaultFormatter: DecimalFormat = dot1digit
         override val defaultValue = 0.0
-        override fun cumulate(last: Double, new: Double): Double = new
-        override fun cumulate(last: Double, new: Double, times: Int): Double = new
+        override fun cumulate(old: Double, new: Double): Double = new
+        override fun cumulate(old: Double, new: Double, times: Int): Double = new
         override fun format(value: Double, format: DecimalFormat?): String {
             val s = format?.format(value) ?: value.toString()
-            val l = if (value > 0) "=$s" else "=($s)"
+            val l = if (value >= 0.0) "=$s" else "=($s)"
             return l
         }
     },
@@ -77,11 +77,11 @@ enum class AttributeOperator(
     CAP_AT(false, true) {
         override val defaultFormatter: DecimalFormat = dot1digit
         override val defaultValue = Double.MAX_VALUE
-        override fun cumulate(last: Double, new: Double): Double = last.coerceAtMost(new)
-        override fun cumulate(last: Double, new: Double, times: Int): Double = last.coerceAtMost(new)
+        override fun cumulate(old: Double, new: Double): Double = old.coerceAtMost(new)
+        override fun cumulate(old: Double, new: Double, times: Int): Double = old.coerceAtMost(new)
         override fun format(value: Double, format: DecimalFormat?): String {
             val s = format?.format(value) ?: value.toString()
-            val l = if (value > 0) "<$s" else "<($s)"
+            val l = if (value >= 0.0) "<$s" else "<($s)"
             return l
         }
     }
@@ -90,8 +90,8 @@ enum class AttributeOperator(
     ;
     abstract val defaultFormatter: DecimalFormat
     abstract val defaultValue: Double
-    abstract fun cumulate(last: Double, new: Double) : Double
-    abstract fun cumulate(last: Double, new: Double, times: Int) : Double
+    abstract fun cumulate(old: Double, new: Double) : Double
+    abstract fun cumulate(old: Double, new: Double, times: Int) : Double
     abstract fun format(value: Double, format: DecimalFormat? = defaultFormatter) : String
 
     override fun toString() = super.toString().lowercase(getDefault())
@@ -104,6 +104,7 @@ enum class AttributeOperator(
          * @return the calculation result, since the method don't care about which `Attribute` is calculated,
          * you should perform range restriction manually
          * */
+        @Deprecated("use double-array version")
         fun attributeCalculator(
             base: Double,
             opMap: Map<AttributeOperator, Double>,

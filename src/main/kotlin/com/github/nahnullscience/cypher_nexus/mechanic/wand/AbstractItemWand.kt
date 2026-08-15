@@ -12,8 +12,8 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInv
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable.Companion.TO_BE_GENERATED
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload.Companion.EMPTY
-import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
-import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.nearestHitPoint
 import net.minecraft.core.component.DataComponentMap

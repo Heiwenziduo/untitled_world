@@ -27,7 +27,7 @@ open class CypherAttribute(
         private val self: (Double) -> Double = { it }
     }
 
-    val isAttributeForCE = applyOn == AttributeApply.ENTITY
+    val isAttributeForEntity = applyOn == AttributeApply.ENTITY
 
     fun restrictRange(v: Double) = v.coerceIn(min, max)
 

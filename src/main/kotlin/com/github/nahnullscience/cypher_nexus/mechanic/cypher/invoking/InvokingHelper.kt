@@ -2,10 +2,9 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
-import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
-import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level

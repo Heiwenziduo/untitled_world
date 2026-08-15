@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.entity
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments
-import com.github.nahnullscience.cypher_nexus.utility.PlaneDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.PlaneDefinition
 import com.github.nahnullscience.cypher_nexus.utility.plus
 import net.minecraft.world.entity.Entity
 import net.neoforged.bus.api.EventPriority

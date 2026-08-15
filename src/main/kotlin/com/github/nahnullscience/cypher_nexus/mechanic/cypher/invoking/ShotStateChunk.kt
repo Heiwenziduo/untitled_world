@@ -7,19 +7,20 @@ import com.github.nahnullscience.cypher_nexus.init.mod.InvokingPatterns.NO_PATTE
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeFastMap
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeFastOperatorMap
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeFastOperatorMap.Companion.attrCalculator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute.AttributeApply
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.spawnCypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeAbortReleaseHook.ReleaseAbort
-import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
-import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastOperatorMap
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
-import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
-import com.github.nahnullscience.cypher_nexus.utility.mod.AttributeFastMap
 import com.github.nahnullscience.cypher_nexus.utility.randomInCone
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
 import net.minecraft.core.Holder
@@ -51,7 +52,7 @@ class ShotStateChunk private constructor (
     }
 
     private var _attrBacking: AttributeFastOperatorMap? = null
-    val attributes: AttributeFastOperatorMap get() {
+    private val attributes: AttributeFastOperatorMap get() {
         return _attrBacking ?: AttributeFastOperatorMap().also { _attrBacking = it }
     }
 
@@ -88,11 +89,6 @@ class ShotStateChunk private constructor (
     override var enabledFlags: Int = 0
 
     private var shotPattern: Holder<AbstractInvokingPattern> = NO_PATTERN
-
-    fun computeRecoil(base: Double = 0.0): Double {
-        val recoilMap = attributes[CypherAttributes.RECOIL.value()] ?: return 0.0
-        return AttributeFastMap.attributeCalculator(CypherAttributes.RECOIL.value(), recoilMap, base)
-    }
 
     fun release(
         level: Level,
@@ -184,8 +180,7 @@ class ShotStateChunk private constructor (
         var dire = posDire.direction
         run spread@ {
             val random = owner?.random ?: directInvoker?.random ?: return@spread
-            val spreadMap = attributes[CypherAttributes.SPREAD.value()] ?: return@spread
-            val spread = AttributeFastMap.attributeCalculator(CypherAttributes.SPREAD, spreadMap)
+            val spread = attributes.attrCalculator(CypherAttributes.SPREAD.value(), 0.0) // TODO wand spread
             if (spread > 0.01) dire = dire.randomInCone(spread / 2, random)
         }
         cypher.spawnCypherEntity(level, owner, this, node, PosDirePair(posDire.position, dire))
@@ -226,38 +221,22 @@ class ShotStateChunk private constructor (
 
         _ccMapBacking?.let { ccMap ->
             ccMap.forEach ccMap@ { (cypher, counts) ->
-
                 // pattern
                 cypher.pattern.let { if (it != NO_PATTERN) shotPattern = it }
-
                 // hook
                 hooks.add(cypher, counts)
-
                 // flag & color (non-proj exclusive)
                 if (cypher is AbstractNonProjectileCypher) {
                     enableFlag(cypher.flags)
-
                     run color@ {
                         cypher.rgb?.let { dyeAccumulator.addDye(it, counts) }
                         cypher.alpha.takeIf { it.isFinite() }?.let { dyeAccumulator.multiplyAlpha(it, counts) }
                         cypher.brightness.takeIf { it.isFinite() }?.let { dyeAccumulator.adjustBrightness(it, counts) }
                     }
                 }
-
                 // state-attributes
-                cypher.dataMap().shotState.forEach stateMap@ { (attribute, cyShotStateModifiers) ->
-
-                    if (attribute.applyOn == AttributeApply.INVOKING_ROOT && !isRoot) return@stateMap
-
-                    val chunkMap = attributes.getOrPut(attribute) { EnumMap(AttributeOperator::class.java) }
-                    // prune: if set, skip
-                    if (chunkMap[AttributeOperator.SET_ALL] != null && cyShotStateModifiers[AttributeOperator.SET_ALL] == null) return@stateMap
-
-                    cyShotStateModifiers.forEach opMap@ { (operator, value) ->
-                        chunkMap.compute(operator) { key, old ->
-                            operator.cumulate(old ?: operator.defaultValue, value, counts)
-                        }
-                    }
+                attributes.absorb(cypher.dataMap().shotState, counts) { attr ->
+                    attr.applyOn == AttributeApply.INVOKING_ROOT && !isRoot // abort if true
                 }
             }
 
@@ -267,6 +246,19 @@ class ShotStateChunk private constructor (
 
         dirty = false
         return this
+    }
+
+    fun computeAttribute(map: AttributeFastMap, cypher: AbstractProjectileCypher<*>) {
+        attributes.forEach { (attr, values) ->
+            if (!attr.isAttributeForEntity) return@forEach
+            // TODO prune cumulation, some of attributes will not be used, depends on cypher implementation
+            map.put(attr, attributes.attrCalculator(attr, cypher))
+        }
+    }
+
+    fun computeRecoil(base: Double = 0.0): Double {
+        val recoil = attributes.attrCalculator(CypherAttributes.RECOIL.value(), base)
+        return recoil
     }
 
 
@@ -283,11 +275,8 @@ class ShotStateChunk private constructor (
         /**
          *
          * */
-        fun addRaw(attr: Holder<CypherAttribute>, operator: AttributeOperator, value: Double) {
-            val opMap = attributes.getOrPut(attr.value()) { EnumMap(AttributeOperator::class.java) }
-            opMap.compute(operator) { op, v ->
-                operator.cumulate(v ?: operator.defaultValue, value)
-            }
+        fun addRaw(attr: Holder<CypherAttribute>, operator: AttributeOperator, value: Double): Double {
+            return attributes.cumulateAttribute(attr.value(), operator, value)
         }
     }
 }

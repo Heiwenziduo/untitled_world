@@ -4,6 +4,8 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherSteerers
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeFastMap
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeFastOperatorMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator.Companion.string2operator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
@@ -27,6 +29,11 @@ object CNCodecs {
         ByteBufCodecs.VAR_LONG, UUID::getMostSignificantBits,
         ByteBufCodecs.VAR_LONG, UUID::getLeastSignificantBits,
         ::UUID
+    )
+
+    val DOUBLE_ARRAY_CODEC: Codec<DoubleArray> = Codec.DOUBLE.listOf().xmap(
+        { list -> DoubleArray(list.size) { i -> list[i] } },
+        { doubles -> buildList(doubles.size) { for (i in doubles.indices) add(i, doubles[i]) } }
     )
 
 
@@ -97,8 +104,8 @@ object CNCodecs {
             { afm -> afm.toMap() }
         )
 
-    val ATTR_FAST_OP_MAP_CODEC: Codec<AttributeFastOperatorMap> =
-        Codec.unboundedMap(CYPHER_ATTRIBUTE, ATTR_OPERATOR_MAP_CODEC).xmap(
+    val ATTR_FAST_OPER_MAP_CODEC: Codec<AttributeFastOperatorMap> =
+        Codec.unboundedMap(CYPHER_ATTRIBUTE, DOUBLE_ARRAY_CODEC).xmap(
             { map -> AttributeFastOperatorMap(map) },
             { fastOpMap -> fastOpMap.toMap() }
         )

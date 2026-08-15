@@ -1,8 +1,8 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractInvokingPattern
-import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
-import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.plus
 import com.github.nahnullscience.cypher_nexus.utility.set
 import com.github.nahnullscience.cypher_nexus.utility.times
@@ -10,7 +10,6 @@ import com.github.nahnullscience.cypher_nexus.utility.toVec3
 import net.minecraft.resources.Identifier
 import org.joml.Quaternionf
 import org.joml.Vector3f
-import kotlin.math.PI
 
 class PlanePentagonPattern(path: Identifier) : AbstractInvokingPattern(path) {
     companion object {

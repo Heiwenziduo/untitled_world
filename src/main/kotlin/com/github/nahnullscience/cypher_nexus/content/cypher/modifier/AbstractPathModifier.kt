@@ -5,11 +5,11 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData.DataTicket
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData.HookDataTicket
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickMovementFinalizeHook
 import com.github.nahnullscience.cypher_nexus.utility.coerceMaxLength
 import com.github.nahnullscience.cypher_nexus.utility.headLeftVectorF
-import com.github.nahnullscience.cypher_nexus.utility.CircleDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.CircleDefinition
 import com.github.nahnullscience.cypher_nexus.utility.mostAlignedDirection
 import com.github.nahnullscience.cypher_nexus.utility.plus
 import net.minecraft.world.entity.Entity
@@ -25,7 +25,7 @@ abstract class AbstractPathModifier(
     companion object {
         private const val ORBIT_RAD = (PI / 16).toFloat()
 
-        private val OrbitCircleTicket = object : DataTicket<CircleDefinition>() {
+        private val OrbitCircleTicket = object : HookDataTicket<CircleDefinition>() {
             override fun <CE> shouldAbortData(
                 cyEntity: CE,
                 data: CircleDefinition

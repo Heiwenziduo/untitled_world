@@ -1,6 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.utility
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity

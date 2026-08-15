@@ -6,8 +6,8 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Buil
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickBehaviorHook
-import com.github.nahnullscience.cypher_nexus.utility.PlaneDefinition.Companion.sideOf
-import com.github.nahnullscience.cypher_nexus.utility.PlaneDefinition.Companion.vectorToPlaneNormal
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.PlaneDefinition.Companion.sideOf
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.PlaneDefinition.Companion.vectorToPlaneNormal
 import com.github.nahnullscience.cypher_nexus.utility.plus
 import com.github.nahnullscience.cypher_nexus.utility.rotateTowards
 import com.github.nahnullscience.cypher_nexus.utility.times

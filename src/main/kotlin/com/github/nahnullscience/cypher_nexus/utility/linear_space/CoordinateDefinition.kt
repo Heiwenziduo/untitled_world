@@ -1,5 +1,6 @@
-package com.github.nahnullscience.cypher_nexus.utility
+package com.github.nahnullscience.cypher_nexus.utility.linear_space
 
+import com.github.nahnullscience.cypher_nexus.utility.toVec3
 import net.minecraft.core.Direction
 import net.minecraft.core.Direction.Axis
 import net.minecraft.world.phys.Vec3
@@ -10,7 +11,7 @@ import org.joml.Vector3d
  * assume [front] & [left] are normalized
  *
  * */
-class CoordinateDefinition(
+open class CoordinateDefinition(
     val front: Vec3,
     val left: Vec3,
     up: Vec3? = null
@@ -26,9 +27,9 @@ class CoordinateDefinition(
     operator fun component2() = left
     operator fun component3() = up
 
-    val reX get() = left
-    val reY get() = up
-    val reZ get() = front
+//    val reX get() = left
+//    val reY get() = up
+//    val reZ get() = front
 
     fun down() = up.reverse()
     fun right() = left.reverse()
@@ -75,5 +76,13 @@ class CoordinateDefinition(
 
             return fromFrontUp(direction.unitVec3, up)
         }
+    }
+
+    class AnchoredCoordinate(
+        front: Vec3,
+        left: Vec3,
+        val anchor: Vec3
+    ) : CoordinateDefinition(front, left) {
+
     }
 }

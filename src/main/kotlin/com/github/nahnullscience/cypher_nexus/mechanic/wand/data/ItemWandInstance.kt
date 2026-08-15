@@ -12,7 +12,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.Abs
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.AbstractWandModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.ITypeUniqueModule
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
-import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity

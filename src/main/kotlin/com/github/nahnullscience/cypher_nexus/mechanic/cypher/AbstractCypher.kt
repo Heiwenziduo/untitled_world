@@ -17,6 +17,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingH
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.InvokingParameterBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.utility.finiteOrDefault
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.ChatFormatting
 import net.minecraft.core.Holder
@@ -269,11 +270,11 @@ sealed class AbstractCypher(
             // keep the order attrs registered
             CypherAttributes.REGISTRY.forEach registry@ { attribute ->
                 if (attribute.hide) return@registry
-                val opMap = dataMap().shotState.getOrElse(attribute) { return@registry }
+                val doubles = dataMap().shotState.getOrElse(attribute) { return@registry }
 
                 var values: MutableComponent? = null
                 AttributeOperator.entries.forEach enum@ { operator ->
-                    var v = opMap.getOrElse(operator) { return@enum }
+                    var v = doubles[operator.ordinal].finiteOrDefault { return@enum }
                     val c: MutableComponent
                     if (operator.needUnit) {
                         v = attribute.parseUnit(v)

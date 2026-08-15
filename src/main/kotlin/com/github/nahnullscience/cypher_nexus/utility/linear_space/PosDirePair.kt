@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.utility
+package com.github.nahnullscience.cypher_nexus.utility.linear_space
 
 import net.minecraft.world.phys.Vec3
 

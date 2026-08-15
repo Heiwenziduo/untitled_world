@@ -7,7 +7,7 @@ import net.minecraft.world.entity.Entity
 
 class HooksSharedData {
 
-    abstract class DataTicket <T> {
+    abstract class HookDataTicket <T> {
         /**
          * called every tick to verify data availability.
          * @return true if outdated, then [data] will be cleared from map
@@ -16,7 +16,7 @@ class HooksSharedData {
     }
 
     companion object {
-        val HomingTicket = object : DataTicket<Entity>() {
+        val HomingTicket = object : HookDataTicket<Entity>() {
             override fun <CE> shouldAbortData(
                 cyEntity: CE,
                 data: Entity
@@ -27,8 +27,8 @@ class HooksSharedData {
         }
     }
 
-    private var _mapBacking: Reference2ReferenceOpenHashMap<DataTicket<*>, Slot<*>>? = null
-    private val map get() = _mapBacking ?: Reference2ReferenceOpenHashMap<DataTicket<*>, Slot<*>>(4)
+    private var _mapBacking: Reference2ReferenceOpenHashMap<HookDataTicket<*>, Slot<*>>? = null
+    private val map get() = _mapBacking ?: Reference2ReferenceOpenHashMap<HookDataTicket<*>, Slot<*>>(4)
         .also { _mapBacking = it }.also { it.defaultReturnValue(null) }
 
     var homingTarget: Entity?
@@ -46,19 +46,19 @@ class HooksSharedData {
     }
 
     @Suppress("UNCHECKED_CAST")
-    operator fun <T : Any> get(ticket: DataTicket<T>): T? = _mapBacking?.let { (map[ticket] as Slot<T>?)?.value } // won't create map through get
+    operator fun <T : Any> get(ticket: HookDataTicket<T>): T? = _mapBacking?.let { (map[ticket] as Slot<T>?)?.value } // won't create map through get
 
-    operator fun <T : Any> set(ticket: DataTicket<T>, value: T): T? {
+    operator fun <T : Any> set(ticket: HookDataTicket<T>, value: T): T? {
         val old = this[ticket]
         map[ticket] = Slot(ticket, value)
         return old
     }
 
-    inline fun <T : Any> getOrPut(ticket: DataTicket<T>, supplier: () -> T): T {
+    inline fun <T : Any> getOrPut(ticket: HookDataTicket<T>, supplier: () -> T): T {
         return this[ticket] ?: supplier().also { this[ticket] = it }
     }
 
-    private class Slot<T : Any>(val ticket: DataTicket<T>, var value: T) {
+    private class Slot<T : Any>(val ticket: HookDataTicket<T>, var value: T) {
         // wrap again to provide type safety
         fun <CE> shouldAbort(ce: CE): Boolean where CE : Entity, CE : ICypherEntity = ticket.shouldAbortData(ce, value)
     }

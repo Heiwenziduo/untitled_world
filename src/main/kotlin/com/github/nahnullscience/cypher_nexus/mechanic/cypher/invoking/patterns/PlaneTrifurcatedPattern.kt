@@ -1,11 +1,9 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractInvokingPattern
-import com.github.nahnullscience.cypher_nexus.utility.CoordinateDefinition
-import com.github.nahnullscience.cypher_nexus.utility.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import net.minecraft.resources.Identifier
-import net.minecraft.world.phys.Vec3
-import org.joml.Quaternionf
 import kotlin.math.PI
 
 class PlaneTrifurcatedPattern(path: Identifier) : AbstractInvokingPattern(path) {
