@@ -11,7 +11,6 @@ import net.minecraft.world.level.Level
 class SecondaryEmptyModule(
     override val instance: ItemWandInstance
 ) : AbstractSecondaryInputModule(), IInputModule by InputEmptyDelegation {
-    override val maxHoldingTick: Int = 100
 
     override fun onHoldingStart(level: Level, invoker: LivingEntity, stack: ItemStack) {
         InputEmptyDelegation.onHoldingStart(level, invoker, stack)

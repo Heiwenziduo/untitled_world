@@ -18,7 +18,15 @@ class PrimaryInvokingModule(
 
     override fun onHoldingTick(level: Level, invoker: LivingEntity, stack: ItemStack) {
         super.onHoldingTick(level, invoker, stack)
-        instance.functionModule(INVOKE_MODULE.get(), invoker, wand = stack, performingTicks = holdingTicks)
+        if (instance.canInvoke()) {
+            val coordinate = perspectiveCoordinate(invoker)
+            instance.functionModule(
+                INVOKE_MODULE.get(), invoker,
+                wand = stack,
+                performingTicks = holdingTicks,
+                coordinate = coordinate
+            )
+        }
     }
 
     override fun onHoldingStop(level: Level, invoker: LivingEntity, stack: ItemStack) {

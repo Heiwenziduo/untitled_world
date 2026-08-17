@@ -2,8 +2,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
@@ -69,14 +68,12 @@ class InvokingHelper (
 
     /**
      *
-     * @param posDire location information of resultant projectiles, direction doesn't have to be normalized
      * */
     fun releaseInvokingResult(
         level: Level,
-        coordinate: CoordinateDefinition,
-        posDire: PosDirePair
+        coordinate: AnchoredCoordinate
     ) {
-        shotRoot.release(level, coordinate, posDire, invoker, invoker)
+        shotRoot.release(level, coordinate, invoker, invoker)
     }
 
     private fun step(): Boolean {

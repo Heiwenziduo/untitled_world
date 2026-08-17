@@ -75,7 +75,7 @@ abstract class AbstractOnBounceSeries(
             }
 
             for (i in 0 until count) {
-                val pair = formation.layout(i, count, co, base)
+                val pair = formation.layout(i, count, co)
                 spawnCypherEntityRaw(
                     cyEntity.cypherHolder,
                     level,

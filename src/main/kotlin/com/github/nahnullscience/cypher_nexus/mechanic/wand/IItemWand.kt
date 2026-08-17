@@ -10,8 +10,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.ItemStack
@@ -37,11 +36,13 @@ interface IItemWand : IWandLike<ItemStack> {
     fun getWandInstance(level: Level, invoker: Entity, stack: ItemStack): ItemWandInstance
 
     /**
-     * determine the initial position & direction of the projectile,
-     * will be further processed if hooks are present.
-     * direction doesn't have to be normalized
+     * a window for item-wands to process coordinate provided by `input-module`.
+     *
+     * use this to adjust the initial position & direction of projectiles.
+     *
+     * the result may be further processed if hooks are present.
      * */
-    fun getInvokingPosDire(level: Level, invoker: Entity, coordinate: CoordinateDefinition, stack: ItemStack): PosDirePair
+    fun adjustInvokingCoordinate(level: Level, invoker: Entity, coordinate: AnchoredCoordinate, stack: ItemStack)
 
     /**
      * resolve invoking feedback, for item-wands this is handled by [ItemWandInstance]
@@ -49,7 +50,7 @@ interface IItemWand : IWandLike<ItemStack> {
     fun afterInvoke(
         level: Level,
         invoker: Entity,
-        coordinate: CoordinateDefinition,
+        coordinate: AnchoredCoordinate,
         stack: ItemStack,
         dataBundle: HelperDataBundle,
         shotStateRoot: ShotStateChunk
@@ -60,13 +61,17 @@ interface IItemWand : IWandLike<ItemStack> {
      * server side is responsible for projectile generation, authorise mana / deck / delay check.
      * client side is for user info overlay, and wand module functions.
      * */
-    override fun tryInvoke(level: Level, invoker: Entity, coordinate: CoordinateDefinition, dataProvider: ItemStack): InvokingResult {
+    override fun tryInvoke(
+        level: Level,
+        invoker: Entity,
+        coordinate: AnchoredCoordinate,
+        dataProvider: ItemStack
+    ): InvokingResult {
         val instance = getWandInstance(level, invoker, dataProvider)
         if (!instance.canInvoke()) return InvokingResult.LOADING
 
         val aoc = getInvokingRecipe(dataProvider)
         val state = instance.toHelperDataBundle()
-        val posDire = getInvokingPosDire(level, invoker, coordinate, dataProvider)
 
         val helper = InvokingHelper(aoc, state, invoker = invoker)
 
@@ -76,7 +81,8 @@ interface IItemWand : IWandLike<ItemStack> {
         }
 
         helper.processSync()
-//        scope.launch { // TODO if async #checkInvokingPrerequisites should handle "pending" state
+        // TODO if async #checkInvokingPrerequisites should handle "pending" state
+//        scope.launch {
 //            helper.process()
 //            helper.finalizeInvoking(
 //                level,
@@ -87,7 +93,8 @@ interface IItemWand : IWandLike<ItemStack> {
 //            return InvokingState.HANG
 //        }
 
-        helper.releaseInvokingResult(level, coordinate, posDire)
+        adjustInvokingCoordinate(level, invoker, coordinate, dataProvider)
+        helper.releaseInvokingResult(level, coordinate)
         return afterInvoke(level, invoker, coordinate, dataProvider, state, helper.shotRoot)
     }
 

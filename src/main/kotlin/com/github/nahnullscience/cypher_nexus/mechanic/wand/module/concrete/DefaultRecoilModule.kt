@@ -2,10 +2,10 @@ package com.github.nahnullscience.cypher_nexus.mechanic.wand.module.concrete
 
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.types.AbstractRecoilFunctionModule
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
-import com.github.nahnullscience.cypher_nexus.utility.perspectiveCoordinate
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
 import com.github.nahnullscience.cypher_nexus.utility.plus
 import com.github.nahnullscience.cypher_nexus.utility.times
+import com.github.nahnullscience.cypher_nexus.utility.toVec3
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
@@ -23,7 +23,7 @@ open class DefaultRecoilModule(
     override fun execute(
         invoker: LivingEntity,
         wand: ItemStack?,
-        invokerCoordinate: CoordinateDefinition?,
+        coordinate: AnchoredCoordinate?,
         indirectTarget: Entity?,
         performingTicks: Int,
         power: Double
@@ -33,13 +33,14 @@ open class DefaultRecoilModule(
             // this logic should run on both side, client for smooth movement, server for verification
 
 //            println("recoil power: $power")
-            val coo = invokerCoordinate ?: invoker.perspectiveCoordinate()
-            val dire = coo.front.reverse()
+            val coo = coordinate ?: fallbackCoordinate(invoker)
+            val dire = coo.front.toVec3().reverse()
             val base = invoker.deltaMovement
 
 //            val next = base * 0.5 + dire * (sqrt(power) * 0.05)
+            val next = base + dire * (sqrt(power) * 0.05)
 
-            invoker.deltaMovement = base + dire * (sqrt(power) * 0.05)
+            invoker.deltaMovement = next
             if (invoker !is Player) { invoker.needsSync = true }
             return true
         }

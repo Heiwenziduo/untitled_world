@@ -12,7 +12,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.Abs
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.AbstractWandModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.ITypeUniqueModule
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundSyncWandInstance
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.entity.Entity
@@ -119,12 +119,12 @@ class ItemWandInstance(
         type: WandModuleType<T>,
         invoker: LivingEntity,
         wand: ItemStack? = null,
-        invokerCoordinate: CoordinateDefinition? = null,
+        coordinate: AnchoredCoordinate? = null,
         indirectTarget: Entity? = null,
         performingTicks: Int = -1,
         power: Double = Double.NaN,
     ): Boolean where T : AbstractFunctionalModule {
-        return getModule(type)?.run { execute(invoker, wand, invokerCoordinate, indirectTarget, performingTicks, power) } ?: false
+        return getModule(type)?.run { execute(invoker, wand, coordinate, indirectTarget, performingTicks, power) } ?: false
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

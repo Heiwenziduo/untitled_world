@@ -12,6 +12,7 @@ object InputEmptyDelegation : IInputModule {
     override val consumeVanillaInput: Boolean = false
     override val stopBubble: Boolean = false
     override val isHoldingInput: Boolean = false
+    override val maxHoldingTick: Int = 100
 
     override fun onHoldingTick(level: Level, invoker: LivingEntity, stack: ItemStack) = Unit
     override fun onHoldingStart(level: Level, invoker: LivingEntity, stack: ItemStack) = Unit

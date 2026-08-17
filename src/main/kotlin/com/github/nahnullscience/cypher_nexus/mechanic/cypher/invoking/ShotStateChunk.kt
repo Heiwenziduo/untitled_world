@@ -18,17 +18,17 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeAbortReleaseHook.ReleaseAbort
 import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.randomInCone
+import com.github.nahnullscience.cypher_nexus.utility.toVec3
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
 import net.minecraft.core.Holder
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
-import java.util.*
 
 class ShotStateChunk private constructor (
     private var charge: Int,
@@ -108,8 +108,7 @@ class ShotStateChunk private constructor (
 
     fun release(
         level: Level,
-        invokerCoordinate: CoordinateDefinition,
-        posDire: PosDirePair,
+        coordinate: AnchoredCoordinate,
         directInvoker: Entity?,
         owner: Entity?,
     ) {
@@ -131,24 +130,19 @@ class ShotStateChunk private constructor (
         }
 
         // apply invoking redirection if hooked
-        var hookedPosDire = posDire
-        hooks[CypherHooks.INVOKE_POS_REDIRECTION_SERVER]?.let {
-            hookedPosDire = hooks.cumulateHooks(
-                CypherHooks.INVOKE_POS_REDIRECTION_SERVER,
-                posDire
-            ) { index, hook, count, cumulate ->
-                hook.redirectPosDireServer(index, count, level, owner, accessor, directInvoker, cumulate)
+        hooks[CypherHooks.INVOKE_REDIRECTION_SERVER]?.let {
+            hooks.playHooks(CypherHooks.INVOKE_REDIRECTION_SERVER) { index, hook, count ->
+                hook.invokeRedirectServer(index, count, level, owner, accessor, coordinate, directInvoker)
             }
-            // TODO rotate coordinate as well
         }
 
         // capture surroundings if hooked
         hooks[CypherHooks.INVOKE_CAPTURE_SERVER]?.let {
-            val pairCopy = hookedPosDire.copy()
-            val entities = level.getEntities(null, pairCopy.position.centeredAABB(CAPTURE_RADIUS_HALF))
+            val pos = coordinate.anchor.toVec3()
+            val entities = level.getEntities(null, pos.centeredAABB(CAPTURE_RADIUS_HALF))
             entities.forEach { entity ->
                 hooks.playHooks(CypherHooks.INVOKE_CAPTURE_SERVER) { index, hook, count ->
-                    hook.forEntityCapturedServer(index, count, level, owner, accessor, pairCopy, entity)
+                    hook.forEntityCapturedServer(index, count, level, owner, accessor, coordinate, entity)
                 }
             }
         }
@@ -159,12 +153,12 @@ class ShotStateChunk private constructor (
         // generate bullets
         simpleProjectiles.reference2IntEntrySet().forEach { (cypher, count) ->
             repeat(count) {
-                wrapSpawn(cypher, null, invokerCoordinate, hookedPosDire, level, owner, directInvoker, spread)
+                wrapSpawn(cypher, null, coordinate, level, owner, directInvoker, spread)
             }
         }
 
         triggeredProjectiles.forEach { node ->
-            wrapSpawn(node.instance, node, invokerCoordinate, hookedPosDire, level, owner, directInvoker, spread)
+            wrapSpawn(node.instance, node, coordinate, level, owner, directInvoker, spread)
         }
 
         Profiler.get().pop()
@@ -177,14 +171,13 @@ class ShotStateChunk private constructor (
     private fun wrapSpawn(
         cypher: AbstractProjectileCypher<*>,
         node: ProjectileNode?,
-        coordinate: CoordinateDefinition,
-        hookedPosDire: PosDirePair,
+        coordinate: AnchoredCoordinate,
         level: ServerLevel,
         owner: Entity?,
         directInvoker: Entity?,
         spread: Double
     ) {
-        val patternPosDire = shotPattern.value().layout(indexP, totalProjectiles, coordinate, hookedPosDire)
+        val patternPosDire = shotPattern.value().layout(indexP, totalProjectiles, coordinate)
         run layer@ {
             var dire = patternPosDire.direction
             run spread@ {

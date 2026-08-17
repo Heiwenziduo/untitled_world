@@ -78,11 +78,11 @@ open class CoordinateDefinition(
         }
     }
 
-    class AnchoredCoordinate(
-        front: Vec3,
-        left: Vec3,
-        val anchor: Vec3
-    ) : CoordinateDefinition(front, left) {
-
-    }
+//    class AnchoredCoordinate(
+//        front: Vec3,
+//        left: Vec3,
+//        val anchor: Vec3
+//    ) : CoordinateDefinition(front, left) {
+//
+//    }
 }

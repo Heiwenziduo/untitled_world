@@ -27,6 +27,11 @@ interface IInputModule {
      * */
     abstract val isHoldingInput: Boolean
 
+    /**
+     *
+     * */
+    abstract val maxHoldingTick: Int
+
 
     /**
      * call both sides

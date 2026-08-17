@@ -1,7 +1,9 @@
 package com.github.nahnullscience.cypher_nexus.utility
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.anchor
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.fromFrontLeft
 import net.minecraft.util.Mth
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
@@ -124,8 +126,8 @@ fun Entity.headLeftVectorF(partialTick: Float = 1.0f): Vector3f {
  *
  * left : entity's head left vector. [headLeftVector]
  * */
-fun Entity.perspectiveCoordinate(): CoordinateDefinition {
-    return CoordinateDefinition(headLookAngle, headLeftVector())
+fun Entity.perspectiveCoordinate(): AnchoredCoordinate {
+    return AnchoredCoordinate.fromFrontLeft(headLookAngle, headLeftVector()).anchor(eyePosition)
 }
 
 /**

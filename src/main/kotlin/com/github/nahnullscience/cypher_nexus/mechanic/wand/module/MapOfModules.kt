@@ -1,6 +1,5 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand.module
 
-import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.AbstractWandModule
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component.ITypeUniqueModule
@@ -14,8 +13,7 @@ class MapOfModules(
     val instance: ItemWandInstance
 ) {
     companion object {
-        private typealias R2ROpenHash<T, R> = Reference2ReferenceOpenHashMap<T, R>
-        private typealias ModuleR2RMap = R2ROpenHash<WandModuleType<*>, AbstractWandModule>
+        private typealias ModuleR2RMap = Reference2ReferenceOpenHashMap<WandModuleType<*>, AbstractWandModule>
     }
 
     @PublishedApi

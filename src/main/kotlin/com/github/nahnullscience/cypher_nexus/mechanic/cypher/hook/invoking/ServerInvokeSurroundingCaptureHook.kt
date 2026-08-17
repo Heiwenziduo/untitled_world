@@ -3,7 +3,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.IHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk.ShotStateAccessor
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 
@@ -15,8 +15,8 @@ interface ServerInvokeSurroundingCaptureHook : IHook {
         level: ServerLevel,
         owner: Entity?,
         state: ShotStateAccessor,
-        pair: PosDirePair,
-        captured: Entity,
+        coordinate: AnchoredCoordinate,
+        captured: Entity
     )
 
     companion object {

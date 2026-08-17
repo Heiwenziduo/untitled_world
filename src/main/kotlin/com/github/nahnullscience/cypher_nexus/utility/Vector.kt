@@ -13,6 +13,7 @@ import kotlin.jvm.optionals.getOrNull
 import kotlin.math.*
 
 fun Vec3.toVec3i() = Vec3i(x.toInt(), y.toInt(), z.toInt())
+fun Vec3.toV3d() = Vector3d(x, y, z)
 
 operator fun Vec3.unaryMinus() = Vec3(-x, -y, -z)
 operator fun Vec3.times(v: Double) = multiply(v, v, v)

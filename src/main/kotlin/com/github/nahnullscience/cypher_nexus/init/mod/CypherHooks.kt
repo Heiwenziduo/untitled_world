@@ -6,7 +6,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule.HookBuilder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.IHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeAbortReleaseHook
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokePosRedirectionHook
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeRedirectionHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeSurroundingCaptureHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.*
 import net.minecraft.core.Registry
@@ -44,7 +44,7 @@ object CypherHooks {
 
     // invoking
     val INVOKE_ABORT_RELEASE_SERVER = registerHook(ServerInvokeAbortReleaseHook.HOOK)
-    val INVOKE_POS_REDIRECTION_SERVER = registerHook(ServerInvokePosRedirectionHook.HOOK)
+    val INVOKE_REDIRECTION_SERVER = registerHook(ServerInvokeRedirectionHook.HOOK)
     val INVOKE_CAPTURE_SERVER = registerHook(ServerInvokeSurroundingCaptureHook.HOOK)
 
     // behavior

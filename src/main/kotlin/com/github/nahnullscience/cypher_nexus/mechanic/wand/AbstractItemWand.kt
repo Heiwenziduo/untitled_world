@@ -12,10 +12,11 @@ import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInv
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable.Companion.TO_BE_GENERATED
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload.Companion.EMPTY
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.nearestHitPoint
+import com.github.nahnullscience.cypher_nexus.utility.toVec3
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.InteractionHand
@@ -122,28 +123,29 @@ abstract class AbstractItemWand(
         return invoker.getData(WAND_DATA_MAP).getOrPutInstance(level, stack, this)
     }
 
-    protected open fun wandLength(stack: ItemStack): Float {
+    protected open fun wandLength(stack: ItemStack): Double {
         val aoc = getInvokingRecipe(stack)
-        return 0.4f + (aoc.capacity.toFloat() / 16).coerceAtMost(3.0f)
+        return 0.4 + (aoc.capacity.toDouble() / 16).coerceAtMost(3.0)
     }
 
-    override fun getInvokingPosDire(level: Level, invoker: Entity, coordinate: CoordinateDefinition, stack: ItemStack): PosDirePair {
-        // for an Item Wand, pos and dire just use the living's view vector
+    override fun adjustInvokingCoordinate(level: Level, invoker: Entity, coordinate: AnchoredCoordinate, stack: ItemStack) {
+        // push a little towards "front" by the value of length
+        val move = invoker.knownMovement // consider inertia
+        val front = coordinate.front.dot(move.x, move.y, move.z).coerceAtLeast(0.0)
         val tip = wandLength(stack)
-        val eye = invoker.eyePosition
-        val front = coordinate.front
-        val scale = tip + invoker.knownMovement.dot(front).coerceAtLeast(0.0) // solve inertia problem
+        val scale = front + tip
 
-        val pos = eye.add(front.scale(scale)).let {
-            level.nearestHitPoint(eye, it, invoker, 0.3)
-        }
-        return PosDirePair(pos, front)
+        val clip0 = coordinate.anchor.toVec3()
+        val clip1 = coordinate.moveForward(scale).anchor.toVec3()
+
+        val pos = level.nearestHitPoint(clip0, clip1, invoker, 0.3)
+        coordinate.move(pos.x, pos.y, pos.z)
     }
 
     override fun afterInvoke(
         level: Level,
         invoker: Entity,
-        coordinate: CoordinateDefinition,
+        coordinate: AnchoredCoordinate,
         stack: ItemStack,
         dataBundle: HelperDataBundle,
         shotStateRoot: ShotStateChunk

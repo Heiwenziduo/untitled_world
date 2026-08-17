@@ -4,6 +4,7 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.Identifier
@@ -16,8 +17,7 @@ abstract class AbstractInvokingPattern(
     abstract fun layout(
         index: Int,
         total: Int,
-        coordinate: CoordinateDefinition,
-        posDire: PosDirePair
+        coordinate: AnchoredCoordinate
     ): PosDirePair
 
     private val translationKey = "invoking.${resource.namespace}.pattern.${resource.path}"

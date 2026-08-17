@@ -3,23 +3,23 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.IHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk.ShotStateViewer
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 
-interface ServerInvokePosRedirectionHook : IHook {
+interface ServerInvokeRedirectionHook : IHook {
 
-    fun redirectPosDireServer(
+    fun invokeRedirectServer(
         index: Int,
         count: Int,
         level: ServerLevel,
         owner: Entity?,
         state: ShotStateViewer,
-        directInvoker: Entity?,
-        pair: PosDirePair,
-    ): PosDirePair
+        coordinate: AnchoredCoordinate,
+        directInvoker: Entity?
+    )
 
     companion object {
-        val HOOK = HookModule.HookBuilder("invoke_pos_redirect", ServerInvokePosRedirectionHook::class).invoking()
+        val HOOK = HookModule.HookBuilder("invoke_redirection", ServerInvokeRedirectionHook::class).invoking()
     }
 }

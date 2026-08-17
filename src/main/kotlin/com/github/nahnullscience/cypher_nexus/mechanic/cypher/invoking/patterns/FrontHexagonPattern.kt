@@ -1,11 +1,10 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractInvokingPattern
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.minus
 import com.github.nahnullscience.cypher_nexus.utility.plus
-import com.github.nahnullscience.cypher_nexus.utility.set
 import com.github.nahnullscience.cypher_nexus.utility.times
 import com.github.nahnullscience.cypher_nexus.utility.toVec3
 import net.minecraft.resources.Identifier
@@ -28,8 +27,7 @@ class FrontHexagonPattern(path: Identifier) : AbstractInvokingPattern(path) {
     override fun layout(
         index: Int,
         total: Int,
-        coordinate: CoordinateDefinition,
-        posDire: PosDirePair
+        coordinate: AnchoredCoordinate
     ): PosDirePair {
         val i = index % 6
         return coordinate.getOrComputePatternCache(i) cache@{

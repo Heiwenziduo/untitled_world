@@ -1,6 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand.module.component
 
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
+import com.github.nahnullscience.cypher_nexus.utility.perspectiveCoordinate
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.item.ItemStack
@@ -12,13 +13,17 @@ import net.minecraft.world.item.ItemStack
  * */
 abstract class AbstractFunctionalModule : AbstractWandModule(), ITypeUniqueModule {
 
+    open fun fallbackCoordinate(invoker: LivingEntity): AnchoredCoordinate {
+        return invoker.perspectiveCoordinate()
+    }
+
     /**
      *
      * */
     abstract fun execute(
         invoker: LivingEntity,
         wand: ItemStack? = null,
-        invokerCoordinate: CoordinateDefinition? = null,
+        coordinate: AnchoredCoordinate? = null,
         indirectTarget: Entity? = null,
         performingTicks: Int = -1,
         power: Double = Double.NaN,
