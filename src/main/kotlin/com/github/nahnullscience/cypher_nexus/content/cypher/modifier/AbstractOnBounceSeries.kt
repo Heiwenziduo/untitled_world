@@ -67,10 +67,10 @@ abstract class AbstractOnBounceSeries(
             val formation: AbstractInvokingPattern
             val count: Int
             if (cyEntity.ccMap?.containsKey(Cyphers.PHANTOM_RUSH) == true) {
-                formation = InvokingPatterns.FRONT_OCTAGON_PATTERN.value()
+                formation = InvokingPatterns.FRONT_DIFFUSE_OCTAGON_PATTERN.value()
                 count = 8
             } else {
-                formation = InvokingPatterns.FRONT_SQUARE_PATTERN.value()
+                formation = InvokingPatterns.FRONT_DIFFUSE_SQUARE_PATTERN.value()
                 count = 4
             }
 

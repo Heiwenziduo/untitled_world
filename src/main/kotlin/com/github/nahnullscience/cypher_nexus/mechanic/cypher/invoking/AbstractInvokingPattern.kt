@@ -17,8 +17,7 @@ abstract class AbstractInvokingPattern(
      * store result position & direction to coordinate-cache in the form of raw double
      * @return the starting number to extract the cache, the true index is 6 * the value
      * */
-    @PublishedApi
-    internal abstract fun arrangeVectors(
+    abstract fun arrangeVectors(
         index: Int,
         total: Int,
         coordinate: AnchoredCoordinate

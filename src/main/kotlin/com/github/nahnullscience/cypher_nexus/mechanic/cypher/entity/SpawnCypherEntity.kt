@@ -18,10 +18,11 @@ fun <CE> AbstractProjectileCypher<CE>.spawnCypherEntity(
     node: ProjectileNode?,
     position: Vec3,
     direction: Vec3
-) : CE where CE : Entity, CE : ICypherEntity {
+) where CE : Entity, CE : ICypherEntity {
     val proj = createCypherEntity(this, level, shotState, invoker, node)
     proj.initPositionDirection(position, direction)
-    return proj.also { level.addFreshEntity(it) }
+    level.addFreshEntity(proj)
+    // return proj.also { level.addFreshEntity(it) }
 }
 
 /** generate projectile with attributes initialized */

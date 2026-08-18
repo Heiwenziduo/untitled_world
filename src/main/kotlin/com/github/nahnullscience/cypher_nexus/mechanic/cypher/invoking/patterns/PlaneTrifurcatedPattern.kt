@@ -2,34 +2,30 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractInvokingPattern
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.putCache
 import net.minecraft.resources.Identifier
 import kotlin.math.PI
 
-class PlaneTrifurcatedPattern(path: Identifier) : AbstractInvokingPattern(path) {
-    companion object {
-        private const val RAD = (PI / 6).toFloat()
-    }
+open class PlaneTrifurcatedPattern(path: Identifier) : AbstractInvokingPattern(path) {
+    protected open val rad = PI / 6
     override fun arrangeVectors(
         index: Int,
         total: Int,
         coordinate: AnchoredCoordinate
     ): Int {
-        val i = index % 3
-        return when (i) {
-            1 -> {
-                coordinate.getOrComputePatternCache(1) cache@ {
-                    val dire = coordinate.rightScrewFromTop(posDire.direction, RAD)
-                    return@cache PosDirePair(posDire.position, dire)
-                }
+        return (index % 3).also { i ->
+            if (coordinate.hasCache(i)) return@also
+            val dire = coordinate.tmpV3d.set(coordinate.front)
+            val up = coordinate.up
+            when (i) {
+                1 -> dire.rotateAxis(rad, up.x(), up.y(), up.z())
+                2 -> dire.rotateAxis(-rad, up.x(), up.y(), up.z())
             }
-            2 -> {
-                coordinate.getOrComputePatternCache(2) cache@ {
-                    val dire = coordinate.rightScrewFromTop(posDire.direction, -RAD)
-                    return@cache PosDirePair(posDire.position, dire)
-                }
-            }
-            else -> posDire
+            coordinate.putCache(i, coordinate.anchor, dire)
         }
+    }
+
+    class PlaneTStylePattern(path: Identifier) : PlaneTrifurcatedPattern(path) {
+        override val rad = PI / 2
     }
 }

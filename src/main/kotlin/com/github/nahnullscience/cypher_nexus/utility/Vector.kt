@@ -8,7 +8,9 @@ import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
 import org.joml.Vector3d
+import org.joml.Vector3dc
 import org.joml.Vector3f
+import org.joml.Vector3fc
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.*
 
@@ -28,7 +30,7 @@ operator fun Vec3.component1() = x
 operator fun Vec3.component2() = y
 operator fun Vec3.component3() = z
 
-fun Vector3f.toVec3(): Vec3 = Vec3(this)
+fun Vector3fc.toVec3(): Vec3 = Vec3(this)
 operator fun Vector3f.unaryMinus() = Vector3f(-x, -y, -z)
 operator fun Vector3f.times(v: Double) = times(v.toFloat())
 operator fun Vector3f.times(v: Float) = Vector3f(x * v, y * v, z * v)
@@ -39,7 +41,7 @@ fun Vector3f.set(v3: Vec3): Vector3f = set(v3.x, v3.y, v3.z)
 //fun Vector3f.rotateAxis(rad: Float, axis: Vec3): Vector3f =
 //    rotateAxis(rad, axis.x.toFloat(), axis.y.toFloat(), axis.z.toFloat())
 
-fun Vector3d.toVec3(): Vec3 = Vec3(x, y, z)
+fun Vector3dc.toVec3(): Vec3 = Vec3(x(), y(), z())
 fun Vector3d.set(v3: Vec3): Vector3d = set(v3.x, v3.y, v3.z)
 
 fun Vec3.coerceMaxLength(length: Double): Vec3 {
@@ -205,11 +207,9 @@ fun Vec3.randomInCone(maxAngle: Double, random: RandomSource): Vec3 {
 fun Vector3f.randomInCone(maxAngle: Double, random: RandomSource): Vector3f {
     val r = Math.toRadians(maxAngle).coerceIn(0.0, PI) // the meaningful domain is [0, pi]
 
-
     // 1. Calculate the local uniform random vector in a Z-up cone
     val u1: Float = random.nextFloat()
     val u2: Float = random.nextFloat()
-
 
     // Use cosine distribution to avoid clumping at the center
     val z = 1.0f - u2 * (1.0f - cos(r).toFloat())
@@ -221,17 +221,14 @@ fun Vector3f.randomInCone(maxAngle: Double, random: RandomSource): Vector3f {
 
     val localRandomDir = Vector3f(x, y, z)
 
-
     // 2. Prepare the target rotation
     val standardZ = Vector3f(0f, 0f, 1f)
     val targetDir = Vector3f(this).normalize()
-
 
     // 3. Overcome Gimbal Lock using JOML's Quaternionf.
     // rotationTo() automatically calculates the single arbitrary axis and angle
     // needed to rotate standardZ into targetDir, bypassing Euler angles completely!
     val rotationQuat = Quaternionf().rotationTo(standardZ, targetDir)
-
 
     // 4. Apply the Quaternion rotation to our local vector
     localRandomDir.rotate(rotationQuat)

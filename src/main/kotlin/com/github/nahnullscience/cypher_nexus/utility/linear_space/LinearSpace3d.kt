@@ -1,8 +1,10 @@
 package com.github.nahnullscience.cypher_nexus.utility.linear_space
 
 import org.joml.Quaterniond
+import org.joml.Quaternionf
 import org.joml.Vector3d
 import org.joml.Vector3dc
+import org.joml.Vector3f
 import kotlin.math.abs
 import kotlin.math.sqrt
 
@@ -72,17 +74,24 @@ class AnchoredCoordinate(
         // maybe do a cross len > 0 check
     }
 
-    override val normal get() = z
+    override val normal: Vector3dc get() = z
 
-    val front get() = z
-    val left get() = x
-    val up get() = y
+    val front: Vector3dc get() = z
+    val left: Vector3dc get() = x
+    val up: Vector3dc get() = y
 
     private var _v0Backing: Vector3d? = null
-    private val v0 get() = _v0Backing ?: Vector3d().also { _v0Backing = it }
+    val tmpV3d: Vector3d get() = _v0Backing ?: Vector3d().also { _v0Backing = it }
+
+    private var _v1Backing: Vector3f? = null
+    val tmpV3f: Vector3f get() = _v1Backing ?: Vector3f().also { _v1Backing = it }
 
     private var _q0Backing: Quaterniond? = null
-    private val q0 get() = _q0Backing ?: Quaterniond().also { _q0Backing = it }
+    val tmpQd: Quaterniond get() = _q0Backing ?: Quaterniond().also { _q0Backing = it }
+
+    private var _q1Backing: Quaternionf? = null
+    val tmpQf: Quaternionf get() = _q1Backing ?: Quaternionf().also { _q1Backing = it }
+
 
     private var _vectorCacheBacking: DoubleArray? = null
     @PublishedApi
@@ -119,23 +128,16 @@ class AnchoredCoordinate(
     override fun move(x: Double, y: Double, z: Double) = apply { anchor.add(x, y, z) }
 
     fun moveForward(factor: Double = 1.0) = apply {
-        if (factor == 1.0) anchor.add(front)
-        else anchor.add(front.x * factor, front.y * factor, front.z * factor)
+        anchor.add(z.x * factor, z.y * factor, z.z * factor)
     }
     fun moveLeftward(factor: Double = 1.0) = apply {
-        if (factor == 1.0) anchor.add(left)
-        else anchor.add(left.x * factor, left.y * factor, left.z * factor)
+        anchor.add(x.x * factor, x.y * factor, x.z * factor)
     }
     fun moveUpward(factor: Double = 1.0) = apply {
-        if (factor == 1.0) anchor.add(up)
-        else anchor.add(up.x * factor, up.y * factor, up.z * factor)
+        anchor.add(y.x * factor, y.y * factor, y.z * factor)
     }
 
-    /**
-     * Rigidly reorients the coordinate frame so `front` faces [targetDir].
-     * Preserves the relative roll and perpendicularity of `left` and `up`.
-     */
-    fun face(targetDir: Vector3dc) = face(targetDir.x(), targetDir.y(), targetDir.z())
+
     /**
      * Rigidly reorients the coordinate frame so `front` faces the given xyz.
      * Preserves the relative roll and perpendicularity of `left` and `up`.
@@ -151,7 +153,7 @@ class AnchoredCoordinate(
         val tz = z * invLen
 
         // Calculate shortest-arc rotation directly from primitive coordinates
-        val q = q0.rotationTo(front.x, front.y, front.z, tx, ty, tz)
+        val q = tmpQd.rotationTo(front.x(), front.y(), front.z(), tx, ty, tz)
         this.rotate(q)
     }
 
@@ -160,17 +162,30 @@ class AnchoredCoordinate(
      * or can be used to eliminate accumulated floating-point drift across frequent rotations.
      */
     fun orthonormalize() = apply {
-        front.normalize()
+        z.normalize()
         // up.set(front).cross(left).normalize().negate() // Or front.cross(left, up).normalize()
-        front.cross(left, up).normalize()
-        up.cross(front, left).normalize()
+        z.cross(x, y).normalize()
+        y.cross(z, x).normalize()
+    }
+
+    fun hasCache(index: Int): Boolean {
+        require(index < CACHE_PAIR)
+        val start = index * 6
+        return vectorCache[start].isFinite()
     }
 
     /**
      *
      * */
-    fun putCache() = apply {
-
+    fun putCache(index: Int, xp: Double, yp: Double, zp: Double, xd: Double, yd: Double, zd: Double) = apply {
+        require(index < CACHE_PAIR)
+        val start = index * 6
+        vectorCache[start] = xp
+        vectorCache[start + 1] = yp
+        vectorCache[start + 2] = zp
+        vectorCache[start + 3] = xd
+        vectorCache[start + 4] = yd
+        vectorCache[start + 5] = zd
     }
 
     /**
@@ -189,7 +204,7 @@ class AnchoredCoordinate(
                 return then(xp, yp, zp, xd, yd, zd)
             }
         }
-        return then(anchor.x, anchor.y, anchor.z, front.x, front.y, front.z)
+        return then(anchor.x, anchor.y, anchor.z, z.x, z.y, z.z)
     }
 
     companion object {

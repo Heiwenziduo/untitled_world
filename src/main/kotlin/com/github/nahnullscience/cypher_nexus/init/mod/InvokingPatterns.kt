@@ -39,14 +39,16 @@ object InvokingPatterns {
     val NO_PATTERN = registerPattern(NoPattern)
     val PLANE_BIFURCATED_PATTERN = registerPattern("plane_bifurcated", ::PlaneBifurcatedPattern)
     val PLANE_TRIFURCATED_PATTERN = registerPattern("plane_trifurcated", ::PlaneTrifurcatedPattern)
-    val PLANE_T_STYLE_PATTERN = registerPattern("plane_t_style", ::PlaneTStylePattern)
-    val PLANE_PENTAGON_PATTERN = registerPattern("plane_pentagon", ::PlanePentagonPattern)
+    val PLANE_T_STYLE_PATTERN = registerPattern("plane_t_style", PlaneTrifurcatedPattern::PlaneTStylePattern)
+    val PLANE_PENTAGON_PATTERN = registerPattern("plane_pentagon", AbstractPlaneRotationalSymmetryPattern::PlanePentagonPattern)
 
-    val FRONT_TRIANGLE_PATTERN = registerPattern("front_triangle", ::FrontTrianglePattern)
-    val FRONT_HEXAGON_PATTERN = registerPattern("front_hexagon", ::FrontHexagonPattern)
-    val FRONT_SQUARE_PATTERN = registerPattern("front_square", AbstractFrontRotationalSymmetryLayout::FrontSquarePattern)
-    val FRONT_OCTAGON_PATTERN = registerPattern("front_octagon", AbstractFrontRotationalSymmetryLayout::FrontOctagonPattern)
+    val FRONT_TRIANGLE_PATTERN = registerPattern("front_triangle", AbstractFrontRotationalSymmetryPattern::FrontTrianglePattern)
+    val FRONT_HEXAGON_PATTERN = registerPattern("front_hexagon", AbstractFrontRotationalSymmetryPattern::FrontHexagonPattern)
 
-    val PERPENDICULAR_SQUARE_PATTERN = registerPattern("perpendicular_square", AbstractPerpendicularPattern::Square)
-    val PERPENDICULAR_OCTAGON_PATTERN = registerPattern("perpendicular_octagon", AbstractPerpendicularPattern::Octagon)
+    val FRONT_DIFFUSE_SQUARE_PATTERN = registerPattern("front_diffuse_square", AbstractFrontRotationalSymmetryPattern::FrontDiffuseSquarePattern)
+    val FRONT_DIFFUSE_HEXAGON_PATTERN = registerPattern("front_diffuse_hexagon", AbstractFrontRotationalSymmetryPattern::FrontDiffuseHexagonPattern)
+    val FRONT_DIFFUSE_OCTAGON_PATTERN = registerPattern("front_diffuse_octagon", AbstractFrontRotationalSymmetryPattern::FrontDiffuseOctagonPattern)
+
+    val PERPENDICULAR_SQUARE_PATTERN = registerPattern("perpendicular_square", AbstractFrontRotationalSymmetryPattern::PerpendicularSquarePattern)
+    val PERPENDICULAR_OCTAGON_PATTERN = registerPattern("perpendicular_octagon", AbstractFrontRotationalSymmetryPattern::PerpendicularOctagonPattern)
 }
