@@ -4,31 +4,32 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import net.minecraft.core.Holder
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntitySpawnReason
+import net.minecraft.world.phys.Vec3
 
 fun <CE> AbstractProjectileCypher<CE>.spawnCypherEntity(
     level: ServerLevel,
+    shotState: ShotState,
     invoker: Entity?,
-    shotState: ShotStateChunk,
     node: ProjectileNode?,
-    posDire: PosDirePair,
-) where CE : Entity, CE : ICypherEntity {
-    val proj = createCypherEntity(this, level, invoker, shotState, node)
-    proj.initDirection(posDire)
-    level.addFreshEntity(proj)
+    position: Vec3,
+    direction: Vec3
+) : CE where CE : Entity, CE : ICypherEntity {
+    val proj = createCypherEntity(this, level, shotState, invoker, node)
+    proj.initPositionDirection(position, direction)
+    return proj.also { level.addFreshEntity(it) }
 }
 
 /** generate projectile with attributes initialized */
 fun <CE> createCypherEntity(
     cypher: AbstractProjectileCypher<CE>,
     level: ServerLevel,
+    shotState: ShotState,
     invoker: Entity?,
-    shotState: ShotStateChunk,
     node: ProjectileNode?,
 ) : CE where CE : Entity, CE : ICypherEntity {
     val entityType = cypher.projectileType.get()
@@ -65,12 +66,13 @@ fun spawnCypherEntityRaw(
     cypher: Holder<out AbstractProjectileCypher<*>>,
     level: ServerLevel,
     steerer: Holder<out AbstractCypherSteerer>,
-    posDire: PosDirePair,
     owner: Entity? = null,
+    position: Vec3,
+    direction: Vec3
 ) {
     fun <CE> spawn(cypher: AbstractProjectileCypher<CE>) where CE : Entity, CE : ICypherEntity {
         val proj = createCypherEntityRaw(cypher, level, steerer.value(), owner)
-        proj.initDirection(posDire)
+        proj.initPositionDirection(position, direction)
         level.addFreshEntity(proj)
     }
     spawn(cypher.value())

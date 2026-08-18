@@ -18,11 +18,11 @@ class PlaneBifurcatedPattern(path: Identifier) : AbstractInvokingPattern(path) {
 //        }
     }
 
-    override fun layout(
+    override fun arrangeVectors(
         index: Int,
         total: Int,
         coordinate: AnchoredCoordinate
-    ): PosDirePair {
+    ): Int {
         val i = index and 1
         return when (i) {
             0 -> {

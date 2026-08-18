@@ -4,7 +4,7 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeRedirectionHook
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk.ShotStateViewer
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState.ShotStateViewer
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.face
 import net.minecraft.core.Direction

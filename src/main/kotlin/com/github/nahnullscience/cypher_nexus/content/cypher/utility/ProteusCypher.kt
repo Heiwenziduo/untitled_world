@@ -8,7 +8,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.IRecursiveCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingSharedParameter
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 
 class ProteusCypher(
     defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder
@@ -24,7 +24,7 @@ class ProteusCypher(
      * */
     override fun invoke(
         helper: InvokingHelper,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: HelperDataBundle,
         paras: InvokingSharedParameter,
         relativeIndex: Int,

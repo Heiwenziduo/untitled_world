@@ -4,7 +4,7 @@ import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingSharedParameter
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import org.apache.logging.log4j.Level
 
 /**
@@ -36,7 +36,7 @@ interface IRecursiveCypher {
     fun copyCypher(
         target: AbstractCypher,
         helper: InvokingHelper,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: HelperDataBundle,
         paras: InvokingSharedParameter,
         targetIndex: Int,
@@ -58,7 +58,7 @@ interface IRecursiveCypher {
     fun copyCypherIndexed(
         index: Int,
         helper: InvokingHelper,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: HelperDataBundle,
         paras: InvokingSharedParameter,
         targetIndex: Int,

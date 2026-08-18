@@ -4,6 +4,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectile
 
 data class ProjectileNode(
     val instance: AbstractProjectileCypher<*>,
-    val payload: ShotStateChunk? = null,
+    val payload: ShotState? = null,
     val trigger: TriggerType = TriggerType.NONE
 )

@@ -9,7 +9,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingH
 interface InvokingTracer {
     fun enter(
         cypher: AbstractCypher,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: HelperDataBundle,
         paras: InvokingSharedParameter,
         relativeIndex: Int,
@@ -17,14 +17,14 @@ interface InvokingTracer {
     )
     fun modify(
         helper: InvokingHelper,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: HelperDataBundle,
         paras: InvokingSharedParameter,
         isCopy: Boolean
     )
     fun exit(
         cypher: AbstractCypher,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: HelperDataBundle,
         paras: InvokingSharedParameter
     )
@@ -33,7 +33,7 @@ interface InvokingTracer {
         val NONE: InvokingTracer = object : InvokingTracer {
             override fun enter(
                 cypher: AbstractCypher,
-                shotState: ShotStateChunk,
+                shotState: ShotState,
                 data: HelperDataBundle,
                 paras: InvokingSharedParameter,
                 relativeIndex: Int,
@@ -42,7 +42,7 @@ interface InvokingTracer {
 
             override fun modify(
                 helper: InvokingHelper,
-                shotState: ShotStateChunk,
+                shotState: ShotState,
                 data: HelperDataBundle,
                 paras: InvokingSharedParameter,
                 isCopy: Boolean
@@ -50,7 +50,7 @@ interface InvokingTracer {
 
             override fun exit(
                 cypher: AbstractCypher,
-                shotState: ShotStateChunk,
+                shotState: ShotState,
                 data: HelperDataBundle,
                 paras: InvokingSharedParameter
             ) = Unit

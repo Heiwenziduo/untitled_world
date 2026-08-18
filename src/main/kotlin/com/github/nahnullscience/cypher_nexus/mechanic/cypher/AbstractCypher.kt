@@ -16,7 +16,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractI
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingSharedParameter
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.utility.finiteOrDefault
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
 import net.minecraft.ChatFormatting
@@ -105,7 +105,7 @@ sealed class AbstractCypher(
      * */
     fun invokeInHand(
         helper: InvokingHelper,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: HelperDataBundle,
         paras: InvokingSharedParameter,
     ) {
@@ -123,7 +123,7 @@ sealed class AbstractCypher(
      * */
     fun traceInvoke(
         helper: InvokingHelper,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: HelperDataBundle,
         paras: InvokingSharedParameter,
         relativeIndex: Int,
@@ -147,7 +147,7 @@ sealed class AbstractCypher(
      * */
     protected open fun invoke(
         helper: InvokingHelper,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: HelperDataBundle,
         paras: InvokingSharedParameter,
         relativeIndex: Int,
@@ -164,7 +164,7 @@ sealed class AbstractCypher(
      * */
     protected fun handleDraws(
         helper: InvokingHelper,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: HelperDataBundle,
         paras: InvokingSharedParameter,
     ) {
@@ -202,7 +202,7 @@ sealed class AbstractCypher(
      * */
     open fun modifyShotState(
         helper: InvokingHelper,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: HelperDataBundle,
         paras: InvokingSharedParameter,
         isCopy: Boolean

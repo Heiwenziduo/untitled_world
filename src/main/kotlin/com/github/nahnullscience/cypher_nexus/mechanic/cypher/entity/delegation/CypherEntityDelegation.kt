@@ -8,12 +8,11 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityPhysics
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStatePool
 import com.github.nahnullscience.cypher_nexus.utility.*
 import com.github.nahnullscience.cypher_nexus.utility.exception.CypherEntityException
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.phys.*
 
@@ -56,7 +55,7 @@ class CypherEntityDelegation <CE> (
 
     override fun initCypher(
         cypher: AbstractProjectileCypher<*>,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         node: ProjectileNode?,
         steerer: AbstractCypherSteerer?
     ) {
@@ -81,7 +80,10 @@ class CypherEntityDelegation <CE> (
 
     private var _initPosition: Vec3? = null // due to CyEntity init timing, remember direction data and init later
     private var _initDirection: Vec3? = null
-    override fun initDirection(pair: PosDirePair) = run { _initDirection = pair.direction; _initPosition = pair.position }
+    override fun initPositionDirection(position: Vec3, direction: Vec3) = run {
+        _initPosition = position
+        _initDirection = direction
+    }
     private fun initDirection(ce: CE) {
         if (ce.level.isClientSide) return
         // when initDirection didn't call, vanilla setPos can handle it, with a direction ZERO

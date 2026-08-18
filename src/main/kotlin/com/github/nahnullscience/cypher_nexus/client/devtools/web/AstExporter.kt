@@ -7,7 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.EmptyCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.resources.Identifier
@@ -102,7 +102,7 @@ object AstExporter {
         children = children.map { it.toAstCallNode() },
     )
 
-    private fun ShotStateChunk.toAstChunk(): AstChunk {
+    private fun ShotState.toAstChunk(): AstChunk {
         compute() // populate delay/recharge + attr2opMap before we read them
 
         val contributors = ccMap.toMap()

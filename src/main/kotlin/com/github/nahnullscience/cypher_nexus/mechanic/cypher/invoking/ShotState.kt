@@ -19,7 +19,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.Serv
 import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import com.github.nahnullscience.cypher_nexus.utility.randomInCone
 import com.github.nahnullscience.cypher_nexus.utility.toVec3
@@ -29,8 +28,11 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
+import org.joml.Vector3d
+import org.joml.Vector3f
 
-class ShotStateChunk private constructor (
+class ShotState private constructor (
     private var charge: Int,
     private val helper: InvokingHelper?
 ) : IFlagExtension {
@@ -54,7 +56,7 @@ class ShotStateChunk private constructor (
         /**
          * create a `root` shot-state, only root has the access to `helper`
          * */
-        fun root(helper: InvokingHelper) = ShotStateChunk(1, helper)
+        fun root(helper: InvokingHelper) = ShotState(1, helper)
     }
 
 //    private var _attrBacking: AttributeFastOperatorMap? = null
@@ -165,6 +167,8 @@ class ShotStateChunk private constructor (
     }
 
     private var indexP = 0
+    private val vd = Vector3d()
+    private val vf = Vector3f()
     /**
      * wrap [spawnCypherEntity] for pattern & chain effect supports
      * */
@@ -177,50 +181,52 @@ class ShotStateChunk private constructor (
         directInvoker: Entity?,
         spread: Double
     ) {
-        val patternPosDire = shotPattern.value().layout(indexP, totalProjectiles, coordinate)
-        run layer@ {
-            var dire = patternPosDire.direction
-            run spread@ {
-                val random = owner?.random ?: directInvoker?.random ?: return@spread
-                if (spread > 0.01) dire = dire.randomInCone(spread / 2, random)
+        shotPattern.value().layout(indexP++, totalProjectiles, coordinate) { xp, yp, zp, xd, yd, zd ->
+            run layer@ {
+                var dire = vf.set(xd, yd, zd)
+                run spread@ {
+                    val random = owner?.random ?: directInvoker?.random ?: return@spread
+                    if (spread > 0.125) dire = dire.randomInCone(spread / 2, random)
+                }
+                val pos = Vec3(xp, yp, zp)
+                val dir = dire.toVec3()
+                cypher.spawnCypherEntity(level, this, owner, node, pos, dir)
             }
-            cypher.spawnCypherEntity(level, owner, this, node, PosDirePair(patternPosDire.position, dire))
         }
-        indexP++
     }
 
 
     fun addProjectileNode(
         cypher: AbstractProjectileCypher<*>,
-        payload: ShotStateChunk,
+        payload: ShotState,
         trigger: TriggerType
-    ): ShotStateChunk = apply {
+    ): ShotState = apply {
         dirty = true
         triggeredProjectiles.add(ProjectileNode(cypher, payload, trigger))
     }
-    fun addProjectileNode(cypher: AbstractProjectileCypher<*>, count: Int = 1): ShotStateChunk = apply {
+    fun addProjectileNode(cypher: AbstractProjectileCypher<*>, count: Int = 1): ShotState = apply {
         dirty = true
         simpleProjectiles.addTo(cypher, count.coerceAtLeast(0))
     }
 
     @Deprecated("state changes affected by this method won't be synced, use ccMap-friendly method instead")
-    fun attachHooks(cypher: AbstractNonProjectileCypher): ShotStateChunk = apply { hooks.add(cypher) }
+    fun attachHooks(cypher: AbstractNonProjectileCypher): ShotState = apply { hooks.add(cypher) }
 
     @Deprecated("state changes affected by this method won't be synced, use ccMap-friendly method instead")
-    fun enableFlags(flag: Int): ShotStateChunk = apply { enableFlag(flag) }
+    fun enableFlags(flag: Int): ShotState = apply { enableFlag(flag) }
 
     /**
      * register cypher to [MapOfCypherCounts], this will make all shot-state attribute of the cypher into count.
      * this won't affect the projectile count.
      * @see addProjectileNode
      * */
-    fun record(cy: AbstractCypher, count: Int = 1): ShotStateChunk = apply {
+    fun record(cy: AbstractCypher, count: Int = 1): ShotState = apply {
         dirty = true
         ccMap.count(cy, count.coerceAtLeast(0))
     }
 
     /** compute and lock the state */
-    fun compute(): ShotStateChunk {
+    fun compute(): ShotState {
         if (!dirty) return this
 
         _ccMapBacking?.let { ccMap ->

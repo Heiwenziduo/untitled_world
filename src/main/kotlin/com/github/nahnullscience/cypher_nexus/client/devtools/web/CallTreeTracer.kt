@@ -5,7 +5,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingH
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingSharedParameter
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingTracer
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 
 class CallTreeTracer : InvokingTracer {
     class Node(val cypher: AbstractCypher, val isCopy: Boolean) {
@@ -16,7 +16,7 @@ class CallTreeTracer : InvokingTracer {
 
     override fun enter(
         cypher: AbstractCypher,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: HelperDataBundle,
         paras: InvokingSharedParameter,
         relativeIndex: Int,
@@ -29,7 +29,7 @@ class CallTreeTracer : InvokingTracer {
 
     override fun modify(
         helper: InvokingHelper,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: HelperDataBundle,
         paras: InvokingSharedParameter,
         isCopy: Boolean
@@ -39,7 +39,7 @@ class CallTreeTracer : InvokingTracer {
 
     override fun exit(
         cypher: AbstractCypher,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: HelperDataBundle,
         paras: InvokingSharedParameter
     ) {

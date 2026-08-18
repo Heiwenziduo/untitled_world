@@ -3,12 +3,12 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.other
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingSharedParameter
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 
 object RequirementOddHand : AbstractRequirement.RequirementIf() {
     override fun requirement(
         helper: InvokingHelper,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: InvokingHelper.HelperDataBundle,
         paras: InvokingSharedParameter,
     ): Boolean {

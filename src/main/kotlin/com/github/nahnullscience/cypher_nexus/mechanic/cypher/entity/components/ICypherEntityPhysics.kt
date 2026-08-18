@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
@@ -13,7 +13,7 @@ interface ICypherEntityPhysics {
     val capturedInitialSpeedSqr: Double
 
     val triggerType: TriggerType
-    val payload: ShotStateChunk?
+    val payload: ShotState?
 
     /**
      * store bounce points triggered in one tick

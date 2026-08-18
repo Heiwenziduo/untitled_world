@@ -6,14 +6,13 @@ import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.RECOIL_MO
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.SECONDARY_MODULE
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingResult
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable.Companion.FALL_BACK
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable.Companion.TO_BE_GENERATED
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload.Companion.EMPTY
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import com.github.nahnullscience.cypher_nexus.utility.nearestHitPoint
 import com.github.nahnullscience.cypher_nexus.utility.toVec3
@@ -148,7 +147,7 @@ abstract class AbstractItemWand(
         coordinate: AnchoredCoordinate,
         stack: ItemStack,
         dataBundle: HelperDataBundle,
-        shotStateRoot: ShotStateChunk
+        shotStateRoot: ShotState
     ): InvokingResult {
         val instance = getWandInstance(level, invoker, stack)
         instance.updateFromHelperData(dataBundle)

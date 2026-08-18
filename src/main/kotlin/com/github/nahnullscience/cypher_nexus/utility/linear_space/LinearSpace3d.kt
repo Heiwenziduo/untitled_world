@@ -84,6 +84,10 @@ class AnchoredCoordinate(
     private var _q0Backing: Quaterniond? = null
     private val q0 get() = _q0Backing ?: Quaterniond().also { _q0Backing = it }
 
+    private var _vectorCacheBacking: DoubleArray? = null
+    @PublishedApi
+    internal val vectorCache = _vectorCacheBacking ?: DoubleArray(CACHE_SIZE) { Double.NaN }.also { _vectorCacheBacking = it }
+
     fun copy() = AnchoredCoordinate(this)
 
     override fun anchor(x: Double, y: Double, z: Double) = apply { anchor.set(x, y, z) }
@@ -162,7 +166,38 @@ class AnchoredCoordinate(
         up.cross(front, left).normalize()
     }
 
+    /**
+     *
+     * */
+    fun putCache() = apply {
+
+    }
+
+    /**
+     * number out of bound / vector uninitialized cases will fall back to anchor + forward
+     * */
+    inline fun extractCache(index: Int, then: vectorsConsumer2) {
+        run cache@ {
+            if (index < CACHE_PAIR) {
+                val start = index * 6
+                val xp = vectorCache[start]    .also { if(it.isNaN()) return@cache }
+                val yp = vectorCache[start + 1].also { if(it.isNaN()) return@cache }
+                val zp = vectorCache[start + 2].also { if(it.isNaN()) return@cache }
+                val xd = vectorCache[start + 3].also { if(it.isNaN()) return@cache }
+                val yd = vectorCache[start + 4].also { if(it.isNaN()) return@cache }
+                val zd = vectorCache[start + 5].also { if(it.isNaN()) return@cache }
+                return then(xp, yp, zp, xd, yd, zd)
+            }
+        }
+        return then(anchor.x, anchor.y, anchor.z, front.x, front.y, front.z)
+    }
+
     companion object {
+        typealias vectorsConsumer2 = (xp: Double, yp: Double, zp: Double, xd: Double, yd: Double, zd: Double) -> Unit
+        @PublishedApi
+        internal const val CACHE_PAIR = 8
+        @PublishedApi
+        internal const val CACHE_SIZE = CACHE_PAIR * 6
 
         fun fromFrontLeft(front: Vector3d, left: Vector3d): AnchoredCoordinate {
             val up = front.cross(left, Vector3d())

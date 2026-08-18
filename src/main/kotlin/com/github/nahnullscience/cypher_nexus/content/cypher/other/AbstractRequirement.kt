@@ -6,14 +6,14 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProject
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingSharedParameter
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 
 /** invoke the next a few cyphers only when the requirements are met */
 sealed class AbstractRequirement : AbstractNonProjectileCypher(UNMODIFIED) {
     override val category = CypherCategories.OTHER
     override fun modifyShotState(
         helper: InvokingHelper,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: HelperDataBundle,
         paras: InvokingSharedParameter,
         isCopy: Boolean
@@ -24,14 +24,14 @@ sealed class AbstractRequirement : AbstractNonProjectileCypher(UNMODIFIED) {
         /** true if conditions are met */
         abstract fun requirement(
             helper: InvokingHelper,
-            shotState: ShotStateChunk,
+            shotState: ShotState,
             data: HelperDataBundle,
             paras: InvokingSharedParameter,
         ) : Boolean
 
         override fun invoke(
             helper: InvokingHelper,
-            shotState: ShotStateChunk,
+            shotState: ShotState,
             data: HelperDataBundle,
             paras: InvokingSharedParameter,
             relativeIndex: Int,

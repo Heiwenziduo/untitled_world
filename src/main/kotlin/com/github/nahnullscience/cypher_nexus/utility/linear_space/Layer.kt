@@ -12,4 +12,5 @@ fun AnchoredCoordinate.Companion.fromFrontLeft(front: Vec3, left: Vec3): Anchore
 }
 
 fun AnchoredCoordinate.anchor(v: Vec3) = anchor(v.x, v.y, v.z)
+fun AnchoredCoordinate.anchor(v: Vector3d) = anchor(v.x, v.y, v.z)
 fun AnchoredCoordinate.face(v: Vec3) = face(v.x, v.y, v.z)

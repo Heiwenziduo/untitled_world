@@ -6,7 +6,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.Attribut
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingResult
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandDataInvariable
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.ItemWandInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.data.WandDataHighPayload
@@ -53,7 +53,7 @@ interface IItemWand : IWandLike<ItemStack> {
         coordinate: AnchoredCoordinate,
         stack: ItemStack,
         dataBundle: HelperDataBundle,
-        shotStateRoot: ShotStateChunk
+        shotStateRoot: ShotState
     ): InvokingResult
 
     /**
@@ -94,7 +94,8 @@ interface IItemWand : IWandLike<ItemStack> {
 //        }
 
         adjustInvokingCoordinate(level, invoker, coordinate, dataProvider)
-        helper.releaseInvokingResult(level, coordinate)
+        helper.shotRoot.release(level, coordinate, invoker, invoker)
+        // helper.releaseInvokingResult(level, coordinate)
         return afterInvoke(level, invoker, coordinate, dataProvider, state, helper.shotRoot)
     }
 

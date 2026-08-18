@@ -40,6 +40,7 @@ fun Vector3f.set(v3: Vec3): Vector3f = set(v3.x, v3.y, v3.z)
 //    rotateAxis(rad, axis.x.toFloat(), axis.y.toFloat(), axis.z.toFloat())
 
 fun Vector3d.toVec3(): Vec3 = Vec3(x, y, z)
+fun Vector3d.set(v3: Vec3): Vector3d = set(v3.x, v3.y, v3.z)
 
 fun Vec3.coerceMaxLength(length: Double): Vec3 {
     val lengthSqr = x * x + y * y + z * z

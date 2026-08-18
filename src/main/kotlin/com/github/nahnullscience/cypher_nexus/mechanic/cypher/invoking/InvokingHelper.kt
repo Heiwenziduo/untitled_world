@@ -2,11 +2,9 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
 import com.github.nahnullscience.cypher_nexus.utility.mod.ArrayOfCyphers
 import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.level.Level
 import kotlin.math.max
 
 /**
@@ -20,7 +18,7 @@ class InvokingHelper (
     val tracer: InvokingTracer = InvokingTracer.NONE,
     val invoker: Entity? = null,
 ) {
-    val shotRoot = ShotStateChunk.root(this)
+    val shotRoot = ShotState.root(this)
     /** safe to modify */
     val paras = InvokingSharedParameter()
     /**
@@ -69,12 +67,12 @@ class InvokingHelper (
     /**
      *
      * */
-    fun releaseInvokingResult(
-        level: Level,
-        coordinate: AnchoredCoordinate
-    ) {
-        shotRoot.release(level, coordinate, invoker, invoker)
-    }
+//    fun releaseInvokingResult(
+//        level: Level,
+//        coordinate: AnchoredCoordinate
+//    ) {
+//        shotRoot.release(level, coordinate, invoker, invoker)
+//    }
 
     private fun step(): Boolean {
         val cy = drawNext()

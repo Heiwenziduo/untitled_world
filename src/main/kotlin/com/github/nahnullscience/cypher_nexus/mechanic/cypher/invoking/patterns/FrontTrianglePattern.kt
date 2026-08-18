@@ -14,11 +14,11 @@ class FrontTrianglePattern(path: Identifier) : AbstractInvokingPattern(path) {
         private const val TOP = BOT / 2
         private val SIDE = BOT * sqrt(3.0) / 2
     }
-    override fun layout(
+    override fun arrangeVectors(
         index: Int,
         total: Int,
         coordinate: AnchoredCoordinate
-    ): PosDirePair {
+    ): Int {
         val i = index % 3
         return when(i) {
             1 -> {

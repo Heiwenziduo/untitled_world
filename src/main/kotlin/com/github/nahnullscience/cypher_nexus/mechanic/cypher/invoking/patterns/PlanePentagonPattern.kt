@@ -18,11 +18,11 @@ class PlanePentagonPattern(path: Identifier) : AbstractInvokingPattern(path) {
         private val A = Vector3f()
     }
 
-    override fun layout(
+    override fun arrangeVectors(
         index: Int,
         total: Int,
         coordinate: AnchoredCoordinate
-    ): PosDirePair {
+    ): Int {
         val i = index % 5
         return coordinate.getOrComputePatternCache(i) cache@ {
             val (pos, dir) = posDire

@@ -20,11 +20,11 @@ abstract class AbstractFrontRotationalSymmetryLayout(path: Identifier) : Abstrac
     protected val q = Quaternionf()
     protected val v = Vector3f()
 
-    override fun layout(
+    override fun arrangeVectors(
         index: Int,
         total: Int,
         coordinate: AnchoredCoordinate
-    ): PosDirePair {
+    ): Int {
         val i = index % count
         return coordinate.getOrComputePatternCache(i) cache@ {
             // TODO should omit the "dir" in posDir entirely, refactor that from ShotState

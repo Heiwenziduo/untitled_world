@@ -9,8 +9,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import net.minecraft.core.Holder
 import net.minecraft.server.level.ServerLevel
@@ -42,11 +41,11 @@ interface ICypherEntity :
     )
 
     /**
-     * init from [ShotStateChunk]
+     * init from [ShotState]
      * */
     fun initCypher(
         cypher: AbstractProjectileCypher<*>,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         node: ProjectileNode?,
         steerer: AbstractCypherSteerer?
     )
@@ -59,7 +58,7 @@ interface ICypherEntity :
     /**
      *
      * */
-    fun initDirection(pair: PosDirePair)
+    fun initPositionDirection(position: Vec3, direction: Vec3)
 
 
     fun getDirectionInitial(): Vec3

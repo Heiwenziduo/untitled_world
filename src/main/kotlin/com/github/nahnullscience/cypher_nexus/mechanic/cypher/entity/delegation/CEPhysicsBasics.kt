@@ -18,7 +18,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityLogicContext
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.*
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
@@ -50,7 +50,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     override var capturedInitialSpeedSqr: Double = 0.0
 
     override var triggerType = TriggerType.NONE
-    override var payload: ShotStateChunk? = null
+    override var payload: ShotState? = null
 
     protected var bounceCount = 0
     override val canBounce: Boolean get() = bounceCount < ce.getBounce()
@@ -66,7 +66,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     protected var explosion: ExplosionSettings<*>? = null
 
 
-    override fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotStateChunk?, node: ProjectileNode?) {
+    override fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotState?, node: ProjectileNode?) {
         if (node != null) {
             triggerType = node.trigger
             payload = node.payload

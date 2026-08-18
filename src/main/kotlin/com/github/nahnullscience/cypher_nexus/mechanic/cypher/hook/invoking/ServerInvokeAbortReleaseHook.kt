@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking
 
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookModule
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.IHook
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk.ShotStateAccessor
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState.ShotStateAccessor
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 

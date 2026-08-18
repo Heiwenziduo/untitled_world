@@ -22,11 +22,11 @@ abstract class AbstractPerpendicularPattern(path: Identifier) : AbstractInvoking
     abstract val rad: Float
     abstract val len: Float
 
-    final override fun layout(
+    final override fun arrangeVectors(
         index: Int,
         total: Int,
         coordinate: AnchoredCoordinate
-    ): PosDirePair {
+    ): Int {
         val i = index and (round - 1)
         return coordinate.getOrComputePatternCache(i) cache@ {
             val (pos, dir) = posDire

@@ -6,7 +6,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import net.minecraft.core.Direction
@@ -23,14 +23,14 @@ interface ICypherEntityLogicContext : TraceableEntity,
     IFlagExtension, ICypherEntityAttributeAccessor {
 
     /**
-     * [MapOfCypherCounts] serves as the token of [ShotStateChunk],
+     * [MapOfCypherCounts] serves as the token of [ShotState],
      * this field initialized in server and will be shipped to client to sync shot-data
      *
-     * this field directly forwards to the backing [ShotStateChunk] and should be treated as `immutable`
+     * this field directly forwards to the backing [ShotState] and should be treated as `immutable`
      * */
     val ccMap: MapOfCypherCounts?
 
-    /** this field directly forwards to the backing [ShotStateChunk] and should be treated as `immutable` */
+    /** this field directly forwards to the backing [ShotState] and should be treated as `immutable` */
     val hooks: HookContainer?
     val hooksSharedData: HooksSharedData
     val steerer: AbstractCypherSteerer

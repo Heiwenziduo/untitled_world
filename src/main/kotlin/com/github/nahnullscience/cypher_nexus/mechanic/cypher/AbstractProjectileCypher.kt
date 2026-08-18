@@ -7,7 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingSharedParameter
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
@@ -36,7 +36,7 @@ abstract class AbstractProjectileCypher <CE> (
 
     override fun invoke(
         helper: InvokingHelper,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: HelperDataBundle,
         paras: InvokingSharedParameter,
         relativeIndex: Int,
@@ -59,7 +59,7 @@ abstract class AbstractProjectileCypher <CE> (
         }
     }
 
-    open fun addProjectileAlone(shotState: ShotStateChunk, count: Int = projectileCount) {
+    open fun addProjectileAlone(shotState: ShotState, count: Int = projectileCount) {
         shotState.addProjectileNode(this, count)
     }
 
@@ -67,10 +67,10 @@ abstract class AbstractProjectileCypher <CE> (
      * @return the newly created payload-state
      * */
     open fun addProjectileWithTrigger(
-        old: ShotStateChunk,
+        old: ShotState,
         trigger: TriggerType,
         charge: Int = TRIGGER_CHARGE_MAX
-    ): ShotStateChunk = ShotStateChunk(charge).also { old.addProjectileNode(this, it, trigger) }
+    ): ShotState = ShotState(charge).also { old.addProjectileNode(this, it, trigger) }
 
 
     fun getAttrOrDefault(attr: CypherAttribute): Double = dataMap().projectile.getAttributeOrDefault(attr)

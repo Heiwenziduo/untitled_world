@@ -12,7 +12,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.StaticProjectileCy
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingHelper.HelperDataBundle
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.InvokingSharedParameter
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 
 /**
  * a series of cypher that can invoke other cyphers
@@ -27,7 +27,7 @@ abstract class AbstractGreekLetter(
 
     override fun invoke(
         helper: InvokingHelper,
-        shotState: ShotStateChunk,
+        shotState: ShotState,
         data: HelperDataBundle,
         paras: InvokingSharedParameter,
         relativeIndex: Int,
@@ -42,7 +42,7 @@ abstract class AbstractGreekLetter(
     class Alpha(defaultAttribute: Builder.() -> Builder) : AbstractGreekLetter("alpha", defaultAttribute) {
         override fun invoke(
             helper: InvokingHelper,
-            shotState: ShotStateChunk,
+            shotState: ShotState,
             data: HelperDataBundle,
             paras: InvokingSharedParameter,
             relativeIndex: Int,
@@ -69,7 +69,7 @@ abstract class AbstractGreekLetter(
     class Gamma(defaultAttribute: Builder.() -> Builder) : AbstractGreekLetter("gamma", defaultAttribute) {
         override fun invoke(
             helper: InvokingHelper,
-            shotState: ShotStateChunk,
+            shotState: ShotState,
             data: HelperDataBundle,
             paras: InvokingSharedParameter,
             relativeIndex: Int,
@@ -94,7 +94,7 @@ abstract class AbstractGreekLetter(
     class Omega(defaultAttribute: Builder.() -> Builder) : AbstractGreekLetter("omega", defaultAttribute) {
         override fun invoke(
             helper: InvokingHelper,
-            shotState: ShotStateChunk,
+            shotState: ShotState,
             data: HelperDataBundle,
             paras: InvokingSharedParameter,
             relativeIndex: Int,
@@ -123,7 +123,7 @@ abstract class AbstractGreekLetter(
     class Tau(defaultAttribute: Builder.() -> Builder) : AbstractGreekLetter("tau", defaultAttribute) {
         override fun invoke(
             helper: InvokingHelper,
-            shotState: ShotStateChunk,
+            shotState: ShotState,
             data: HelperDataBundle,
             paras: InvokingSharedParameter,
             relativeIndex: Int,
@@ -147,7 +147,7 @@ abstract class AbstractGreekLetter(
     class Mu(defaultAttribute: Builder.() -> Builder) : AbstractGreekLetter("mu", defaultAttribute) {
         override fun invoke(
             helper: InvokingHelper,
-            shotState: ShotStateChunk,
+            shotState: ShotState,
             data: HelperDataBundle,
             paras: InvokingSharedParameter,
             relativeIndex: Int,
@@ -172,7 +172,7 @@ abstract class AbstractGreekLetter(
     class Phi(defaultAttribute: Builder.() -> Builder) : AbstractGreekLetter("phi", defaultAttribute) {
         override fun invoke(
             helper: InvokingHelper,
-            shotState: ShotStateChunk,
+            shotState: ShotState,
             data: HelperDataBundle,
             paras: InvokingSharedParameter,
             relativeIndex: Int,
@@ -193,7 +193,7 @@ abstract class AbstractGreekLetter(
     class Sigma(defaultAttribute: Builder.() -> Builder) : AbstractGreekLetter("sigma", defaultAttribute) {
         override fun invoke(
             helper: InvokingHelper,
-            shotState: ShotStateChunk,
+            shotState: ShotState,
             data: HelperDataBundle,
             paras: InvokingSharedParameter,
             relativeIndex: Int,

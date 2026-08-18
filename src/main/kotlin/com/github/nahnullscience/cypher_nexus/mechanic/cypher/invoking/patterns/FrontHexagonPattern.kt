@@ -24,11 +24,11 @@ class FrontHexagonPattern(path: Identifier) : AbstractInvokingPattern(path) {
         private val SCRATCH_QUAD = ThreadLocal.withInitial { Quaternionf() }
         private val SCRATCH_AXIS = ThreadLocal.withInitial { Vector3f() }
     }
-    override fun layout(
+    override fun arrangeVectors(
         index: Int,
         total: Int,
         coordinate: AnchoredCoordinate
-    ): PosDirePair {
+    ): Int {
         val i = index % 6
         return coordinate.getOrComputePatternCache(i) cache@{
             val (pos, dir) = posDire

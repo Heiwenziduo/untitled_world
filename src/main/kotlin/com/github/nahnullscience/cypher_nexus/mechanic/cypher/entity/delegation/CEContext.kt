@@ -14,7 +14,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.NoS
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotStateChunk
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.utility.isOwnerOf
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import net.minecraft.core.registries.Registries
@@ -48,7 +48,7 @@ open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity
 
     override fun initCypher(
         cypher: AbstractProjectileCypher<*>,
-        shotState: ShotStateChunk?,
+        shotState: ShotState?,
         steerer: AbstractCypherSteerer?
     ) {
         enabledFlags = (shotState?.enabledFlags ?: 0) or cypher.flags

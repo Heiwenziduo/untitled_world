@@ -10,11 +10,11 @@ class PlaneTrifurcatedPattern(path: Identifier) : AbstractInvokingPattern(path) 
     companion object {
         private const val RAD = (PI / 6).toFloat()
     }
-    override fun layout(
+    override fun arrangeVectors(
         index: Int,
         total: Int,
         coordinate: AnchoredCoordinate
-    ): PosDirePair {
+    ): Int {
         val i = index % 3
         return when (i) {
             1 -> {
