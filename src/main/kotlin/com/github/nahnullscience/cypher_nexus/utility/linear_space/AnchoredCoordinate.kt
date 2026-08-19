@@ -160,7 +160,7 @@ class AnchoredCoordinate(
     companion object {
         typealias vectorsConsumer2 = (xp: Double, yp: Double, zp: Double, xd: Double, yd: Double, zd: Double) -> Unit
         @PublishedApi
-        internal const val CACHE_PAIR = 8
+        internal const val CACHE_PAIR = 32
         @PublishedApi
         internal const val CACHE_SIZE = CACHE_PAIR * 6
 

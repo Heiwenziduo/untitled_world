@@ -21,7 +21,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.Attribut
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractInvokingPattern
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.AbstractInvokingPattern
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.exception.CypherNotFoundException
 import net.minecraft.core.Holder
@@ -581,8 +581,8 @@ object Cyphers {
     }
 
 
-//    val FORMATION_TEST = registerFormation(InvokingPatterns.FRONT_SQUARE_PATTERN) {
-//        manaDrain(3f)
+//    val FORMATION_TEST = registerFormation(InvokingPatterns.STAR_FLEET_PATTERN) {
+//        manaDrain(0f)
 //        draw(4)
 //        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -30.0)
 //    }

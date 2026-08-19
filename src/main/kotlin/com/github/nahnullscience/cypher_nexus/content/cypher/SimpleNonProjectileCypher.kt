@@ -7,7 +7,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.Attribut
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractInvokingPattern
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.AbstractInvokingPattern
 import com.github.nahnullscience.cypher_nexus.utility.toRGB
 import net.minecraft.core.Holder
 import net.minecraft.resources.Identifier

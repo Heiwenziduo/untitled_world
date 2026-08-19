@@ -2,6 +2,7 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.other
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherCategories
+import com.github.nahnullscience.cypher_nexus.init.mod.InvokingPatterns
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.IRecursiveCypher
@@ -17,10 +18,10 @@ abstract class AbstractDivideBy(
     val divideByX: Int,
     val chainPosLimit: Int
 ) : AbstractNonProjectileCypher(defaultAttribute), IRecursiveCypher {
-
     final override val resource = CypherNexus.modResource(path)
     final override val category = CypherCategories.OTHER
-    override val isRecursive = false
+    final override val pattern = InvokingPatterns.FRONT_EVEN_FAN_PATTERN
+    final override val isRecursive = false
 
     override fun invoke(
         helper: InvokingHelper,

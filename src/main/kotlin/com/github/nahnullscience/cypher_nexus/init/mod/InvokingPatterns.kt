@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractInvokingPattern
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.AbstractInvokingPattern
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.*
 import net.minecraft.core.Registry
 import net.minecraft.resources.Identifier
@@ -48,6 +48,10 @@ object InvokingPatterns {
     val FRONT_DIFFUSE_SQUARE_PATTERN = registerPattern("front_diffuse_square", AbstractFrontRotationalSymmetryPattern::FrontDiffuseSquarePattern)
     val FRONT_DIFFUSE_HEXAGON_PATTERN = registerPattern("front_diffuse_hexagon", AbstractFrontRotationalSymmetryPattern::FrontDiffuseHexagonPattern)
     val FRONT_DIFFUSE_OCTAGON_PATTERN = registerPattern("front_diffuse_octagon", AbstractFrontRotationalSymmetryPattern::FrontDiffuseOctagonPattern)
+
+    val FRONT_EVEN_FAN_PATTERN = registerPattern("front_even_fan", ::FrontEvenFanPattern)
+    val FRONT_EVEN_LINE_PATTERN = registerPattern("front_even_line", ::FrontEvenLinePattern)
+    val STAR_FLEET_PATTERN = registerPattern("star_fleet", FrontEvenLinePattern::StarFleetPattern)
 
     val PERPENDICULAR_SQUARE_PATTERN = registerPattern("perpendicular_square", AbstractFrontRotationalSymmetryPattern::PerpendicularSquarePattern)
     val PERPENDICULAR_OCTAGON_PATTERN = registerPattern("perpendicular_octagon", AbstractFrontRotationalSymmetryPattern::PerpendicularOctagonPattern)
