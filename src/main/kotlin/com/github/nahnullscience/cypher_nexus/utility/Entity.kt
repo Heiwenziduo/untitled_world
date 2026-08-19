@@ -5,12 +5,14 @@ import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoord
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.anchor
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.fromFrontLeft
 import net.minecraft.util.Mth
+import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.TraceableEntity
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
+import org.joml.Vector3d
 import org.joml.Vector3f
 import kotlin.math.cos
 import kotlin.math.sin

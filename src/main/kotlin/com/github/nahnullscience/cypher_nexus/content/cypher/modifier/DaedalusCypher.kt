@@ -19,10 +19,7 @@ import net.minecraft.world.level.ClipContext
 import net.minecraft.world.level.ClipContext.Block
 import net.minecraft.world.level.ClipContext.Fluid
 import net.minecraft.world.phys.HitResult.Type
-import net.minecraft.world.phys.Vec3
 import org.joml.Vector3d
-import org.joml.Vector3f
-import org.joml.minus
 
 class DaedalusCypher(
     defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder
@@ -48,10 +45,13 @@ class DaedalusCypher(
         val heightMax = (16.0 + 8.0 * count).coerceAtMost(128.0)
         val lengthMax = (16.0 + 8.0 * count).coerceAtMost(64.0)
 
-        val start = coordinate.anchor.toVec3()
-        val direction = coordinate.front.toVec3()
-        val routeDefault = direction.scale(lengthMax)
-        var hitDestination = start.add(routeDefault)
+        var vf = coordinate.tmpV3f
+        val vd0 = coordinate.tmpV3d
+        val vd1 = Vector3d()
+
+        val start = vd0.set(coordinate.anchor).toVec3()
+        val route = vd1.set(coordinate.front).mul(lengthMax)
+        var hitDestination = vd0.add(route).toVec3()
 
         var hitDir: Direction? = null
         level.nearestHitPointThen(start, hitDestination, directInvoker, MARGIN) { hitPoint, dir ->
@@ -59,37 +59,29 @@ class DaedalusCypher(
             hitDir = dir
         }
 
-        val vf = Vector3f()
-        val posFinal = Vector3d()
-        val dirFinal = Vector3d()
 
         if (hitDir != Direction.DOWN) {
-            vf.set(0f, 1f, 0f).randomInCone(angle, directInvoker.random).mul(heightMax.toFloat())
+            vf = vf.set(0f, 1f, 0f).randomInCone(angle, directInvoker.random)
+            vf.mul(heightMax.toFloat())
             val upward = vf.toVec3()
             val blockResult2 = level.clipIncludingBorder(
                 ClipContext(hitDestination, hitDestination.add(upward), Block.COLLIDER, Fluid.NONE, directInvoker)
             )
-//            posFinal =
-//                if (blockResult2.type != Type.MISS) blockResult2.location.subtract(0.0, 0.25, 0.0)
-//                else hitDestination.add(upward)
-//            dirFinal = posFinal.vectorTo(hitDestination)
+
             if (blockResult2.type != Type.MISS) {
-                posFinal.set(blockResult2.location).sub(0.0, 0.25, 0.0)
+                vd0.set(blockResult2.location).sub(0.0, 0.25, 0.0)
             } else {
-                posFinal.set(hitDestination.x + upward.x, hitDestination.y + upward.y, hitDestination.z + upward.z)
+                vd0.set(hitDestination.x + upward.x, hitDestination.y + upward.y, hitDestination.z + upward.z)
             }
-            dirFinal.set(hitDestination).minus(posFinal)
+            vd1.set(hitDestination).sub(vd0)
         } else {
             // if targeting a ceiling, fire projectiles like a shower
             val downward = vf.set(0f, -1f, 0f).randomInCone(angle, directInvoker.random)
-//            hitDestination = hitDestination.subtract(0.0, 0.25, 0.0)
-//            posFinal = hitDestination
-//            dirFinal = downward
-            posFinal.set(hitDestination).sub(0.0, 0.25, 0.0)
-            dirFinal.set(downward)
+            vd0.set(hitDestination).sub(0.0, 0.25, 0.0)
+            vd1.set(downward)
         }
 
-        coordinate.anchor(posFinal)
-        coordinate.face(dirFinal)
+        coordinate.anchor(vd0)
+        coordinate.face(vd1)
     }
 }

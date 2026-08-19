@@ -138,7 +138,7 @@ abstract class AbstractItemWand(
         val clip1 = coordinate.moveForward(scale).anchor.toVec3()
 
         val pos = level.nearestHitPoint(clip0, clip1, invoker, 0.3)
-        coordinate.move(pos.x, pos.y, pos.z)
+        coordinate.anchor(pos.x, pos.y, pos.z)
     }
 
     override fun afterInvoke(

@@ -11,8 +11,10 @@ import org.joml.Vector3d
 import org.joml.Vector3dc
 import org.joml.Vector3f
 import org.joml.Vector3fc
+import java.lang.Math
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.*
+
 
 fun Vec3.toVec3i() = Vec3i(x.toInt(), y.toInt(), z.toInt())
 fun Vec3.toV3d() = Vector3d(x, y, z)
@@ -381,4 +383,41 @@ fun Axis.randomPerpendicularNormal(random: RandomSource): Vec3 {
         Axis.Y -> Vec3(sin(v), 0.0, cos(v))
         Axis.Z -> Vec3(sin(v), cos(v), 0.0)
     }
+}
+
+fun Axis.randomPerpendicularNormalD(random: RandomSource): Vector3d {
+    val v = random.nextDouble() * Math.TAU
+    return when(this) {
+        Axis.X -> Vector3d(0.0, sin(v), cos(v))
+        Axis.Y -> Vector3d(sin(v), 0.0, cos(v))
+        Axis.Z -> Vector3d(sin(v), cos(v), 0.0)
+    }
+}
+
+/**
+ * Computes the normalized horizontal "left" vector perpendicular to this "front" vector.
+ *
+ * If this vector points directly upwards or downwards (or is degenerate),
+ * it falls back to a random unit vector on the horizontal (XZ) plane.
+ *
+ * @param random The RandomSource to roll fallback angles from.
+ * @param dest Optional target vector to store the result in (avoids heap allocation).
+ */
+fun Vector3d.horizontalLeft(
+    dest: Vector3d = Vector3d(),
+    random: RandomSource
+): Vector3d = horizontalLeft(dest) { dest ->
+    val angle = random.nextDouble() * Math.TAU
+    dest.set(cos(angle), 0.0, sin(angle))
+}
+
+fun Vector3d.horizontalLeft(
+    dest: Vector3d = Vector3d(),
+    fallback: (dest: Vector3d) -> Vector3d
+): Vector3d {
+    val hLenSqr = x * x + z * z
+    return if (hLenSqr > 1e-7) {
+        val invHLen = 1.0 / sqrt(hLenSqr)
+        dest.set(z * invHLen, 0.0, -x * invHLen)
+    } else fallback(dest)
 }

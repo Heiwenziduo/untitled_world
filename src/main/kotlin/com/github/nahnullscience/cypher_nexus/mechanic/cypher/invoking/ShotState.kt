@@ -167,8 +167,6 @@ class ShotState private constructor (
     }
 
     private var indexP = 0
-    private val vd = Vector3d()
-    private val vf = Vector3f()
     /**
      * wrap [spawnCypherEntity] for pattern & chain effect supports
      * */
@@ -183,14 +181,13 @@ class ShotState private constructor (
     ) {
         shotPattern.value().layout(indexP++, totalProjectiles, coordinate) { xp, yp, zp, xd, yd, zd ->
             run layer@ {
-                var dire = vf.set(xd, yd, zd)
+                val pos = Vec3(xp, yp, zp)
+                var dir = coordinate.tmpV3f.set(xd, yd, zd)
                 run spread@ {
                     val random = owner?.random ?: directInvoker?.random ?: return@spread
-                    if (spread > 0.125) dire = dire.randomInCone(spread / 2, random)
+                    if (spread > 0.125) dir = dir.randomInCone(spread / 2, random)
                 }
-                val pos = Vec3(xp, yp, zp)
-                val dir = dire.toVec3()
-                cypher.spawnCypherEntity(level, this, owner, node, pos, dir)
+                cypher.spawnCypherEntity(level, this, owner, node, pos, dir.toVec3())
             }
         }
     }

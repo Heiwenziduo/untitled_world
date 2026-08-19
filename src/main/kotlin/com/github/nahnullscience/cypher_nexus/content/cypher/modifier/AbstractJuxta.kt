@@ -10,7 +10,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.spawnCypherEntityRaw
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickBehaviorHook
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import com.github.nahnullscience.cypher_nexus.utility.randomInCone
 import com.github.nahnullscience.cypher_nexus.utility.toVec3
 import net.minecraft.core.Direction
@@ -33,7 +32,12 @@ abstract class AbstractJuxta(
 
     }
     protected open val illusionSteerer: Holder<AbstractCypherSteerer> = NO_STEERER
-    protected abstract fun <CE> shootingPosPair(cyEntity: CE): PosDirePair where CE : Entity, CE : ICypherEntity
+
+    protected open fun <CE> shootingPos(cyEntity: CE): Vec3 where CE : Entity, CE : ICypherEntity {
+        return cyEntity.position()
+    }
+    protected abstract fun <CE> shootingDir(cyEntity: CE): Vec3 where CE : Entity, CE : ICypherEntity
+
     protected open fun <CE> isJuxtaTime(cyEntity: CE): Boolean where CE : Entity, CE : ICypherEntity {
         cyEntity.ccMap?.containsKey(Cyphers.PHANTOM_RUSH)?.let {
             if (it) return (cyEntity.tickCount - 1) and 3 == 3
@@ -47,13 +51,14 @@ abstract class AbstractJuxta(
         level: Level,
         cyEntity: CE
     ) where CE : Entity, CE : ICypherEntity {
-        val level = cyEntity.level() as? ServerLevel ?: return
-        if (isJuxtaTime(cyEntity)) {
+        if (level is ServerLevel && isJuxtaTime(cyEntity)) {
             spawnCypherEntityRaw(
                 cyEntity.cypherHolder,
                 level,
                 illusionSteerer,
-                shootingPosPair(cyEntity)
+                cyEntity.owner,
+                shootingPos(cyEntity),
+                shootingDir(cyEntity)
             )
         }
     }
@@ -61,12 +66,12 @@ abstract class AbstractJuxta(
     class PhantomRush(defaultAttribute: Builder.() -> Builder) : AbstractJuxta(defaultAttribute) {
         override val resource = CypherNexus.modResource("phantom_rush")
         override val illusionSteerer = SLOW_BOOT_STEERER
-        override fun <CE> shootingPosPair(cyEntity: CE): PosDirePair where CE : Entity, CE : ICypherEntity {
-            val dire: Vec3
+        override fun <CE> shootingDir(cyEntity: CE): Vec3 where CE : Entity, CE : ICypherEntity {
+            val dir: Vec3
             cyEntity.deltaMovement.let {
-                dire = if (it == Vec3.ZERO) Vec3.ZERO else it.randomInCone(6.0, cyEntity.random)
+                dir = if (it == Vec3.ZERO) Vec3.ZERO else it.randomInCone(6.0, cyEntity.random)
             }
-            return PosDirePair(cyEntity.position(), dire)
+            return dir
         }
 
         override fun <CE> isJuxtaTime(cyEntity: CE): Boolean where CE : Entity, CE : ICypherEntity {
@@ -76,23 +81,23 @@ abstract class AbstractJuxta(
 
     class ChaoticJuxta(defaultAttribute: Builder.() -> Builder) : AbstractJuxta(defaultAttribute) {
         override val resource = CypherNexus.modResource("chaotic_juxta")
-        override fun <CE> shootingPosPair(cyEntity: CE): PosDirePair where CE : Entity, CE : ICypherEntity {
-            val dire = Vector3f(1f, 0f, 0f).randomInCone(180.0, cyEntity.random)
-            return PosDirePair(cyEntity.position(), dire.toVec3())
+        override fun <CE> shootingDir(cyEntity: CE): Vec3 where CE : Entity, CE : ICypherEntity {
+            val dir = Vector3f(1f, 0f, 0f).randomInCone(180.0, cyEntity.random)
+            return dir.toVec3()
         }
     }
 
     class DownwardJuxta(defaultAttribute: Builder.() -> Builder) : AbstractJuxta(defaultAttribute) {
         override val resource = CypherNexus.modResource("downward_juxta")
-        override fun <CE> shootingPosPair(cyEntity: CE): PosDirePair where CE : Entity, CE : ICypherEntity {
-            return PosDirePair(cyEntity.position(), Direction.DOWN.unitVec3)
+        override fun <CE> shootingDir(cyEntity: CE): Vec3 where CE : Entity, CE : ICypherEntity {
+            return Direction.DOWN.unitVec3
         }
     }
 
     class UpwardJuxta(defaultAttribute: Builder.() -> Builder) : AbstractJuxta(defaultAttribute) {
         override val resource = CypherNexus.modResource("upward_juxta")
-        override fun <CE> shootingPosPair(cyEntity: CE): PosDirePair where CE : Entity, CE : ICypherEntity {
-            return PosDirePair(cyEntity.position(), Direction.UP.unitVec3)
+        override fun <CE> shootingDir(cyEntity: CE): Vec3 where CE : Entity, CE : ICypherEntity {
+            return Direction.UP.unitVec3
         }
     }
 }

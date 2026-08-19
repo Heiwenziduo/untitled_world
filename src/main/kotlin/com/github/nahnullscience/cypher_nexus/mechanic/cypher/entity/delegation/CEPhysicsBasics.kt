@@ -21,8 +21,9 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.Projectil
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.*
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.anchor
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.face
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
@@ -39,6 +40,7 @@ import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.HitResult.Type
 import net.minecraft.world.phys.Vec3
+import org.joml.Vector3d
 import kotlin.math.pow
 
 open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypherEntity {
@@ -65,6 +67,8 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
 
     protected var explosion: ExplosionSettings<*>? = null
 
+    override lateinit var personalCoordinate: AnchoredCoordinate
+
 
     override fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotState?, node: ProjectileNode?) {
         if (node != null) {
@@ -85,45 +89,32 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         ce.initExplosion().also { explosion = it }
     }
 
-
-    protected open fun applyGravity() {
-        if (ce.getGravityFactor() != 0.0)
-            ce.deltaMovement = ce.deltaMovement.add(0.0, -ce.getGravityFactor(), 0.0)
+    protected open fun initCoordinate() {
+        personalCoordinate =
+            if (ce.deltaMovement == Vec3.ZERO) {
+                AnchoredCoordinate.genStatic()
+            }
+            else {
+                val front = Vector3d().set(ce.deltaMovement).normalize()
+                val left = front.horizontalLeft(Vector3d(), ce.random)
+                AnchoredCoordinate.fromFrontLeft(front, left)
+            }
+        personalCoordinate.anchor(ce.position())
     }
 
-    protected open fun applyFriction() {
-        val f: Double =
-            if (ce.isInWater) ce.getUnderwaterSpeedFactor() * ce.getSpeedFactor()
-            else ce.getSpeedFactor()
-        if (f >= 1.0 && tickStartSpeedSqr >= 64.0) return
-        else ce.deltaMovement *= f
-    }
 
-    override fun trigger(coordinate: CoordinateDefinition, releaseTo: PosDirePair) {
-        payload?.release(
-            level,
-            coordinate,
-            releaseTo,
-            ce,
-            ce.owner
-        )
+    override fun trigger(coordinate: AnchoredCoordinate) {
+        payload?.release(level, coordinate, ce, ce.owner)
     }
     protected open fun handleTrigger(type: TriggerType, releasePoint: Vec3, speedDir: Vec3) {
         if (level.isClientSide || triggerType == TriggerType.NONE || type != triggerType) return
-        ce.whenFace(speedDir, false) { front, left ->
-            val co = CoordinateDefinition(front, left)
-            val po = PosDirePair(releasePoint, speedDir)
-            trigger(co, po)
-        }
+        val coo = personalCoordinate.copy().face(speedDir).anchor(releasePoint)
+        trigger(coo)
     }
     protected open fun handleCollisionTrigger(direction: Direction, releasePoint: Vec3, speedDir: Vec3) {
         if (level.isClientSide || triggerType != TriggerType.COLLISION) return
-
-        val co = CoordinateDefinition.faceDirectionWithUpVector(direction, speedDir) {
-            direction.axis.randomPerpendicularNormal(random)
-        }
-        val po = PosDirePair(releasePoint + direction.unitVec3 * 0.1, direction.unitVec3)
-        trigger(co, po)
+        val coo = personalCoordinate.copy().face(direction.unitVec3).anchor(releasePoint + direction.unitVec3 * 0.0625)
+        trigger(coo)
     }
 
 
@@ -166,6 +157,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         Profiler.get().push { "cypherEntityTick" }
 
         if (ce.tickCount == 1) {
+            initCoordinate()
             ce.onFirstTick(ce)
             ce.steerer.init(ce)
         }
@@ -416,6 +408,19 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
             this.level.gameEvent(GameEvent.PROJECTILE_LAND, blockPos, Context.of(ce, level.getBlockState(blockPos)))
     }
 
+
+    protected open fun applyGravity() {
+        if (ce.getGravityFactor() != 0.0)
+            ce.deltaMovement = ce.deltaMovement.add(0.0, -ce.getGravityFactor(), 0.0)
+    }
+
+    protected open fun applyFriction() {
+        val f: Double =
+            if (ce.isInWater) ce.getUnderwaterSpeedFactor() * ce.getSpeedFactor()
+            else ce.getSpeedFactor()
+        if (f >= 1.0 && tickStartSpeedSqr >= 64.0) return
+        else ce.deltaMovement *= f
+    }
 
     protected open fun onLowSpeedCheck() {
         if (ce.noFlagsNone(CypherFlags.PHYSICS_SOLID, CypherFlags.MOTION_FOLLOWS_OWNER) &&

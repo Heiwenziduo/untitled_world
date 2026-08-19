@@ -10,16 +10,18 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.spawnCypherEntityRaw
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.OnBounceHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.AbstractInvokingPattern
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.CoordinateDefinition
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.anchor
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.fromDirectionWithUpVector
 import com.github.nahnullscience.cypher_nexus.utility.plus
-import com.github.nahnullscience.cypher_nexus.utility.randomPerpendicularNormal
+import com.github.nahnullscience.cypher_nexus.utility.set
 import com.github.nahnullscience.cypher_nexus.utility.times
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
+import org.joml.Vector3d
 
 abstract class AbstractOnBounceSeries(
     defaultAttribute: Builder.() -> Builder
@@ -59,10 +61,11 @@ abstract class AbstractOnBounceSeries(
             bouncePoint: Vec3
         ) where CE : Entity, CE : ICypherEntity {
             if (level !is ServerLevel) return
-            val co = CoordinateDefinition.faceDirectionWithUpVector(bounceSurface, cyEntity.deltaMovement) {
-                bounceSurface.axis.randomPerpendicularNormal(cyEntity.random)
-            }
-            val base = PosDirePair(bouncePoint + bounceSurface.unitVec3 * 0.01, bounceSurface.unitVec3)
+            val coo = AnchoredCoordinate.fromDirectionWithUpVector(
+                bounceSurface,
+                Vector3d().set(cyEntity.deltaMovement),
+                cyEntity.random
+            ).anchor(bouncePoint + bounceSurface.unitVec3 * 0.0625)
 
             val formation: AbstractInvokingPattern
             val count: Int
@@ -75,13 +78,16 @@ abstract class AbstractOnBounceSeries(
             }
 
             for (i in 0 until count) {
-                val pair = formation.arrangeVectors(i, count, co)
-                spawnCypherEntityRaw(
-                    cyEntity.cypherHolder,
-                    level,
-                    NO_STEERER,
-                    pair
-                )
+                formation.layout(i, count, coo) { xp, yp, zp, xd, yd, zd ->
+                    spawnCypherEntityRaw(
+                        cyEntity.cypherHolder,
+                        level,
+                        NO_STEERER,
+                        cyEntity.owner,
+                        Vec3(xp, yp, zp),
+                        Vec3(xd, yd, zd)
+                    )
+                }
             }
         }
     }

@@ -1,7 +1,13 @@
 package com.github.nahnullscience.cypher_nexus.utility.linear_space
 
+import com.github.nahnullscience.cypher_nexus.utility.randomPerpendicularNormalD
+import com.github.nahnullscience.cypher_nexus.utility.set
 import com.github.nahnullscience.cypher_nexus.utility.toV3d
+import net.minecraft.core.Direction
+import net.minecraft.core.Direction.Axis
+import net.minecraft.util.RandomSource
 import net.minecraft.world.phys.Vec3
+import org.joml.Vector3d
 import org.joml.Vector3dc
 
 /*
@@ -10,6 +16,30 @@ import org.joml.Vector3dc
 fun AnchoredCoordinate.Companion.fromFrontLeft(front: Vec3, left: Vec3): AnchoredCoordinate {
     return fromFrontLeft(front.toV3d(), left.toV3d())
 }
+
+fun AnchoredCoordinate.Companion.fromDirectionWithUpVector(
+    direction: Direction,
+    approximateUp: Vector3d,
+    fallback: () -> Vector3d
+): AnchoredCoordinate {
+    val front = Vector3d().set(direction.unitVec3)
+    when(direction.axis) {
+        Axis.X -> approximateUp.x = 0.0
+        Axis.Y -> approximateUp.y = 0.0
+        Axis.Z -> approximateUp.z = 0.0
+    }
+    val up =
+        if (approximateUp.lengthSquared() > 1e-6) approximateUp.normalize()
+        else fallback() // if speed vector and direction are in the same direction
+    return fromFrontUp(front, up)
+}
+
+fun AnchoredCoordinate.Companion.fromDirectionWithUpVector(
+    direction: Direction,
+    approximateUp: Vector3d,
+    random: RandomSource
+) = fromDirectionWithUpVector(direction, approximateUp) { direction.axis.randomPerpendicularNormalD(random) }
+
 
 fun AnchoredCoordinate.anchor(v: Vec3) = anchor(v.x, v.y, v.z)
 fun AnchoredCoordinate.anchor(v: Vector3dc) = anchor(v.x(), v.y(), v.z())

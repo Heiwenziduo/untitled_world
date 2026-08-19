@@ -10,11 +10,11 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.spawnCypherEntityRaw
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickBehaviorHook
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.PosDirePair
 import net.minecraft.core.Holder
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
+import net.minecraft.world.phys.Vec3
 
 abstract class AbstractEscortOrbit(
     defaultAttribute: Builder.() -> Builder
@@ -38,14 +38,14 @@ abstract class AbstractEscortOrbit(
         level: Level,
         cyEntity: CE
     ) where CE : Entity, CE : ICypherEntity {
-        val level = cyEntity.level() as? ServerLevel ?: return
-        if (cyEntity.tickCount.isTimeToGenerate()) { // "count doesn't count"
+        if (level is ServerLevel && cyEntity.tickCount.isTimeToGenerate()) {
             spawnCypherEntityRaw(
                 getProjectileToGen(cyEntity),
                 level,
                 ESCORT_ORBIT_STEERER,
-                PosDirePair(cyEntity.position()),
-                cyEntity
+                cyEntity,
+                cyEntity.position(),
+                Vec3.ZERO
             )
         }
     }
