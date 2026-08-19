@@ -16,6 +16,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAt
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.spawnCypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeAbortReleaseHook.ReleaseAbort
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.AbstractInvokingPattern
 import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
@@ -29,8 +30,6 @@ import net.minecraft.util.profiling.Profiler
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
-import org.joml.Vector3d
-import org.joml.Vector3f
 
 class ShotState private constructor (
     private var charge: Int,
@@ -228,11 +227,13 @@ class ShotState private constructor (
 
         _ccMapBacking?.let { ccMap ->
             ccMap.forEach ccMap@ { (cypher, counts) ->
-                // pattern
-                cypher.pattern.let { if (it != NO_PATTERN) shotPattern = it }
+                // pattern // the first pattern appears would dictate
+                cypher.pattern.let {
+                    if (it != NO_PATTERN && shotPattern == NO_PATTERN) shotPattern = it
+                }
                 // hook
                 hooks.add(cypher, counts)
-                // flag & color (non-proj exclusive)
+                // flag & color (non-projectile exclusive)
                 if (cypher is AbstractNonProjectileCypher) {
                     enableFlag(cypher.flags)
                     run color@ {

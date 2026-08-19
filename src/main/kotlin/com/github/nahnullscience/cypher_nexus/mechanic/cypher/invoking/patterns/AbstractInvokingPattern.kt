@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking
+package com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.utility.i.IRegisterable
@@ -14,7 +14,9 @@ abstract class AbstractInvokingPattern(
     constructor(path: String) : this(CypherNexus.modResource(path))
 
     /**
-     * store result position & direction to coordinate-cache in the form of raw double
+     * store result position & direction to coordinate-cache in the form of raw double.
+     *
+     * note [index] starts from 0, and [total] counts from 1.
      * @return the starting number to extract the cache, the true index is 6 * the value
      * */
     abstract fun arrangeVectors(

@@ -317,6 +317,9 @@
   "invoking.cypher_nexus.pattern.front_diffuse_square": "Front Square",
   "invoking.cypher_nexus.pattern.front_diffuse_hexagon": "Front Hexagon",
   "invoking.cypher_nexus.pattern.front_diffuse_octagon": "Front Octagon",
+  "invoking.cypher_nexus.pattern.front_even_fan": "Front Fan",
+  "invoking.cypher_nexus.pattern.front_even_line": "Front Line",
+  "invoking.cypher_nexus.pattern.star_fleet": "Star Fleet",
   "invoking.cypher_nexus.pattern.perpendicular_square": "Perpendicular Square",
   "invoking.cypher_nexus.pattern.perpendicular_octagon": "Perpendicular Octagon",
 

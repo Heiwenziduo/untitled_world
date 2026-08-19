@@ -24,6 +24,7 @@ import com.github.nahnullscience.cypher_nexus.utility.*
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.anchor
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.face
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.fromDirectionWithUpVector
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap
 import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
@@ -67,8 +68,6 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
 
     protected var explosion: ExplosionSettings<*>? = null
 
-    override lateinit var personalCoordinate: AnchoredCoordinate
-
 
     override fun initCypher(cypher: AbstractProjectileCypher<*>, shotState: ShotState?, node: ProjectileNode?) {
         if (node != null) {
@@ -89,31 +88,25 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         ce.initExplosion().also { explosion = it }
     }
 
-    protected open fun initCoordinate() {
-        personalCoordinate =
-            if (ce.deltaMovement == Vec3.ZERO) {
-                AnchoredCoordinate.genStatic()
-            }
-            else {
-                val front = Vector3d().set(ce.deltaMovement).normalize()
-                val left = front.horizontalLeft(Vector3d(), ce.random)
-                AnchoredCoordinate.fromFrontLeft(front, left)
-            }
-        personalCoordinate.anchor(ce.position())
-    }
-
 
     override fun trigger(coordinate: AnchoredCoordinate) {
         payload?.release(level, coordinate, ce, ce.owner)
     }
+
     protected open fun handleTrigger(type: TriggerType, releasePoint: Vec3, speedDir: Vec3) {
         if (level.isClientSide || triggerType == TriggerType.NONE || type != triggerType) return
-        val coo = personalCoordinate.copy().face(speedDir).anchor(releasePoint)
+        val front = Vector3d().set(speedDir).normalize()
+        val left = front.horizontalLeft(Vector3d(), ce.random)
+        val coo = AnchoredCoordinate.fromFrontLeftOrthonormal(front, left).anchor(releasePoint)
         trigger(coo)
     }
+
     protected open fun handleCollisionTrigger(direction: Direction, releasePoint: Vec3, speedDir: Vec3) {
         if (level.isClientSide || triggerType != TriggerType.COLLISION) return
-        val coo = personalCoordinate.copy().face(direction.unitVec3).anchor(releasePoint + direction.unitVec3 * 0.0625)
+//        val coo = personalCoordinate.copy().face(direction.unitVec3).anchor(releasePoint + direction.unitVec3 * 0.0625)
+        val up = Vector3d().set(speedDir)
+        val coo = AnchoredCoordinate.fromDirectionWithUpVector(direction, up, ce.random)
+            coo.anchor(releasePoint + direction.unitVec3 * 0.0625)
         trigger(coo)
     }
 
@@ -157,7 +150,6 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         Profiler.get().push { "cypherEntityTick" }
 
         if (ce.tickCount == 1) {
-            initCoordinate()
             ce.onFirstTick(ce)
             ce.steerer.init(ce)
         }

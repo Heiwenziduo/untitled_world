@@ -13,8 +13,11 @@ import org.joml.Vector3dc
 /*
  * communicate with minecraft world
  * */
-fun AnchoredCoordinate.Companion.fromFrontLeft(front: Vec3, left: Vec3): AnchoredCoordinate {
-    return fromFrontLeft(front.toV3d(), left.toV3d())
+/**
+ * require front & left are unified and perpendicular to each other
+ * */
+fun AnchoredCoordinate.Companion.fromFrontLeftOrthonormal(front: Vec3, left: Vec3): AnchoredCoordinate {
+    return fromFrontLeftOrthonormal(front.toV3d(), left.toV3d())
 }
 
 fun AnchoredCoordinate.Companion.fromDirectionWithUpVector(
@@ -31,7 +34,8 @@ fun AnchoredCoordinate.Companion.fromDirectionWithUpVector(
     val up =
         if (approximateUp.lengthSquared() > 1e-6) approximateUp.normalize()
         else fallback() // if speed vector and direction are in the same direction
-    return fromFrontUp(front, up)
+
+    return fromFrontUpOrthonormal(front, up)
 }
 
 fun AnchoredCoordinate.Companion.fromDirectionWithUpVector(
