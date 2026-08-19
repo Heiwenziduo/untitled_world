@@ -5,7 +5,6 @@ import org.joml.Quaternionf
 import org.joml.Vector3d
 import org.joml.Vector3dc
 import org.joml.Vector3f
-import kotlin.math.abs
 import kotlin.math.sqrt
 
 /**
@@ -165,15 +164,19 @@ class AnchoredCoordinate(
         @PublishedApi
         internal const val CACHE_SIZE = CACHE_PAIR * 6
 
-        fun fromFrontLeft(front: Vector3d, left: Vector3d): AnchoredCoordinate {
+        /**
+         * assume `front` and `left` are unified perpendicular vectors
+         * */
+        fun fromFrontLeftOrthonormal(front: Vector3d, left: Vector3d): AnchoredCoordinate {
             val up = front.cross(left, Vector3d())
-                .normalize() // in case front & left are not strictly perpendicular
             return AnchoredCoordinate(left, up, front)
         }
 
-        fun fromFrontUp(front: Vector3d, up: Vector3d): AnchoredCoordinate {
+        /**
+         * assume `front` and `up` are unified perpendicular vectors
+         * */
+        fun fromFrontUpOrthonormal(front: Vector3d, up: Vector3d): AnchoredCoordinate {
             val left = up.cross(front, Vector3d())
-                .normalize()
             return AnchoredCoordinate(left, up, front)
         }
 
@@ -182,19 +185,5 @@ class AnchoredCoordinate(
             Vector3d(0.0, 1.0, 0.0),
             Vector3d(0.0, 0.0, 1.0),
         )
-
-//        fun fromFront(front: Vector3d, fallbackUp: Vector3dc = Vector3d(0.0, 1.0, 0.0)): AnchoredCoordinate {
-//            val f = Vector3d(front).normalize()
-//            val l = Vector3d()
-//            if (abs(f.dot(fallbackUp)) > 0.999) {
-//                // Pitch singularity: fallback to Z-axis reference
-//                Vector3d(0.0, 0.0, 1.0).cross(f, l).normalize()
-//            } else {
-//                fallbackUp.cross(f, l).normalize()
-//            }
-//            val u = Vector3d()
-//            f.cross(l, u).normalize()
-//            return AnchoredCoordinate(x = l, y = u, z = f)
-//        }
     }
 }

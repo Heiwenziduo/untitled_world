@@ -4,7 +4,6 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReas
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.ICoordinateDefinition
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.Vec3
 
@@ -21,8 +20,6 @@ interface ICypherEntityPhysics {
     val bouncePoints: List<Vec3>
     val bouncedThisTick: Boolean
     val canBounce: Boolean
-
-    val personalCoordinate: ICoordinateDefinition
 
     /**
      *

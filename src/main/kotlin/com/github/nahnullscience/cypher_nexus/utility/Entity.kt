@@ -3,16 +3,14 @@ package com.github.nahnullscience.cypher_nexus.utility
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.anchor
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.fromFrontLeft
+import com.github.nahnullscience.cypher_nexus.utility.linear_space.fromFrontLeftOrthonormal
 import net.minecraft.util.Mth
-import net.minecraft.util.RandomSource
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.TraceableEntity
 import net.minecraft.world.entity.projectile.Projectile
 import net.minecraft.world.phys.Vec3
 import org.joml.Quaternionf
-import org.joml.Vector3d
 import org.joml.Vector3f
 import kotlin.math.cos
 import kotlin.math.sin
@@ -129,7 +127,7 @@ fun Entity.headLeftVectorF(partialTick: Float = 1.0f): Vector3f {
  * left : entity's head left vector. [headLeftVector]
  * */
 fun Entity.perspectiveCoordinate(): AnchoredCoordinate {
-    return AnchoredCoordinate.fromFrontLeft(headLookAngle, headLeftVector()).anchor(eyePosition)
+    return AnchoredCoordinate.fromFrontLeftOrthonormal(headLookAngle, headLeftVector()).anchor(eyePosition)
 }
 
 /**
