@@ -11,10 +11,10 @@ import net.minecraft.core.Direction
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 
-class DirectSkywardCypher(
+class DirectGroundwardCypher(
     defaultAttribute: CypherDataMap.Builder.() -> CypherDataMap.Builder
 ) : ModifierCypher(defaultAttribute), ServerInvokeRedirectionHook {
-    override val resource = CypherNexus.modResource("direct_skyward")
+    override val resource = CypherNexus.modResource("direct_groundward")
     override fun invokeRedirectServer(
         index: Int,
         count: Int,
@@ -24,6 +24,6 @@ class DirectSkywardCypher(
         coordinate: AnchoredCoordinate,
         directInvoker: Entity?
     ) {
-        coordinate.face(Direction.UP.unitVec3)
+        coordinate.face(Direction.DOWN.unitVec3)
     }
 }

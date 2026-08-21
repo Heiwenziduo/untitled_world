@@ -1,9 +1,9 @@
 package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.content.cypher.AbstractSimpleProjectile
-import com.github.nahnullscience.cypher_nexus.content.cypher.AbstractSimpleProjectile.SimpleProjectile
-import com.github.nahnullscience.cypher_nexus.content.cypher.AbstractSimpleProjectile.SimpleStaticProjectile
+import com.github.nahnullscience.cypher_nexus.content.cypher.AbstractSimpleProjectileCypher
+import com.github.nahnullscience.cypher_nexus.content.cypher.AbstractSimpleProjectileCypher.SimpleProjectile
+import com.github.nahnullscience.cypher_nexus.content.cypher.AbstractSimpleProjectileCypher.SimpleStaticProjectile
 import com.github.nahnullscience.cypher_nexus.content.cypher.SimpleNonProjectileCypher
 import com.github.nahnullscience.cypher_nexus.content.cypher.modifier.*
 import com.github.nahnullscience.cypher_nexus.content.cypher.other.*
@@ -751,7 +751,7 @@ object Cyphers {
      * note the `cypherHolder` in respective `CypherEntity`-s is always pointed to the original one
      * @return cypher-holder of the `origin`
      */
-    private inline fun <C : AbstractProjectileCypher<AbstractDedicatedCypherProjectile>, reified B : AbstractSimpleProjectile<C>> registerGenericProjectile(
+    private inline fun <C : AbstractProjectileCypher<AbstractDedicatedCypherProjectile>, reified B : AbstractSimpleProjectileCypher<C>> registerGenericProjectile(
         projectileHolder: CypherProjectileHolder,
         crossinline builderFactory: (Identifier, CypherProjectileHolder) -> B,
         crossinline config: B.() -> Unit,

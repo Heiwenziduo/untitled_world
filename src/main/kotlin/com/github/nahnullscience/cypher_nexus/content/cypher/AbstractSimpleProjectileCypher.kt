@@ -18,7 +18,7 @@ import java.util.function.Supplier
 /**
  * the idea is, put entity-specific logics inside those Entity [com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile] classes, and leave the cypher simple
  * */
-abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<AbstractDedicatedCypherProjectile>> (
+abstract class AbstractSimpleProjectileCypher <out C : AbstractProjectileCypher<AbstractDedicatedCypherProjectile>> (
     protected val path: Identifier,
     protected val type: Supplier<out EntityType<out AbstractDedicatedCypherProjectile>>
 ) : CypherDataMap.Builder() {
@@ -51,7 +51,7 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
     override fun shotStateAttr(holder: Holder<CypherAttribute>, operator: AttributeOperator, value: Double) = run {
         val opMap = shotStateAttrHolder.getOrPut(holder) { EnumMap(AttributeOperator::class.java) }
         opMap[operator] = value
-        this@AbstractSimpleProjectile
+        this@AbstractSimpleProjectileCypher
     }
 
     abstract fun createProjectile(): C
@@ -73,7 +73,7 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
     class SimpleProjectile(
         path: Identifier,
         type: Supplier<out EntityType<out AbstractDedicatedCypherProjectile>>
-    ) : AbstractSimpleProjectile <ProjectileCypher<AbstractDedicatedCypherProjectile>> (path, type) {
+    ) : AbstractSimpleProjectileCypher <ProjectileCypher<AbstractDedicatedCypherProjectile>> (path, type) {
         override fun createProjectile() = object : ProjectileCypher<AbstractDedicatedCypherProjectile>() {
             override val resource = this@SimpleProjectile.path
             override val projectileType = this@SimpleProjectile.type
@@ -88,7 +88,7 @@ abstract class AbstractSimpleProjectile <out C : AbstractProjectileCypher<Abstra
     class SimpleStaticProjectile(
         path: Identifier,
         type: Supplier<out EntityType<out AbstractDedicatedCypherProjectile>>
-    ) : AbstractSimpleProjectile <StaticProjectileCypher<AbstractDedicatedCypherProjectile>> (path, type) {
+    ) : AbstractSimpleProjectileCypher <StaticProjectileCypher<AbstractDedicatedCypherProjectile>> (path, type) {
         override fun createProjectile() = object : StaticProjectileCypher<AbstractDedicatedCypherProjectile>() {
             override val resource = this@SimpleStaticProjectile.path
             override val projectileType = this@SimpleStaticProjectile.type

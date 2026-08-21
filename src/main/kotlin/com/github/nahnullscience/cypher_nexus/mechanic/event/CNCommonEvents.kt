@@ -1,5 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.event
 
+import com.github.nahnullscience.cypher_nexus.mechanic.event.wand.LivingGatherWandsEvent
+import com.github.nahnullscience.cypher_nexus.mechanic.event.wand.LivingGatherWandsEvent.Companion.GatherLivingWandsConstructor
 import com.github.nahnullscience.cypher_nexus.mechanic.event.wand.WandCanPerformInputModuleEvent
 import com.github.nahnullscience.cypher_nexus.mechanic.event.wand.WandPerformingStateChangeEvent
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.module.WandModuleType

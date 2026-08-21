@@ -1,4 +1,4 @@
-package com.github.nahnullscience.cypher_nexus.mechanic.event
+package com.github.nahnullscience.cypher_nexus.mechanic.event.wand
 
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IItemWand.Companion.isWand
 import it.unimi.dsi.fastutil.objects.ReferenceArrayList
@@ -9,13 +9,14 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.neoforged.neoforge.event.entity.living.LivingEvent
 
-private typealias PoolableStorage = ReferenceArrayList<ItemStack>
-typealias GatherLivingWandsConstructor = (entity: LivingEntity, array: PoolableStorage) -> LivingGatherWandsEvent
-
 sealed class LivingGatherWandsEvent(
     entity: LivingEntity,
     private val array: PoolableStorage
 ) : LivingEvent(entity) {
+    companion object {
+        private typealias PoolableStorage = ReferenceArrayList<ItemStack>
+        typealias GatherLivingWandsConstructor = (entity: LivingEntity, array: PoolableStorage) -> LivingGatherWandsEvent
+    }
 
     /**
      * contains wand valid check

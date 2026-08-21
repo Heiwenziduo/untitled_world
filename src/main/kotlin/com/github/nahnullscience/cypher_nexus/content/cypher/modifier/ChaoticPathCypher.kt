@@ -46,7 +46,7 @@ class ChaoticPathCypher(
                  * */
                 val random = cyEntity.random
                 time += random.nextInt(28) + 4
-                val ang = random.nextDouble() * 135.0
+                val ang = random.nextDouble() * 150.0
                 val spe = random.nextDouble() * 0.8 + 0.3
                 cyEntity.deltaMovement = cyEntity.deltaMovement.randomInCone(ang, random) * spe
                 cyEntity.needsSync = true

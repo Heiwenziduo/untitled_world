@@ -5,6 +5,7 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Buil
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickBehaviorHook
+import com.github.nahnullscience.cypher_nexus.utility.isServerSide
 import com.github.nahnullscience.cypher_nexus.utility.unaryMinus
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
@@ -19,7 +20,7 @@ class PingPongPathCypher(
         level: Level,
         cyEntity: CE
     ) where CE : Entity, CE : ICypherEntity {
-        if (!level.isClientSide && (cyEntity.tickCount - 1) and 15 == 15) {
+        if (level.isServerSide && (cyEntity.tickCount - 1) and 15 == 15) {
             cyEntity.deltaMovement = -cyEntity.deltaMovement
             cyEntity.needsSync = true
         }
