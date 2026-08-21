@@ -62,6 +62,11 @@ interface ICypherEntityLogicContext : TraceableEntity,
      * better over zero...
      * */
     fun getHitSameTargetTickNeeds(): Int = 10
+    /**
+     *
+     * */
+    fun getSpeedSqrLeastToDealKineticDamage(): Double = 0.0625
+
 
     /**
      *

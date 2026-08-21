@@ -199,7 +199,7 @@ abstract class AbstractDedicatedCypherProjectile(
 
     override fun shouldRender(x: Double, y: Double, z: Double): Boolean = super.shouldRender(x, y, z)
     override fun shouldRenderAtSqrDistance(distance: Double): Boolean {
-        val v = getEffectRadius() * getViewScale() * 48
+        val v = getEffectRadius() * getViewScale() * 64
         return distance < v * v
     }
 

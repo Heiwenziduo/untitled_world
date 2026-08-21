@@ -15,14 +15,14 @@ import com.github.nahnullscience.cypher_nexus.content.cypher.wand_module.Primary
 import com.github.nahnullscience.cypher_nexus.content.cypher.wand_module.RecoilRocketModuleCypher
 import com.github.nahnullscience.cypher_nexus.init.ModEntities
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.*
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.UNMODIFIED
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.AttrConfig
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractCypher.Companion.UNMODIFIED
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.AttributeOperator
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.category.CypherCategory
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.AbstractInvokingPattern
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.AbstractInvokingPattern
 import com.github.nahnullscience.cypher_nexus.utility.exception.CypherNotFoundException
 import net.minecraft.core.Holder
 import net.minecraft.core.Registry
@@ -74,10 +74,10 @@ object Cyphers {
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, -16.0)
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 1.0)
         projectileAttr(CypherAttributes.DAMAGE, 3.0)
-        projectileAttr(CypherAttributes.SPEED_INITIAL, 1.3)
+        projectileAttr(CypherAttributes.SPEED_INITIAL, 1.5)
         projectileAttr(CypherAttributes.EXISTING, 3000.0)
-        projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.01)
-        projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.01)
+        projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.02)
+        projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.03)
     }
     val SNOWBALL = registerProjectile(ModEntities.CYPHER_SNOWBALL, TriggerType.COLLISION, TriggerType.TIMER_20) {
         manaDrain(5f)
@@ -275,6 +275,7 @@ object Cyphers {
     val EFFECTIVE_RADIUS = registerModifier("effective_radius", 30f) {
         shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, 1.0)
         shotStateAttr(CypherAttributes.KNOCKBACK, AttributeOperator.ADD, 5.0)
+        shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 2.0)
         shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, 0.5)
     }
     val CRIT_PLUS = registerModifier("critical_plus", 10f) {

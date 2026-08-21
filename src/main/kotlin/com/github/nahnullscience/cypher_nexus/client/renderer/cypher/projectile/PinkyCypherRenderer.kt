@@ -1,6 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile
 
-import com.github.nahnullscience.cypher_nexus.client.particle.addCypherTrailParticle
+import com.github.nahnullscience.cypher_nexus.client.util.addCypherTrailParticle
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.SimpleItemProjectileRenderer
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.Pinky
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius

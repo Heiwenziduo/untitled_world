@@ -50,7 +50,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     protected val random get() = ce.random
 
     override var tickStartSpeedSqr: Double = 0.0
-    override var capturedInitialSpeedSqr: Double = 0.0
+    override var capturedInitialSpeedSqr: Double = 1.0
 
     override var triggerType = TriggerType.NONE
     override var payload: ShotState? = null
@@ -78,7 +78,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
 
     override fun initEntity(ce: CE) {
         this@CEPhysicsBasics.ce = ce
-        ce.noPhysics = ce.noFlag(CypherFlags.PHYSICS_SOLID)
+        ce.noPhysics = ce.noFlag(CypherFlags.PHYSICS_SOLID) || ce.hasFlag(CypherFlags.PENETRATE_WORLD)
 
         // if can hit multiple target...
         if (ce.hasFlagsAny(CypherFlags.PHYSICS_SOLID, CypherFlags.PIERCE_ENTITY) || ce.canBounce) {
@@ -344,6 +344,8 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
     // cyEntity.whenHit -> Delegation.whenHit -> interface default
     protected open fun whenHitDelegate(result: HitResult, stepMove: Vec3, direction: Direction?) {
         if (result.type == Type.MISS) return
+        // TODO handle hit & bounce least kinetic
+//        if (tickStartSpeedSqr < ce.getSpeedSqrLeastToDealKineticDamage()) return
         val dir = direction ?: run {
             if (tickStartSpeedSqr > KINETIC_DAMAGE_SPEED_SQR) stepMove.mostAlignedDirection()
             else return
@@ -376,7 +378,8 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
 
         hitEntityInvulnerabilityMap?.let {
             var next = ce.tickCount + ce.getHitSameTargetTickNeeds()
-            if (ce.noFlag(CypherFlags.PIERCE_ENTITY)) next += 10 // for bounce only
+            if (ce.noFlag(CypherFlags.PIERCE_ENTITY))
+                next = next.coerceAtLeast(10) // for bounce
             it.put(target.id, next)
         }
 

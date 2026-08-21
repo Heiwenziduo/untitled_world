@@ -1,13 +1,12 @@
 package com.github.nahnullscience.cypher_nexus.client.renderer.cypher.utility
 
-import com.github.nahnullscience.cypher_nexus.client.particle.addCypherTrailParticle
+import com.github.nahnullscience.cypher_nexus.client.util.addCypherTrailParticle
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.AbstractCypherRenderer
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.utility.DistanceDeliverCypherRenderer.DistanceDeliverCypherRenderState
 import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.component.CypherRenderStateDelegate
 import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.component.ICypherEntityRenderState
 import com.github.nahnullscience.cypher_nexus.content.entity.utility.DistanceDeliverer
 import com.github.nahnullscience.cypher_nexus.utility.linearInterpolateGaps
-import com.github.nahnullscience.cypher_nexus.utility.linearInterpolateTimes
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.renderer.SubmitNodeCollector

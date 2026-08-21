@@ -84,9 +84,9 @@
       "projectile": {
         "cypher_nexus:damage": 3.0,
         "cypher_nexus:existing": 3000.0,
-        "cypher_nexus:friction_factor": 0.01,
-        "cypher_nexus:gravity_factor": 0.01,
-        "cypher_nexus:speed": 1.3
+        "cypher_nexus:friction_factor": 0.03,
+        "cypher_nexus:gravity_factor": 0.02,
+        "cypher_nexus:speed": 1.5
       },
       "recharge": 0,
       "shotState": {
@@ -106,9 +106,9 @@
       "projectile": {
         "cypher_nexus:damage": 3.0,
         "cypher_nexus:existing": 3000.0,
-        "cypher_nexus:friction_factor": 0.01,
-        "cypher_nexus:gravity_factor": 0.01,
-        "cypher_nexus:speed": 1.3
+        "cypher_nexus:friction_factor": 0.03,
+        "cypher_nexus:gravity_factor": 0.02,
+        "cypher_nexus:speed": 1.5
       },
       "recharge": 0,
       "shotState": {
@@ -128,9 +128,9 @@
       "projectile": {
         "cypher_nexus:damage": 3.0,
         "cypher_nexus:existing": 3000.0,
-        "cypher_nexus:friction_factor": 0.01,
-        "cypher_nexus:gravity_factor": 0.01,
-        "cypher_nexus:speed": 1.3
+        "cypher_nexus:friction_factor": 0.03,
+        "cypher_nexus:gravity_factor": 0.02,
+        "cypher_nexus:speed": 1.5
       },
       "recharge": 0,
       "shotState": {
@@ -489,6 +489,9 @@
         },
         "cypher_nexus:knockback": {
           "add": 5.0
+        },
+        "cypher_nexus:recoil": {
+          "add": 2.0
         }
       }
     },

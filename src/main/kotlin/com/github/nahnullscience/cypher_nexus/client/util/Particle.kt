@@ -1,15 +1,13 @@
-package com.github.nahnullscience.cypher_nexus.client.particle
+package com.github.nahnullscience.cypher_nexus.client.util
 
 import com.github.nahnullscience.cypher_nexus.client.particle.CypherTrailParticleGroup.Companion.INSTANCE
 import com.github.nahnullscience.cypher_nexus.client.particle.CypherTrailParticleGroup.Companion.MAX_PARTICLE_TRACKING_DISTANCE_SQR
 import com.github.nahnullscience.cypher_nexus.client.particle.CypherTrailParticleGroup.Companion.mainCamera
-import com.github.nahnullscience.cypher_nexus.client.particle.CypherTrailParticleGroup.Companion.particleEngine
 import com.github.nahnullscience.cypher_nexus.client.particle.CypherTrailParticleGroup.Companion.updateInstance
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.SingleQuadParticle
-import net.minecraft.client.particle.SingleQuadParticle.Layer
 import net.minecraft.core.particles.ParticleOptions
 import net.minecraft.world.entity.Entity
 

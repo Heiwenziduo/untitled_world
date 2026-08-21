@@ -8,7 +8,6 @@
 //object HandleEntityEvents {
 //
 //    private fun tackingCypherProjectiles(event: StartTracking) {
-//        // TODO consider availability
 //        /**
 //         * check [net.minecraft.server.level.ServerEntity.addPairing]
 //         * */
