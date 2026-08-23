@@ -1,7 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.network.server
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
-import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
+import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_INSTANCE_MAP
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.mechanic.event.CNCommonEvents
 import com.github.nahnullscience.cypher_nexus.mechanic.wand.IItemWand
@@ -58,7 +58,7 @@ data class ServerboundEditWandCyphers(
                 // TODO check data authentic
                 stack?.editRecipeIfWand(data.cyphers)?.let {
                     if (it) {
-                        player.getData(WAND_DATA_MAP).updateWandInstance(player.level(), stack, stack.item as IItemWand)
+                        player.getData(WAND_INSTANCE_MAP).updateWandInstance(player.level(), stack, stack.item as IItemWand)
                         PacketDistributor.sendToPlayer(player as ServerPlayer, data.makeConfirm())
                     }
                 } ?: CypherNexus.debugWand(Level.ERROR) { "wand didn't find [${data.uuid}]" }

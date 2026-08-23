@@ -1,6 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.wand
 
-import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
+import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_INSTANCE_MAP
 import com.github.nahnullscience.cypher_nexus.init.ModDataComponents
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.RECOIL_MODULE
 import com.github.nahnullscience.cypher_nexus.init.mod.WandModuleTypes.SECONDARY_MODULE
@@ -119,7 +119,7 @@ abstract class AbstractItemWand(
     }
 
     override fun getWandInstance(level: Level, invoker: Entity, stack: ItemStack): ItemWandInstance {
-        return invoker.getData(WAND_DATA_MAP).getOrPutInstance(level, stack, this)
+        return invoker.getData(WAND_INSTANCE_MAP).getOrPutInstance(level, stack, this)
     }
 
     protected open fun wandLength(stack: ItemStack): Double {

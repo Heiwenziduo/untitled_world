@@ -58,8 +58,8 @@ open class WandModuleStateTracker {
 
         fun LivingEntity.isPerformingModule(module: Supplier<out WandModuleType<*>>) = isPerformingModule(module.get())
         fun LivingEntity.isPerformingModule(module: WandModuleType<*>): Boolean {
-            return if (!this.hasData(WAND_MODULE_STATE_TRACKER)) false
-            else this.getData(WAND_MODULE_STATE_TRACKER).isPerforming(module)
+            val tracker = this.getExistingDataOrNull(WAND_MODULE_STATE_TRACKER)
+            return tracker?.isPerforming(module) ?: false
         }
 
         fun LivingEntity.startPerformingModule(module: Supplier<out WandModuleType<*>>) = startPerformingModule(module.get())

@@ -39,9 +39,8 @@ class InvokerStateTracker {
         @SubscribeEvent(priority = EventPriority.NORMAL)
         private fun updateTracker(event: EntityTickEvent.Pre) {
             val entity = event.entity
-            if (entity.hasData(ModDataAttachments.INVOKER_STATE_TRACKER)) {
-                entity.getData(ModDataAttachments.INVOKER_STATE_TRACKER).tick(entity)
-            }
+            val tracker = entity.getExistingDataOrNull(ModDataAttachments.INVOKER_STATE_TRACKER)
+            tracker?.tick(entity)
         }
     }
 }

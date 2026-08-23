@@ -12,7 +12,7 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent
  * can be found through [Entity.getData] on entities that can be `hit` by cyphers.
  * only exist on `server` side.
  * */
-class VictimStateTracker {
+class CETargetStateTracker {
     private var hitFlag: Int = 0
 
     fun tick(entity: Entity) {
@@ -29,9 +29,8 @@ class VictimStateTracker {
         @SubscribeEvent(priority = EventPriority.NORMAL)
         private fun updateTracker(event: EntityTickEvent.Post) {
             val entity = event.entity
-            if (entity.hasData(ModDataAttachments.VICTIM_STATE_TRACKER)) {
-                entity.getData(ModDataAttachments.VICTIM_STATE_TRACKER).tick(entity)
-            }
+            val tracker = entity.getExistingDataOrNull(ModDataAttachments.CE_TARGET_STATE_TRACKER)
+            tracker?.tick(entity)
         }
     }
 }

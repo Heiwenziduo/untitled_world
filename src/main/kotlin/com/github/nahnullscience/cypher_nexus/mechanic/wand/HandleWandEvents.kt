@@ -25,9 +25,8 @@ object HandleWandEvents {
      * */
     @SubscribeEvent(priority = EventPriority.NORMAL)
     private fun wandModuleTick(event: EntityTickEvent.Pre) { // didn't find `LivingTick`, strange
-        if (!event.entity.hasData(WAND_MODULE_STATE_TRACKER)) return
         val living = event.entity as? LivingEntity ?: return
-        val tracker = living.getData(WAND_MODULE_STATE_TRACKER)
+        val tracker = living.getExistingDataOrNull(WAND_MODULE_STATE_TRACKER) ?: return
 
         val inputs = inputModules.filter { tracker.isPerforming(it) }.toMutableList()
         if (inputs.isNotEmpty()) {
@@ -97,7 +96,7 @@ object HandleWandEvents {
     @SubscribeEvent(priority = EventPriority.NORMAL)
     private fun wandInstanceUpdatePlayer(event: PlayerTickEvent.Post) {
         val player = event.entity
-        val map = player.getData(ModDataAttachments.WAND_DATA_MAP)
+        val map = player.getData(ModDataAttachments.WAND_INSTANCE_MAP)
         CNCommonEvents.livingGatherWandsTracking(player) track@ { index, stack ->
             val wand = stack.item as? IItemWand ?: return@track
             map.getOrPutInstance(player.level(), stack, wand).tick(player)

@@ -2,7 +2,7 @@ package com.github.nahnullscience.cypher_nexus.client.network
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.client.gui.CypherIndexScreen
-import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_DATA_MAP
+import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments.WAND_INSTANCE_MAP
 import com.github.nahnullscience.cypher_nexus.mechanic.event.CNCommonEvents
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundEditWandCyphersConfirm
 import com.github.nahnullscience.cypher_nexus.network.client.ClientboundOpenIndexScreen
@@ -48,7 +48,7 @@ object ClientPayloadHandler {
 
         context.enqueueWork {
             val player = context.player()
-            player.getData(WAND_DATA_MAP)[data.uuid]?.syncInvokingDataClientOnly(
+            player.getData(WAND_INSTANCE_MAP)[data.uuid]?.syncInvokingDataClientOnly(
                 data.mana,
                 data.delay,
                 data.recharge,
@@ -65,7 +65,7 @@ object ClientPayloadHandler {
 
         context.enqueueWork {
             val player = context.player()
-            player.getData(WAND_DATA_MAP)[data.uuid]?.updateAoc(data.cyphers)
+            player.getData(WAND_INSTANCE_MAP)[data.uuid]?.updateAoc(data.cyphers)
         }.exceptionally {
             CypherNexus.debugNetwork { it.message.toString() }
             return@exceptionally null

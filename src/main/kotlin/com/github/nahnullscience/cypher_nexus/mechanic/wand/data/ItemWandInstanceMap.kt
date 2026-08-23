@@ -31,9 +31,8 @@ class ItemWandInstanceMap {
         private fun tickWandDataMap(event: EntityTickEvent.Post) {
             // fired on both sides
             val entity = event.entity
-            if (entity.hasData(ModDataAttachments.WAND_DATA_MAP)) {
-                entity.getData(ModDataAttachments.WAND_DATA_MAP).tick(entity)
-            }
+            val map = entity.getExistingDataOrNull(ModDataAttachments.WAND_INSTANCE_MAP)
+            map?.tick(entity)
         }
     }
 
