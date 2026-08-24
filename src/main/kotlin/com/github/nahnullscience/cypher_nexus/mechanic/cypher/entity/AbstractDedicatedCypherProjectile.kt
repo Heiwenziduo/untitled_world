@@ -134,6 +134,8 @@ abstract class AbstractDedicatedCypherProjectile(
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     open fun doEntitySetup() = Unit
 
+    open fun enableGridTrack(): Boolean = false
+
     override fun tick() {
         if (firstTick) {
             doEntitySetup()
