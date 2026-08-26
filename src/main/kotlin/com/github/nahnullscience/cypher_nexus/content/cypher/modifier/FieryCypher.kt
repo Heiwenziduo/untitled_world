@@ -1,13 +1,19 @@
 package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
+import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.FirstTickHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.GeneralOnHitHook
+import com.github.nahnullscience.cypher_nexus.mechanic.entity.collision.CETargetStorageGridsManager.Companion.forEachEntityRayCast
+import com.github.nahnullscience.cypher_nexus.utility.isServerSide
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.animal.golem.IronGolem
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.arrow.Arrow
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
@@ -42,6 +48,19 @@ class FieryCypher(
         level: Level,
         cyEntity: CE
     ) where CE : Entity, CE : ICypherEntity {
+        run test@ {
+//            val manager = level.getData(ModDataAttachments.STORAGE_GRID_MANAGER)
+//            val pos = cyEntity.position()
+//            val dir = cyEntity.deltaMovement
+//            val level = cyEntity.level()
+//            repeat(10000) {
+//                manager.forEachEntityRayCast(pos, dir, 0.3) { entity, t, direction ->
+//                    if (level.isServerSide && entity is LivingEntity && entity !is IronGolem && entity !is Player) {
+//                        entity.health -= 1f
+//                    }
+//                }
+//            }
+        }
         if (level is ServerLevel) {
 //            val pos = cyEntity.position()
 //            val speed = cyEntity.deltaMovement

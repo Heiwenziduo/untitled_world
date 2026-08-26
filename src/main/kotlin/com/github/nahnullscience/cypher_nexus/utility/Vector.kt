@@ -367,6 +367,98 @@ inline fun checkAABBIntersection(
 }
 
 /**
+ * raw-double segment vs AABB slab test. this is the pure version.
+ *
+ * xyz position & direction represent the vector in space.
+ *
+ * min & max represent the least & most significant points of a virtual AABB.
+ * @return entry t in `[0, 1]`, or -1.0 if the segment misses the box
+ * @see rayAABBCollision
+ * @see checkAABBIntersection
+ * */
+@Suppress("DuplicatedCode")
+fun rayAABBEntryT(
+    xp: Double, yp: Double, zp: Double,
+    xd: Double, yd: Double, zd: Double,
+    minX: Double, minY: Double, minZ: Double,
+    maxX: Double, maxY: Double, maxZ: Double,
+): Double {
+    var tEntry = 0.0; var tExit = 1.0
+
+    if (xd == 0.0) { if (xp !in minX..maxX) return -1.0 }
+    else {
+        var t1 = (minX - xp) / xd; var t2 = (maxX - xp) / xd
+        if (t1 > t2) { val s = t1; t1 = t2; t2 = s } // let t1 always be the entry time, t2 the exit
+        if (t1 > tEntry) tEntry = t1
+        if (t2 < tExit) tExit = t2
+        if (tEntry > tExit) return -1.0
+    }
+    if (yd == 0.0) { if (yp !in minY..maxY) return -1.0 }
+    else {
+        var t1 = (minY - yp) / yd; var t2 = (maxY - yp) / yd
+        if (t1 > t2) { val s = t1; t1 = t2; t2 = s }
+        if (t1 > tEntry) tEntry = t1
+        if (t2 < tExit) tExit = t2
+        if (tEntry > tExit) return -1.0
+    }
+    if (zd == 0.0) { if (zp !in minZ..maxZ) return -1.0 }
+    else {
+        var t1 = (minZ - zp) / zd; var t2 = (maxZ - zp) / zd
+        if (t1 > t2) { val s = t1; t1 = t2; t2 = s }
+        if (t1 > tEntry) tEntry = t1
+        if (t2 < tExit) tExit = t2
+        if (tEntry > tExit) return -1.0
+    }
+    return tEntry
+}
+
+@Suppress("DuplicatedCode")
+inline fun rayAABBCollision(
+    xp: Double, yp: Double, zp: Double,
+    xd: Double, yd: Double, zd: Double,
+    minX: Double, minY: Double, minZ: Double,
+    maxX: Double, maxY: Double, maxZ: Double,
+    margin: Double = Double.NaN,
+    then: (t: Double, direction: Direction?) -> Unit
+) {
+    var tEntry = 0.0; var tExit = 1.0
+    var minX = minX; var minY = minY; var minZ = minZ
+    var maxX = maxX; var maxY = maxY; var maxZ = maxZ
+    var direction: Direction? = null
+
+    if (margin.isFinite()) {
+        minX -= margin; minY -= margin; minZ -= margin
+        maxX += margin; maxY += margin; maxZ += margin
+    }
+
+    if (xd == 0.0) { if (xp !in minX..maxX) return }
+    else {
+        var t1 = (minX - xp) / xd; var t2 = (maxX - xp) / xd
+        if (t1 > t2) { val s = t1; t1 = t2; t2 = s }
+        if (t1 > tEntry) tEntry = t1
+        if (t2 < tExit) tExit = t2
+        if (tEntry > tExit) return
+    }
+    if (yd == 0.0) { if (yp !in minY..maxY) return }
+    else {
+        var t1 = (minY - yp) / yd; var t2 = (maxY - yp) / yd
+        if (t1 > t2) { val s = t1; t1 = t2; t2 = s }
+        if (t1 > tEntry) tEntry = t1
+        if (t2 < tExit) tExit = t2
+        if (tEntry > tExit) return
+    }
+    if (zd == 0.0) { if (zp !in minZ..maxZ) return }
+    else {
+        var t1 = (minZ - zp) / zd; var t2 = (maxZ - zp) / zd
+        if (t1 > t2) { val s = t1; t1 = t2; t2 = s }
+        if (t1 > tEntry) tEntry = t1
+        if (t2 < tExit) tExit = t2
+        if (tEntry > tExit) return
+    }
+    return then(tEntry, direction)
+}
+
+/**
  * assume that `abs(sign) > 1e-12`
  * */
 fun directionFromAxisAndSign(axis: Axis, sign: Double): Direction {

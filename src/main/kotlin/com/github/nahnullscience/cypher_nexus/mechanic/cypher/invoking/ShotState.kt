@@ -226,6 +226,7 @@ class ShotState private constructor (
         if (!dirty) return this
 
         _ccMapBacking?.let { ccMap ->
+            // FIXME kotlin foreach on fastutil primitive-collections introduce boxing
             ccMap.forEach ccMap@ { (cypher, counts) ->
                 // pattern // the first pattern appears would dictate
                 cypher.pattern.let {
