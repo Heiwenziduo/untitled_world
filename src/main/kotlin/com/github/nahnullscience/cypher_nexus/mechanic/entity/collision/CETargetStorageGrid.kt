@@ -1,5 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.entity.collision
 
+import com.github.nahnullscience.cypher_nexus.mechanic.entity.collision.CETargetStorageGridsManager.Companion.rayAABBEntryT
 import com.github.nahnullscience.cypher_nexus.mechanic.entity.collision.CETargetStorageGridsManager.Companion.unpackSectionX
 import com.github.nahnullscience.cypher_nexus.mechanic.entity.collision.CETargetStorageGridsManager.Companion.unpackSectionY
 import com.github.nahnullscience.cypher_nexus.mechanic.entity.collision.CETargetStorageGridsManager.Companion.unpackSectionZ
@@ -11,13 +12,19 @@ import kotlin.math.floor
 
 /**
  * storage for one 16x16x16 section: which entities/items are in it, and — per occupant — which
- * of the 64 4x4x4 sub-cells its AABB currently touches, folded per-kind into [girdMask] /
- * [girdMaskItem] so a future ray-march can test a whole cell against a single `and` before it
+ * of the 64 4x4x4 sub-cells its AABB currently touches, folded per-kind into [gridMask] /
+ * [gridMaskItem] so a future ray-march can test a whole cell against a single `and` before it
  * ever has to look at an individual entity.
  * */
-class CETargetStorageGrid(
-    val sectionKey: Long
+class CETargetStorageGrid private constructor (
+    val sectionKey: Long,
+    val skX: Int, val skY: Int, val skZ: Int
 ) {
+    init {
+
+    }
+    constructor(sectionKey: Long): this(sectionKey, sectionKey.unpackSectionX(), sectionKey.unpackSectionY(), sectionKey.unpackSectionZ())
+
     @PublishedApi
     internal val targets: Reference2LongOpenHashMap<Entity> =
         Reference2LongOpenHashMap<Entity>().apply { defaultReturnValue(0L) }
@@ -25,14 +32,12 @@ class CETargetStorageGrid(
     internal val items: Reference2LongOpenHashMap<ItemEntity> =
         Reference2LongOpenHashMap<ItemEntity>().apply { defaultReturnValue(0L) }
 
-    private var girdMask: Long = 0L
-    private var girdMaskItem: Long = 0L
-
-    /** true once neither map holds anything — the manager drops the grid from its section map when this flips */
-    val isEmpty: Boolean get() = targets.isEmpty() && items.isEmpty()
-    val isNotEmpty: Boolean get() = targets.isNotEmpty() || items.isNotEmpty()
-
-    val size: Int get() = targets.size + items.size
+    @PublishedApi
+    internal var gridMask: Long = 0L
+        private set
+    @PublishedApi
+    internal var gridMaskItem: Long = 0L
+        private set
 
     /**
      * true whenever [targets]/[items] changed since the aggregate mask was last folded. checked
@@ -43,14 +48,63 @@ class CETargetStorageGrid(
      * first read, means a tick with zero ray-casts pays zero folding cost regardless of how many
      * entities moved.
      * */
-    private var entityMaskDirty = true
-    private var itemMaskDirty = true
+    @PublishedApi
+    internal var entityMaskDirty = true
+        private set
+    @PublishedApi
+    internal var itemMaskDirty = true
+        private set
+
+    /** true once neither map holds anything — the manager drops the grid from its section map when this flips */
+    val isEmpty: Boolean get() = targets.isEmpty() && items.isEmpty()
+    val isNotEmpty: Boolean get() = targets.isNotEmpty() || items.isNotEmpty()
+
+    val size: Int get() = targets.size + items.size
 
     var lastModifyGameTime: Long = -1L
         private set
 
     var lastSortGameTime: Long = -1L
         private set
+
+    // ------------------------------------------------------------------------------------------
+    // extraction
+    // ------------------------------------------------------------------------------------------
+
+    /**
+     * go through entities that pierced by the given vector,
+     * this function will sort the grid-mask and allow consecutive calls cheaper.
+     * */
+    inline fun forEachEntity(
+        time: Long,
+        xp: Double, yp: Double, zp: Double,
+        xd: Double, yd: Double, zd: Double,
+        minX: Double, minY: Double, minZ: Double,
+        maxX: Double, maxY: Double, maxZ: Double,
+        margin: Double = Double.NaN,
+        selector: (entity: Entity) -> Boolean = { true },
+        then: (entity: Entity, t: Double) -> Unit
+    ) {
+        val needSort = entityMaskDirty || lastModifyGameTime > lastSortGameTime
+        var sortMask = 0L
+
+        // a crude aabb-like grid cover for a vector may prove more efficient than an exact grid-marching
+        val vecMask = computeGridMask(minX, minY, minZ, maxX, maxY, maxZ, skX, skY, skZ)
+
+        if (!needSort && vecMask and gridMask == 0L) return // no grid overlapping with the vector
+
+        targets.forEach { (entity, lng) ->
+            sortMask = sortMask or lng
+            if (vecMask and lng == 0L) return@forEach // no overlapping
+            if (!selector(entity)) return@forEach // selector not fulfilled
+
+            val bb = entity.boundingBox
+            val t = rayAABBEntryT(xp, yp, zp, xd, yd, zd, bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ, margin)
+            if (t >= 0.0) then(entity, t)
+        }
+
+        sortMask(time, sortMask)
+    }
 
     // ------------------------------------------------------------------------------------------
     // targets
@@ -84,11 +138,17 @@ class CETargetStorageGrid(
      * */
     fun freshEntityMask(gameTime: Long): Long {
         if (entityMaskDirty) {
-            girdMask = foldMasks(targets)
+            gridMask = foldMasks(targets)
             entityMaskDirty = false
             lastSortGameTime = gameTime
         }
-        return girdMask
+        return gridMask
+    }
+
+    fun sortMask(time: Long, mask: Long) {
+        entityMaskDirty = false
+        lastSortGameTime = time
+        gridMask = mask
     }
 
     // ------------------------------------------------------------------------------------------
@@ -110,31 +170,39 @@ class CETargetStorageGrid(
 
     fun freshItemMask(gameTime: Long): Long {
         if (itemMaskDirty) {
-            girdMaskItem = foldMasks(items)
+            gridMaskItem = foldMasks(items)
             itemMaskDirty = false
             lastSortGameTime = gameTime
         }
-        return girdMaskItem
+        return gridMaskItem
     }
 
     // ------------------------------------------------------------------------------------------
 
+    fun computeGridMask(bb: AABB, sx: Int, sy: Int, sz: Int): Long =
+        computeGridMask(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ, sx, sy, sz)
     /**
      * Computes the 64-bit `grid` occupancy mask of an AABB clamped to section (sx, sy, sz).
      * Cell indexing: (lx shl 4) + (lz shl 2) + ly where lx, ly, lz in [0, 3].
+     *
+     * pos min & max alto-wrap, and the result will contain at least one 1-bit.
      */
-    fun computeGridMask(bb: AABB, sx: Int, sy: Int, sz: Int): Long {
+    fun computeGridMask(
+        minX: Double, minY: Double, minZ: Double,
+        maxX: Double, maxY: Double, maxZ: Double,
+        sx: Int, sy: Int, sz: Int
+    ): Long {
         val secOriginX = sx shl 4
         val secOriginY = sy shl 4
         val secOriginZ = sz shl 4
 
         // Local 4m sub-cell bounds clamped to [0..3]
-        val minLX = bb.minX.pos2GridCooAutoWrap(secOriginX)
-        val maxLX = bb.maxX.pos2GridCooAutoWrap(secOriginX)
-        val minLY = bb.minY.pos2GridCooAutoWrap(secOriginY)
-        val maxLY = bb.maxY.pos2GridCooAutoWrap(secOriginY)
-        val minLZ = bb.minZ.pos2GridCooAutoWrap(secOriginZ)
-        val maxLZ = bb.maxZ.pos2GridCooAutoWrap(secOriginZ)
+        val minLX = minX.pos2GridCooAutoWrap(secOriginX)
+        val maxLX = maxX.pos2GridCooAutoWrap(secOriginX)
+        val minLY = minY.pos2GridCooAutoWrap(secOriginY)
+        val maxLY = maxY.pos2GridCooAutoWrap(secOriginY)
+        val minLZ = minZ.pos2GridCooAutoWrap(secOriginZ)
+        val maxLZ = maxZ.pos2GridCooAutoWrap(secOriginZ)
 
         var xM = 0L
         var yM = 0L
@@ -153,10 +221,7 @@ class CETargetStorageGrid(
     }
 
     override fun toString(): String {
-        val x = sectionKey.unpackSectionX()
-        val y = sectionKey.unpackSectionY()
-        val z = sectionKey.unpackSectionZ()
-        return "StorageGrid[x: $x, y: $y, z: $z, entities: ${targets.size}, items: ${items.size}]"
+        return "StorageGrid[x: $skX, y: $skY, z: $skZ, entities: ${targets.size}, items: ${items.size}]"
     }
 
     companion object {

@@ -6,6 +6,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.entity.collision
  * */
 class CETargetStateTracker {
 
+    // GRID pos
     private var xLeast: Int = 0
     private var yLeast: Int = 0
     private var zLeast: Int = 0
@@ -28,6 +29,10 @@ class CETargetStateTracker {
     var isTracked: Boolean = false
         private set
 
+    /**
+     * pass in `block-pos` min & max, compare with stored old `grid-pos`,
+     * and return whether the grid pos needs an update
+     * */
     fun needGridPosUpdate(xl: Int, yl: Int, zl: Int, xm: Int, ym: Int, zm: Int): Boolean {
         val gxl = xl shr 2
         val gyl = yl shr 2
