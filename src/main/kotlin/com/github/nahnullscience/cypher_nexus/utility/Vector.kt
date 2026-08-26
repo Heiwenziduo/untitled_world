@@ -302,12 +302,8 @@ inline fun AABB.checkIntersectionThen(from: Vec3, to: Vec3, onIntersect: onClip)
 inline fun checkAABBIntersection(
     from: Vec3,
     to: Vec3,
-    minX: Double,
-    minY: Double,
-    minZ: Double,
-    maxX: Double,
-    maxY: Double,
-    maxZ: Double,
+    minX: Double, minY: Double, minZ: Double,
+    maxX: Double, maxY: Double, maxZ: Double,
     onIntersect: onClip
 ): Boolean {
     val dir = to - from
@@ -363,7 +359,6 @@ inline fun checkAABBIntersection(
                     else -> directionFromAxisAndSign(Axis.Z, normalSign)
                 }
 
-
         onIntersect(clippingPoint, direction)
         return true
     }
@@ -371,8 +366,10 @@ inline fun checkAABBIntersection(
     return false
 }
 
+/**
+ * assume that `abs(sign) > 1e-12`
+ * */
 fun directionFromAxisAndSign(axis: Axis, sign: Double): Direction {
-    require(abs(sign) > 1e-12)
     return if (sign > 0) axis.positive else axis.negative
 }
 

@@ -22,7 +22,7 @@ object HandleEntityTracking {
     /**
      * check [net.minecraft.server.level.ServerEntity.addPairing]
      * */
-    private fun tackingCypherProjectiles(e: StartTracking) {
+    private fun trackingCypherProjectiles(e: StartTracking) {
 
     }
 

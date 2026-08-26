@@ -18,9 +18,11 @@ import kotlin.math.floor
 class CETargetStorageGrid(
     val sectionKey: Long
 ) {
-    private val targets: Reference2LongOpenHashMap<Entity> =
+    @PublishedApi
+    internal val targets: Reference2LongOpenHashMap<Entity> =
         Reference2LongOpenHashMap<Entity>().apply { defaultReturnValue(0L) }
-    private val items: Reference2LongOpenHashMap<ItemEntity> =
+    @PublishedApi
+    internal val items: Reference2LongOpenHashMap<ItemEntity> =
         Reference2LongOpenHashMap<ItemEntity>().apply { defaultReturnValue(0L) }
 
     private var girdMask: Long = 0L
@@ -31,6 +33,18 @@ class CETargetStorageGrid(
     val isNotEmpty: Boolean get() = targets.isNotEmpty() || items.isNotEmpty()
 
     val size: Int get() = targets.size + items.size
+
+    /**
+     * true whenever [targets]/[items] changed since the aggregate mask was last folded. checked
+     * (and cleared) lazily by [freshEntityMask]/[freshItemMask] instead of inside
+     * addOrUpdateEntity/removeEntity themselves - those run every tick for every moving entity,
+     * while the aggregate mask is only ever read by a ray-cast, which may not run at all this
+     * tick, or may run several times back-to-back. folding once, on demand, right before the
+     * first read, means a tick with zero ray-casts pays zero folding cost regardless of how many
+     * entities moved.
+     * */
+    private var entityMaskDirty = true
+    private var itemMaskDirty = true
 
     var lastModifyGameTime: Long = -1L
         private set
@@ -51,20 +65,30 @@ class CETargetStorageGrid(
      * */
     fun addOrUpdateEntity(entity: Entity, bb: AABB, sx: Int, sy: Int, sz: Int) {
         lastModifyGameTime = entity.level().gameTime
-        val mask = computeGridMask(bb, sx, sy, sz)
-        val old = targets.put(entity, mask)
-        // old ⊆ mask → nothing left the union, safe to just OR the new bits in.
-        // otherwise the footprint shrank/shifted and some vacated bit might have been exclusive
-        // to this entity — fold the grid to find out for sure.
-        girdMask = if ((old and mask) == old) girdMask or mask else foldMasks(targets)
+        targets.put(entity, computeGridMask(bb, sx, sy, sz))
+        entityMaskDirty = true
     }
 
     /** @return true once this leaves the grid with nothing left in it at all (targets + items) */
     fun removeEntity(entity: Entity): Boolean {
         lastModifyGameTime = entity.level().gameTime
-        val old = targets.removeLong(entity)
-        if (old != 0L) girdMask = foldMasks(targets)
+        if (targets.removeLong(entity) != 0L) entityMaskDirty = true
         return isEmpty
+    }
+
+    /**
+     * @return the union of every tracked entity's per-cell occupancy bits, refolding first only
+     * if something changed since the last fold - a no-op boolean check on every call after the
+     * first, whether that's several cells of the same grid within one ray-cast, or several
+     * ray-casts on the same tick.
+     * */
+    fun freshEntityMask(gameTime: Long): Long {
+        if (entityMaskDirty) {
+            girdMask = foldMasks(targets)
+            entityMaskDirty = false
+            lastSortGameTime = gameTime
+        }
+        return girdMask
     }
 
     // ------------------------------------------------------------------------------------------
@@ -74,16 +98,23 @@ class CETargetStorageGrid(
 
     fun addOrUpdateItem(item: ItemEntity, bb: AABB, sx: Int, sy: Int, sz: Int) {
         lastModifyGameTime = item.level().gameTime
-        val mask = computeGridMask(bb, sx, sy, sz)
-        val old = items.put(item, mask)
-        girdMaskItem = if ((old and mask) == old) girdMaskItem or mask else foldMasks(items)
+        items.put(item, computeGridMask(bb, sx, sy, sz))
+        itemMaskDirty = true
     }
 
     fun removeItem(item: ItemEntity): Boolean {
         lastModifyGameTime = item.level().gameTime
-        val old = items.removeLong(item)
-        if (old != 0L) girdMaskItem = foldMasks(items)
+        if (items.removeLong(item) != 0L) itemMaskDirty = true
         return isEmpty
+    }
+
+    fun freshItemMask(gameTime: Long): Long {
+        if (itemMaskDirty) {
+            girdMaskItem = foldMasks(items)
+            itemMaskDirty = false
+            lastSortGameTime = gameTime
+        }
+        return girdMaskItem
     }
 
     // ------------------------------------------------------------------------------------------
@@ -133,10 +164,6 @@ class CETargetStorageGrid(
         private val Z = LongArray(4) { i -> 0x000F_000F_000F_000FL shl (i * 4) }
         private val Y = LongArray(4) { i -> 0x1111_1111_1111_1111L shl i }
 
-        /**
-         * `[0, 3]`
-         * */
-        fun Double.pos2GridCoo(): Int = (floor(this).toInt() shr 2) and 0b0011
 
         /**
          * @param sc section coordinate << 4
