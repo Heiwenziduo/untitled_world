@@ -3,12 +3,12 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherSteerers.NO_STEERER
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherSteerers.SLOW_BOOT_STEERER
-import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.spawnCypherEntityRaw
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.TickBehaviorHook
 import com.github.nahnullscience.cypher_nexus.utility.randomInCone
 import com.github.nahnullscience.cypher_nexus.utility.toVec3
@@ -28,9 +28,6 @@ import org.joml.Vector3f
 abstract class AbstractJuxta(
     defaultAttribute: Builder.() -> Builder
 ) : ModifierCypher(defaultAttribute), TickBehaviorHook {
-    companion object {
-
-    }
     protected open val illusionSteerer: Holder<AbstractCypherSteerer> = NO_STEERER
 
     protected open fun <CE> shootingPos(cyEntity: CE): Vec3 where CE : Entity, CE : ICypherEntity {
@@ -39,10 +36,8 @@ abstract class AbstractJuxta(
     protected abstract fun <CE> shootingDir(cyEntity: CE): Vec3 where CE : Entity, CE : ICypherEntity
 
     protected open fun <CE> isJuxtaTime(cyEntity: CE): Boolean where CE : Entity, CE : ICypherEntity {
-        cyEntity.ccMap?.containsKey(Cyphers.PHANTOM_RUSH)?.let {
-            if (it) return (cyEntity.tickCount - 1) and 3 == 3
-        }
-        return (cyEntity.tickCount - 1) and 7 == 7
+        return if (cyEntity.hasFlag(CypherFlags.PHANTOM)) (cyEntity.tickCount - 1) and 3 == 3
+        else (cyEntity.tickCount - 1) and 7 == 7
     }
 
     final override fun <CE> onTick(

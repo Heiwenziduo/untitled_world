@@ -43,7 +43,7 @@ abstract class AbstractDedicatedCypherProjectile(
     entityType: EntityType<out AbstractDedicatedCypherProjectile>,
     level: Level
 ) : Projectile(entityType, level), IEntityWithComplexSpawn,
-    IFlagExtension,
+    IFlagExtension<CypherFlags>,
     ICypherEntity by CypherEntityDelegation<AbstractDedicatedCypherProjectile>() {
     companion object {
 

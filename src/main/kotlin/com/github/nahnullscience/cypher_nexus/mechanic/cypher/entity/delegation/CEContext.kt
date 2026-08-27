@@ -31,7 +31,7 @@ open class CEContext <CE> : ICEContext<CE> where CE : Entity, CE : ICypherEntity
     protected val random get() = ce.random
 
     protected val attributeMap = AttributeFastMap()
-    override var enabledFlags = CypherFlags.fromFlags() // no flag by default
+    override var enabledFlags = 0 // no flag by default
 
     override var ccMap: MapOfCypherCounts? = null
 

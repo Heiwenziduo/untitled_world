@@ -282,13 +282,16 @@ object Cyphers {
         shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.2)
     }
     val REMOVE_DAMAGE = registerModifier("remove_damage", 0f) {
+        delay(-3)
         flags(CypherFlags.SAFE_EXPLODE)
+        shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, -1.0)
         shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.SET_ALL, 0.0)
         shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.SET_ALL, 0.0)
     }
     val REMOVE_EXPLOSION = registerModifier("remove_explosion", 0f) {
-        delay(-5)
-        flags(CypherFlags.SAFE_EXPLODE)
+        delay(-3)
+        flags(CypherFlags.SAFE_EXPLODE, CypherFlags.REMOVE_EXPLOSION)
+        shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, -1.0)
         shotStateAttr(CypherAttributes.DAMAGE, AttributeOperator.ADD, -1.0)
         shotStateAttr(CypherAttributes.EFFECT_RADIUS, AttributeOperator.MULTIPLY_BASE, -0.2)
     }
@@ -387,6 +390,7 @@ object Cyphers {
     val PHANTOM_RUSH = registerCypher(AbstractJuxta::PhantomRush) {
         configJuxta()
         manaDrain(200f)
+        flags(CypherFlags.PHANTOM)
         shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.CAP_AT, 100.0)
     }
     val CHAOTIC_JUXTA = registerCypher(AbstractJuxta::ChaoticJuxta) {
@@ -407,13 +411,13 @@ object Cyphers {
         shotStateAttr(CypherAttributes.FORTUNE_LEVEL, AttributeOperator.ADD, 1.0)
     }
     val DAEDALUS = registerCypher(::DaedalusCypher) {
-        manaDrain(24f)
-        delay(-3)
-        shotStateAttr(CypherAttributes.SPEED_INITIAL, AttributeOperator.MULTIPLY_TOTAL, 1.24)
+        manaDrain(33f)
+        delay(-2)
+        recharge(-2)
+        shotStateAttr(CypherAttributes.SPEED_INITIAL, AttributeOperator.MULTIPLY_TOTAL, 1.33)
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.MULTIPLY_TOTAL, 0.0)
-        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 24.0)
-        shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.24)
-        shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.04)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 33.0)
+        shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.33)
     }
     val DIRECT_SKYWARD = registerCypher(::DirectSkywardCypher) {
         delay(-3)

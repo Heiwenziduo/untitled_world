@@ -100,7 +100,7 @@ class TieredWandGenerationFunction(
     }
 
     enum class WandPropertyPreference(
-        override val value: Int,
+        override val mask: Int,
 
         val rate: Float,
     ): IFlagExtension.IFlagEnum {
@@ -115,7 +115,7 @@ class TieredWandGenerationFunction(
         ;
 
         companion object {
-            fun preference(vararg pre: WandPropertyPreference): Int = pre.sumOf { a -> a.value }
+            fun preference(vararg pre: WandPropertyPreference): Int = pre.sumOf { a -> a.mask }
             fun toProbabilityMap(preference: Int) : HashMap<WandPropertyPreference, Int> {
                 val all = WandPropertyPreference.entries
                 val map = HashMap<WandPropertyPreference, Int>(all.size)
@@ -129,5 +129,5 @@ class TieredWandGenerationFunction(
 }
 
 private fun Int.contain(flag: TieredWandGenerationFunction.WandPropertyPreference): Boolean {
-    return this and flag.value > 0
+    return this and flag.mask > 0
 }

@@ -291,26 +291,23 @@
       "recharge": 7
     },
     "cypher_nexus:daedalus": {
-      "delay": -3,
+      "delay": -2,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 24.0,
-      "recharge": 0,
+      "manaDrain": 33.0,
+      "recharge": -2,
       "shotState": {
         "cypher_nexus:crit_chance": {
-          "add": 0.24
-        },
-        "cypher_nexus:gravity_factor": {
-          "add": 0.04
+          "add": 0.33
         },
         "cypher_nexus:recoil": {
           "multiply_total": 0.0
         },
         "cypher_nexus:speed": {
-          "multiply_total": 1.24
+          "multiply_total": 1.33
         },
         "cypher_nexus:spread": {
-          "add": 24.0
+          "add": 33.0
         }
       }
     },
@@ -583,7 +580,7 @@
     "cypher_nexus:firework_rocket": {
       "delay": 0,
       "draw": 0,
-      "flags": 3072,
+      "flags": 5120,
       "manaDrain": 50.0,
       "projectile": {
         "cypher_nexus:crit_chance": 0.1,
@@ -603,7 +600,7 @@
     "cypher_nexus:firework_rocket_death": {
       "delay": 0,
       "draw": 1,
-      "flags": 3072,
+      "flags": 5120,
       "manaDrain": 70.0,
       "projectile": {
         "cypher_nexus:crit_chance": 0.1,
@@ -623,7 +620,7 @@
     "cypher_nexus:firework_rocket_random": {
       "delay": 0,
       "draw": 0,
-      "flags": 3072,
+      "flags": 5120,
       "manaDrain": 60.0,
       "projectile": {
         "cypher_nexus:crit_chance": 0.1,
@@ -758,7 +755,7 @@
     "cypher_nexus:glowing": {
       "delay": 0,
       "draw": 1,
-      "flags": 8192,
+      "flags": 16384,
       "manaDrain": 1.0,
       "recharge": 0
     },
@@ -907,7 +904,7 @@
     "cypher_nexus:lightning_bolt": {
       "delay": 10,
       "draw": 0,
-      "flags": 9280,
+      "flags": 17472,
       "manaDrain": 200.0,
       "projectile": {
         "cypher_nexus:damage": 10.0,
@@ -1010,7 +1007,7 @@
     "cypher_nexus:peaceful_mode": {
       "delay": -2,
       "draw": 1,
-      "flags": 2064,
+      "flags": 4112,
       "manaDrain": 5.0,
       "recharge": 0,
       "shotState": {
@@ -1032,7 +1029,7 @@
     "cypher_nexus:phantom_rush": {
       "delay": 5,
       "draw": 1,
-      "flags": 0,
+      "flags": 32768,
       "manaDrain": 200.0,
       "recharge": 0,
       "shotState": {
@@ -1252,9 +1249,9 @@
       }
     },
     "cypher_nexus:remove_damage": {
-      "delay": 0,
+      "delay": -3,
       "draw": 1,
-      "flags": 2048,
+      "flags": 4096,
       "manaDrain": 0.0,
       "recharge": 0,
       "shotState": {
@@ -1263,13 +1260,16 @@
         },
         "cypher_nexus:damage": {
           "set_all": 0.0
+        },
+        "cypher_nexus:recoil": {
+          "add": -1.0
         }
       }
     },
     "cypher_nexus:remove_explosion": {
-      "delay": -5,
+      "delay": -3,
       "draw": 1,
-      "flags": 2048,
+      "flags": 6144,
       "manaDrain": 0.0,
       "recharge": 0,
       "shotState": {
@@ -1278,6 +1278,9 @@
         },
         "cypher_nexus:effect_radius": {
           "multiply_base": -0.2
+        },
+        "cypher_nexus:recoil": {
+          "add": -1.0
         }
       }
     },
@@ -1326,7 +1329,7 @@
     "cypher_nexus:smoke_bomb": {
       "delay": 6,
       "draw": 0,
-      "flags": 3328,
+      "flags": 5376,
       "manaDrain": 40.0,
       "projectile": {
         "cypher_nexus:crit_chance": 0.05,

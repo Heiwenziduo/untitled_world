@@ -14,10 +14,12 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.Attribut
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.attribute.CypherAttribute.AttributeApply
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.spawnCypherEntity
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.invoking.ServerInvokeAbortReleaseHook.ReleaseAbort
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.AbstractInvokingPattern
 import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
+import com.github.nahnullscience.cypher_nexus.utility.forEachInt
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
@@ -34,7 +36,7 @@ import net.minecraft.world.phys.Vec3
 class ShotState private constructor (
     private var charge: Int,
     private val helper: InvokingHelper?
-) : IFlagExtension {
+) : IFlagExtension<CypherFlags> {
     /**
      * create ShotState with given charge, this constructor will create a `payload` shot-state,
      * for creating root-state inside invoking process, see [root]
@@ -150,26 +152,27 @@ class ShotState private constructor (
 
 
         val spread = attributes.attrCalculator(CypherAttributes.SPREAD.value())
+        var spawnIndex = 0
 
         // generate bullets
         simpleProjectiles.reference2IntEntrySet().forEach { (cypher, count) ->
             repeat(count) {
-                wrapSpawn(cypher, null, coordinate, level, owner, directInvoker, spread)
+                wrapSpawn(spawnIndex++, cypher, null, coordinate, level, owner, directInvoker, spread)
             }
         }
 
         triggeredProjectiles.forEach { node ->
-            wrapSpawn(node.instance, node, coordinate, level, owner, directInvoker, spread)
+            wrapSpawn(spawnIndex++, node.instance, node, coordinate, level, owner, directInvoker, spread)
         }
 
         Profiler.get().pop()
     }
 
-    private var indexP = 0
     /**
      * wrap [spawnCypherEntity] for pattern & chain effect supports
      * */
     private fun wrapSpawn(
+        index: Int,
         cypher: AbstractProjectileCypher<*>,
         node: ProjectileNode?,
         coordinate: AnchoredCoordinate,
@@ -178,7 +181,9 @@ class ShotState private constructor (
         directInvoker: Entity?,
         spread: Double
     ) {
-        shotPattern.value().layout(indexP++, totalProjectiles, coordinate) { xp, yp, zp, xd, yd, zd ->
+        shotPattern.value().layout(
+            index, totalProjectiles, coordinate
+        ) { xp, yp, zp, xd, yd, zd ->
             run layer@ {
                 val pos = Vec3(xp, yp, zp)
                 var dir = coordinate.tmpV3f.set(xd, yd, zd)
@@ -205,12 +210,6 @@ class ShotState private constructor (
         simpleProjectiles.addTo(cypher, count.coerceAtLeast(0))
     }
 
-    @Deprecated("state changes affected by this method won't be synced, use ccMap-friendly method instead")
-    fun attachHooks(cypher: AbstractNonProjectileCypher): ShotState = apply { hooks.add(cypher) }
-
-    @Deprecated("state changes affected by this method won't be synced, use ccMap-friendly method instead")
-    fun enableFlags(flag: Int): ShotState = apply { enableFlag(flag) }
-
     /**
      * register cypher to [MapOfCypherCounts], this will make all shot-state attribute of the cypher into count.
      * this won't affect the projectile count.
@@ -221,13 +220,18 @@ class ShotState private constructor (
         ccMap.count(cy, count.coerceAtLeast(0))
     }
 
+    @Deprecated("state changes affected by this method won't be synced, use ccMap-friendly method instead")
+    fun attachHooks(cypher: AbstractNonProjectileCypher): ShotState = apply { hooks.add(cypher) }
+
+    @Deprecated("state changes affected by this method won't be synced, use ccMap-friendly method instead")
+    fun enableFlags(flag: Int): ShotState = apply { enableFlagRaw(flag) }
+
     /** compute and lock the state */
     fun compute(): ShotState {
         if (!dirty) return this
 
         _ccMapBacking?.let { ccMap ->
-            // FIXME kotlin foreach on fastutil primitive-collections introduce boxing
-            ccMap.forEach ccMap@ { (cypher, counts) ->
+            ccMap.forEachInt ccMap@ { cypher, counts ->
                 // pattern // the first pattern appears would dictate
                 cypher.pattern.let {
                     if (it != NO_PATTERN && shotPattern == NO_PATTERN) shotPattern = it
@@ -236,7 +240,7 @@ class ShotState private constructor (
                 hooks.add(cypher, counts)
                 // flag & color (non-projectile exclusive)
                 if (cypher is AbstractNonProjectileCypher) {
-                    enableFlag(cypher.flags)
+                    enableFlagRaw(cypher.flags)
                     run color@ {
                         cypher.rgb?.let { dyeAccumulator.addDye(it, counts) }
                         cypher.alpha.takeIf { it.isFinite() }?.let { dyeAccumulator.multiplyAlpha(it, counts) }

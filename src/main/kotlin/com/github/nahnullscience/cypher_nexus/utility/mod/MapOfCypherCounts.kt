@@ -5,8 +5,8 @@ import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap
 import net.minecraft.core.Holder
 
 /**
- * ccMap or MoCC,
- * serve as a token to ship across network and rebuild the `ShotStateChunk` on the other side
+ * `ccMap` or `MoCC`,
+ * serve as a token to ship across network and rebuild the `ShotState` on the other side
  * (this only includes shot-state attributes that shares among all CE of that state,
  * CE themselves and payload info are not included)
  * */
@@ -20,7 +20,7 @@ open class MapOfCypherCounts(capa: Int = 32) : Reference2IntLinkedOpenHashMap<Ab
         private set
 
     /**
-     *
+     * typealias to [addTo]
      * */
     fun count(cy: AbstractCypher, n: Int = 1): Int = addTo(cy, n)
 
@@ -32,8 +32,9 @@ open class MapOfCypherCounts(capa: Int = 32) : Reference2IntLinkedOpenHashMap<Ab
     fun getCount(cy: Holder<out AbstractCypher>) = getCount(cy.value())
 
     override fun containsKey(cy: AbstractCypher): Boolean = getInt(cy) > 0
+
     /**
-     * may prefer `flag` check
+     * note, should prefer a `flag` check rather than a cypher-specific check
      * */
     fun containsKey(cy: Holder<out AbstractCypher>) = containsKey(cy.value())
 }

@@ -2,25 +2,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag
 
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 
-/**
- * Kotlin provides a few operators for bits operation
- *
- * shl(bits) – signed shift left
- *
- * shr(bits) – signed shift right
- *
- * ushr(bits) – unsigned shift right
- *
- * and(bits) – bitwise AND
- *
- * or(bits) – bitwise OR
- *
- * xor(bits) – bitwise XOR
- *
- * inv() – bitwise inversion
- * */
 
-/** a flag is basically a bundle of booleans, all flag-bits are 0 by default */
 enum class CypherFlags : IFlagExtension.IFlagEnum {
 
     /**
@@ -84,6 +66,11 @@ enum class CypherFlags : IFlagExtension.IFlagEnum {
     EXPLOSIVE,
 
     /**
+     * disable projectile explosion even [EXPLOSIVE] is present
+     * */
+    REMOVE_EXPLOSION,
+
+    /**
      * make explosions not break blocks
      * */
     SAFE_EXPLODE,
@@ -91,12 +78,24 @@ enum class CypherFlags : IFlagExtension.IFlagEnum {
     /**
      * do not play server sound
      * */
+    // TODO
     SILENT,
 
     /**
      * always render in full light
      * */
     GLOWING,
+
+    /**
+     * strengthen the juxta series
+     * */
+    PHANTOM,
+
+    /**
+     * make
+     * */
+    // TODO
+    POLYMORPH,
 
 
 //    /**
@@ -108,24 +107,22 @@ enum class CypherFlags : IFlagExtension.IFlagEnum {
 //    NO_ROTATION,
 
     ;
-    override val value: Int = 1 shl ordinal
+    override val mask: Int = 1 shl ordinal
     init {
 //        require(value != 0)
 //        require(value == 1 || value % 2 == 0)
-        require(value < Int.MAX_VALUE)
+        require(mask < Int.MAX_VALUE)
     }
 
     companion object {
         fun printFlag(flags: Int) {
             print("number $flags have CypherFlag:\n[")
             for (e in entries) {
-                if (flags and e.value > 0) print("${e.name}, ")
+                if (flags and e.mask > 0) print("${e.name}, ")
             }
             println("]")
         }
 
-        fun fromFlags(vararg flags: CypherFlags): Int = flags.sumOf { it.value }
-
-        fun Int.containsFlag(flag: CypherFlags): Boolean = this and flag.value == flag.value
+        fun Int.containsFlag(flag: CypherFlags): Boolean = this and flag.mask == flag.mask
     }
 }

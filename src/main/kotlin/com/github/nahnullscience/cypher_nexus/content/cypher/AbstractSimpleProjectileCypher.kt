@@ -36,10 +36,10 @@ abstract class AbstractSimpleProjectileCypher <out C : AbstractProjectileCypher<
     private val projectileAttrHolder: HashMap<Holder<CypherAttribute>, Double> = HashMap()
     private val shotStateAttrHolder: HashMap<Holder<CypherAttribute>, EnumMap<AttributeOperator, Double>> = HashMap()
 
-    override fun manaDrain(float: Float) = apply { super.manaDrain(float) }
-    override fun draw(int: Int) = apply { super.draw(int) }
-    override fun delay(int: Int) = apply { super.delay(int) }
-    override fun recharge(int: Int) = apply { super.recharge(int) }
+    override fun manaDrain(f: Float) = apply { super.manaDrain(f) }
+    override fun draw(i: Int) = apply { super.draw(i) }
+    override fun delay(i: Int) = apply { super.delay(i) }
+    override fun recharge(i: Int) = apply { super.recharge(i) }
     override fun flags(vararg flag: CypherFlags) = apply { super.flags(*flag) }
     fun borderColor(int: Int) = apply {
         borderColor = int

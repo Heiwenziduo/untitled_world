@@ -138,7 +138,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         z: Double,
         factor: Float
     ): Boolean {
-        if (ce.ccMap?.containsKey(Cyphers.REMOVE_EXPLOSION) == true) return false
+        if (ce.hasFlag(CypherFlags.REMOVE_EXPLOSION)) return false
         explosion?.let {
             if (level is ServerLevel) it.explode(level, x, y, z, factor)
             ce.onExplode(ce)

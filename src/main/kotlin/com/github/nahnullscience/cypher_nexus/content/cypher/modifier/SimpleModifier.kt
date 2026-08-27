@@ -21,10 +21,10 @@ class SimpleModifier(
         draw(1)
     }
 
-    override fun manaDrain(float: Float) = apply { super.manaDrain(float) }
-    override fun draw(int: Int) = apply { super.draw(int) }
-    override fun delay(int: Int) = apply { super.delay(int) }
-    override fun recharge(int: Int) = apply { super.recharge(int) }
+    override fun manaDrain(f: Float) = apply { super.manaDrain(f) }
+    override fun draw(i: Int) = apply { super.draw(i) }
+    override fun delay(i: Int) = apply { super.delay(i) }
+    override fun recharge(i: Int) = apply { super.recharge(i) }
     override fun flags(vararg flag: CypherFlags) = apply { super.flags(*flag) }
     override fun borderColor(color: Int) = apply { super.borderColor(color) }
     override fun dyeColor(rgb: Int) = apply { super.dyeColor(rgb) }

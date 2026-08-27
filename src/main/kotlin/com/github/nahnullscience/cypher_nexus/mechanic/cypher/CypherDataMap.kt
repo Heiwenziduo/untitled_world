@@ -59,11 +59,11 @@ data class CypherDataMap(
         private val projectile = AttributeFastMap()
         private val shotState = AttributeFastOperatorMap()
 
-        open fun manaDrain(float: Float): Builder = apply { manaDrain = float }
-        open fun draw(int: Int): Builder = apply { draw = int }
-        open fun delay(int: Int): Builder = apply { delay = int }
-        open fun recharge(int: Int): Builder = apply { recharge = int }
-        open fun flags(vararg flag: CypherFlags) = apply { flag.forEach { flags = flags or it.value } }
+        open fun manaDrain(f: Float): Builder = apply { manaDrain = f }
+        open fun draw(i: Int): Builder = apply { draw = i }
+        open fun delay(i: Int): Builder = apply { delay = i }
+        open fun recharge(i: Int): Builder = apply { recharge = i }
+        open fun flags(vararg flag: CypherFlags) = apply { flag.forEach { flags = flags or it.mask } }
 
         // it seems datagen has a special lifecycle that can unpacks a holder directly (?)
         open fun projectileAttr(holder: Holder<CypherAttribute>, value: Double) = projectileAttr(holder.value(), value)

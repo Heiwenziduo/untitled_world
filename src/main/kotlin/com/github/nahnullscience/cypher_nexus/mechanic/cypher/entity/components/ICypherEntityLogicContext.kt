@@ -5,6 +5,7 @@ import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.GENERIC_CAPTURE_RADIUS
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
@@ -23,7 +24,7 @@ import net.minecraft.world.phys.HitResult
 import net.minecraft.world.phys.Vec3
 
 interface ICypherEntityLogicContext : TraceableEntity,
-    IFlagExtension, ICypherEntityAttributeAccessor {
+    IFlagExtension<CypherFlags>, ICypherEntityAttributeAccessor {
 
     /**
      * [MapOfCypherCounts] serves as the token of [ShotState],

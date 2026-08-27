@@ -2,12 +2,12 @@ package com.github.nahnullscience.cypher_nexus.content.cypher.modifier
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherSteerers.NO_STEERER
-import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.init.mod.InvokingPatterns
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.CypherDataMap.Builder
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.ModifierCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.spawnCypherEntityRaw
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.projectile.OnBounceHook
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.patterns.AbstractInvokingPattern
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
@@ -69,7 +69,7 @@ abstract class AbstractOnBounceSeries(
 
             val formation: AbstractInvokingPattern
             val count: Int
-            if (cyEntity.ccMap?.containsKey(Cyphers.PHANTOM_RUSH) == true) {
+            if (cyEntity.hasFlag(CypherFlags.PHANTOM)) {
                 formation = InvokingPatterns.FRONT_DIFFUSE_OCTAGON_PATTERN.value()
                 count = 8
             } else {
