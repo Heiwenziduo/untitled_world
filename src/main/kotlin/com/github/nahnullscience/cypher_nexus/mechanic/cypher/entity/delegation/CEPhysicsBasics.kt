@@ -1,5 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation
 
+import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments
 import com.github.nahnullscience.cypher_nexus.init.mod.Cyphers
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
@@ -20,10 +21,10 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ProjectileNode
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.TriggerType
+import com.github.nahnullscience.cypher_nexus.mechanic.entity.collision.CETargetStorageGridsManager.Companion.forEachEntityRayCast
 import com.github.nahnullscience.cypher_nexus.utility.*
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.AnchoredCoordinate
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.anchor
-import com.github.nahnullscience.cypher_nexus.utility.linear_space.face
 import com.github.nahnullscience.cypher_nexus.utility.linear_space.fromDirectionWithUpVector
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap
 import net.minecraft.core.Direction
@@ -204,111 +205,139 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
 
     protected fun loopHitAndBounce() {
         Profiler.get().push { "loopHitBounce" }
-
         bouncePoints.clear()
-//        val speedSqr = cyEntity.deltaMovement.lengthSqr()
+        val manager = level.getData(ModDataAttachments.STORAGE_GRID_MANAGER)
+        val collisionMargin = ce.bbWidth + 0.25
+
         var stepPosition = ce.position()
         var stepMovement = ce.deltaMovement
 
         var hitSomething: Boolean
         var loopTimes = 0
         // Block: { normal, ignore } X Entity: { normal, pierce, ignore }
-        if (!ce.collideWithBlocks && !ce.collideWithEntities) {} // penetrate, do nothing
+        if (!ce.collideWithBlocks && !ce.collideWithEntities) {
+            // penetrate, do nothing
+        }
 //        else if (speedSqr <= LOW_SPEED_THRESHOLD_SQR) {} // too slow, do nothing
-        else
-            do {
-                if (ce.isRemoved) break
-                hitSomething = false
+        else do {
+            if (ce.isRemoved) break
+            hitSomething = false
 
-                val stepDestination0 = stepPosition.add(stepMovement)
-                var destination = stepDestination0
-                var bouncePoint: Vec3? = null
-                var blockResult: BlockHitResult? = null
-                var bounceDirection: Direction? = null
+            val stepDestination0 = stepPosition.add(stepMovement)
+            var destination = stepDestination0
+            var bouncePoint: Vec3? = null
+            var blockResult: BlockHitResult? = null
+            var bounceDirection: Direction? = null
 
-                // if normal, truncate path
-                if (ce.collideWithBlocks) {
-                    // get path end-point by checking Block collision
-                    blockResult = level.clipIncludingBorder(
-                        ClipContext(stepPosition, destination, Block.COLLIDER, Fluid.NONE, ce)
-                    )
-                    if (blockResult.type != Type.MISS) {
-                        // truncate stepDestination
-                        destination = blockResult.location
+            // if normal, truncate path
+            if (ce.collideWithBlocks) {
+                // get path end-point by checking Block collision
+                blockResult = level.clipIncludingBorder(
+                    ClipContext(stepPosition, destination, Block.COLLIDER, Fluid.NONE, ce)
+                )
+                if (blockResult.type != Type.MISS) {
+                    // truncate stepDestination
+                    destination = blockResult.location
+                    bouncePoint = destination
+                    bounceDirection = blockResult.direction
+                }
+            }
+
+            // handle entity collisions
+            if (ce.collideWithEntities) {
+                val margin = HIT_BB_INFLATION + ce.getDimensions(ce.pose).width / 2
+                if (ce.hasFlag(CypherFlags.PIERCE_ENTITY)) {
+                    // if tagged pierce, collide all
+
+//                    level.getEntities(
+//                        ce,
+//                        ce.boundingBox.expandToAtMost(stepMovement, 16.0),
+//                        ce::canHitTarget
+//                    ).forEach { target ->
+//                        // there is a trigger call inside whenHit, which may modifies the entity list in section storage.
+//                        // execute an on-site sub-effect may raise ConcurrentModificationException
+//                        // it seems we have to extract entities first and go through the list one more time
+//                        if (canHitTargetAtThisTick(target))
+//                        stepPosition.rayCastThen(destination, target.boundingBox, margin) { hitPoint, dir ->
+//                            whenHitDelegate(EntityHitResult(target, hitPoint), stepMovement, dir)
+//                        }
+//                    }
+
+                    manager.forEachEntityRayCast(
+                        stepPosition, stepMovement,
+                        margin = collisionMargin,
+                        selector = ce::canHitTarget
+                    ) { entity, t, direction ->
+                        if (canHitTargetAtThisTick(entity)) {
+                            val hitPoint = stepPosition + stepMovement * t
+                            val result = EntityHitResult(entity, hitPoint)
+                            whenHitDelegate(result, stepMovement, direction)
+                        }
+                    }
+                } else {
+                    // otherwise collide first
+                    var nearestT = Double.MAX_VALUE
+                    var hitEntity: Entity? = null
+
+//                    level.forEachEntityWithin(
+//                        ce,
+//                        ce.boundingBox.expandToAtMost(stepMovement, 16.0),
+//                        ce::canHitTarget
+//                    ) { target ->
+//                        if (canHitTargetAtThisTick(target))
+//                        stepPosition.rayCastThen(destination, target.boundingBox, margin) { hitPoint, dir ->
+//                            val dd: Double = stepPosition.distanceToSqr(hitPoint)
+//                            if (dd < nearestT) {
+//                                hitEntity = target
+//                                nearestT = dd
+//                                destination = hitPoint
+//                                bounceDirection = dir
+//                            }
+//                        }
+//                    }
+
+                    manager.forEachEntityRayCast(
+                        stepPosition, stepMovement,
+                        margin = collisionMargin,
+                        selector = ce::canHitTarget
+                    ) { entity, t, direction ->
+                        if (canHitTargetAtThisTick(entity) && t < nearestT) {
+                            hitEntity = entity
+                            nearestT = t
+                            bounceDirection = direction
+                        }
+                    }
+
+                    if (hitEntity != null) {
+                        destination = stepPosition + stepMovement * nearestT
                         bouncePoint = destination
-                        bounceDirection = blockResult.direction
+                        whenHitDelegate(EntityHitResult(hitEntity, destination), stepMovement, bounceDirection)
                     }
                 }
+            }
 
-                // handle entity collisions
-                if (ce.collideWithEntities) {
-                    val margin = HIT_BB_INFLATION + ce.getDimensions(ce.pose).width / 2
-                    if (ce.hasFlag(CypherFlags.PIERCE_ENTITY)) {
-                        // if tagged pierce, collide all
-                        level.getEntities(
-                            ce,
-                            ce.boundingBox.expandToAtMost(stepMovement, 16.0),
-                            ce::canHitTarget
-                        ).forEach { target ->
-                            // there is a trigger call inside whenHit, which may modifies the entity list in section storage.
-                            // execute an on-site sub-effect may raise ConcurrentModificationException
-                            // it seems we have to extract entities first and go through the list one more time
-                            if (canHitTargetAtThisTick(target))
-                            stepPosition.rayCastThen(destination, target.boundingBox, margin) { hitPoint, dir ->
-                                whenHitDelegate(EntityHitResult(target, hitPoint), stepMovement, dir)
-                            }
-                        }
-                    } else {
-                        // otherwise collide first
-                        var nearest = Double.MAX_VALUE
-                        var hitEntity: Entity? = null
+            // bounce from the point
+            if (bouncePoint != null) {
+                hitSomething = true
+                if (blockResult?.location == bouncePoint) whenHitDelegate(blockResult, stepMovement, bounceDirection)
 
-                        level.forEachEntityWithin(
-                            ce,
-                            ce.boundingBox.expandToAtMost(stepMovement, 16.0),
-                            ce::canHitTarget
-                        ) { target ->
-                            if (canHitTargetAtThisTick(target))
-                            stepPosition.rayCastThen(destination, target.boundingBox, margin) { hitPoint, dir ->
-                                val dd: Double = stepPosition.distanceToSqr(hitPoint)
-                                if (dd < nearest) {
-                                    hitEntity = target
-                                    nearest = dd
-                                    destination = hitPoint
-                                    bounceDirection = dir
-                                }
-                            }
-                        }
+                if (canBounce) {
+                    bounceCount++
+                    bouncePoints.add(bouncePoint)
+                    val bd = bounceDirection ?: stepMovement.mostAlignedDirection()
+                    onBounceDelegate(bouncePoint, bounceCount, bd)
 
-                        if (hitEntity != null) {
-                            whenHitDelegate(EntityHitResult(hitEntity, destination), stepMovement, bounceDirection)
-                            bouncePoint = destination
-                        }
-                    }
+                    stepPosition = bouncePoint.add(bd.unitVec3.scale(1E-4)) // avoid "diving into blocks" bug
+                    stepMovement = stepDestination0.subtract(destination).flipByAxis(
+                        bd.axis,
+                        ce.getBounceSpeedDegrade()
+                    )
+                    ce.setPos(stepPosition)
+                    ce.needsSync = true
                 }
+            }
 
-                // bounce from the point
-                if (bouncePoint != null) {
-                    hitSomething = true
-                    if (blockResult?.location == bouncePoint) whenHitDelegate(blockResult, stepMovement, bounceDirection)
-
-                    if (canBounce) {
-                        bounceCount++
-                        bouncePoints.add(bouncePoint)
-                        val bd = bounceDirection ?: stepMovement.mostAlignedDirection()
-                        onBounceDelegate(bouncePoint, bounceCount, bd)
-
-                        stepPosition = bouncePoint.add(bd.unitVec3.scale(1E-4)) // avoid "diving into blocks" bug
-                        stepMovement = stepDestination0.subtract(destination).flipByAxis(
-                            bd.axis,
-                            ce.getBounceSpeedDegrade()
-                        )
-                        ce.setPos(stepPosition)
-                        ce.needsSync = true
-                    }
-                }
-
-            } while (hitSomething && canBounce && loopTimes++ <= 16)
+        } while (hitSomething && canBounce && loopTimes++ <= 16)
 
         // finalize position
         ce.setPos(stepPosition.add(stepMovement))

@@ -66,7 +66,7 @@ class CETargetStorageGrid private constructor (
      * go through entities that pierced by the given vector,
      * this function will sort the grid-mask and allow consecutive calls cheaper.
      * */
-    inline fun forEachEntity(
+    inline fun forEachEntityRayCast(
         time: Long,
         xp: Double, yp: Double, zp: Double,
         xd: Double, yd: Double, zd: Double,
@@ -86,12 +86,16 @@ class CETargetStorageGrid private constructor (
         var sortMask = 0L
         entities.forEachLong { entity, lng ->
             sortMask = sortMask or lng
-            if (vecMask and lng == 0L) return@forEachLong // no overlapping
+            if (vecMask and lng == 0L) return@forEachLong // no grid overlapping
             if (!selector(entity)) return@forEachLong // selector not fulfilled
 
             val bb = entity.boundingBox
-            rayAABBCollision(xp, yp, zp, xd, yd, zd, bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ, margin)
-            { t, direction ->
+            rayAABBCollision(
+                xp, yp, zp, xd, yd, zd,
+                bb.minX, bb.minY, bb.minZ,
+                bb.maxX, bb.maxY, bb.maxZ,
+                margin
+            ) { t, direction ->
                 then(entity, t, direction)
             }
         }
@@ -100,6 +104,29 @@ class CETargetStorageGrid private constructor (
         // a performance freak may also want to detect the total amount of entities then decide the effort for sorting
         // small size just go through every one,
         // large size do a more precise grid computation (DDA) or even arrange an int[0, 63]->Entity[] map on the first call
+    }
+
+    inline fun forEachEntityAABB(
+        time: Long,
+        minX: Double, minY: Double, minZ: Double,
+        maxX: Double, maxY: Double, maxZ: Double,
+        selector: (entity: Entity) -> Boolean = { true },
+        then: (entity: Entity) -> Unit
+    ) {
+        val vecMask = computeGridMask(minX, minY, minZ, maxX, maxY, maxZ, skX, skY, skZ)
+        if (vecMask and entityGridMask == 0L) return
+        var sortMask = 0L
+
+        entities.forEachLong { entity, lng ->
+            sortMask = sortMask or lng
+            if (vecMask and lng == 0L) return@forEachLong
+            if (!selector(entity)) return@forEachLong
+            if (entity.boundingBox.intersects(minX, minY, minZ, maxX, maxY, maxZ)) {
+                then(entity)
+            }
+        }
+
+        sortMask(time, sortMask)
     }
 
     inline fun forEachItem(
@@ -283,12 +310,5 @@ class CETargetStorageGrid private constructor (
          * for position outside current section, the return always 0 or 3 (depends on direction)
          * */
         fun Double.pos2GridCooAutoWrap(sc: Int) = ((floor(this).toInt() - sc) shr 2).coerceIn(0, 3)
-
-        private fun foldMasks(map: Reference2LongOpenHashMap<*>): Long {
-            var m = 0L
-            val it = map.values.iterator() // LongIterator - unboxed
-            while (it.hasNext()) m = m or it.nextLong()
-            return m
-        }
     }
 }

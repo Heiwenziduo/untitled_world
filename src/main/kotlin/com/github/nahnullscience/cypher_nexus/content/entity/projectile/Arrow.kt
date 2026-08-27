@@ -14,7 +14,7 @@ class Arrow(
     var shakeTime: Float = 0f
         private set
 
-    override fun getRotationSpeed(): Float = 0.2f
+    override fun getRotationSpeed(): Float = 0.25f
 
     override fun discardVisualEffect() {
 //        for (i in 0 until radiusFriendlyParticleCount(8, 64)) {

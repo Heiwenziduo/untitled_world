@@ -305,7 +305,7 @@ object Cyphers {
     val MANA_SURGE = registerModifier("mana_surge", -40f) {
         delay(4)
     }
-    val QUICK_LOAD = registerModifier("quick_load", 15f) {
+    val QUICK_LOAD = registerModifier("quick_load", 20f) {
         delay(-4)
         recharge(-6)
     }
@@ -412,6 +412,7 @@ object Cyphers {
         shotStateAttr(CypherAttributes.SPEED_INITIAL, AttributeOperator.MULTIPLY_TOTAL, 1.24)
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.MULTIPLY_TOTAL, 0.0)
         shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 24.0)
+        shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.24)
         shotStateAttr(CypherAttributes.GRAVITY_FACTOR, AttributeOperator.ADD, 0.04)
     }
     val DIRECT_SKYWARD = registerCypher(::DirectSkywardCypher) {

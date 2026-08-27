@@ -3,9 +3,7 @@ package com.github.nahnullscience.cypher_nexus.mechanic.entity.collision
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments
 import com.github.nahnullscience.cypher_nexus.mechanic.entity.collision.HandleEntityTracking.needTrackingInGrid
-import com.github.nahnullscience.cypher_nexus.utility.forEachLong
 import com.github.nahnullscience.cypher_nexus.utility.rayAABBEntryT
-import com.github.nahnullscience.cypher_nexus.utility.sideString
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet
 import it.unimi.dsi.fastutil.longs.Long2ReferenceOpenHashMap
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet
@@ -85,13 +83,37 @@ class CETargetStorageGridsManager(
         val time = level.gameTime
         val entitySet = IntOpenHashSet()
 
-        forEachStoredSection(xp, yp, zp, xd, yd, zd, margin)
-        { index, key, grid,
-          minX, minY, minZ, maxX, maxY, maxZ ->
-            grid.forEachEntity(time, xp, yp, zp, xd, yd, zd, minX, minY, minZ, maxX, maxY, maxZ, margin, selector)
-            { entity, t, direction ->
+        forEachStoredSection(
+            xp, yp, zp,
+            xd, yd, zd,
+            margin
+        ) { key, grid,
+            minX, minY, minZ, maxX, maxY, maxZ ->
+
+            grid.forEachEntityRayCast(
+                time,
+                xp, yp, zp, xd, yd, zd,
+                minX, minY, minZ, maxX, maxY, maxZ,
+                margin, selector
+            ) { entity, t, direction ->
                 // fulfill the selector, actually pierced by the vector, and is new to the loop
                 if (entitySet.add(entity.id)) then(entity, t, direction)
+            }
+        }
+    }
+
+    inline fun forEachEntityWithin(
+        minX: Double, minY: Double, minZ: Double,
+        maxX: Double, maxY: Double, maxZ: Double,
+        crossinline selector: (entity: Entity) -> Boolean = { true },
+        crossinline then: (entity: Entity) -> Unit
+    ) {
+        val time = level.gameTime
+        val entitySet = IntOpenHashSet()
+
+        forEachStoredSection(minX, minY, minZ, maxX, maxY, maxZ) { key, grid ->
+            grid.forEachEntityAABB(time, minX, minY, minZ, maxX, maxY, maxZ, selector) { entity ->
+                if (entitySet.add(entity.id)) then(entity)
             }
         }
     }
@@ -120,8 +142,8 @@ class CETargetStorageGridsManager(
         val sxMin = xl.pos2SectionCoo(); val syMin = yl.pos2SectionCoo(); val szMin = zl.pos2SectionCoo()
         val sxMax = xm.pos2SectionCoo(); val syMax = ym.pos2SectionCoo(); val szMax = zm.pos2SectionCoo()
 
-        val skMin = packSection(sxMin, syMin, szMin)
-        val skMax = packSection(sxMax, syMax, szMax)
+        val skMin = packSectionKey(sxMin, syMin, szMin)
+        val skMax = packSectionKey(sxMax, syMax, szMax)
 
         if (tracker.isTracked) retractStale(
             skMinOld = tracker.sectionKeyMin, skMaxOld = tracker.sectionKeyMax,
@@ -151,7 +173,10 @@ class CETargetStorageGridsManager(
         val tracker = entity.getExistingDataOrNull(ModDataAttachments.CE_TARGET_STATE_TRACKER)
         if (tracker?.isTracked?.not() ?: true) return
 
-        forEachStoredSection(tracker.sectionKeyMin, tracker.sectionKeyMax) { key, grid ->
+        forEachStoredSection(
+            tracker.sectionKeyMin,
+            tracker.sectionKeyMax
+        ) { key, grid ->
             val nowEmpty =
                 if (entity is ItemEntity) grid.removeItem(entity)
                 else grid.removeEntity(entity)
@@ -179,7 +204,7 @@ class CETargetStorageGridsManager(
         entity: Entity, bb: AABB
     ) {
         for (sx in sxMin..sxMax) for (sy in syMin..syMax) for (sz in szMin..szMax) {
-            val sectionKey = packSection(sx, sy, sz)
+            val sectionKey = packSectionKey(sx, sy, sz)
             gridAt(sectionKey) { key, grid, isOld ->
                 grid.addOrUpdateEntity(entity, bb, sx, sy, sz)
             }
@@ -215,7 +240,7 @@ class CETargetStorageGridsManager(
                 val inY = inX && sy in syMin..syMax
                 for (sz in ozMin..ozMax) {
                     if (inY && sz in szMin..szMax) continue // still covered by the new range
-                    val key = packSection(sx, sy, sz)
+                    val key = packSectionKey(sx, sy, sz)
                     val grid = grids.get(key) ?: continue
                     if (removeSection(key, grid)) prepareRemove(key, grid)
                 }
@@ -223,9 +248,28 @@ class CETargetStorageGridsManager(
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
-     * go through sections that intersects with the "cube" structured by the given min & max section keys
-     * if a overlapping section is empty (no mapping), that key will be skipped.
+     * base function that go through sections that intersects with the virtual AABB
+     * structured by the given min & max section-pos.
+     * if an overlapping section is empty (no mapping), that key will be skipped.
+     * */
+    @PublishedApi
+    internal inline fun forEachStoredSection(
+        sxMin: Int, syMin: Int, szMin: Int,
+        sxMax: Int, syMax: Int, szMax: Int,
+        action: (key: Long, grid: CETargetStorageGrid) -> Unit
+    ) {
+        for (sx in sxMin..sxMax) for (sy in syMin..syMax) for (sz in szMin..szMax) {
+            val key = packSectionKey(sx, sy, sz)
+            val grid = grids.get(key) ?: continue
+            action(key, grid)
+        }
+    }
+
+    /**
+     * using packed section keys
      * */
     @PublishedApi
     internal inline fun forEachStoredSection(
@@ -238,18 +282,19 @@ class CETargetStorageGridsManager(
     }
 
     /**
-     *
+     * using a virtual AABB represented by the given min & max position
      * */
     @PublishedApi
     internal inline fun forEachStoredSection(
-        sxMin: Int, syMin: Int, szMin: Int,
-        sxMax: Int, syMax: Int, szMax: Int,
+        minX: Double, minY: Double, minZ: Double,
+        maxX: Double, maxY: Double, maxZ: Double,
         action: (key: Long, grid: CETargetStorageGrid) -> Unit
     ) {
-        for (sx in sxMin..sxMax) for (sy in syMin..syMax) for (sz in szMin..szMax) {
-            val key = packSection(sx, sy, sz)
-            val grid = grids.get(key) ?: continue
-            action(key, grid)
+        validAABB(
+            minX, minY, minZ,
+            maxX, maxY, maxZ
+        ) { sxMin, syMin, szMin, sxMax, syMax, szMax ->
+            forEachStoredSection(sxMin, syMin, szMin, sxMax, syMax, szMax, action)
         }
     }
 
@@ -264,27 +309,33 @@ class CETargetStorageGridsManager(
         xp: Double, yp: Double, zp: Double,
         xd: Double, yd: Double, zd: Double,
         margin: Double = Double.NaN,
-        action: (index: Int, key: Long, grid: CETargetStorageGrid, minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double) -> Unit
+        action: (key: Long, grid: CETargetStorageGrid, minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double) -> Unit
     ) {
-        vectorMinMaxPoint(xp, yp, zp, xd, yd, zd, margin) { minX, minY, minZ, maxX, maxY, maxZ ->
-            val xl = minX.toBlockPos(); val yl = minY.toBlockPos(); val zl = minZ.toBlockPos()
-            val xm = maxX.toBlockPos(); val ym = maxY.toBlockPos(); val zm = maxZ.toBlockPos()
-            if (isBlockSpanInsane(xl, yl, zl, xm, ym, zm)) {
-                CypherNexus.LOGGER.warn("ray-cast from ({}, {}, {}) dir ({}, {}, {}) spans an implausible range - aborting", xp, yp, zp, xd, yd, zd)
-                return@vectorMinMaxPoint
+        vectorMinMaxPoint(
+            xp, yp, zp,
+            xd, yd, zd,
+            margin
+        ) { minX, minY, minZ, maxX, maxY, maxZ ->
+            val r = validAABB(
+                minX, minY, minZ,
+                maxX, maxY, maxZ
+            ) { sxMin, syMin, szMin, sxMax, syMax, szMax ->
+                for (sx in sxMin..sxMax) for (sy in syMin..syMax) for (sz in szMin..szMax) {
+                    if (!sectionContainsVector(sx, sy, sz, xp, yp, zp, xd, yd, zd, margin)) continue
+                    val key = packSectionKey(sx, sy, sz)
+                    val grid = grids.get(key) ?: continue
+                    action(key, grid, minX, minY, minZ, maxX, maxY, maxZ)
+                }
             }
-            val sxMin = minX.pos2SectionCoo(); val syMin = minY.pos2SectionCoo(); val szMin = minZ.pos2SectionCoo()
-            val sxMax = maxX.pos2SectionCoo(); val syMax = maxY.pos2SectionCoo(); val szMax = maxZ.pos2SectionCoo()
-
-            var i = 0
-            for (sx in sxMin..sxMax) for (sy in syMin..syMax) for (sz in szMin..szMax) {
-                if (!sectionContainsVector(sx, sy, sz, xp, yp, zp, xd, yd, zd, margin)) continue
-                val key = packSection(sx, sy, sz)
-                val grid = grids.get(key) ?: continue
-                action(i++, key, grid, minX, minY, minZ, maxX, maxY, maxZ)
+            if (!r) {
+                CypherNexus.warn { "ray-cast failed" }
             }
         }
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /** primitive-key get-or-create - avoids the boxed-Long path plain `Map.getOrPut` would take here */
     @PublishedApi
@@ -312,30 +363,10 @@ class CETargetStorageGridsManager(
 
     @PublishedApi
     internal fun gridAtCellOrNull(cellX: Int, cellY: Int, cellZ: Int): CETargetStorageGrid? =
-        grids.get(packSection(cellX shr 2, cellY shr 2, cellZ shr 2))
+        grids.get(packSectionKey(cellX shr 2, cellY shr 2, cellZ shr 2))
 
     private fun prepareRemove(key: Long, grid: CETargetStorageGrid) {
         gridsTrashCan.add(key)
-    }
-
-    /**
-     * guards against a pathological/buggy AABB flooding hundreds of grids in one tick.
-     *
-     * xyz least & most in the unit of `block-pos`
-     * */
-    @PublishedApi
-    internal fun isBlockSpanInsane(xl: Int, yl: Int, zl: Int, xm: Int, ym: Int, zm: Int): Boolean {
-        return  (xm - xl) > BLOCK_SPAN_LIMIT ||
-                (ym - yl) > BLOCK_SPAN_LIMIT ||
-                (zm - zl) > BLOCK_SPAN_LIMIT
-    }
-
-    /***/
-    @PublishedApi
-    internal fun isSectionSpanInsane(xl: Int, yl: Int, zl: Int, xm: Int, ym: Int, zm: Int): Boolean {
-        return  (xm - xl) > SECTION_SPAN_LIMIT ||
-                (ym - yl) > SECTION_SPAN_LIMIT ||
-                (zm - zl) > SECTION_SPAN_LIMIT
     }
 
 
@@ -370,13 +401,19 @@ class CETargetStorageGridsManager(
         /**
          * @see net.minecraft.core.SectionPos.asLong
          * */
-        fun packSection(x: Int, y: Int, z: Int): Long {
+        fun packSectionKey(sx: Int, sy: Int, sz: Int): Long {
             var node = 0L
-            node = node or ((PACK_22 and x.toLong()) shl 42)
-            node = node or ((PACK_20 and y.toLong()) shl 0)
-            node = node or ((PACK_22 and z.toLong()) shl 20)
+            node = node or ((PACK_22 and sx.toLong()) shl 42)
+            node = node or ((PACK_20 and sy.toLong()) shl 0)
+            node = node or ((PACK_22 and sz.toLong()) shl 20)
             return node
         }
+
+        // sign-extending inverses of packSection, so a stored section key can be iterated
+        // without keeping a redundant int-triple copy of it anywhere
+        fun Long.unpackSectionX(): Int = (this shr 42).toInt()
+        fun Long.unpackSectionZ(): Int = ((this shl 22) shr 42).toInt()
+        fun Long.unpackSectionY(): Int = ((this shl 44) shr 44).toInt()
 
         /** local occupancy bit for a global grid-cell coordinate: `(lx shl 4) + (lz shl 2) + ly` */
         fun gridBitIndex(cellX: Int, cellY: Int, cellZ: Int): Int {
@@ -386,12 +423,48 @@ class CETargetStorageGridsManager(
             return (lx shl 4) + (lz shl 2) + ly
         }
 
-        // sign-extending inverses of packSection, so a stored section key can be iterated
-        // without keeping a redundant int-triple copy of it anywhere
-        fun Long.unpackSectionX(): Int = (this shr 42).toInt()
-        fun Long.unpackSectionZ(): Int = ((this shl 22) shr 42).toInt()
-        fun Long.unpackSectionY(): Int = ((this shl 44) shr 44).toInt()
+        /**
+         * guards against a pathological/buggy AABB flooding hundreds of grids in one tick.
+         *
+         * xyz least & most in the unit of `block-pos`
+         * */
+        @PublishedApi
+        internal fun isBlockSpanInsane(xl: Int, yl: Int, zl: Int, xm: Int, ym: Int, zm: Int): Boolean {
+            return  (xm - xl) !in 0..BLOCK_SPAN_LIMIT ||
+                    (ym - yl) !in 0..BLOCK_SPAN_LIMIT ||
+                    (zm - zl) !in 0..BLOCK_SPAN_LIMIT
+        }
 
+        /***/
+        @PublishedApi
+        internal fun isSectionSpanInsane(xl: Int, yl: Int, zl: Int, xm: Int, ym: Int, zm: Int): Boolean {
+            return  (xm - xl) !in 0..SECTION_SPAN_LIMIT ||
+                    (ym - yl) !in 0..SECTION_SPAN_LIMIT ||
+                    (zm - zl) !in 0..SECTION_SPAN_LIMIT
+        }
+
+        /**
+         * @return false if the AABB is invalid
+         * */
+        inline fun validAABB(
+            minX: Double, minY: Double, minZ: Double,
+            maxX: Double, maxY: Double, maxZ: Double,
+            action: (sxMin: Int, syMin: Int, szMin: Int, sxMax: Int, syMax: Int, szMax: Int) -> Unit,
+        ): Boolean {
+            val xl = minX.toBlockPos(); val yl = minY.toBlockPos(); val zl = minZ.toBlockPos()
+            val xm = maxX.toBlockPos(); val ym = maxY.toBlockPos(); val zm = maxZ.toBlockPos()
+            if (isBlockSpanInsane(xl, yl, zl, xm, ym, zm)) {
+                CypherNexus.LOGGER.warn(
+                    "AABB[ min ({}, {}, {}) max ({}, {}, {}) ] spans an implausible range - aborting",
+                    xl, yl, zl, xm, ym, zm
+                )
+                return false
+            }
+            val sxMin = xl.pos2SectionCoo(); val syMin = yl.pos2SectionCoo(); val szMin = zl.pos2SectionCoo()
+            val sxMax = xm.pos2SectionCoo(); val syMax = ym.pos2SectionCoo(); val szMax = zm.pos2SectionCoo()
+            action(sxMin, syMin, szMin, sxMax, syMax, szMax)
+            return true
+        }
 
         /**
          * compute the min(negative) and max(positive) points of the given vector
@@ -464,6 +537,8 @@ class CETargetStorageGridsManager(
         }
 
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
         inline fun CETargetStorageGridsManager.forEachEntityRayCast(
             position: Vec3, direction: Vec3,
             margin: Double = Double.NaN,
@@ -485,5 +560,11 @@ class CETargetStorageGridsManager(
             direction.x(), direction.y(), direction.z(),
             margin, selector, then
         )
+
+        inline fun CETargetStorageGridsManager.forEachEntityWithin(
+            aabb: AABB,
+            crossinline selector: (entity: Entity) -> Boolean = { true },
+            crossinline then: (entity: Entity) -> Unit
+        ) = forEachEntityWithin(aabb.minX, aabb.minY, aabb.minZ, aabb.maxX, aabb.maxY, aabb.maxZ, selector, then)
     }
 }

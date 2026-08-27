@@ -99,7 +99,7 @@ fun Vec3.mostAlignedDirectionExact(): Direction? {
 }
 
 /**
- * more tolerant version of [mostAlignedDirectionExact], which will flow X -> Y -> Z order when values are equal
+ * more tolerant version of [mostAlignedDirectionExact], which will follow X -> Y -> Z order when values are equal
  * */
 fun Vec3.mostAlignedDirection(): Direction {
     val axis: Axis
@@ -251,6 +251,10 @@ typealias onClip = (clippingPoint: Vec3, direction: Direction?) -> Unit
 /**
  * execute [task] if ray pierce the given AABB.
  * direction might be null if both the start and the end vector are inside the AABB.
+ *
+ * on bulk usage, should prefer specialized version over this
+ * @see rayAABBEntryT
+ * @see rayAABBCollision
  * */
 inline fun Vec3.rayCastThen(destination: Vec3, bb: AABB, margin: Double = Double.NaN, task: onClip): Boolean {
     val b = if (margin.isNaN()) bb else bb.inflate(margin)
@@ -424,7 +428,8 @@ inline fun rayAABBCollision(
     var tEntry = 0.0; var tExit = 1.0
     var minX = minX; var minY = minY; var minZ = minZ
     var maxX = maxX; var maxY = maxY; var maxZ = maxZ
-    var direction: Direction? = null
+    var lastEnter = Axis.X
+    var axisSign = 0.0
 
     if (margin.isFinite()) {
         minX -= margin; minY -= margin; minZ -= margin
@@ -435,7 +440,7 @@ inline fun rayAABBCollision(
     else {
         var t1 = (minX - xp) / xd; var t2 = (maxX - xp) / xd
         if (t1 > t2) { val s = t1; t1 = t2; t2 = s }
-        if (t1 > tEntry) tEntry = t1
+        if (t1 > tEntry) { tEntry = t1; lastEnter = Axis.X; axisSign = xd }
         if (t2 < tExit) tExit = t2
         if (tEntry > tExit) return
     }
@@ -443,7 +448,7 @@ inline fun rayAABBCollision(
     else {
         var t1 = (minY - yp) / yd; var t2 = (maxY - yp) / yd
         if (t1 > t2) { val s = t1; t1 = t2; t2 = s }
-        if (t1 > tEntry) tEntry = t1
+        if (t1 > tEntry) { tEntry = t1; lastEnter = Axis.Y; axisSign = yd }
         if (t2 < tExit) tExit = t2
         if (tEntry > tExit) return
     }
@@ -451,18 +456,28 @@ inline fun rayAABBCollision(
     else {
         var t1 = (minZ - zp) / zd; var t2 = (maxZ - zp) / zd
         if (t1 > t2) { val s = t1; t1 = t2; t2 = s }
-        if (t1 > tEntry) tEntry = t1
+        if (t1 > tEntry) { tEntry = t1; lastEnter = Axis.Z; axisSign = zd }
         if (t2 < tExit) tExit = t2
         if (tEntry > tExit) return
     }
+
+    val direction = directionFromAxisAndSignStrict(lastEnter, -axisSign) // minus sign for bounce direction
     return then(tEntry, direction)
 }
 
 /**
- * assume that `abs(sign) > 1e-12`
+ * sign >= 0 -> positive, otherwise negative
  * */
 fun directionFromAxisAndSign(axis: Axis, sign: Double): Direction {
-    return if (sign > 0) axis.positive else axis.negative
+    return if (sign >= 0) axis.positive else axis.negative
+}
+/**
+ * sign > 0 -> positive; sign < 0 -> negative; == 0 -> null
+ * */
+fun directionFromAxisAndSignStrict(axis: Axis, sign: Double): Direction? {
+    return  if (sign > 0) axis.positive
+            else if (sign == 0.0) null
+            else axis.negative
 }
 
 fun Axis.randomPerpendicularNormal(random: RandomSource): Vec3 {

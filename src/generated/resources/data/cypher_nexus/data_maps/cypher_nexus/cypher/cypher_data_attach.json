@@ -297,6 +297,9 @@
       "manaDrain": 24.0,
       "recharge": 0,
       "shotState": {
+        "cypher_nexus:crit_chance": {
+          "add": 0.24
+        },
         "cypher_nexus:gravity_factor": {
           "add": 0.04
         },
@@ -1164,7 +1167,7 @@
       "delay": -4,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 15.0,
+      "manaDrain": 20.0,
       "recharge": -6
     },
     "cypher_nexus:randomize_shot": {

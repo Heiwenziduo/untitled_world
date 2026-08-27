@@ -1,5 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components
 
+import com.github.nahnullscience.cypher_nexus.init.ModDataAttachments
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherHooks
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.DiscardReason
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.GENERIC_CAPTURE_RADIUS
@@ -7,6 +8,8 @@ import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.Abs
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HookContainer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.hook.HooksSharedData
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.invoking.ShotState
+import com.github.nahnullscience.cypher_nexus.mechanic.entity.collision.CETargetStorageGridsManager.Companion.forEachEntityWithin
+import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
 import com.github.nahnullscience.cypher_nexus.utility.mod.MapOfCypherCounts
 import net.minecraft.core.Direction
@@ -128,12 +131,19 @@ interface ICypherEntityLogicContext : TraceableEntity,
             }
 
             if (need) {
-                val entities = level.getEntities(
-                    ce,
-                    ce.boundingBox.inflate(GENERIC_CAPTURE_RADIUS)
-                ) { entity -> ce.canHitTarget(entity) && entity !is ICypherEntity }
+//                val entities = level.getEntities(
+//                    ce,
+//                    ce.boundingBox.inflate(GENERIC_CAPTURE_RADIUS)
+//                ) { entity -> ce.canHitTarget(entity) && entity !is ICypherEntity }
+//
+//                for (entity in entities) {
+//                    ce.forEntityCaptured(ce, entity)
+//                }
 
-                for (entity in entities) {
+                val manager = level.getData(ModDataAttachments.STORAGE_GRID_MANAGER)
+                manager.forEachEntityWithin(
+                    ce.position().centeredAABB(GENERIC_CAPTURE_RADIUS)
+                ) { entity ->
                     ce.forEntityCaptured(ce, entity)
                 }
             }

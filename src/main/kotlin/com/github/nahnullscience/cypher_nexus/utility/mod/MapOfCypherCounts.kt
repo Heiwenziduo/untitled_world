@@ -32,5 +32,8 @@ open class MapOfCypherCounts(capa: Int = 32) : Reference2IntLinkedOpenHashMap<Ab
     fun getCount(cy: Holder<out AbstractCypher>) = getCount(cy.value())
 
     override fun containsKey(cy: AbstractCypher): Boolean = getInt(cy) > 0
+    /**
+     * may prefer `flag` check
+     * */
     fun containsKey(cy: Holder<out AbstractCypher>) = containsKey(cy.value())
 }
