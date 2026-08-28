@@ -3,7 +3,7 @@ package com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile
 import com.github.nahnullscience.cypher_nexus.client.util.addCypherTrailParticle
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.SimpleParticleProjectileRenderer
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.SmokeBomb
-import com.github.nahnullscience.cypher_nexus.utility.linearInterpolateGaps
+import com.github.nahnullscience.cypher_nexus.utility.forEachGap
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context
 import net.minecraft.core.particles.ParticleTypes
@@ -20,7 +20,7 @@ class SmokeBombCypherRenderer(context: Context) : SimpleParticleProjectileRender
         yo: Double,
         zo: Double
     ) {
-        linearInterpolateGaps(xo, yo, zo, x, y, z, 0.35) { step, x, y, z ->
+        forEachGap(xo, yo, zo, x, y, z, 0.35) { step, x, y, z ->
             addCypherTrailParticle(ce, ParticleTypes.CAMPFIRE_COSY_SMOKE, x, y, z, 0.0, 0.0, 0.0) {
                 lifetime += 60
             }

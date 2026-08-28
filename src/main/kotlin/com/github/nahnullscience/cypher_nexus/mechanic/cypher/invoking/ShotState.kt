@@ -105,9 +105,6 @@ class ShotState private constructor (
 
     private var shotPattern: Holder<AbstractInvokingPattern> = NO_PATTERN
 
-    init {
-
-    }
 
     fun release(
         level: Level,
@@ -116,13 +113,11 @@ class ShotState private constructor (
         owner: Entity?,
     ) {
         if (charge-- <= 0) return
-
-        Profiler.get().push { "cypherEntityCreation" }
         if (dirty) compute()
         CypherNexus.debugCypher { "${level.isClientSide} client ccMap: $_ccMapBacking" }
 
-        // handle entities only on server
-        if (level !is ServerLevel) return
+        if (level !is ServerLevel) return // create entities only on server
+        Profiler.get().push { $$"shotState$createCypherEntity" }
 
         // let hooks determine if this release should be aborted
         hooks[CypherHooks.INVOKE_ABORT_RELEASE_SERVER]?.let {
@@ -227,8 +222,9 @@ class ShotState private constructor (
     fun enableFlags(flag: Int): ShotState = apply { enableFlagRaw(flag) }
 
     /** compute and lock the state */
-    fun compute(): ShotState {
-        if (!dirty) return this
+    fun compute(): ShotState = apply {
+        if (!dirty) return@apply
+        Profiler.get().push { $$"shotState$computeAttribute" }
 
         _ccMapBacking?.let { ccMap ->
             ccMap.forEachInt ccMap@ { cypher, counts ->
@@ -258,10 +254,11 @@ class ShotState private constructor (
         }
 
         dirty = false
-        return this
+        Profiler.get().pop()
     }
 
     fun computeAttribute(map: AttributeFastMap, cypher: AbstractProjectileCypher<*>) {
+        if (dirty) compute()
         attributes.forEach { (attr, values) ->
             if (!attr.isAttributeForEntity) return@forEach
             // TODO prune cumulation, some of attributes will not be used, depends on cypher implementation
@@ -270,6 +267,7 @@ class ShotState private constructor (
     }
 
     fun computeRecoil(base: Double = 0.0): Double {
+        if (dirty) compute()
         val recoil = attributes.attrCalculator(CypherAttributes.RECOIL.value(), base)
         return recoil
     }

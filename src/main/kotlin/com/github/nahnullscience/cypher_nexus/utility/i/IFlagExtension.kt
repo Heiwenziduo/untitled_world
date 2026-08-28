@@ -70,4 +70,11 @@ interface IFlagExtension <FLAG : IFlagEnum> {
     interface IFlagEnum {
         val mask: Int
     }
+
+    companion object {
+        fun Int.containsFlag(flag: IFlagEnum): Boolean = this and flag.mask == flag.mask
+    }
+
+    @JvmInline
+    value class IntFlag(val flags: Int)
 }

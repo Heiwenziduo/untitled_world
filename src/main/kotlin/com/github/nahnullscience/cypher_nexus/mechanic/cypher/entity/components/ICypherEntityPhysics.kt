@@ -16,11 +16,11 @@ interface ICypherEntityPhysics {
     val payload: ShotState?
 
     /**
-     * store bounce points triggered in one tick
+     * store bounce points triggered in one tick,
+     * currently this only present on client side.
      * */
-    val bouncePoints: List<Vec3>
+    val bouncePoints: BouncePointsManager?
     val bouncedThisTick: Boolean
-    val canBounce: Boolean
 
     /**
      *
@@ -28,12 +28,12 @@ interface ICypherEntityPhysics {
     fun trigger(coordinate: AnchoredCoordinate)
 
     /**
-     *
+     * can be called on both side
      * */
     fun discardCypher(reason: DiscardReason)
 
     /**
-     *
+     * can be called on both side
      * */
     fun explode(level: Level, x: Double, y: Double, z: Double, factor: Float = 1f): Boolean
 

@@ -65,8 +65,3 @@ fun <T : ParticleOptions, CE> addCypherTrailParticle(
     x: Double, y: Double, z: Double,
     xa: Double, ya: Double, za: Double,
 ) where CE : Entity, CE : ICypherEntity = addCypherTrailParticle(cyEntity, options, x, y, z, xa, ya, za) { }
-
-//fun SingleQuadParticle.setARGB(a: Float, r: Float, g: Float, b: Float) {
-//    setColor(r, g, b)
-//    setAlpha(a)
-//}

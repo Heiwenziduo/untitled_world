@@ -1,11 +1,11 @@
 package com.github.nahnullscience.cypher_nexus.client.renderer.cypher.projectile
 
-import com.github.nahnullscience.cypher_nexus.client.util.addCypherTrailParticle
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.SimpleItemProjectileRenderer
+import com.github.nahnullscience.cypher_nexus.client.util.addCypherTrailParticle
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.Pinky
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.BouncePointsManager.Companion.forEachGap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
 import com.github.nahnullscience.cypher_nexus.utility.getArrayRGB
-import com.github.nahnullscience.cypher_nexus.utility.linearInterpolateGaps
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.renderer.entity.EntityRendererProvider.Context
 import net.minecraft.core.particles.ParticleTypes
@@ -27,7 +27,12 @@ class PinkyCypherRenderer(
     ) {
         val speed = ce.deltaMovement
         val scale = ce.getEffectRadius().coerceIn(0.25f, 4f) * 0.5f
-        linearInterpolateGaps(xo, yo, zo, x, y, z, 0.25) { step, x, y, z ->
+        forEachGap(
+            xo, yo, zo,
+            x, y, z,
+            0.25,
+            ce.bouncePoints,
+        ) { step, x, y, z ->
             addCypherTrailParticle(
                 ParticleTypes.CLOUD,
                 x, y, z,

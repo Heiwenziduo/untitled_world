@@ -6,7 +6,7 @@ import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.utility.Dis
 import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.component.CypherRenderStateDelegate
 import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.component.ICypherEntityRenderState
 import com.github.nahnullscience.cypher_nexus.content.entity.utility.DistanceDeliverer
-import com.github.nahnullscience.cypher_nexus.utility.linearInterpolateGaps
+import com.github.nahnullscience.cypher_nexus.utility.forEachGap
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.renderer.SubmitNodeCollector
@@ -34,7 +34,7 @@ class DistanceDeliverCypherRenderer (
         x: Double, y: Double, z: Double,
         xo: Double, yo: Double, zo: Double
     ) {
-        linearInterpolateGaps(xo, yo, zo, x, y, z, 0.25) { step, x, y, z ->
+        forEachGap(xo, yo, zo, x, y, z, 0.25) { step, x, y, z ->
             addCypherTrailParticle(
                 ParticleTypes.PORTAL,
                 x, y - 0.5, z,

@@ -45,9 +45,6 @@ abstract class AbstractDedicatedCypherProjectile(
 ) : Projectile(entityType, level), IEntityWithComplexSpawn,
     IFlagExtension<CypherFlags>,
     ICypherEntity by CypherEntityDelegation<AbstractDedicatedCypherProjectile>() {
-    companion object {
-
-    }
 
     override fun defineSynchedData(builder: SynchedEntityData.Builder) { }
     override fun onSyncedDataUpdated(key: EntityDataAccessor<*>) {

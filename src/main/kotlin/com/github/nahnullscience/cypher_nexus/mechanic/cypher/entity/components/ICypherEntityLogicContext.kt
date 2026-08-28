@@ -59,7 +59,7 @@ interface ICypherEntityLogicContext : TraceableEntity,
      * */
     fun getUnderwaterSpeedFactor(): Double = 0.8
     fun getInWallSpeedFactor(): Double = 0.5
-    fun getBounceSpeedDegrade(): Double = 0.9
+    fun getBounceSpeedFactor(): Double = 0.9
     fun getRotationSpeed(): Float = 0.25f
     /**
      * mainly for projectiles that can `pierce`, this defines how much ticks they can hit the same target again.

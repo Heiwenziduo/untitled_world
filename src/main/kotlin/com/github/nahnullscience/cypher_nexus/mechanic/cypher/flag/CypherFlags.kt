@@ -122,7 +122,5 @@ enum class CypherFlags : IFlagExtension.IFlagEnum {
             }
             println("]")
         }
-
-        fun Int.containsFlag(flag: CypherFlags): Boolean = this and flag.mask == flag.mask
     }
 }

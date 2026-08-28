@@ -8,7 +8,7 @@ import com.github.nahnullscience.cypher_nexus.content.entity.projectile.Firework
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
 import com.github.nahnullscience.cypher_nexus.utility.Colors
 import com.github.nahnullscience.cypher_nexus.utility.ang2Rad
-import com.github.nahnullscience.cypher_nexus.utility.linearInterpolateGaps
+import com.github.nahnullscience.cypher_nexus.utility.forEachGap
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.renderer.SubmitNodeCollector
@@ -72,7 +72,7 @@ class FireworkRocketCypherRenderer(
         val speed = ce.knownMovement
         val random = ce.random
         val scale = ce.getEffectRadius().coerceIn(0.25f, 2f) // vanilla firework can't be easily scale, that's a shame
-        linearInterpolateGaps(xo, yo, zo, x, y, z, 0.4) { step, x, y, z ->
+        forEachGap(xo, yo, zo, x, y, z, 0.4) { step, x, y, z ->
             addCypherTrailParticle(
                 ParticleTypes.FIREWORK,
                 x, y, z,

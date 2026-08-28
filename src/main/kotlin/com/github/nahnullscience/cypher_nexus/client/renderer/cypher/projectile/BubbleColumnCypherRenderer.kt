@@ -4,7 +4,7 @@ import com.github.nahnullscience.cypher_nexus.client.util.addCypherTrailParticle
 import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.SimpleParticleProjectileRenderer
 import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.ParticleProjectileRenderState
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.BubbleColumn
-import com.github.nahnullscience.cypher_nexus.utility.linearInterpolateGaps
+import com.github.nahnullscience.cypher_nexus.utility.forEachGap
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.renderer.SubmitNodeCollector
@@ -24,7 +24,7 @@ class BubbleColumnCypherRenderer(context: Context) : SimpleParticleProjectileRen
         yo: Double,
         zo: Double
     ) {
-        linearInterpolateGaps(xo, yo, zo, x, y, z, 0.25) { step, x, y, z ->
+        forEachGap(xo, yo, zo, x, y, z, 0.25) { step, x, y, z ->
             addCypherTrailParticle(ce, ParticleTypes.BUBBLE, x, y, z, 0.0, 0.0, 0.0)
         }
     }

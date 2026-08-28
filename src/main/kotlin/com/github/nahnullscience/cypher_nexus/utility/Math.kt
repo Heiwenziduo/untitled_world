@@ -1,5 +1,6 @@
 package com.github.nahnullscience.cypher_nexus.utility
 
+import net.minecraft.world.phys.Vec3
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import kotlin.math.PI
@@ -9,6 +10,8 @@ import kotlin.math.sqrt
 //    if (this == 0 || s == 0) return this
 //    return if (this * s > 0) this else this * -1
 //}
+@PublishedApi
+internal val emptyDoubleArray = doubleArrayOf()
 
 const val RAD_2_ANG = 180.0 / PI
 const val RAD_2_ANG_F = RAD_2_ANG.toFloat()
@@ -52,30 +55,82 @@ fun Int.tick2second(): String {
     return dot2digit.format(s)
 }
 
+fun Int.showBits32(chunkSize: Int = 4): String {
+    val bits = this
+        .toUInt()
+        .toString(radix = 2)
+        .padStart(32, '0')
+        .chunked(chunkSize)
+        .joinToString(" ")
+    return bits
+}
+
+fun Long.showBits64(chunkSize: Int = 4): String {
+    val bits = this
+        .toULong()
+        .toString(radix = 2)
+        .padStart(64, '0')
+        .chunked(chunkSize)
+        .joinToString(" ")
+    return bits
+}
+
 /**
- * execute [task] on points within `from` to `to` in an interval of given gap.
- * e.g. once a gap distance has been traveled
- * @see [linearInterpolateTimes]
+ * execute [task] given times on points evenly distributed through 'start' to 'end'
+ * @see [forEachGap]
  * */
-inline fun linearInterpolateGaps(
-    fromX: Double, fromY: Double, fromZ: Double,
-    toX: Double, toY: Double, toZ: Double,
+inline fun forEachBetween(
+    startX: Double, startY: Double, startZ: Double,
+    endX: Double, endY: Double, endZ: Double,
+    times: Int,
+    task: (step: Int, x: Double, y: Double, z: Double) -> Unit
+) {
+    if (times <= 1) {
+        task(0, startX, startY, startZ)
+        return
+    }
+
+    val inv = 1.0 / (times - 1)
+    val stepX = (endX - startX) * inv
+    val stepY = (endY - startY) * inv
+    val stepZ = (endZ - startZ) * inv
+
+    var currX = startX
+    var currY = startY
+    var currZ = startZ
+
+    for (i in 0 until times) {
+        task(i, currX, currY, currZ)
+        currX += stepX
+        currY += stepY
+        currZ += stepZ
+    }
+}
+
+/**
+ * execute [task] on points within `start` to `end` in an interval of given gap.
+ * e.g. once a gap distance has been traveled
+ * @see [forEachBetween]
+ * */
+inline fun forEachGap(
+    startX: Double, startY: Double, startZ: Double,
+    endX: Double, endY: Double, endZ: Double,
     gap: Double,
     atLeastOnce: Boolean = true,
     task: (step: Int, x: Double, y: Double, z: Double) -> Unit,
 ) {
     if (gap <= 0.0) {
-        if (atLeastOnce) task(0, fromX, fromY, fromZ)
+        if (atLeastOnce) task(0, startX, startY, startZ)
         return
     }
 
-    val dx = toX - fromX
-    val dy = toY - fromY
-    val dz = toZ - fromZ
+    val dx = endX - startX
+    val dy = endY - startY
+    val dz = endZ - startZ
     val distSq = dx * dx + dy * dy + dz * dz
 
     if (distSq < gap * gap) {
-        if (atLeastOnce) task(0, fromX, fromY, fromZ)
+        if (atLeastOnce) task(0, startX, startY, startZ)
         return
     }
 
@@ -86,44 +141,11 @@ inline fun linearInterpolateGaps(
     val stepZ = dz * stepFactor
 
     val steps = (dist / gap).toInt()
-    var currX = fromX
-    var currY = fromY
-    var currZ = fromZ
+    var currX = startX
+    var currY = startY
+    var currZ = startZ
 
     for (i in 0..steps) {
-        task(i, currX, currY, currZ)
-        currX += stepX
-        currY += stepY
-        currZ += stepZ
-    }
-}
-
-/**
- * execute [task] given times on points evenly distributed through 'from' to 'to'
- * @see [linearInterpolateGaps]
- * */
-inline fun linearInterpolateTimes(
-    fromX: Double, fromY: Double, fromZ: Double,
-    toX: Double, toY: Double, toZ: Double,
-    times: Int,
-    task: (step: Int, x: Double, y: Double, z: Double) -> Unit
-) {
-    if (times <= 0) return
-    if (times == 1) {
-        task(0, fromX, fromY, fromZ)
-        return
-    }
-
-    val inv = 1.0 / (times - 1)
-    val stepX = (toX - fromX) * inv
-    val stepY = (toY - fromY) * inv
-    val stepZ = (toZ - fromZ) * inv
-
-    var currX = fromX
-    var currY = fromY
-    var currZ = fromZ
-
-    for (i in 0 until times) {
         task(i, currX, currY, currZ)
         currX += stepX
         currY += stepY

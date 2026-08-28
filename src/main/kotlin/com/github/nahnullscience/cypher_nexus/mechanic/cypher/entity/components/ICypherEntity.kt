@@ -79,6 +79,9 @@ interface ICypherEntity :
         }
 
         const val CLIP_MARGIN = 0.2f
+        const val HIT_BB_INFLATION = 0.25
+
+        const val MAX_BOUNCE_PER_TICK = 16
 
         const val GENERIC_CAPTURE_RADIUS = 8.0
         const val GENERIC_CAPTURE_RADIUS_SQR = GENERIC_CAPTURE_RADIUS * GENERIC_CAPTURE_RADIUS
@@ -89,13 +92,14 @@ interface ICypherEntity :
         const val KINETIC_DAMAGE_SPEED = 0.25
         const val KINETIC_DAMAGE_SPEED_SQR = KINETIC_DAMAGE_SPEED * KINETIC_DAMAGE_SPEED
 
-        const val HIT_BB_INFLATION = 0.25
-
         inline val ICypherEntity.cypher get() = cypherHolder.value()
         fun ICypherEntity.canNotHurtOwner(): Boolean = !canHurtOwner()
 
-        inline val ICypherEntity.collideWithBlocks get() = noFlagsNone(CypherFlags.IGNORE_BLOCK, CypherFlags.PENETRATE_WORLD)
-        inline val ICypherEntity.collideWithEntities get() = noFlagsNone(CypherFlags.PENETRATE_WORLD)
+        inline val ICypherEntity.collideWithBlocks get() =
+            noFlagsNone(CypherFlags.IGNORE_BLOCK, CypherFlags.PENETRATE_WORLD)
+
+        inline val ICypherEntity.collideWithEntities get() =
+            noFlagsNone(CypherFlags.PENETRATE_WORLD)
 
         fun ICypherEntity.exertDamage(level: ServerLevel, target: Entity) {
             var damage = this@exertDamage.getAttributeOrDefault(CypherAttributes.DAMAGE)

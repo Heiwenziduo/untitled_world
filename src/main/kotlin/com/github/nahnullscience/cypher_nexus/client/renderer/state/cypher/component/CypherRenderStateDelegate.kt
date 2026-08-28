@@ -1,15 +1,15 @@
 package com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.component
 
 import com.github.nahnullscience.cypher_nexus.init.config.ModClientConfig
-import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.BouncePointsManager
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.BouncePointsManager.Companion.polylineInterpolate
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags.Companion.containsFlag
+import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension.Companion.containsFlag
 import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.util.LightCoordsUtil
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.phys.Vec3
 
 
 class CypherRenderStateDelegate : ICypherEntityRenderState {
@@ -25,9 +25,9 @@ class CypherRenderStateDelegate : ICypherEntityRenderState {
         private set
     override var flags: Int = 0
         private set
-    override var effectRadius: Float = CypherAttributes.EFFECT_RADIUS.value().defaultValue.toFloat()
+    override var effectRadius: Float = 1f
         private set
-    override var bouncePoints: List<Vec3> = listOf()
+    override var bouncePoints: BouncePointsManager? = null
         private set
 
 
@@ -45,19 +45,26 @@ class CypherRenderStateDelegate : ICypherEntityRenderState {
         bouncePoints = ce.bouncePoints
 
         if (flags.containsFlag(CypherFlags.GLOWING) || flags.containsFlag(CypherFlags.PENETRATE_WORLD)) {
-            // val block = LightCoordsUtil.block(state.lightCoords)
-            state.lightCoords = LightCoordsUtil.pack(15, 15) // full light when glow
+            state.lightCoords = LightCoordsUtil.FULL_BRIGHT
+
         } else if (flags.containsFlag(CypherFlags.IGNORE_BLOCK)) {
-            // avoid full black when phase block
+            // avoid full black when phase through blocks
             val block = LightCoordsUtil.block(state.lightCoords).coerceAtLeast(3)
             val sky = LightCoordsUtil.sky(state.lightCoords)
             state.lightCoords = LightCoordsUtil.pack(block, sky)
         }
 
-//        state.boundingBoxHeight *= ce.getEffectRadius()
-//        state.boundingBoxWidth *= ce.getEffectRadius()
-        if (ModClientConfig.CONFIG.bouncePointsInterpolate.isTrue && bouncePoints.isNotEmpty()) {
-
+        if (ModClientConfig.CONFIG.bouncePointsInterpolate.isTrue && bouncePoints?.isNotEmpty() ?: false) {
+            polylineInterpolate(
+                ce.xOld, ce.yOld, ce.zOld,
+                ce.x, ce.y, ce.z,
+                bouncePoints!!,
+                partialTicks
+            ) { x, y, z ->
+                state.x = x
+                state.y = y
+                state.z = z
+            }
         }
     }
 }

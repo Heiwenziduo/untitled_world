@@ -10,5 +10,5 @@ class Pinky(
     level: Level
 ) : AbstractDedicatedCypherProjectile(entityType, level) {
     override val cypherHolder = Cyphers.PINKY
-    override fun getBounceSpeedDegrade(): Double = 1.0
+    override fun getBounceSpeedFactor(): Double = 1.0
 }
