@@ -65,8 +65,8 @@ interface ICypherEntity :
     ///////////////////////////// helpers /////////////////////////////////
     companion object {
 
-        const val CLIP_MARGIN = 0.2f
-        const val HIT_BB_INFLATION = 0.25
+        const val TERRAN_CLIP_MARGIN = 0.2f
+        const val HIT_BB_INFLATION = 0.125
 
         const val MAX_BOUNCE_PER_TICK = 16
 

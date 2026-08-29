@@ -28,6 +28,8 @@ object EntityUtil {
 
 inline val Entity.level get() = level()
 
+fun Entity.getDimensions() = getDimensions(this.pose)
+
 fun <CE> Entity.isOwnerOf(ce: CE): Boolean where CE : Entity, CE : ICypherEntity {
     if (this == ce.owner) return true
     ce.owner?.let {

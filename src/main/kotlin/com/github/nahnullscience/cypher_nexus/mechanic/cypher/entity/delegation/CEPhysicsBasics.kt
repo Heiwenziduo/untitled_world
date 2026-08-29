@@ -225,7 +225,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         // else if (tickStartSpeedSqr <= LOW_SPEED_THRESHOLD_SQR) {} // too slow, do nothing
         else {
             val manager = level.getData(ModDataAttachments.STORAGE_GRID_MANAGER)
-            val collisionMargin = ce.bbWidth + HIT_BB_INFLATION
+            val collisionMargin = HIT_BB_INFLATION + ce.bbWidth / 2
             var loopContinue: Boolean
             do {
                 if (ce.isRemoved) break

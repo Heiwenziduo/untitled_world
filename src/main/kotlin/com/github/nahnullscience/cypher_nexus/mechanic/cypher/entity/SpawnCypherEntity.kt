@@ -28,6 +28,7 @@ fun <CE> AbstractProjectileCypher<CE>.spawnCypherEntity(
     proj.initCypher(this, shotState, node, null)
     proj.initPositionDirection(position, direction)
     proj.initEntity(proj)
+    proj.refreshDimensions()
     level.addFreshEntity(proj)
 }
 
@@ -50,6 +51,7 @@ fun <CE> AbstractProjectileCypher<CE>.spawnCypherEntityRaw(
     proj.initCypher(this, null, steerer.value())
     proj.initPositionDirection(position, direction)
     proj.initEntity(proj)
+    proj.refreshDimensions()
     level.addFreshEntity(proj)
 }
 
