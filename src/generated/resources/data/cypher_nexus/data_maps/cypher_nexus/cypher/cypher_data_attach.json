@@ -294,20 +294,20 @@
       "delay": -2,
       "draw": 1,
       "flags": 0,
-      "manaDrain": 33.0,
+      "manaDrain": 25.0,
       "recharge": -2,
       "shotState": {
         "cypher_nexus:crit_chance": {
-          "add": 0.33
+          "add": 0.25
         },
         "cypher_nexus:recoil": {
           "multiply_total": 0.0
         },
         "cypher_nexus:speed": {
-          "multiply_total": 1.33
+          "multiply_total": 2.0
         },
         "cypher_nexus:spread": {
-          "add": 33.0
+          "add": 25.0
         }
       }
     },
@@ -957,6 +957,18 @@
       },
       "recharge": 0
     },
+    "cypher_nexus:mana_power": {
+      "delay": 5,
+      "draw": 1,
+      "flags": 0,
+      "manaDrain": 0.0,
+      "recharge": 3,
+      "shotState": {
+        "cypher_nexus:recoil": {
+          "add": 1.0
+        }
+      }
+    },
     "cypher_nexus:mana_surge": {
       "delay": 4,
       "draw": 1,
@@ -1012,7 +1024,7 @@
       "recharge": 0,
       "shotState": {
         "cypher_nexus:existing": {
-          "add": 100.0
+          "add": 60.0
         },
         "cypher_nexus:recoil": {
           "add": -1.0
@@ -1075,11 +1087,11 @@
       "flags": 256,
       "manaDrain": 20.0,
       "projectile": {
-        "cypher_nexus:bounce": 25.0,
+        "cypher_nexus:bounce": 20.0,
         "cypher_nexus:damage": 1.0,
         "cypher_nexus:existing": 300.0,
         "cypher_nexus:friction_factor": 0.04,
-        "cypher_nexus:gravity_factor": 0.04,
+        "cypher_nexus:gravity_factor": 0.05,
         "cypher_nexus:speed": 1.0
       },
       "recharge": 0
@@ -1104,6 +1116,13 @@
           "set_all": 0.0
         }
       }
+    },
+    "cypher_nexus:polymorphism": {
+      "delay": 0,
+      "draw": 0,
+      "flags": 65536,
+      "manaDrain": 20.0,
+      "recharge": 0
     },
     "cypher_nexus:power": {
       "delay": 1,

@@ -44,6 +44,7 @@ class ShotState private constructor (
     constructor(charge: Int = 1): this(charge, null) {
         // give payloads a default spread
         attributes.setAttribute(CypherAttributes.SPREAD.value(), AttributeOperator.ADD, 60.0)
+        dirty = true
     }
     /**
      * init from ccMap, used by client side
@@ -276,7 +277,7 @@ class ShotState private constructor (
     /***/
     // TODO
     abstract inner class ShotStateViewer {
-        fun getOpMap(attr: Holder<CypherAttribute>) = attributes[attr.value()]
+        // fun getOpMap(attr: Holder<CypherAttribute>) = attributes[attr.value()]
 
     }
 
@@ -284,9 +285,12 @@ class ShotState private constructor (
     inner class ShotStateAccessor : ShotStateViewer() {
 
         /**
+         * add an arbitrary attribute.
          *
+         * attributes added through this way won't be synced automatically.
          * */
         fun addRaw(attr: Holder<CypherAttribute>, operator: AttributeOperator, value: Double): Double {
+            dirty = true
             return attributes.cumulateAttribute(attr.value(), operator, value)
         }
     }

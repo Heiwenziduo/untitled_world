@@ -300,7 +300,7 @@ object Cyphers {
         delay(-2)
         flags(CypherFlags.SKIP_DAMAGE_CHECK, CypherFlags.SAFE_EXPLODE)
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, -1.0)
-        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 100.0)
+        shotStateAttr(CypherAttributes.EXISTING, AttributeOperator.ADD, 60.0)
     }
     val FIERY = registerCypher(::FieryCypher) {
         manaDrain(5f)
@@ -308,6 +308,12 @@ object Cyphers {
     }
     val MANA_SURGE = registerModifier("mana_surge", -40f) {
         delay(4)
+    }
+    val MANA_POWER = registerCypher(::ManaPowerCypher) {
+        manaDrain(0f)
+        delay(5)
+        recharge(3)
+        shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.ADD, 1.0)
     }
     val QUICK_LOAD = registerModifier("quick_load", 20f) {
         delay(-4)
@@ -412,13 +418,13 @@ object Cyphers {
         shotStateAttr(CypherAttributes.FORTUNE_LEVEL, AttributeOperator.ADD, 1.0)
     }
     val DAEDALUS = registerCypher(::DaedalusCypher) {
-        manaDrain(33f)
+        manaDrain(25f)
         delay(-2)
         recharge(-2)
-        shotStateAttr(CypherAttributes.SPEED_INITIAL, AttributeOperator.MULTIPLY_TOTAL, 1.33)
+        shotStateAttr(CypherAttributes.SPEED_INITIAL, AttributeOperator.MULTIPLY_TOTAL, 2.0)
         shotStateAttr(CypherAttributes.RECOIL, AttributeOperator.MULTIPLY_TOTAL, 0.0)
-        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 33.0)
-        shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.33)
+        shotStateAttr(CypherAttributes.SPREAD, AttributeOperator.ADD, 25.0)
+        shotStateAttr(CypherAttributes.CRIT_CHANCE, AttributeOperator.ADD, 0.25)
     }
     val DIRECT_SKYWARD = registerCypher(::DirectSkywardCypher) {
         delay(-3)
@@ -714,6 +720,11 @@ object Cyphers {
         delay(7)
         recharge(7)
     }
+
+//    val POLYMORPHISM = registerCypher("polymorphism", CypherCategories.OTHER) {
+//        manaDrain(20f)
+//        flags(CypherFlags.POLYMORPH)
+//    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // wand module
