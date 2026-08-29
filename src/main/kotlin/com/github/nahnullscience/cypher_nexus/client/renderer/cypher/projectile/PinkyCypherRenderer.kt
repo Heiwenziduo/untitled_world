@@ -18,14 +18,9 @@ class PinkyCypherRenderer(
     override fun addTrailParticles(
         level: ClientLevel,
         ce: Pinky,
-        x: Double,
-        y: Double,
-        z: Double,
-        xo: Double,
-        yo: Double,
-        zo: Double
+        x: Double, y: Double, z: Double,
+        xo: Double, yo: Double, zo: Double
     ) {
-        val speed = ce.deltaMovement
         val scale = ce.getEffectRadius().coerceIn(0.25f, 4f) * 0.5f
         forEachGap(
             xo, yo, zo,
@@ -36,9 +31,6 @@ class PinkyCypherRenderer(
             addCypherTrailParticle(
                 ParticleTypes.CLOUD,
                 x, y, z,
-                -speed.x * 0.25,
-                -speed.y * 0.25,
-                -speed.z * 0.25
             ) {
                 lifetime = 15
                 scale(scale)

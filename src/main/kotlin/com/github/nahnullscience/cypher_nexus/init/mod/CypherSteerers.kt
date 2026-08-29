@@ -2,7 +2,6 @@ package com.github.nahnullscience.cypher_nexus.init.mod
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.LifeCycle.getIdOfBound
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.createCypherEntityRaw
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.EscortOrbitSteerer
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.NoSteerer
@@ -18,7 +17,7 @@ import thedarkcolour.kotlinforforge.neoforge.forge.MOD_BUS
 /**
  * steerer is a simple logic component that controls a cypher-entity's behavior externally.
  *
- * main use case is CEs come from [createCypherEntityRaw].
+ * main use case is CEs come from [com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.spawnCypherEntityRaw].
  * they don't have backing shot states, so a steerer is required to perform variable behaviors.
  *
  * it should be stateless to avoid instantiate overhead.

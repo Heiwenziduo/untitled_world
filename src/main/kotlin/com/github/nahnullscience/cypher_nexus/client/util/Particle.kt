@@ -11,24 +11,16 @@ import net.minecraft.client.particle.SingleQuadParticle
 import net.minecraft.core.particles.ParticleOptions
 import net.minecraft.world.entity.Entity
 
-
-/**
- *
- * */
 // now we can ntr vanilla quad to our render layer
-fun <T : ParticleOptions> addCypherTrailParticle(
-    options: T,
-    x: Double, y: Double, z: Double,
-    xa: Double, ya: Double, za: Double
-) = addCypherTrailParticle(options, x, y, z, xa, ya, za) { }
+
 /**
  *
  * */
 inline fun <T : ParticleOptions> addCypherTrailParticle(
     options: T,
     x: Double, y: Double, z: Double,
-    xa: Double, ya: Double, za: Double,
-    config: SingleQuadParticle.() -> Unit
+    xa: Double = 0.0, ya: Double = 0.0, za: Double = 0.0,
+    crossinline config: SingleQuadParticle.() -> Unit
 ) {
     if (mainCamera.position().distanceToSqr(x, y, z) > MAX_PARTICLE_TRACKING_DISTANCE_SQR) return
     val particle = Minecraft.getInstance().particleEngine.makeParticle(options, x, y, z, xa, ya, za)
@@ -37,31 +29,33 @@ inline fun <T : ParticleOptions> addCypherTrailParticle(
         (INSTANCE ?: updateInstance()).particlesToAdd.add(particle)
     }
 }
+
 /**
- *
+ * with basic setup
  * */
 inline fun <T : ParticleOptions, CE> addCypherTrailParticle(
     cyEntity: CE,
     options: T,
     x: Double, y: Double, z: Double,
-    xa: Double, ya: Double, za: Double,
-    config: SingleQuadParticle.() -> Unit
+    xa: Double = 0.0, ya: Double = 0.0, za: Double = 0.0,
+    crossinline config: SingleQuadParticle.() -> Unit
 ) where CE : Entity, CE : ICypherEntity {
-    if (mainCamera.position().distanceToSqr(x, y, z) > MAX_PARTICLE_TRACKING_DISTANCE_SQR) return
-    val particle = Minecraft.getInstance().particleEngine.makeParticle(options, x, y, z, xa, ya, za)
-    if (particle is SingleQuadParticle) {
-        particle.scale(cyEntity.getEffectRadius().coerceIn(0.25f, 4f))
+    addCypherTrailParticle(options, x, y, z, xa, ya, za) {
+        scale(cyEntity.getEffectRadius().coerceIn(0.25f, 4f))
         if (cyEntity.dyed) cyEntity.hueFloatArray.let {
-            particle.setColor(it[0], it[1], it[2])
-            particle.setAlpha(it[3]) // TODO if no alpha pass
+            setColor(it[0], it[1], it[2])
+            setAlpha(it[3]) // TODO if no alpha pass
         }
-        particle.config()
-        (INSTANCE ?: updateInstance()).particlesToAdd.add(particle)
+        config()
     }
 }
+
+/**
+ *
+ * */
 fun <T : ParticleOptions, CE> addCypherTrailParticle(
     cyEntity: CE,
     options: T,
     x: Double, y: Double, z: Double,
-    xa: Double, ya: Double, za: Double,
+    xa: Double = 0.0, ya: Double = 0.0, za: Double = 0.0,
 ) where CE : Entity, CE : ICypherEntity = addCypherTrailParticle(cyEntity, options, x, y, z, xa, ya, za) { }

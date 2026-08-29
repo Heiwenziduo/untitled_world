@@ -150,7 +150,7 @@ class ShotState private constructor (
         var spawnIndex = 0
 
         // generate bullets
-        simpleProjectiles.reference2IntEntrySet().forEach { (cypher, count) ->
+        simpleProjectiles.forEachInt { cypher, count ->
             repeat(count) {
                 wrapSpawn(spawnIndex++, cypher, null, coordinate, level, owner, directInvoker, spread)
             }

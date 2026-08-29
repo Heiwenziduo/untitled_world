@@ -81,7 +81,7 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         this@CEPhysicsBasics.ce = ce
         ce.noPhysics = ce.noFlag(CypherFlags.PHYSICS_SOLID) || ce.hasFlag(CypherFlags.PENETRATE_WORLD)
 
-        // if can hit multiple target...
+        // if ce can hit multiple target
         if (ce.hasFlagsAny(CypherFlags.PHYSICS_SOLID, CypherFlags.PIERCE_ENTITY) || ce.getBounce() > 0) {
             hitEntityInvulnerabilityMap = Int2IntOpenHashMap()
         }
@@ -89,10 +89,10 @@ open class CEPhysicsBasics <CE> : ICEPhysics<CE> where CE : Entity, CE : ICypher
         ce.initExplosion().also { explosion = it }
         if (level.isClientSide && ce.getBounce() > 0) bouncePoints = BouncePointsManager(MAX_BOUNCE_PER_TICK)
 
-        println("init entity: ${level.sideString()} $ce")
-        println("flags: ${ce.enabledFlags.showBits32()}")
-        println("explosion: $explosion")
-        println("bpManager: $bouncePoints")
+//        println("init entity: ${level.sideString()} $ce")
+//        println("flags: ${ce.enabledFlags.showBits32()}")
+//        println("explosion: $explosion")
+//        println("bpManager: $bouncePoints")
     }
 
 

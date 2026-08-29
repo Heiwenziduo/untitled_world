@@ -48,16 +48,16 @@ class ArrowCypherRenderer (
     override fun addTrailParticles(
         level: ClientLevel,
         ce: Arrow,
-        x: Double,
-        y: Double,
-        z: Double,
-        xo: Double,
-        yo: Double,
-        zo: Double
+        x: Double, y: Double, z: Double,
+        xo: Double, yo: Double, zo: Double
     ) {
         val speed = ce.deltaMovement
-        if (ce.tickCount and 1 == 1 && ce.tickStartSpeedSqr >= 2)
-        forEachBetween(xo, yo, zo, x, y, z, 1) { step, x, y, z ->
+        if (ce.tickCount and 1 == 1 && ce.tickStartSpeedSqr >= 1.5)
+        forEachBetween(
+            xo, yo, zo,
+            x, y, z,
+            1
+        ) { step, x, y, z ->
             addCypherTrailParticle(
                 ce,
                 ParticleTypes.CRIT,

@@ -47,8 +47,7 @@ abstract class AbstractJuxta(
         cyEntity: CE
     ) where CE : Entity, CE : ICypherEntity {
         if (level is ServerLevel && isJuxtaTime(cyEntity)) {
-            spawnCypherEntityRaw(
-                cyEntity.cypherHolder,
+            cyEntity.cypherHolder.spawnCypherEntityRaw(
                 level,
                 illusionSteerer,
                 cyEntity.owner,

@@ -38,8 +38,7 @@ abstract class AbstractEscortOrbit(
         cyEntity: CE
     ) where CE : Entity, CE : ICypherEntity {
         if (level is ServerLevel && isTimeToGenerate(cyEntity)) {
-            spawnCypherEntityRaw(
-                getProjectileToGen(cyEntity),
+            getProjectileToGen(cyEntity).spawnCypherEntityRaw(
                 level,
                 ESCORT_ORBIT_STEERER,
                 cyEntity,

@@ -5,6 +5,7 @@ import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.AbstractCyp
 import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.projectile.FireworkRocketCypherRenderState
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.FireworkRocket
 import com.github.nahnullscience.cypher_nexus.content.entity.projectile.FireworkRocket.RandomFireRocket
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.BouncePointsManager.Companion.forEachGap
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
 import com.github.nahnullscience.cypher_nexus.utility.Colors
 import com.github.nahnullscience.cypher_nexus.utility.ang2Rad
@@ -62,17 +63,18 @@ class FireworkRocketCypherRenderer(
     override fun addTrailParticles(
         level: ClientLevel,
         ce: FireworkRocket,
-        x: Double,
-        y: Double,
-        z: Double,
-        xo: Double,
-        yo: Double,
-        zo: Double
+        x: Double, y: Double, z: Double,
+        xo: Double, yo: Double, zo: Double
     ) {
         val speed = ce.knownMovement
         val random = ce.random
-        val scale = ce.getEffectRadius().coerceIn(0.25f, 2f) // vanilla firework can't be easily scale, that's a shame
-        forEachGap(xo, yo, zo, x, y, z, 0.4) { step, x, y, z ->
+        val scale = ce.getEffectRadius().coerceIn(0.25f, 3f) // vanilla firework can't be easily scale, that's a shame
+        forEachGap(
+            xo, yo, zo,
+            x, y, z,
+            0.4,
+            ce.bouncePoints
+        ) { step, x, y, z ->
             addCypherTrailParticle(
                 ParticleTypes.FIREWORK,
                 x, y, z,

@@ -1335,6 +1335,7 @@
         "cypher_nexus:crit_chance": 0.05,
         "cypher_nexus:damage": 2.0,
         "cypher_nexus:existing": 300.0,
+        "cypher_nexus:friction_factor": 0.04,
         "cypher_nexus:gravity_factor": 0.03,
         "cypher_nexus:speed": 0.7
       },

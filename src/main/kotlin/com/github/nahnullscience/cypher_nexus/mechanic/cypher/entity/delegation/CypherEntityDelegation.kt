@@ -68,10 +68,10 @@ class CypherEntityDelegation <CE> (
 
     override fun <T> initEntity (ce: T) where T : Entity, T : ICypherEntity {
         @Suppress("UNCHECKED_CAST")
-        ce as CE
+        val ce = ce as CE
         context.initEntity(ce)
         physics.initEntity(ce)
-        initDirection(ce)
+        shoot(ce)
     }
 
 
@@ -84,7 +84,8 @@ class CypherEntityDelegation <CE> (
         _initPosition = position
         _initDirection = direction
     }
-    private fun initDirection(ce: CE) {
+
+    private fun shoot(ce: CE) {
         if (ce.level.isClientSide) return
         // when initDirection didn't call, vanilla setPos can handle it, with a direction ZERO
         if (_initPosition == null || _initDirection == null) return

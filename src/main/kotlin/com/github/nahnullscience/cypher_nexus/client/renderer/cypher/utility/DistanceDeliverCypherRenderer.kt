@@ -6,6 +6,7 @@ import com.github.nahnullscience.cypher_nexus.client.renderer.cypher.utility.Dis
 import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.component.CypherRenderStateDelegate
 import com.github.nahnullscience.cypher_nexus.client.renderer.state.cypher.component.ICypherEntityRenderState
 import com.github.nahnullscience.cypher_nexus.content.entity.utility.DistanceDeliverer
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.BouncePointsManager.Companion.forEachGap
 import com.github.nahnullscience.cypher_nexus.utility.forEachGap
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.multiplayer.ClientLevel
@@ -34,11 +35,16 @@ class DistanceDeliverCypherRenderer (
         x: Double, y: Double, z: Double,
         xo: Double, yo: Double, zo: Double
     ) {
-        forEachGap(xo, yo, zo, x, y, z, 0.25) { step, x, y, z ->
+        forEachGap(
+            xo, yo, zo,
+            x, y, z,
+            0.25,
+            ce.bouncePoints
+        ) { step, x, y, z ->
             addCypherTrailParticle(
+                ce,
                 ParticleTypes.PORTAL,
                 x, y - 0.5, z,
-                0.0, 0.0, 0.0
             ) {
                 lifetime = 10 + step
                 scale(0.25f)

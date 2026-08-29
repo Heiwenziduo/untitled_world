@@ -156,6 +156,7 @@ object Cyphers {
         projectileAttr(CypherAttributes.SPEED_INITIAL, 0.7)
         projectileAttr(CypherAttributes.EXISTING, 300.0)
         projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.03)
+        projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.04)
     }
     private val configFirework: AttrConfig = {
         recharge(5)
@@ -182,9 +183,9 @@ object Cyphers {
         projectileAttr(CypherAttributes.DAMAGE, 1.0)
         projectileAttr(CypherAttributes.SPEED_INITIAL, 1.0)
         projectileAttr(CypherAttributes.EXISTING, 300.0)
-        projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.04)
+        projectileAttr(CypherAttributes.GRAVITY_FACTOR, 0.05)
         projectileAttr(CypherAttributes.FRICTION_FACTOR, 0.04)
-        projectileAttr(CypherAttributes.BOUNCE, 25.0)
+        projectileAttr(CypherAttributes.BOUNCE, 20.0)
     }
     val LIGHTNING_BOLT = registerProjectile(ModEntities.CYPHER_LIGHTNING_BOLT) {
         manaDrain(200f)

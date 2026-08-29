@@ -79,8 +79,7 @@ abstract class AbstractOnBounceSeries(
 
             for (i in 0 until count) {
                 formation.layout(i, count, coo) { xp, yp, zp, xd, yd, zd ->
-                    spawnCypherEntityRaw(
-                        cyEntity.cypherHolder,
+                    cyEntity.cypherHolder.spawnCypherEntityRaw(
                         level,
                         NO_STEERER,
                         cyEntity.owner,

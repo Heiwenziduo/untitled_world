@@ -2,11 +2,11 @@ package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity
 
 import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.CypherEntityDelegation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntity.Companion.cypher
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getEffectRadius
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getExisting
+import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.CypherEntityDelegation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.flag.CypherFlags
 import com.github.nahnullscience.cypher_nexus.utility.centeredAABB
 import com.github.nahnullscience.cypher_nexus.utility.i.IFlagExtension
@@ -30,11 +30,7 @@ import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.storage.ValueInput
 import net.minecraft.world.level.storage.ValueOutput
-import net.minecraft.world.phys.AABB
-import net.minecraft.world.phys.BlockHitResult
-import net.minecraft.world.phys.EntityHitResult
-import net.minecraft.world.phys.HitResult
-import net.minecraft.world.phys.Vec3
+import net.minecraft.world.phys.*
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn
 import java.util.*
 import java.util.function.Consumer
@@ -46,15 +42,11 @@ abstract class AbstractDedicatedCypherProjectile(
     IFlagExtension<CypherFlags>,
     ICypherEntity by CypherEntityDelegation<AbstractDedicatedCypherProjectile>() {
 
-    override fun defineSynchedData(builder: SynchedEntityData.Builder) { }
-    override fun onSyncedDataUpdated(key: EntityDataAccessor<*>) {
-        super.onSyncedDataUpdated(key)
-    }
-    override fun readAdditionalSaveData(input: ValueInput) = Unit
-    override fun addAdditionalSaveData(output: ValueOutput) = Unit
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // initialization
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     override fun writeSpawnData(buffer: RegistryFriendlyByteBuf) {
-        // send when entity added to level
         buffer.writeBoolean(ccMap != null) // write & read relay strictly on order, use a marker to tell client if a map follows
         if (ccMap != null) {
             MOCC_STREAM.encode(buffer, ccMap!!)
@@ -64,18 +56,23 @@ abstract class AbstractDedicatedCypherProjectile(
     }
 
     override fun readSpawnData(buffer: RegistryFriendlyByteBuf) {
-        // only on client
-        // should note this function is called after EntityJoinLevelEvent
-        // this results initEntity -> initCypher order on client side
-        // while        initCypher -> initEntity on the server side
+        // println("===client spawn start [$tickCount $firstTick]===")
         val hasCC = buffer.readBoolean()
         val ccMap = if (hasCC) MOCC_STREAM.decode(buffer) else null
         val steerer = CYPHER_STEERER_STREAM.decode(buffer)
+
+        // handle initialization client side
         initCypher(cypher, ccMap, steerer)
-        refreshDimensions() // let BB fit effect-radius // server auto handles dimension when creation
+        initEntity(this)
+        refreshDimensions()
+
+        // println("===client spawn end [$tickCount $firstTick]===")
     }
 
     override fun onAddedToLevel() {
+        /**
+         * called after [net.neoforged.neoforge.event.entity.EntityJoinLevelEvent], on both sides
+         * */
         super.onAddedToLevel()
     }
 
@@ -98,8 +95,15 @@ abstract class AbstractDedicatedCypherProjectile(
         super.moveOrInterpolateTo(position, yRot, xRot)
     }
 
+    override fun defineSynchedData(builder: SynchedEntityData.Builder) { }
+    override fun onSyncedDataUpdated(key: EntityDataAccessor<*>) {
+        super.onSyncedDataUpdated(key)
+    }
+    override fun readAdditionalSaveData(input: ValueInput) = Unit
+    override fun addAdditionalSaveData(output: ValueOutput) = Unit
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // initialization
+    // basic setup
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     abstract override val cypherHolder: Holder<out AbstractProjectileCypher<out AbstractDedicatedCypherProjectile>>

@@ -1,9 +1,7 @@
 package com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components
 
-import com.github.nahnullscience.cypher_nexus.CypherNexus
 import com.github.nahnullscience.cypher_nexus.init.mod.CypherAttributes
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.AbstractProjectileCypher
-import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.AbstractDedicatedCypherProjectile
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.components.ICypherEntityAttributeAccessor.Companion.getAttributeOrDefault
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.delegation.CypherEntityDelegation
 import com.github.nahnullscience.cypher_nexus.mechanic.cypher.entity.steerer.AbstractCypherSteerer
@@ -16,10 +14,6 @@ import net.minecraft.server.level.ServerLevel
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.phys.Vec3
-import net.neoforged.bus.api.EventPriority
-import net.neoforged.bus.api.SubscribeEvent
-import net.neoforged.fml.common.EventBusSubscriber
-import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent
 
 /**
  * define data pieces that all cypher-entity would require.
@@ -51,7 +45,8 @@ interface ICypherEntity :
     )
 
     /**
-     *
+     * called after [initCypher].
+     * only after entity-initialized, the `ce` property can be accessed properly.
      * */
     fun <CE> initEntity(ce: CE) where CE : Entity, CE : ICypherEntity
 
@@ -68,15 +63,7 @@ interface ICypherEntity :
 
 
     ///////////////////////////// helpers /////////////////////////////////
-    @EventBusSubscriber(modid = CypherNexus.MOD_ID)
     companion object {
-        @SubscribeEvent(priority = EventPriority.NORMAL)
-        private fun initCypherEntity(event: EntityJoinLevelEvent) {
-            val entity = event.entity
-            if (entity is AbstractDedicatedCypherProjectile || entity is ICypherEntity) {
-                entity.initEntity(entity)
-            }
-        }
 
         const val CLIP_MARGIN = 0.2f
         const val HIT_BB_INFLATION = 0.25
